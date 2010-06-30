@@ -19,12 +19,12 @@
 
 import os
 from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_string
-from step import Step
+from core.executomat.Step import Step
 from core.Exceptions import MomError, ConfigurationError
-# from AutobuildCore.helpers.exceptdefs import AutoBuildError
-# from AutobuildCore.helpers.build_script_helpers import DebugN
+from core.MObject import MObject
+from core.Defaults import Defaults
 
-class Executomat:
+class Executomat( MObject ):
 	"""Executomat executes actions in steps which can be individually enabled and disabled.
 	The operations are performed as an ordered list of named steps. Each step consists of
 	three phases:
@@ -34,12 +34,13 @@ class Executomat:
 	Every step can be enabled or disabled individually. If a step is enabled, all 
 	of it's actions need to finish successfully."""
 
-	def __init__( self, name = '' ):
-		"""Steps contains series of actions."""
-		self.Steps = {}
-		self.__name = name
-		self.__logfileName = 'execution.log'
+	def __init__( self, name = None ):
+		"""Constructor."""
+		MObject.__init__( self, name )
+		self.__steps = []
+		self.__logfileName = Defaults().getExecutomatLogfileName()
 		self.__logDir = '.'
+		self.__logfile = None
 		self.__failedStep = None
 
 	def setLogDir( self, path ):
@@ -56,7 +57,7 @@ class Executomat:
 		check_for_string( filename, "The log file name must be a string containing a path name." )
 		self.__logfileName = filename
 
-	def getlogfileName( self ):
+	def getLogfileName( self ):
 		"""Return the log file name."""
 		return self.__logfileName
 
@@ -72,75 +73,57 @@ class Executomat:
 		command replaces the old one."""
 		if not isinstance( newStep, Step ):
 			raise MomError( 'only executomat.Step instances can be added to the queue' )
-		check_for_nonempty_string( newStep.name(), "An Executomat step must have a name!" );
-		self.Steps[ newStep.getName() ] = newStep
+		check_for_nonempty_string( newStep.getName(), "An Executomat step must have a name!" );
+		self.__steps.append( newStep )
 
-	def addCustomCommands( self, command ):
-		assert False # this should be done with the action object
-#		"""Add a custom command (either a pre, a post command, or both) to a step.
-#		The command is a tuple ( stepid, precmd, type ). Only one command can added 
-#		at a time. type is pre or post."""
-#		if len( command ) != 3 or not str( command[0] ) or not str( command[1] ) or not str( command[2] ):
-#			raise MomError( 'Cannot add custom command. Custom commands are tuples ( stepid, command, type), where type is pre or post.' )
-#		step = self.step( command[0] ) # this may raise an AutoBuildError
-#		if command[2] == 'pre':
-#			# add precommand
-#			pass
-#		elif command[2] == 'post':
-#			# add postcommand
-#			pass
-#		else:
-#			# bad
-#			pass
-		assert not 'Implemented'
+	def _getSteps( self ):
+		return self.__steps
 
 	def getStep( self, identifier ):
 		"""Find the step with this identifier and return it."""
-		if self.Steps.has_key( identifier ):
-			return self.Steps[ identifier ]
+		for step in self._getSteps():
+			if step.getName() == identifier:
+				return step
 		raise MomError( 'no such step "{0}"'.format( identifier ) )
 
 	def log( self, text ):
 		"""Write a text to the log file, if it is there."""
-		assert False # this is wrong or a misnomer
-#		if( self.__logfileName ):
-#			self.__logfileName.write( text.rstrip() + '\n' )
-#		else:
-#			DebugN( 1, text )
+		if( self.__logfile ):
+			self.__logfile.write( text.rstrip() + '\n' )
 
-	def run( self, project, firstErrorType = -1 ):
+	def run( self, project, firstErrorType = None ):
 		self.__logfileName = None
 		try:
-			if not os.path.isdir( self.logDir() ):
-				raise ConfigurationError( 'Log dir at ' + str( self.logDir() ) + ' does not exist.' )
-			if self.__logFileName:
+			if not os.path.isdir( self.getLogDir() ):
+				raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( self.logDir() ) ) )
+			if self.getLogfileName():
 				try:
-					self.__logfileName = open( self.logDir() + os.sep + self.__logFileName, 'a' )
+					self.__logfile = open( self.getLogDir() + os.sep + self.getLogfileName(), 'a' )
 				except:
-					raise ConfigurationError( 'Cannot open log file at ' + str( self.__logFileName ) )
-			self.log( '# Starting execution of ' + self.name() )
-			for Step in self.Steps:
-				project.debugN( 1, 'now executing step "' + Step[1].name() + '" for "' + self.name() + '"' )
-#				if Step[1].execute( self, weHaveIssues ):
-#					DebugN( 2, 'success: ' + Step[1].name() )
-#				else:
-#					self.log( '# aborting execution except for execute-even-on-failure commands\n########' )
-#					if firstErrorType == -1:
-#						firstErrorType = Step[1].getErrorType()
-#					if self.__failedStep == None:
-#						# we are only interested in the log files for the first failure 
-#						self.__failedStep = Step[1]
-#					weHaveIssues = True # sequence failed
-#					DebugN( 2, 'failed: ' + Step[1].name() )
+					raise ConfigurationError( 'Cannot open log file at "{0}"'.format( self.getLogfileName() ) )
+			self.log( '# Starting execution of ' + self.getName() )
+			for step in self._getSteps():
+				project.debugN( 1, 'now executing step "' + step.getName() + '" for "' + self.getName() + '"' )
+				if step.execute( self, project ):
+					project.debugN( 2, 'success: "{0}"'.format( step.getName() ) )
+				else:
+					self.log( '# aborting execution except for execute-even-on-failure commands\n########' )
+					if not firstErrorType:
+						firstErrorType = step.getErrorType()
+					if self.__failedStep == None:
+						# we are only interested in the log files for the first failure 
+						self.__failedStep = step[1]
+					project.setReturnCode( step.getErrorType() )
+					project.debugN( 2, 'failed: ' + step[1].name() )
 			self.log( '# execution finished \n########' )
-#			return ( weHaveIssues, firstErrorType )
+			return firstErrorType
 		finally: # make sure the log file is closed
-			if self.__logfileName:
-				self.__logfileName.close()
+			if self.__logfile:
+				self.__logfile.close()
 
 	def report( self ):
 		Report = []
-		for Step in self.Steps:
+		for Step in self.__steps:
 			Report.append( Step[1].report() )
 		return Report
 

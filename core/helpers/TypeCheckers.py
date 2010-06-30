@@ -30,7 +30,7 @@ def check_for_string( expression, description ):
 		raise ConfigurationError( description )
 
 def check_for_nonempty_string( expression, description ):
-	if not isinstance( expression, str ) or expression.isEmpty():
+	if not isinstance( expression, str ) or not expression:
 		raise ConfigurationError( description )
 
 def check_for_int( expression, description ):

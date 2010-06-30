@@ -30,9 +30,9 @@ class Action( MObject ):
 	def run( self, project ):
 		raise AbstractMethodCalledError()
 
-	def __init__( self ):
+	def __init__( self, name = "Action" ):
 		"""Constructor"""
-		MObject.__init__( self, "Action" )
+		MObject.__init__( self, name )
 		self.__logfileName = None
 		self.__workingDir = None
 		self.__executed = False

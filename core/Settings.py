@@ -16,11 +16,24 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.actions.filesystem.MkDirAction import MkDirAction
+from core.MObject import MObject
+from core.Defaults import Defaults
 
-import core.Project
-project = core.Project.Project( "Simple Project Run Test", "0.5.0" )
-project.setup()
-step = project.getExecutomat().getStep( "project-create-folders" )
-step.addMainAction( MkDirAction( "src" ) )
-project.build()
+class Settings( MObject ):
+	"""Settings stores all configurable values for a build script run."""
+
+	def __init__( self ):
+		'''Constructor'''
+		MObject.__init__( self )
+		defaults = Defaults()
+		self._setProjectBuildSteps( defaults.getProjectBuildSteps() )
+		self._setDefaultBuildSteps( defaults.getProjectDefaultBuildSteps() )
+
+	def _setProjectBuildSteps( self, steps ):
+		self.__projectBuildSteps = steps
+
+	def getProjectBuildSteps( self ):
+		return self.__projectBuildSteps
+
+	def _setDefaultBuildSteps( self, stepsDict ):
+		self.__defaultSteps = stepsDict

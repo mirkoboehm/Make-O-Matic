@@ -22,6 +22,9 @@ from core.MObject import MObject
 from core.modules.FolderManager import FolderManager
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
+from core.executomat.Executomat import Executomat
+from core.executomat.Step import Step
+from core.Settings import Settings
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -31,11 +34,16 @@ class Project( MObject ):
 	def __init__( self, projectName, minimalMomVersion = None ):
 		"""Set up the build steps, parse the command line arguments."""
 		MObject.__init__( self, projectName )
+		self.__settings = Settings()
 		self.__loggers = [ ConsoleLogger() ]
 		self.__startTime = datetime.datetime.utcnow()
 		self.__buildMode = 'm'
 		self.__plugins = [ FolderManager() ]
 		self.__returnCode = 0
+		self.__executomat = Executomat( "Project Executomat" )
+
+	def getSettings( self ):
+		return self.__settings
 
 	def getPlugins( self ):
 		return self.__plugins
@@ -53,6 +61,9 @@ class Project( MObject ):
 	def getReturnCode( self ):
 		return self.__returnCode
 
+	def getExecutomat( self ):
+		return self.__executomat
+
 	def message( self, text ):
 		[ logger.message( text ) for logger in self.getLoggers() ]
 
@@ -62,7 +73,14 @@ class Project( MObject ):
 	def debugN( self, level, text ):
 		[ logger.debugN( level, text ) for logger in self.getLoggers() ]
 
+	def setup( self ):
+		for step in self.getSettings().getProjectBuildSteps():
+			self.getExecutomat().addStep( Step( step ) )
+
 	def build( self, configurations = [] ):
+		# enable and disable the steps according to the settings for the build mode
+		# FIXME
 		# ignore configurations for now
 		[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
+		self.getExecutomat().run( self, None )
 

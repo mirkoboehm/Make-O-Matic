@@ -19,30 +19,23 @@
 
 import os, re
 from core.Exceptions import MomError
+from core.MObject import MObject
 
-class Step( object ):
+class Step( MObject ):
 	"""An individual step of an Executomat run."""
 	def __init__( self, stepName = None ):
-		self.Enabled = True
-		self.__name = stepName
-		# the entries in the command lists are not just shell commands, but tuples that contain 
-		# * the shell command, and after execution
-		# * the return value
-		# * the output to stdout and stderr
-		# * whether the shello command timed out
-		self.PreCommands = [] # list of preparation shell commands
-		self.MainCommands = [] # Main Command
-		self.PostCommands = [] # Cleanup commands
+		MObject.__init__( self, stepName )
+		self.__enabled = True
+		self.__preActions = [] # list of preparation actions
+		self.__mainActions = [] # list of main actions
+		self.__postActions = [] # list of post actions
 		self.__logFileName = None
 		self.__failed = False
 		self.__errorType = 0
 
-	def setName( self, n ):
-		"""Set the human readable name of the step"""
-		self.__name = n
-
-	def name( self ):
-		return self.__name
+# FIXME is failed and errorType redundant? And what does errorType mean anyway? 
+	def failed( self ):
+		return self.__failed
 
 	def setErrorType( self, code ):
 		self.__errorType = code
@@ -50,42 +43,52 @@ class Step( object ):
 	def getErrorType( self ):
 		return self.__errorType
 
+	def setEnabled( self, enabled = True ):
+		self.__enabled = True
+
+	def getEnabled( self ):
+		return self.__enabled
+
 	def logFileName( self ):
 		return self.__logFileName
 
-	def addPreCommand( self, cmdString, workingDir = None, executeOnFailure = False, timeOut = 900 ):
+	def getPreActions( self ):
+		return self.__preActions
+
+	def getMainActions( self ):
+		return self.__mainActions
+
+	def getPostActions( self ):
+		return self.__postActions
+
+	def addPreAction( self, action ):
 		"""Add one precommand."""
-		self.__addCommand( self.PreCommands, cmdString, workingDir, executeOnFailure, timeOut )
+		self.__addAction( self.getPreActions(), action )
 
-	def addMainCommand( self, cmdString, workingDir = None, executeOnFailure = False, timeOut = 900 ):
+	def addMainAction( self, action ):
 		"""Add a main command."""
-		self.__addCommand( self.MainCommands, cmdString, workingDir, executeOnFailure, timeOut )
+		self.__addAction( self.getMainActions(), action )
 
-	def addPostCommand( self, cmdString, workingDir = None, executeOnFailure = False, timeOut = 900 ):
+	def addPostAction( self, action ):
 		"""Add a post command"""
-		self.__addCommand( self.PostCommands, cmdString, workingDir, executeOnFailure, timeOut )
+		self.__addAction( self.getPostActions(), action )
 
-# FIXME Mirko
-#	def __addCommand( self, container, cmdString, workingDir, executeOnFailure, timeOut ):
-#		cmd = ShellCommand()
-#		cmd.setWorkingDirectory( workingDir )
-#		cmd.setCommand( cmdString, timeOut )
-#		cmd.setExecuteOnFailure( executeOnFailure )
-#		container.append( cmd )
+	def __addAction( self, container, action ):
+		container.append( action )
 
 	def report( self ):
 		"""Generate a human readable report about the command execution.
 		Every report is a tuple like this: ( 'stepName', 'ok', 'pre: ok, main: ok, post: ok', 'logFileName.log' )"""
 		details = ''
 		result = [ self.name(), '', '', self.__logFileName ]
-		if not self.Enabled:
+		if not self.__enabled:
 			result[1] = 'disabled'
 			result[2] = result[1]
 			return result
 		else:
-			workSet = ( ['precmds', '', self.PreCommands ],
-						['maincmds', '', self.MainCommands ],
-						['postcmds', '', self.PostCommands ] )
+			workSet = ( ['precmds', '', self.__preActions ],
+						['maincmds', '', self.__mainActions ],
+						['postcmds', '', self.__postActions ] )
 			notRun = True
 			failed = False
 			report = ''
@@ -123,19 +126,19 @@ class Step( object ):
 
 	def execute( self, executomat, project ):
 		"""Execute the command"""
-		if not self.name():
+		if not self.getName():
 			raise MomError( "Cannot execute a command with no name!" )
-		if not self.Enabled:
+		if not self.__enabled:
 			executomat.log( '# Command ' + self.name() + ' is disabled, skipping.' )
 			return True
-		executomat.log( '# Executing command "' + self.name() + '"' )
+		executomat.log( '# Executing command "' + self.getName() + '"' )
 		executomat.log( '# in ' + os.getcwd() )
-		project.debugN( 5, 'environment before executing ' + self.name() + ':' )
+		project.debugN( 5, 'environment before executing ' + self.getName() + ':' )
 		for key, value in os.environ.iteritems():
 			project.debugN( 5, '--> ' + key + '   : ' + value )
-		Phases = { 'Preparatory Commands' : self.PreCommands,
-				   'Main Commands' : self.MainCommands,
-				   'Post Commands' : self.PostCommands }
+		Phases = { 'Preparatory Commands' : self.__preActions,
+				   'Main Commands' : self.__mainActions,
+				   'Post Commands' : self.__postActions }
 		for Phase, CommandList in Phases.iteritems():
 			if CommandList:
 				executomat.log( '# Executing ' + Phase )
@@ -154,13 +157,3 @@ class Step( object ):
 #						return False # do not continue with the remaining commands
 		return True
 
-	def failed( self ):
-		return self.__failed
-
-	def setEnabled( self, Enabled ):
-		"""Enable the step."""
-		self.Enabled = ( Enabled == True )
-
-	def enabled( self ):
-		"""Return whether this step is enabled."""
-		return self.Enabled

@@ -7,11 +7,11 @@ class ShellCommandAction( object ):
 	"""ShellCommandAction encapsulates the execution of one command in the Step class. 
 	It is mostly used internally, but can be of general use as well."""
 	def __init__( self ):
-		self.__command = ''
-		self.__timeOutPeriod = -1
-		self.__exitCode = -1 # default: not started
-		self.__stdOut = '' # will contain a list of strings
-		self.__stdErr = '' # same
+		self.__command = None
+		self.__timeOutPeriod = None
+		self.__exitCode = None # default: not started
+		self.__stdOut = [] # will contain a list of strings
+		self.__stdErr = [] # same
 		self.__timedOut = False
 		self.__executed = False # True, after execution
 
