@@ -29,6 +29,10 @@ def check_for_string( expression, description ):
 	if not isinstance( expression, str ):
 		raise ConfigurationError( description )
 
+def check_for_nonempty_string( expression, description ):
+	if not isinstance( expression, str ) or expression.isEmpty():
+		raise ConfigurationError( description )
+
 def check_for_int( expression, description ):
 	try:
 		int( expression )

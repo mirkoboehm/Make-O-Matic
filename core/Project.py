@@ -21,6 +21,7 @@ import datetime
 from core.MObject import MObject
 from core.modules.FolderManager import FolderManager
 from core.loggers.ConsoleLogger import ConsoleLogger
+from core.helpers.TypeCheckers import check_for_nonnegative_int
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -34,6 +35,7 @@ class Project( MObject ):
 		self.__startTime = datetime.datetime.utcnow()
 		self.__buildMode = 'm'
 		self.__plugins = [ FolderManager() ]
+		self.__returnCode = 0
 
 	def getPlugins( self ):
 		return self.__plugins
@@ -43,6 +45,13 @@ class Project( MObject ):
 
 	def getLoggers( self ):
 		return self.__loggers
+
+	def setReturnCode( self, code ):
+		check_for_nonnegative_int( code, "The return code of the build script has to be a non-negative integer number!" )
+		self.__returnCode = code
+
+	def getReturnCode( self ):
+		return self.__returnCode
 
 	def message( self, text ):
 		[ logger.message( text ) for logger in self.getLoggers() ]

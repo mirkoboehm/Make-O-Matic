@@ -1,16 +1,30 @@
-# One step of an executomat run.
-# (C) Mirko Boehm, KDAB, 2007
+# This file is part of make-o-matic.
+# -*- coding: utf-8 -*-
+# 
+# Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
+# Author: Mirko Boehm <mirko@kdab.com>
+# 
+# make-o-matic is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# make-o-matic is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+# 
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os, re
-from AutobuildCore.helpers.build_script_helpers import DebugN
-from AutobuildCore.helpers.exceptdefs import AutoBuildError
-from AutobuildCore.helpers.runcommand import RunCommand
-from AutobuildCore.Executomat.shellcommand import ShellCommand
+from core.Exceptions import MomError
 
 class Step( object ):
 	"""An individual step of an Executomat run."""
 	def __init__( self, stepName = None ):
 		self.Enabled = True
-		self.__name =stepName
+		self.__name = stepName
 		# the entries in the command lists are not just shell commands, but tuples that contain 
 		# * the shell command, and after execution
 		# * the return value
@@ -22,7 +36,7 @@ class Step( object ):
 		self.__logFileName = None
 		self.__failed = False
 		self.__errorType = 0
-		
+
 	def setName( self, n ):
 		"""Set the human readable name of the step"""
 		self.__name = n
@@ -30,10 +44,10 @@ class Step( object ):
 	def name( self ):
 		return self.__name
 
-	def setErrorType(self, code):
+	def setErrorType( self, code ):
 		self.__errorType = code
 
-	def getErrorType(self):
+	def getErrorType( self ):
 		return self.__errorType
 
 	def logFileName( self ):
@@ -42,22 +56,23 @@ class Step( object ):
 	def addPreCommand( self, cmdString, workingDir = None, executeOnFailure = False, timeOut = 900 ):
 		"""Add one precommand."""
 		self.__addCommand( self.PreCommands, cmdString, workingDir, executeOnFailure, timeOut )
-		
+
 	def addMainCommand( self, cmdString, workingDir = None, executeOnFailure = False, timeOut = 900 ):
 		"""Add a main command."""
 		self.__addCommand( self.MainCommands, cmdString, workingDir, executeOnFailure, timeOut )
-		
+
 	def addPostCommand( self, cmdString, workingDir = None, executeOnFailure = False, timeOut = 900 ):
 		"""Add a post command"""
 		self.__addCommand( self.PostCommands, cmdString, workingDir, executeOnFailure, timeOut )
 
-	def __addCommand( self, container, cmdString, workingDir, executeOnFailure, timeOut ):
-		cmd = ShellCommand()
-		cmd.setWorkingDirectory( workingDir )
-		cmd.setCommand( cmdString, timeOut )
-		cmd.setExecuteOnFailure( executeOnFailure )
-		container.append( cmd ) 
-		
+# FIXME Mirko
+#	def __addCommand( self, container, cmdString, workingDir, executeOnFailure, timeOut ):
+#		cmd = ShellCommand()
+#		cmd.setWorkingDirectory( workingDir )
+#		cmd.setCommand( cmdString, timeOut )
+#		cmd.setExecuteOnFailure( executeOnFailure )
+#		container.append( cmd )
+
 	def report( self ):
 		"""Generate a human readable report about the command execution.
 		Every report is a tuple like this: ( 'stepName', 'ok', 'pre: ok, main: ok, post: ok', 'logFileName.log' )"""
@@ -68,8 +83,8 @@ class Step( object ):
 			result[2] = result[1]
 			return result
 		else:
-			workSet = ( ['precmds', '', self.PreCommands ], 
-						['maincmds', '', self.MainCommands ], 
+			workSet = ( ['precmds', '', self.PreCommands ],
+						['maincmds', '', self.MainCommands ],
 						['postcmds', '', self.PostCommands ] )
 			notRun = True
 			failed = False
@@ -96,7 +111,7 @@ class Step( object ):
 							notRun = False
 							phase[1] = 'ok'
 				if result[2]:
-					result[2] += ', ' 
+					result[2] += ', '
 				result[2] += phase[0] + ': ' + phase[1]
 			if notRun:
 				result[1] = 'SKIPPED'
@@ -105,21 +120,21 @@ class Step( object ):
 			else:
 				result[1] += 'success'
 			return result
-	
-	def execute( self, executomat, weHaveIssues ):
+
+	def execute( self, executomat, project ):
 		"""Execute the command"""
 		if not self.name():
-			raise AutoBuildError( "Cannot execute a command with no name!" )
+			raise MomError( "Cannot execute a command with no name!" )
 		if not self.Enabled:
 			executomat.log( '# Command ' + self.name() + ' is disabled, skipping.' )
 			return True
 		executomat.log( '# Executing command "' + self.name() + '"' )
 		executomat.log( '# in ' + os.getcwd() )
-		DebugN( 5, 'environment before executing ' + self.name() + ':' )
+		project.debugN( 5, 'environment before executing ' + self.name() + ':' )
 		for key, value in os.environ.iteritems():
-			DebugN( 5, '--> ' + key + '   : ' + value )
-		Phases = { 'Preparatory Commands' : self.PreCommands, 
-				   'Main Commands' : self.MainCommands, 
+			project.debugN( 5, '--> ' + key + '   : ' + value )
+		Phases = { 'Preparatory Commands' : self.PreCommands,
+				   'Main Commands' : self.MainCommands,
 				   'Post Commands' : self.PostCommands }
 		for Phase, CommandList in Phases.iteritems():
 			if CommandList:
@@ -130,21 +145,22 @@ class Step( object ):
 					executomat.log( Cmd.command() )
 					self.__logFileName = executomat.logDir() + os.sep + re.sub( "\s+", "_", self.name() + '.log' )
 					Cmd.setLogFile( self.__logFileName )
-					if Cmd.run( weHaveIssues ) == 0:
-						executomat.log( '# ' + Phase[:-1] + ' "' + Cmd.command() + '" successful (or skipped)' )
-					else:
-						executomat.log( '# ' + Phase[:-1] + ' "' + Cmd.command() + '" command failed' )
-						self.__failed = True
-						return False # do not continue with the remaining commands
+# FIXME Mirko
+#					if Cmd.run( weHaveIssues ) == 0:
+#						executomat.log( '# ' + Phase[:-1] + ' "' + Cmd.command() + '" successful (or skipped)' )
+#					else:
+#						executomat.log( '# ' + Phase[:-1] + ' "' + Cmd.command() + '" command failed' )
+#						self.__failed = True
+#						return False # do not continue with the remaining commands
 		return True
-	
-	def failed(self):
+
+	def failed( self ):
 		return self.__failed
 
 	def setEnabled( self, Enabled ):
 		"""Enable the step."""
 		self.Enabled = ( Enabled == True )
-		
+
 	def enabled( self ):
 		"""Return whether this step is enabled."""
 		return self.Enabled

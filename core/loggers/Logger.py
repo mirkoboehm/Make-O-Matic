@@ -19,6 +19,7 @@
 from datetime import datetime
 import os
 from core.MObject import MObject
+from core.Exceptions import AbstractMethodCalledError
 
 class Logger( MObject ):
 	"""Logger is the base class for Logger objects."""
@@ -28,13 +29,13 @@ class Logger( MObject ):
 		MObject.__init__( self, name )
 
 	def message( self, msg ):
-		raise Exception( "Abstract base class method called!" )
+		raise AbstractMethodCalledError()
 
 	def debug( self, msg ):
-		raise Exception( "Abstract base class method called!" )
+		raise AbstractMethodCalledError()
 
 	def debugN( self, level , msg ):
-		raise Exception( "Abstract base class method called!" )
+		raise AbstractMethodCalledError()
 
 	def timeStampPrefix( self ):
 		return datetime.now().strftime( '%y%m%d-%H:%M:%S' ) + ' '
