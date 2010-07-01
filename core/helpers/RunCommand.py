@@ -26,21 +26,23 @@ import time
 from core.MObject import MObject
 from core.helpers.TypeCheckers import check_for_positive_int
 
-
 class _CommandRunner( Thread ):
 	def __init__ ( self, project, command ):
 		Thread.__init__( self )
 		self.__project = project
 		self.__started = None
-		self.mCmd = command
-		self.mOutput = ()
-		self.mPid = -1
-		self.mReturnCode = -1
-		self.mError = ()
+		self._cmd = command
+		self._output = ()
+		self._pid = -1
+		self._returnCode = -1
+		self._error = ()
 		self.__combinedOutput = False
 
 	def getProject( self ):
 		return self.__project
+
+	def getReturnCode( self ):
+		return self._returnCode
 
 	def setCombinedOutput( self, combine ):
 		if combine: # make sure combine is usable as a boolean
@@ -52,36 +54,36 @@ class _CommandRunner( Thread ):
 		return self.__combinedOutput
 
 	def run( self ):
-		self.getProject().debugN( 4, 'run_command: ' + self.mCmd )
+		self.getProject().debugN( 4, 'run_command: ' + self._cmd )
 		stderrValue = subprocess.PIPE
 		if self.__combinedOutput:
 			stderrValue = subprocess.STDOUT
 		self.__started = True
-		p = Popen ( self.mCmd, shell = True, stdout = subprocess.PIPE, stderr = stderrValue )
-		self.mPid = p.pid
-		self.mOutput, self.mError = p.communicate()
-		self.mReturnCode = p.returncode
+		p = Popen ( self._cmd, shell = True, stdout = subprocess.PIPE, stderr = stderrValue )
+		self._pid = p.pid
+		self._output, self._error = p.communicate()
+		self._returnCode = p.returncode
 		self.getProject().debugN( 4, 'ReturnCode of run_command: ' + str( p.returncode ) )
 
 	def started( self ):
 		return self.__started
 
 	def output( self ):
-		return self.mOutput, self.mError
+		return self._output, self._error
 
 	def terminate( self ):
 		# FIXME logic?
-		if self.mPid != -1:
-			self.kill( self.mPid, signal.SIGTERM )
-		if self.mPid == True:
+		if self._pid != -1:
+			self.kill( self._pid, signal.SIGTERM )
+		if self._pid == True:
 			self.join( 5 )
-			self.kill( self.mPid, signal.SIGKILL )
-		self.mPid = -1
+			self.kill( self._pid, signal.SIGKILL )
+		self._pid = -1
 
 	def windowskill( self, pid ):
 		""" replace os.kill on Windows, where it is not available"""
-		Cmd = 'taskkill /PID ' + str( int( pid ) ) + ' /T /F'
-		if os.system( Cmd ) == 0:
+		cmd = 'taskkill /PID ' + str( int( pid ) ) + ' /T /F'
+		if os.system( cmd ) == 0:
 			self.getProject().debugN( 4, 'windowskill: process ' + str( pid ) + ' killed.' )
 
 	def kill( self, pid, signal ):
@@ -91,12 +93,12 @@ class _CommandRunner( Thread ):
 			os.kill( pid, signal )
 
 class RunCommand( MObject ):
-	def __init__( self , project, cmd, timeoutSeconds = None, combineOutput = False ):
+	def __init__( self, project, cmd, timeoutSeconds = None, combineOutput = False ):
 		MObject.__init__( self )
 		self.__project = project
 		self.__cmd = cmd
 		if timeoutSeconds:
-			check_for_positive_int( timeoutSeconds, "The timeout period must be a non-negative integer number! " )
+			check_for_positive_int( timeoutSeconds, "The timeout period must be a positive integer number! " )
 		self.__timeoutSeconds = timeoutSeconds
 		self.__combineOutput = combineOutput
 		self.__stdOut = ''
@@ -119,18 +121,24 @@ class RunCommand( MObject ):
 	def getProject( self ):
 		return self.__project
 
+	def getStdOut( self ):
+		return self.__stdOut
+
+	def getStdErr( self ):
+		return self.__stdErr
+
 	def getCommand( self ):
 		return self.__cmd
 
 	def run( self ):
-		timeoutString = ' without a timeout'
+		timeoutString = 'without a timeout'
 		if self.getTimeoutSeconds() != None:
-			timeoutString = ' with timeout of ' + str( self.getTimeoutSeconds() )
-		combinedOutputString = ' and separate output for stdout and stderr'
+			timeoutString = 'with timeout of {0} seconds'.format( self.getTimeoutSeconds() )
+		combinedOutputString = 'and separate output for stdout and stderr'
 		if self.getCombineOutput():
-			combinedOutputString = ' and combined stdout and stderr output'
-		self.getProject().debugN ( 3, 'run_command: executing ' + str( self.getCommand() ) + timeoutString + combinedOutputString )
-		runner = _CommandRunner ( self.getCommand() )
+			combinedOutputString = 'and combined stdout and stderr output'
+		self.getProject().debugN ( 3, 'run_command: executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
+		runner = _CommandRunner ( self.getProject(), self.getCommand() )
 		runner.setCombinedOutput( self.getCombineOutput() )
 		runner.start()
 		# this sucks, but seems to be needed on Windows at least
@@ -143,11 +151,11 @@ class RunCommand( MObject ):
 		if runner.isAlive():
 			runner.terminate()
 			runner.join( 5 )
-		self.__timedOut = True
+			self.__timedOut = True
 		self.__stdOut = runner.output()[0]
 		self.__stdErr = runner.output()[1]
-		self.__returnCode = runner.mReturnCode
+		self.__returnCode = runner.getReturnCode()
 		timeoutString = "timed out" if self.getTimedOut() else "completed"
-		self.getProject().debugN( self, 3, 'command {0}, return code is '.format( timeoutString, str( self.getReturnCode() ) ) )
+		self.getProject().debugN( 3, 'command {0}, return code is {1}'.format( timeoutString, str( self.getReturnCode() ) ) )
 		return self.getReturnCode()
 
