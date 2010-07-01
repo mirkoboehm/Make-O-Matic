@@ -20,7 +20,7 @@
 import os
 from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_string
 from core.executomat.Step import Step
-from core.Exceptions import MomError, ConfigurationError
+from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.MObject import MObject
 from core.Defaults import Defaults
 
@@ -91,7 +91,7 @@ class Executomat( MObject ):
 		if( self.__logfile ):
 			self.__logfile.write( text.rstrip() + '\n' )
 
-	def run( self, project, firstErrorType = None ):
+	def run( self, project ):
 		self.__logfileName = None
 		try:
 			if not os.path.isdir( self.getLogDir() ):
@@ -108,15 +108,12 @@ class Executomat( MObject ):
 					project.debugN( 2, 'success: "{0}"'.format( step.getName() ) )
 				else:
 					self.log( '# aborting execution except for execute-even-on-failure commands\n########' )
-					if not firstErrorType:
-						firstErrorType = step.getErrorType()
 					if self.__failedStep == None:
 						# we are only interested in the log files for the first failure 
-						self.__failedStep = step[1]
-					project.setReturnCode( step.getErrorType() )
-					project.debugN( 2, 'failed: ' + step[1].name() )
+						self.__failedStep = step
+					project.setReturnCode( BuildError().getReturnCode() )
+					project.debugN( 2, 'failed: ' + step.getName() )
 			self.log( '# execution finished \n########' )
-			return firstErrorType
 		finally: # make sure the log file is closed
 			if self.__logfile:
 				self.__logfile.close()

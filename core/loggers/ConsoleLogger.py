@@ -23,7 +23,7 @@ from core.helpers.TypeCheckers import check_for_nonnegative_int
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
 
-	def __init__( self, level = 5 ):
+	def __init__( self, level = 3 ):
 		"""Constructor"""
 		Logger.__init__( self, self.__class__.__name__ )
 		self.setLevel( level )

@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os, re
+import os
 from core.Exceptions import MomError
 from core.MObject import MObject
+from core.helpers.FilesystemAccess import make_foldername_from_string
 
 class Step( MObject ):
 	"""An individual step of an Executomat run."""
@@ -31,17 +32,9 @@ class Step( MObject ):
 		self.__postActions = [] # list of post actions
 		self.__logFileName = None
 		self.__failed = False
-		self.__errorType = 0
 
-# FIXME is failed and errorType redundant? And what does errorType mean anyway? 
 	def failed( self ):
 		return self.__failed
-
-	def setErrorType( self, code ):
-		self.__errorType = code
-
-	def getErrorType( self ):
-		return self.__errorType
 
 	def setEnabled( self, enabled = True ):
 		self.__enabled = True
@@ -134,26 +127,27 @@ class Step( MObject ):
 		executomat.log( '# Executing command "' + self.getName() + '"' )
 		executomat.log( '# in ' + os.getcwd() )
 		project.debugN( 5, 'environment before executing ' + self.getName() + ':' )
-		for key, value in os.environ.iteritems():
-			project.debugN( 5, '--> ' + key + '   : ' + value )
-		Phases = { 'Preparatory Commands' : self.__preActions,
-				   'Main Commands' : self.__mainActions,
-				   'Post Commands' : self.__postActions }
-		for Phase, CommandList in Phases.iteritems():
-			if CommandList:
-				executomat.log( '# Executing ' + Phase )
-				for Cmd in CommandList:
-					if Cmd.workingDirectory():
-						executomat.log( '# changing directory to ' + Cmd.workingDirectory() + ' and back' )
-					executomat.log( Cmd.command() )
-					self.__logFileName = executomat.logDir() + os.sep + re.sub( "\s+", "_", self.name() + '.log' )
-					Cmd.setLogFile( self.__logFileName )
-# FIXME Mirko
-#					if Cmd.run( weHaveIssues ) == 0:
-#						executomat.log( '# ' + Phase[:-1] + ' "' + Cmd.command() + '" successful (or skipped)' )
-#					else:
-#						executomat.log( '# ' + Phase[:-1] + ' "' + Cmd.command() + '" command failed' )
-#						self.__failed = True
-#						return False # do not continue with the remaining commands
+		for key in os.environ:
+			project.debugN( 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
+		phases = { 'preparatory actions' : self.__preActions,
+				   'main actions' : self.__mainActions,
+				   'post actions' : self.__postActions }
+		for phase in phases:
+			actions = phases[ phase ]
+			if actions:
+				executomat.log( '# Executing {0}'.format( phase ) )
+				for action in actions:
+					if action.getWorkingDirectory():
+						executomat.log( '# changing directory to "{0}" and back.'.format( action.workingDirectory() ) )
+					executomat.log( action.getLogDescription() )
+					logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
+					self.__logFileName = executomat.getLogDir() + os.sep + logfileName
+					action.setLogfileName( self.__logFileName )
+					if action.run( project ) == True:
+						executomat.log( '# {0} "{1}" successful (or skipped)'.format( phase, action.getLogDescription() ) )
+					else:
+						executomat.log( '# {0} "{1}" failed'.format( phase, action.getLogDescription() ) )
+						self.__failed = True
+						return False # do not continue with the remaining commands
 		return True
 

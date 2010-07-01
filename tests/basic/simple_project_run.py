@@ -16,11 +16,8 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.actions.filesystem.MkDirAction import MkDirAction
 
-import core.Project
-project = core.Project.Project( "Simple Project Run Test", "0.5.0" )
+from core.Project import Project
+project = Project( "Simple Project Run Test", "0.5.0" )
 project.setup()
-step = project.getExecutomat().getStep( "project-create-folders" )
-step.addMainAction( MkDirAction( "src" ) )
 project.build()

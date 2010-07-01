@@ -56,7 +56,7 @@ class ShellCommandAction( object ):
 				raise MomError( 'cannot write to log file ' + self.logFile() )
 		if oldCwd:
 			os.chdir( oldCwd )
-		return self.__exitCode
+		return self.__exitCode == 0
 
 	def hasTimedOut( self ):
 		"""Returns True if the shell command process timed out, e.g., was not completed within the timeout period.

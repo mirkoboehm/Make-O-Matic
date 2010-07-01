@@ -85,3 +85,7 @@ class Action( MObject ):
 			raise MomError( 'stdOut() queried before the action was executed' )
 		return self.__stdOut
 
+	def getLogDescription( self ):
+		"""Provide a textual description for the Action that can be added to the execution log file."""
+		raise AbstractMethodCalledError()
+

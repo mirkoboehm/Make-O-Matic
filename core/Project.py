@@ -82,5 +82,5 @@ class Project( MObject ):
 		# FIXME
 		# ignore configurations for now
 		[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
-		self.getExecutomat().run( self, None )
+		self.getExecutomat().run( self )
 

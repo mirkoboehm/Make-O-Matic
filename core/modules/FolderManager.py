@@ -20,6 +20,7 @@ import os, time
 from core.Plugin import Plugin
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.Exceptions import ConfigurationError
+from core.actions.filesystem.MkDirAction import MkDirAction
 
 class FolderManager( Plugin ):
 	"""FolderManager creates and deletes the project folders."""
@@ -45,5 +46,9 @@ class FolderManager( Plugin ):
 			os.mkdir( directory )
 		except OSError as o:
 			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( directory, str( o ) ) )
-		project.debugN( 1, 'Project build folder created at "{0}"'.format( directory ) )
+		os.chdir( directory )
+		project.debugN( 1, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
+		step = project.getExecutomat().getStep( "project-create-folders" )
+		step.addMainAction( MkDirAction( "src" ) )
+
 
