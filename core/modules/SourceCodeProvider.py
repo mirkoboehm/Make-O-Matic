@@ -17,18 +17,60 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
+from core.Exceptions import AbstractMethodCalledError
 
-class Plugin( MObject ):
+class SourceCodeProvider( MObject ):
 
 	def __init__( self, name ):
 		"""Constructor"""
 		MObject.__init__( self, name )
+		self.__url = None
+		self.__revision = None
+		self.__committer = None
+		self.__commitTime = None
+		self.__commitMessage = None
+
+	def setUrl( self, url ):
+		self.__url = url
+
+	def getUrl( self ):
+		return self.__url
+
+	def setRevision( self, revision ):
+		self.__revision = revision
+
+	def getRevision( self ):
+		return self.__revision
+
+	def getCommitter( self ):
+		if not self.__committer:
+			( self.__committer, self.__commitMessage, self.__revision, self.__commitTime ) \
+				 = self._getRevisionInfo()
+		return self.__committer
+
+	def getCommitTime( self ):
+		if not self.__commitTime:
+			( self.__committer, self.__commitMessage, self.__revision, self.__commitTime ) \
+				 = self._getRevisionInfo()
+		return self.__commitTime
+
+	def getCommitMessage( self ):
+		if not self.__commitMessage:
+			( self.__committer, self.__commitMessage, self.__revision, self.__commitTime ) \
+				 = self._getRevisionInfo()
+		return self.__commitMessage
+
+	def _getRevisionInfo( self ):
+		"""Set __committer, __commitMessage, __commitTime and __revision"""
+		raise AbstractMethodCalledError
+
+	def _checkInstallation( self ):
+		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
+		raise AbstractMethodCalledError
 
 	def preFlightCheck( self, project ):
-		"""PreFlightCheck is called after the command line arguments have been passed, 
-		but before the build steps are generated.
-		Modules should check the setup of the tools they use in this phase."""
-		pass
+		"""Overload"""
+		self._checkInstallation()
 
 	def setup( self, project ):
 		"""Setup is called after the build steps have been generated, and the command line 

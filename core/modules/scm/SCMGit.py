@@ -16,8 +16,15 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from core.modules.SourceCodeProvider import SourceCodeProvider
 
-from core.Project import Project
+class SCMGit( SourceCodeProvider ):
+	'''
+	classdocs
+	'''
 
-project = Project( "Simple Project Run Test", "0.5.0" )
-project.build()
+
+	def __init__( self, params ):
+		'''
+		Constructor
+		'''
