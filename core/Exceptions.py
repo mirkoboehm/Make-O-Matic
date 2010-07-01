@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import signal
 
 class MomException( Exception ):
 	"""MomException encapsulates an error that occurs during a build script run."""
@@ -56,3 +57,9 @@ class AbstractMethodCalledError( MomError ):
 	It is a MomError, for that reason."""
 	def __init__( self ):
 		Exception.__init__( self, "(Abstract) base class method called!" )
+
+class InterruptedException( MomError ):
+	"""This class is not used directly by MOM, it only defines the correct return code."""
+	def getReturnCode( self ):
+		return signal.SIGINT + 128
+

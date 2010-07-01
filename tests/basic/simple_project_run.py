@@ -18,6 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Project import Project
+import sys
 project = Project( "Simple Project Run Test", "0.5.0" )
-project.setup()
-project.build()
+sys.exit( project.build() )

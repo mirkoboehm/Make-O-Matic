@@ -25,6 +25,8 @@ from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.executomat.Executomat import Executomat
 from core.executomat.Step import Step
 from core.Settings import Settings
+import sys
+from core.Exceptions import InterruptedException
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -77,10 +79,26 @@ class Project( MObject ):
 		for step in self.getSettings().getProjectBuildSteps():
 			self.getExecutomat().addStep( Step( step ) )
 
-	def build( self, configurations = [] ):
+	def buildAndReturn( self, configurations = [] ):
+		"""BuildAndReturn executes the build and returns the exit code of the script.
+		It is useful for scripts that need to perform other code after the build method.
+		build wraps this function and exits with the error code."""
 		# enable and disable the steps according to the settings for the build mode
 		# FIXME
 		# ignore configurations for now
-		[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
-		self.getExecutomat().run( self )
+		try:
+			[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
+			self.setup()
+			[ plugin.setup( self ) for plugin in self.getPlugins() ]
+			self.getExecutomat().run( self )
+			[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
+			return 0
+		except KeyboardInterrupt:
+			self.message( 'Interrupted. Have a nice day.' )
+			return InterruptedException().getReturnCode()
+		finally:
+			[ plugin.shutDown( self ) for plugin in self.getPlugins() ]
 
+	def build( self, configurations = [] ):
+		"""build executes the build and exits the process with the correct return code."""
+		sys.exit( self.buildAndReturn( configurations ) )

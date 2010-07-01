@@ -25,5 +25,23 @@ class Plugin( MObject ):
 		MObject.__init__( self, name )
 
 	def preFlightCheck( self, project ):
+		"""PreFlightCheck is called after the command line arguments have been passed, 
+		but before the build steps are generated.
+		Modules should check the setup of the tools they use in this phase."""
 		pass
 
+	def setup( self, project ):
+		"""Setup is called after the build steps have been generated, and the command line 
+		options have been applied to them. It can be used to insert actions into the build
+		steps, for example."""
+		pass
+
+	def wrapUp( self, project ):
+		"""WrapUp is called when the last step has finished. It could be used to publish 
+		the reports, for example."""
+		pass
+
+	def shutDown( self, project ):
+		"""Shutdown is called right before the build ends. It could be used to close
+		files or network connections."""
+		pass
