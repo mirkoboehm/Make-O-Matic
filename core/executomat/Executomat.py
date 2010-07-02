@@ -111,7 +111,7 @@ class Executomat( MObject ):
 					if self.__failedStep == None:
 						# we are only interested in the log files for the first failure 
 						self.__failedStep = step
-					project.setReturnCode( BuildError().getReturnCode() )
+					project.setReturnCode( BuildError( 'dummy' ).getReturnCode() )
 					project.debugN( self, 2, 'failed: "{0}"'.format( step.getName() ) )
 			self.log( '# execution finished \n########' )
 		finally: # make sure the log file is closed

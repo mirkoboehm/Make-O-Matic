@@ -24,7 +24,8 @@ from subprocess import Popen
 import signal
 import time
 from core.MObject import MObject
-from core.helpers.TypeCheckers import check_for_positive_int
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string
+import core
 
 class _CommandRunner( Thread ):
 	def __init__ ( self, project, runner ):
@@ -98,11 +99,13 @@ class _CommandRunner( Thread ):
 class RunCommand( MObject ):
 	def __init__( self, project, cmd, timeoutSeconds = None, combineOutput = False ):
 		MObject.__init__( self )
+		assert isinstance( project, core.Project.Project )
 		self.__project = project
 		self.__cmd = cmd
 		if timeoutSeconds:
 			check_for_positive_int( timeoutSeconds, "The timeout period must be a positive integer number! " )
 		self.__timeoutSeconds = timeoutSeconds
+		self.__workingDir = None
 		self.__combineOutput = combineOutput
 		self.__stdOut = None
 		self.__stdErr = None
@@ -114,6 +117,13 @@ class RunCommand( MObject ):
 
 	def getTimedOut( self ):
 		return self.__timedOut
+
+	def setWorkingDir( self, dir ):
+		check_for_nonempty_string( dir, 'The working directory must be a non-empty string!' )
+		self.__workingDir = dir
+
+	def getWorkingDir( self ):
+		return self.__workingDir
 
 	def getCombineOutput( self ):
 		return self.__combineOutput
@@ -143,28 +153,36 @@ class RunCommand( MObject ):
 		return self.__cmd
 
 	def run( self ):
-		timeoutString = 'without a timeout'
-		if self.getTimeoutSeconds() != None:
-			timeoutString = 'with timeout of {0} seconds'.format( self.getTimeoutSeconds() )
-		combinedOutputString = 'and separate output for stdout and stderr'
-		if self.getCombineOutput():
-			combinedOutputString = 'and combined stdout and stderr output'
-		self.getProject().debugN ( self, 3, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
-		runner = _CommandRunner ( self.getProject(), self )
-		runner.setCombineOutput( self.getCombineOutput() )
-		runner.start()
-		# this sucks, but seems to be needed on Windows at least
-		while not runner.wasStarted():
-			time.sleep( 0.1 )
-		if not self.getTimeoutSeconds():
-			runner.join()
-		else:
-			runner.join( self.getTimeoutSeconds() )
-		if runner.isAlive():
-			runner.terminate()
-			runner.join( 5 )
-			self.__timedOut = True
-		timeoutString = "timed out" if self.getTimedOut() else "completed"
-		self.getProject().debugN( self, 3, 'command {0}, return code is {1}'.format( timeoutString, str( self.getReturnCode() ) ) )
-		return self.getReturnCode()
+		oldCwd = None
+		try:
+			if self.getWorkingDir():
+				oldCwd = os.getcwd()
+				os.chdir( self.getWorkingDir() )
+			timeoutString = 'without a timeout'
+			if self.getTimeoutSeconds() != None:
+				timeoutString = 'with timeout of {0} seconds'.format( self.getTimeoutSeconds() )
+			combinedOutputString = 'and separate output for stdout and stderr'
+			if self.getCombineOutput():
+				combinedOutputString = 'and combined stdout and stderr output'
+			self.getProject().debugN( self, 3, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
+			runner = _CommandRunner ( self.getProject(), self )
+			runner.setCombineOutput( self.getCombineOutput() )
+			runner.start()
+			# this sucks, but seems to be needed on Windows at least
+			while not runner.wasStarted():
+				time.sleep( 0.1 )
+			if not self.getTimeoutSeconds():
+				runner.join()
+			else:
+				runner.join( self.getTimeoutSeconds() )
+			if runner.isAlive():
+				runner.terminate()
+				runner.join( 5 )
+				self.__timedOut = True
+			timeoutString = "timed out" if self.getTimedOut() else "completed"
+			self.getProject().debugN( self, 3, 'command {0}, return code is {1}'.format( timeoutString, str( self.getReturnCode() ) ) )
+			return self.getReturnCode()
+		finally:
+			if oldCwd:
+				os.chdir( oldCwd )
 

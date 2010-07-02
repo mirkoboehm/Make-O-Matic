@@ -30,6 +30,10 @@ class Action( MObject ):
 	def run( self, project ):
 		raise AbstractMethodCalledError()
 
+	def getLogDescription( self ):
+		"""Provide a textual description for the Action that can be added to the execution log file."""
+		raise AbstractMethodCalledError()
+
 	def __init__( self, name = "Action" ):
 		"""Constructor"""
 		MObject.__init__( self, name )
@@ -50,7 +54,7 @@ class Action( MObject ):
 
 	def setWorkingDirectory( self, dir ):
 		"""Set the directory to execute the command in."""
-		check_for_string( dir, "The log file parameter must be a string containing a directory name." )
+		check_for_string( dir, "The working directory parameter must be a string containing a directory name." )
 		self.__workingDir = dir
 
 	def getWorkingDirectory( self ):
@@ -84,8 +88,4 @@ class Action( MObject ):
 		if not self.wasExecuted():
 			raise MomError( 'stdOut() queried before the action was executed' )
 		return self.__stdOut
-
-	def getLogDescription( self ):
-		"""Provide a textual description for the Action that can be added to the execution log file."""
-		raise AbstractMethodCalledError()
 

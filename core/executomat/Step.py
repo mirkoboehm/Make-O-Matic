@@ -138,7 +138,7 @@ class Step( MObject ):
 				executomat.log( '# Executing {0}'.format( phase ) )
 				for action in actions:
 					if action.getWorkingDirectory():
-						executomat.log( '# changing directory to "{0}" and back.'.format( action.workingDirectory() ) )
+						executomat.log( '# changing directory to "{0}" and back.'.format( action.getWorkingDirectory() ) )
 					executomat.log( action.getLogDescription() )
 					logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
 					self.__logFileName = executomat.getLogDir() + os.sep + logfileName

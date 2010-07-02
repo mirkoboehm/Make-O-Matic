@@ -30,6 +30,7 @@ class SourceCodeProvider( MObject ):
 		self.__committer = None
 		self.__commitTime = None
 		self.__commitMessage = None
+		self.__srcDir = None
 		self.__description = None
 
 	def setUrl( self, url ):
@@ -37,6 +38,13 @@ class SourceCodeProvider( MObject ):
 
 	def getUrl( self ):
 		return self.__url
+
+	def setSrcDir( self, dir ):
+		check_for_nonempty_string( dir, 'The course folder needs to be a non-empty string!' )
+		self.__srcDir = dir
+
+	def getSrcDir( self ):
+		return self.__srcDir
 
 	def getDescription( self ):
 		return self.__description
@@ -74,6 +82,18 @@ class SourceCodeProvider( MObject ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
 		raise AbstractMethodCalledError
 
+	def makeCheckoutStep( self, project ):
+		"""Create steps to check out the source code"""
+		raise AbstractMethodCalledError()
+
+	def makeExportStep( self, project, targetDir ):
+		"""Create a Step that will export the source code to the target directory."""
+		raise AbstractMethodCalledError()
+
+	def makePackageStep( self, project, ):
+		"""Create a src archive of the project and put it into the packages directory."""
+		raise AbstractMethodCalledError()
+
 	def preFlightCheck( self, project ):
 		"""Overload"""
 		self._checkInstallation( project )
@@ -83,7 +103,10 @@ class SourceCodeProvider( MObject ):
 		"""Setup is called after the build steps have been generated, and the command line 
 		options have been applied to them. It can be used to insert actions into the build
 		steps, for example."""
-		pass
+		self.makeCheckoutStep( project )
+		self.makePackageStep( project )
+		# FIXME it needs to be decided by the builder if this gets called!
+		# self.makeExportStep( project )
 
 	def wrapUp( self, project ):
 		"""WrapUp is called when the last step has finished. It could be used to publish 
