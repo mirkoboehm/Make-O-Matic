@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
 from core.Exceptions import AbstractMethodCalledError
+from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class SourceCodeProvider( MObject ):
 
@@ -29,12 +30,20 @@ class SourceCodeProvider( MObject ):
 		self.__committer = None
 		self.__commitTime = None
 		self.__commitMessage = None
+		self.__description = None
 
 	def setUrl( self, url ):
 		self.__url = url
 
 	def getUrl( self ):
 		return self.__url
+
+	def getDescription( self ):
+		return self.__description
+
+	def _setDescription( self, description ):
+		check_for_nonempty_string( description, "The SCM description needs to be a non-empty string." )
+		self.__description = description
 
 	def setRevision( self, revision ):
 		self.__revision = revision
@@ -44,33 +53,31 @@ class SourceCodeProvider( MObject ):
 
 	def getCommitter( self ):
 		if not self.__committer:
-			( self.__committer, self.__commitMessage, self.__revision, self.__commitTime ) \
-				 = self._getRevisionInfo()
+			self._getRevisionInfo()
 		return self.__committer
 
 	def getCommitTime( self ):
 		if not self.__commitTime:
-			( self.__committer, self.__commitMessage, self.__revision, self.__commitTime ) \
-				 = self._getRevisionInfo()
+			self._getRevisionInfo()
 		return self.__commitTime
 
 	def getCommitMessage( self ):
 		if not self.__commitMessage:
-			( self.__committer, self.__commitMessage, self.__revision, self.__commitTime ) \
-				 = self._getRevisionInfo()
+			self._getRevisionInfo()
 		return self.__commitMessage
 
 	def _getRevisionInfo( self ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
 		raise AbstractMethodCalledError
 
-	def _checkInstallation( self ):
+	def _checkInstallation( self, project ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
 		raise AbstractMethodCalledError
 
 	def preFlightCheck( self, project ):
 		"""Overload"""
-		self._checkInstallation()
+		self._checkInstallation( project )
+		project.debugN( 1, 'SCM module initialized: {0}'.format( self.getDescription() ) )
 
 	def setup( self, project ):
 		"""Setup is called after the build steps have been generated, and the command line 

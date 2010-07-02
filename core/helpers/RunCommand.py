@@ -30,7 +30,7 @@ class _CommandRunner( Thread ):
 	def __init__ ( self, project, command ):
 		Thread.__init__( self )
 		self.__project = project
-		self.__started = None
+		self.__executed = None
 		self._cmd = command
 		self._output = ()
 		self._pid = -1
@@ -58,7 +58,7 @@ class _CommandRunner( Thread ):
 		stderrValue = subprocess.PIPE
 		if self.__combinedOutput:
 			stderrValue = subprocess.STDOUT
-		self.__started = True
+		self.__executed = True
 		p = Popen ( self._cmd, shell = True, stdout = subprocess.PIPE, stderr = stderrValue )
 		self._pid = p.pid
 		self._output, self._error = p.communicate()
@@ -66,7 +66,7 @@ class _CommandRunner( Thread ):
 		self.getProject().debugN( 4, 'ReturnCode of run_command: ' + str( p.returncode ) )
 
 	def started( self ):
-		return self.__started
+		return self.__executed
 
 	def output( self ):
 		return self._output, self._error

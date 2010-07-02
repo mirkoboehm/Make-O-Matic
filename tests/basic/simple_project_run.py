@@ -18,6 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Project import Project
+from core.modules.scm.SCMGit import SCMGit
 
 project = Project( "Simple Project Run Test", "0.5.0" )
+scm = SCMGit()
+scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
+project.addPlugin( scm )
 project.build()

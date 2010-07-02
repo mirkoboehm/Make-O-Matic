@@ -17,14 +17,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.modules.SourceCodeProvider import SourceCodeProvider
+from core.Exceptions import AbstractMethodCalledError, ConfigurationError
+from core.helpers.RunCommand import RunCommand
 
 class SCMGit( SourceCodeProvider ):
-	'''
-	classdocs
-	'''
+	"""Git SCM Provider Class"""
 
+	def __init__( self, name = None ):
+		SourceCodeProvider.__init__( self, name )
 
-	def __init__( self, params ):
-		'''
-		Constructor
-		'''
+	def _getRevisionInfo( self ):
+		"""Set __committer, __commitMessage, __commitTime and __revision"""
+		raise AbstractMethodCalledError
+
+	def _checkInstallation( self, project ):
+		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
+		# c				"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
+		assert project
+		runner = RunCommand( project, 'git --version' )
+		runner.run()
+		if( runner.getReturnCode() != 0 ):
+			raise ConfigurationError( "SCMGit::checkInstallation: git not found." )
+		else:
+			lines = runner.getStdOut().decode().split( '\n' )
+			self._setDescription( lines[0].rstrip() )
+			project.debugN( 2, 'git found: ' + self.getDescription() )

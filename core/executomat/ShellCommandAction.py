@@ -2,6 +2,7 @@
 import os
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_nonnegative_int
 from core.Exceptions import MomError
+from core.helpers.RunCommand import RunCommand
 
 class ShellCommandAction( object ):
 	"""ShellCommandAction encapsulates the execution of one command in the Step class. 
@@ -9,11 +10,7 @@ class ShellCommandAction( object ):
 	def __init__( self ):
 		self.__command = None
 		self.__timeOutPeriod = None
-		self.__exitCode = None # default: not started
-		self.__stdOut = [] # will contain a list of strings
-		self.__stdErr = [] # same
-		self.__timedOut = False
-		self.__executed = False # True, after execution
+		self.__runner = None
 
 	def setCommand( self, command, TimeOutPeriod = None ):
 		"""Set the shell command"""
@@ -22,11 +19,15 @@ class ShellCommandAction( object ):
 			check_for_nonnegative_int( TimeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
 		self.__command = command
 		self.__timeOutPeriod = TimeOutPeriod
-		self.__executed = False
 
 	def getCommand( self ):
 		"""Returns the command"""
 		return self.__command
+
+	def _getRunner( self ):
+		if self.__runner == None:
+			raise MomError( "The command runner was not initialized before being queried" )
+		return self.__runner
 
 	def run( self, project ):
 		"""Executes the shell command. Needs a command to be set."""
@@ -39,18 +40,12 @@ class ShellCommandAction( object ):
 				raise MomError( 'working directory ' + self.__workingDir + ' does not exist' )
 			oldCwd = os.getcwd()
 			os.chdir( self.__workingDir )
-		redirect = ''
-# FIXME Mirko
-#		ShellResult = RunCommand( self.__command + redirect, self.__timeOutPeriod, True )
-#		self.__exitCode = ShellResult[0]
-#		self.__stdOut = ShellResult[1][0]
-#		self.__stdErr = ShellResult[1][1] # should be empty, stdout and stderr are combined
-#		self.__timedOut = ShellResult[2]
-#		self.__executed = True
+		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, True )
+		self._getRunner().run()
 		if self.logFile():
 			file = open( self.logFile(), 'a' )
 			if file:
-				file.writelines( self.stdOut() )
+				file.writelines( self._getRunner().getStdOut() )
 				file.close()
 			else:
 				raise MomError( 'cannot write to log file ' + self.logFile() )
@@ -63,5 +58,5 @@ class ShellCommandAction( object ):
 		Can only be called after execution."""
 		if not self.__executed:
 			raise MomError( 'timedOut() queried before the command was executed' )
-		return self.__timedOut
+		return self._getRunner().getTimedOut();
 
