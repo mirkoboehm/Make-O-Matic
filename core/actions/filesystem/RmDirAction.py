@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.executomat.Action import Action
 from core.helpers.TypeCheckers import check_for_nonempty_string
-import os
+import shutil
 
 class RmDirAction( Action ):
 	"""RmDirAction deletes a directory."""
@@ -38,7 +38,7 @@ class RmDirAction( Action ):
 		check_for_nonempty_string( self.getPath(), "No directory specified!" )
 		project.debugN( self, 2, 'deleting directory "{0}"'.format( self.getPath() ) )
 		try:
-			os.removedirs( self.getPath() )
+			shutil.rmtree( self.getPath(), False )
 			return True
 		except ( OSError, IOError ) as e:
 			project.debug( self, 'error deleting directory "{0}": {1}'

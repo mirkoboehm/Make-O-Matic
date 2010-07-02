@@ -44,7 +44,7 @@ class SCMGit( SourceCodeProvider ):
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
 		# FIXME platformdefs for home
-		self.__cloneArmy = os.environ['HOME'] + os.sep + 'cloneArmy'
+		self.__cloneArmy = os.environ['HOME'] + os.sep + '.cloneArmy'
 
 	def getCloneArmyDir( self ):
 		return self.__cloneArmy

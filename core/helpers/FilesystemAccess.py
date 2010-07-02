@@ -16,11 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os, re
+import re
 
 def make_foldername_from_string( text ):
 	"""Create a name from the text that can safely be used as a foldername."""
 	name = re.sub( '[\{\}\[\]\(\)\:]', '_', text )
+	name = re.sub( '\/', '+', name )
 	name = re.sub( '\s+', '_', name )
 	name = name.lower()
 	return name
