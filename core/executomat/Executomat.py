@@ -103,16 +103,16 @@ class Executomat( MObject ):
 					raise ConfigurationError( 'Cannot open log file at "{0}"'.format( self.getLogfileName() ) )
 			self.log( '# Starting execution of ' + self.getName() )
 			for step in self._getSteps():
-				project.debugN( 1, 'now executing step "' + step.getName() + '" for "' + self.getName() + '"' )
+				project.debugN( self, 1, 'now executing step "{0}"'.format( step.getName() ) )
 				if step.execute( self, project ):
-					project.debugN( 2, 'success: "{0}"'.format( step.getName() ) )
+					project.debugN( self, 2, 'success: "{0}"'.format( step.getName() ) )
 				else:
 					self.log( '# aborting execution except for execute-even-on-failure commands\n########' )
 					if self.__failedStep == None:
 						# we are only interested in the log files for the first failure 
 						self.__failedStep = step
 					project.setReturnCode( BuildError().getReturnCode() )
-					project.debugN( 2, 'failed: ' + step.getName() )
+					project.debugN( self, 2, 'failed: "{0}"'.format( step.getName() ) )
 			self.log( '# execution finished \n########' )
 		finally: # make sure the log file is closed
 			if self.__logfile:

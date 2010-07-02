@@ -56,7 +56,7 @@ class ShellCommandAction( object ):
 	def hasTimedOut( self ):
 		"""Returns True if the shell command process timed out, e.g., was not completed within the timeout period.
 		Can only be called after execution."""
-		if not self.__executed:
+		if not self.__started:
 			raise MomError( 'timedOut() queried before the command was executed' )
 		return self._getRunner().getTimedOut();
 

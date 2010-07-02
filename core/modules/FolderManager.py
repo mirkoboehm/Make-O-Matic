@@ -32,7 +32,7 @@ class FolderManager( Plugin ):
 	def preFlightCheck( self, project ):
 		buildfolderName = make_foldername_from_string( project.getName() )
 		directory = os.path.normpath( os.getcwd() + os.sep + buildfolderName )
-		project.debugN( 3, 'Project build folder is "{0}"'.format( directory ) )
+		project.debugN( self, 3, 'Project build folder is "{0}"'.format( directory ) )
 		if os.path.isdir( directory ):
 			stats = os.stat( directory )
 			mtime = time.localtime( stats[8] )
@@ -42,13 +42,13 @@ class FolderManager( Plugin ):
 				os.rename( directory, newFolder )
 			except OSError as o:
 				raise ConfigurationError( 'Cannot move existing project build folder at "{0}" to "{1}": {2}'.format( directory, newFolder, str( o ) ) )
-			project.debugN( 1, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
+			project.debug( self, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
 		try:
 			os.mkdir( directory )
 		except OSError as o:
 			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( directory, str( o ) ) )
 		os.chdir( directory )
-		project.debugN( 1, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
+		project.debug( self, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
 
 	def setup( self, project ):
 		create = project.getExecutomat().getStep( 'project-create-folders' )

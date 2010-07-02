@@ -35,17 +35,17 @@ class ConsoleLogger( Logger ):
 	def getLevel( self ):
 		return self.__level
 
-	def message( self, msg ):
+	def message( self, mobject, msg ):
 		text = str( msg )
 		if not text.endswith( '\n' ): text = text + '\n'
-		sys.stderr.write( self.timeStampPrefix() + self.messagePrefix() + str( text ) )
+		fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
+		sys.stderr.write( fulltext )
 
-	def debug( self, msg ):
+	def debug( self, mobject, msg ):
 		text = str( msg )
 		if self.getLevel() > 0:
-			self.message( 'DEBUG: ' + str( text ) )
+			self.message( mobject, 'DEBUG: ' + str( text ) )
 
-	def debugN( self, level , msg ):
-		# FIXME check for int
+	def debugN( self, mobject, level , msg ):
 		if self.getLevel() >= level:
-			self.debug( msg )
+			self.debug( mobject, msg )

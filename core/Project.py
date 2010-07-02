@@ -66,14 +66,14 @@ class Project( MObject ):
 	def getExecutomat( self ):
 		return self.__executomat
 
-	def message( self, text ):
-		[ logger.message( text ) for logger in self.getLoggers() ]
+	def message( self, mobject, text ):
+		[ logger.message( mobject, text ) for logger in self.getLoggers() ]
 
-	def debug( self, text ):
-		[ logger.debug( text ) for logger in self.getLoggers() ]
+	def debug( self, mobject, text ):
+		[ logger.debug( mobject, text ) for logger in self.getLoggers() ]
 
-	def debugN( self, level, text ):
-		[ logger.debugN( level, text ) for logger in self.getLoggers() ]
+	def debugN( self, mobject, level, text ):
+		[ logger.debugN( mobject, level, text ) for logger in self.getLoggers() ]
 
 	def setup( self ):
 		for step in self.getSettings().getProjectBuildSteps():

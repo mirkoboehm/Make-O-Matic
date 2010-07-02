@@ -35,7 +35,7 @@ class Action( MObject ):
 		MObject.__init__( self, name )
 		self.__logfileName = None
 		self.__workingDir = None
-		self.__executed = False
+		self.__started = False
 		self.__executeOnFailure = False
 		self.__result = 0
 		self.__stdOut = ""
@@ -65,7 +65,7 @@ class Action( MObject ):
 		return self.__executeOnFailure
 
 	def wasExecuted( self ):
-		return self.__executed != False
+		return self.__started != False
 
 	def getExitCode( self ):
 		"""Returns the actions integer exit code. Can only be called after execution."""

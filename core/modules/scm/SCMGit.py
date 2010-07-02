@@ -41,4 +41,4 @@ class SCMGit( SourceCodeProvider ):
 		else:
 			lines = runner.getStdOut().decode().split( '\n' )
 			self._setDescription( lines[0].rstrip() )
-			project.debugN( 2, 'git found: ' + self.getDescription() )
+			project.debugN( self, 2, 'git found: "{0}"'.format( self.getDescription() ) )

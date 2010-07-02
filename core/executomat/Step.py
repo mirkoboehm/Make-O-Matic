@@ -126,9 +126,9 @@ class Step( MObject ):
 			return True
 		executomat.log( '# Executing command "' + self.getName() + '"' )
 		executomat.log( '# in ' + os.getcwd() )
-		project.debugN( 5, 'environment before executing ' + self.getName() + ':' )
+		project.debugN( self, 5, 'environment before:' )
 		for key in os.environ:
-			project.debugN( 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
+			project.debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
 		phases = { 'preparatory actions' : self.__preActions,
 				   'main actions' : self.__mainActions,
 				   'post actions' : self.__postActions }

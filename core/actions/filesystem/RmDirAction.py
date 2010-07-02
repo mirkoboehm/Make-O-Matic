@@ -36,13 +36,13 @@ class RmDirAction( Action ):
 
 	def run( self, project ):
 		check_for_nonempty_string( self.getPath(), "No directory specified!" )
-		project.debugN( 2, '[{0}] deleting directory "{1}"'.format( self.getName(), self.getPath() ) )
+		project.debugN( self, 2, 'deleting directory "{0}"'.format( self.getPath() ) )
 		try:
 			os.removedirs( self.getPath() )
 			return True
 		except ( OSError, IOError ) as e:
-			project.debug( '[{0}] error deleting directory "{1}": {2}'
-						.format( self.getName(), self.getPath(), str( e ) ) )
+			project.debug( self, 'error deleting directory "{0}": {1}'
+						.format( self.getPath(), str( e ) ) )
 			return False
 
 	def getLogDescription( self ):

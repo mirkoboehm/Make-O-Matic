@@ -28,13 +28,13 @@ class Logger( MObject ):
 		"""Constructor"""
 		MObject.__init__( self, name )
 
-	def message( self, msg ):
+	def message( self, mobject, msg ):
 		raise AbstractMethodCalledError()
 
-	def debug( self, msg ):
+	def debug( self, mobject, msg ):
 		raise AbstractMethodCalledError()
 
-	def debugN( self, level , msg ):
+	def debugN( self, mobject, level , msg ):
 		raise AbstractMethodCalledError()
 
 	def timeStampPrefix( self ):

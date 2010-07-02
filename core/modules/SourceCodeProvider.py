@@ -77,7 +77,7 @@ class SourceCodeProvider( MObject ):
 	def preFlightCheck( self, project ):
 		"""Overload"""
 		self._checkInstallation( project )
-		project.debugN( 1, 'SCM module initialized: {0}'.format( self.getDescription() ) )
+		project.debug( self, 'SCM module initialized: {0}'.format( self.getDescription() ) )
 
 	def setup( self, project ):
 		"""Setup is called after the build steps have been generated, and the command line 
