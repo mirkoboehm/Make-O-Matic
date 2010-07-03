@@ -20,15 +20,23 @@
 from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
 from core.loggers.ConsoleLogger import ConsoleLogger
+from core.modules.DoxygenGenerator import DoxygenGenerator
 
 project = Project( "Simple Project Run Test", "0.5.0" )
+# add a console logger
 logger = ConsoleLogger()
 project.addLogger( logger )
+
+# add a git SCM
 scm = SCMGit()
 scm.setSrcDir( 'src' )
 scm.setRevision( 'HEAD' )
 scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
 # scm.setUrl( 'file:////d/kdab/products/charm/src' )
-# FIXME: project.setScm! 
-project.addPlugin( scm )
+project.setScm( scm )
+
+# add a doxygen generator
+dox = DoxygenGenerator()
+dox.setDoxygenFile( 'doxygen.cfg' )
+project.addPlugin( dox )
 project.build()

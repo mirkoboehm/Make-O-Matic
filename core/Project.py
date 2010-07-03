@@ -20,6 +20,7 @@
 import datetime
 from core.MObject import MObject
 from core.modules.FolderManager import FolderManager
+from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.executomat.Executomat import Executomat
@@ -37,6 +38,7 @@ class Project( MObject ):
 		"""Set up the build steps, parse the command line arguments."""
 		MObject.__init__( self, projectName )
 		self.__settings = Settings()
+		self.__scm = None
 		self.__loggers = []
 		self.__startTime = datetime.datetime.utcnow()
 		self.__buildMode = 'm'
@@ -46,6 +48,17 @@ class Project( MObject ):
 
 	def getSettings( self ):
 		return self.__settings
+
+	def setScm( self, scm ):
+		if self.getScm():
+			raise MomError( 'The master SCM can only be set once!' )
+		if not isinstance( scm, SourceCodeProvider ):
+			raise MomError( 'SCMs need to re-implement the SourceCodeProvider class!' )
+		self.__scm = scm
+		self.addPlugin( scm )
+
+	def getScm( self ):
+		return self.__scm
 
 	def getPlugins( self ):
 		return self.__plugins

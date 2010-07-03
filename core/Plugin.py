@@ -20,7 +20,7 @@ from core.MObject import MObject
 
 class Plugin( MObject ):
 
-	def __init__( self, name ):
+	def __init__( self, name = None ):
 		"""Constructor"""
 		MObject.__init__( self, name )
 

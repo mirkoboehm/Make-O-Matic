@@ -94,7 +94,7 @@ class SCMGit( SourceCodeProvider ):
 			if not os.path.isdir( hiddenClone ):
 				raise MomError( 'hidden clone exists at "{0}", but is not a directory. Help!'.format( hiddenClone ) )
 			# FIXME get timeout value from settings
-			runner = RunCommand( project, 'git fetch', 1200, True )
+			runner = RunCommand( project, 'git pull --all', 1200, True )
 			runner.setWorkingDir( hiddenClone )
 			runner.run()
 			if runner.getReturnCode() == 0:
