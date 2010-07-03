@@ -19,9 +19,16 @@
 
 from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
+from core.loggers.ConsoleLogger import ConsoleLogger
 
 project = Project( "Simple Project Run Test", "0.5.0" )
+logger = ConsoleLogger()
+project.addLogger( logger )
 scm = SCMGit()
+scm.setSrcDir( 'src' )
+scm.setRevision( 'HEAD' )
 scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
+# scm.setUrl( 'file:////d/kdab/products/charm/src' )
+# FIXME: project.setScm! 
 project.addPlugin( scm )
 project.build()

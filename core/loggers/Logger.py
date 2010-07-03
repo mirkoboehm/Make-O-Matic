@@ -18,15 +18,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from datetime import datetime
 import os
-from core.MObject import MObject
 from core.Exceptions import AbstractMethodCalledError
+from core.Plugin import Plugin
 
-class Logger( MObject ):
+class Logger( Plugin ):
 	"""Logger is the base class for Logger objects."""
 
 	def __init__( self, name ):
 		"""Constructor"""
-		MObject.__init__( self, name )
+		Plugin.__init__( self, name )
 
 	def message( self, mobject, msg ):
 		raise AbstractMethodCalledError()

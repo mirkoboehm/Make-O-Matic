@@ -20,13 +20,13 @@
 import datetime
 from core.MObject import MObject
 from core.modules.FolderManager import FolderManager
-from core.loggers.ConsoleLogger import ConsoleLogger
+from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.executomat.Executomat import Executomat
 from core.executomat.Step import Step
 from core.Settings import Settings
 import sys
-from core.Exceptions import InterruptedException
+from core.Exceptions import InterruptedException, MomError
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -37,7 +37,7 @@ class Project( MObject ):
 		"""Set up the build steps, parse the command line arguments."""
 		MObject.__init__( self, projectName )
 		self.__settings = Settings()
-		self.__loggers = [ ConsoleLogger() ]
+		self.__loggers = []
 		self.__startTime = datetime.datetime.utcnow()
 		self.__buildMode = 'm'
 		self.__plugins = [ FolderManager() ]
@@ -52,6 +52,12 @@ class Project( MObject ):
 
 	def addPlugin( self, plugin ):
 		self.__plugins.append( plugin )
+
+	def addLogger( self, logger ):
+		if not isinstance( logger, Logger ):
+			raise MomError( 'Loggers need to re-implement the Logger class!' )
+		self.__loggers.append( logger )
+		self.addPlugin( logger )
 
 	def getLoggers( self ):
 		return self.__loggers
