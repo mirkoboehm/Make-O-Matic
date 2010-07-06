@@ -8,11 +8,9 @@ from core.executomat.Action import Action
 class ShellCommandAction( Action ):
 	"""ShellCommandAction encapsulates the execution of one command in the Step class. 
 	It is mostly used internally, but can be of general use as well."""
-	def __init__( self, command = None, timeout = None, workingDir = None ):
+	def __init__( self, command = None, timeout = None ):
 		Action.__init__( self )
 		self.setCommand( command, timeout )
-		if workingDir:
-			self.setWorkingDirectory( workingDir )
 		self.__runner = None
 
 	def getLogDescription( self ):
@@ -39,27 +37,8 @@ class ShellCommandAction( Action ):
 	def run( self, project ):
 		"""Executes the shell command. Needs a command to be set."""
 		check_for_nonempty_string( self.getCommand(), 'trying to run a command without a command' )
-		if project.getReturnCode() != 0 and not self.executeOnFailure():
-			return 0
-		oldCwd = None
-		try:
-			if self.getWorkingDirectory():
-				if not os.path.isdir( self.getWorkingDirectory() ):
-					raise MomError( 'working directory ' + self.__workingDir + ' does not exist' )
-				oldCwd = os.getcwd()
-				os.chdir( self.getWorkingDirectory() )
-			self.__runner = RunCommand( project, self.__command, self.__timeOutPeriod, True )
-			self._getRunner().run()
-			if self.getLogfileName():
-				file = open( self.getLogfileName(), 'a' )
-				if file:
-					file.writelines( self._getRunner().getStdOut().decode() )
-					file.close()
-				else:
-					raise MomError( 'cannot write to log file "{0}"'.format( self.getLogfileName() ) )
-		finally:
-			if oldCwd:
-				os.chdir( oldCwd )
+		self.__runner = RunCommand( project, self.__command, self.__timeOutPeriod, True )
+		self._getRunner().run()
 		return self._getRunner().getReturnCode() == 0
 
 	def hasTimedOut( self ):

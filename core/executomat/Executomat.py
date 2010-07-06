@@ -23,6 +23,8 @@ from core.executomat.Step import Step
 from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.MObject import MObject
 from core.Defaults import Defaults
+from core.helpers.TimeKeeper import TimeKeeper
+from lib2to3.tests.support import proj_dir
 
 class Executomat( MObject ):
 	"""Executomat executes actions in steps which can be individually enabled and disabled.
@@ -39,6 +41,7 @@ class Executomat( MObject ):
 		MObject.__init__( self, name )
 		self.__steps = []
 		self.__logfileName = Defaults().getExecutomatLogfileName()
+		self.__timeKeeper = TimeKeeper()
 		self.__logDir = '.'
 		self.__logfile = None
 		self.__failedStep = None
@@ -92,6 +95,14 @@ class Executomat( MObject ):
 			self.__logfile.write( text.rstrip() + '\n' )
 
 	def run( self, project ):
+		try:
+			self.__timeKeeper.start()
+			return self._runTimed( project )
+		finally:
+			self.__timeKeeper.stop()
+			project.debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
+
+	def _runTimed( self, project ):
 		self.__logfileName = None
 		try:
 			if not os.path.isdir( self.getLogDir() ):

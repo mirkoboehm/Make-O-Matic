@@ -17,8 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-from core.helpers.TypeCheckers import check_for_string
-from core.Exceptions import AbstractMethodCalledError, MomError
+from core.helpers.TypeCheckers import check_for_string, check_for_nonnegative_int
+from core.Exceptions import AbstractMethodCalledError, MomError, MomException, BuildError
+import os
+from core.helpers.TimeKeeper import TimeKeeper
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -34,23 +36,16 @@ class Action( MObject ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
 		raise AbstractMethodCalledError()
 
-	def __init__( self, name = "Action" ):
+	def __init__( self, name = None ):
 		"""Constructor"""
 		MObject.__init__( self, name )
-		self.__logfileName = None
+		self.__timeKeeper = TimeKeeper()
 		self.__workingDir = None
 		self.__started = False
-		self.__executeOnFailure = False
-		self.__result = 0
-		self.__stdOut = ""
-		self.__stdErr = ""
-
-	def setLogfileName( self, logfileName ):
-		check_for_string( logfileName, "The log file parameter must be a string containing a file name." )
-		self.__logfileName = logfileName
-
-	def getLogfileName( self ):
-		return self.__logfileName
+		self.__finished = False
+		self.__result = None
+		self.__stdOut = None
+		self.__stdErr = None
 
 	def setWorkingDirectory( self, dir ):
 		"""Set the directory to execute the command in."""
@@ -61,31 +56,81 @@ class Action( MObject ):
 		"""Return the working directory."""
 		return self.__workingDir
 
-	def setExecuteOnFailure( self, doIt ):
-		"""Set execute-on-failure. If true, the command will be executed, even if a previous command of the same sequence failed."""
-		self.__executeOnFailure = doIt
+	def _aboutToStart( self ):
+		self.__started = True
 
-	def getExecuteOnFailure( self ):
-		return self.__executeOnFailure
-
-	def wasExecuted( self ):
+	def wasStarted( self ):
 		return self.__started != False
+
+	def _finished( self ):
+		self.__finished = True
+
+	def didFinish( self ):
+		return self.__finished != False
+
+	def _setResult( self, result ):
+		check_for_nonnegative_int( result, 'The result of an action must be a non-negative integer!' )
+
+	def getResult( self ):
+		return self.__result
 
 	def getExitCode( self ):
 		"""Returns the actions integer exit code. Can only be called after execution."""
-		if not self.wasExecuted():
-			raise MomError( 'exitCode() queried before the command was executed' )
+		if not self.didFinish():
+			raise MomError( 'exitCode() queried before the command was finished' )
 		return self.__exitCode
 
 	def getStdErr( self ):
 		"""Returns the stderr output of the action. Can only be called after execution."""
-		if not self.wasExecuted():
-			raise MomError( 'stdErr() queried before the action was executed' )
+		if not self.didFinish():
+			raise MomError( 'stdErr() queried before the action was finished' )
 		return self.__stdErr
 
 	def getStdOut( self ):
 		"""Returns the stdout output of the action. Can only be called after execution."""
-		if not self.wasExecuted():
-			raise MomError( 'stdOut() queried before the action was executed' )
+		if not self.didFinish():
+			raise MomError( 'stdOut() queried before the action was finished' )
 		return self.__stdOut
 
+	def executeAction( self, project, executomat, step ):
+		try:
+			self.__timeKeeper.start()
+			return self._executeActionTimed( project, executomat, step )
+		finally:
+			self.__timeKeeper.stop()
+			project.debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
+
+	def _executeActionTimed( self, project, executomat, step ):
+		oldPwd = None
+		try:
+			executomat.log( '# {0}'.format( self.getLogDescription() ) )
+			if self.getWorkingDirectory():
+				oldPwd = os.getcwd()
+				executomat.log( '# changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
+				try:
+					os.chdir( self.getWorkingDirectory() )
+				except ( OSError, IOError ) as e:
+					raise BuildError( str( e ) )
+			self._aboutToStart()
+			self._setResult( 0 )
+			result = self.run( project )
+			self._finished()
+			if step.getLogfileName():
+				file = open( step.getLogfileName(), 'a' )
+				if file:
+					if self.getStdOut():
+						file.writelines( self.getStdOut().decode() )
+					else:
+						file.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
+					file.close()
+				else:
+					raise MomError( 'cannot write to log file "{0}"'.format( step.getLogfileName() ) )
+			return result
+		except MomException as e:
+			project.debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
+			self._setResult( e.getReturnCode() )
+			return False
+		finally:
+			if oldPwd:
+				executomat.log( '# changing back to "{0}"'.format( oldPwd ) )
+				os.chdir( oldPwd )

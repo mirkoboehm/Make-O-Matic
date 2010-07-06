@@ -164,7 +164,7 @@ class RunCommand( MObject ):
 			combinedOutputString = 'and separate output for stdout and stderr'
 			if self.getCombineOutput():
 				combinedOutputString = 'and combined stdout and stderr output'
-			self.getProject().debugN( self, 3, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
+			self.getProject().debugN( self, 4, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
 			runner = _CommandRunner ( self.getProject(), self )
 			runner.setCombineOutput( self.getCombineOutput() )
 			runner.start()
@@ -180,7 +180,7 @@ class RunCommand( MObject ):
 				runner.join( 5 )
 				self.__timedOut = True
 			timeoutString = "timed out" if self.getTimedOut() else "completed"
-			self.getProject().debugN( self, 3, 'command {0}, return code is {1}'.format( timeoutString, str( self.getReturnCode() ) ) )
+			self.getProject().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( self.getCommand(), timeoutString, str( self.getReturnCode() ) ) )
 			return self.getReturnCode()
 		finally:
 			if oldCwd:
