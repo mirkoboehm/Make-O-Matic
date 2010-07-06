@@ -98,7 +98,7 @@ class Action( MObject ):
 			return self._executeActionTimed( project, executomat, step )
 		finally:
 			self.__timeKeeper.stop()
-			project.debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
+			project.debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
 
 	def _executeActionTimed( self, project, executomat, step ):
 		oldPwd = None

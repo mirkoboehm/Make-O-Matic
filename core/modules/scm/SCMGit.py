@@ -63,7 +63,7 @@ class SCMGit( SourceCodeProvider ):
 		else:
 			lines = runner.getStdOut().decode().split( '\n' )
 			self._setDescription( lines[0].rstrip() )
-			project.debugN( self, 2, 'git found: "{0}"'.format( self.getDescription() ) )
+			project.debugN( self, 4, 'git found: "{0}"'.format( self.getDescription() ) )
 
 	def makeCheckoutStep( self, project ):
 		"""Create steps to check out the source code"""
@@ -79,7 +79,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def makePackageStep( self, project, ):
 		"""Create a src tarball of the project and put it into the packages directory."""
-		project.message( self, 'NOT IMPLEMENTED!' )
+		# project.message( self, 'NOT IMPLEMENTED!' )
 
 	def _getHiddenClonePath( self ):
 		clonename = make_foldername_from_string( self.getUrl() )

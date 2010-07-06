@@ -25,7 +25,7 @@ from core.modules.DoxygenGenerator import DoxygenGenerator
 project = Project( "Simple Project Run Test", "0.5.0" )
 # add a console logger
 logger = ConsoleLogger()
-logger.setLevel( 3 )
+logger.setLevel( 2 )
 project.addLogger( logger )
 
 # add a git SCM

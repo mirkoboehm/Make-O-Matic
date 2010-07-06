@@ -47,4 +47,4 @@ class RmDirAction( Action ):
 
 	def getLogDescription( self ):
 		"""Overload"""
-		return '{0} "{1}"'.format( self.getName(), self.getPath() )
+		return 'rmdir "{0}"'.format( self.getPath() )

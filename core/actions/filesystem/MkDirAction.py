@@ -38,7 +38,7 @@ class MkDirAction( Action ):
 
 	def run( self, project ):
 		check_for_nonempty_string( self.getPath(), "No directory specified!" )
-		project.debugN( self, 2, 'creating directory "{0}"'.format( self.getPath() ) )
+		project.debugN( self, 4, 'creating directory "{0}"'.format( self.getPath() ) )
 		try:
 			os.makedirs( self.getPath() )
 			return True
@@ -48,4 +48,4 @@ class MkDirAction( Action ):
 
 	def getLogDescription( self ):
 		"""Overload"""
-		return '{0} "{1}"'.format( self.getName(), self.getPath() )
+		return 'mkdir "{0}"'.format( self.getPath() )
