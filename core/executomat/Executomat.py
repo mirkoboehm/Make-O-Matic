@@ -24,7 +24,6 @@ from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.MObject import MObject
 from core.Defaults import Defaults
 from core.helpers.TimeKeeper import TimeKeeper
-from lib2to3.tests.support import proj_dir
 
 class Executomat( MObject ):
 	"""Executomat executes actions in steps which can be individually enabled and disabled.
@@ -88,6 +87,9 @@ class Executomat( MObject ):
 			if step.getName() == identifier:
 				return step
 		raise MomError( 'no such step "{0}"'.format( identifier ) )
+
+	def getTimeKeeper( self ):
+		return self.__timeKeeper
 
 	def log( self, text ):
 		"""Write a text to the log file, if it is there."""

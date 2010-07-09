@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.MObject import MObject
 from core.Exceptions import AbstractMethodCalledError
 from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.Plugin import Plugin
 
-class SourceCodeProvider( MObject ):
+class SourceCodeProvider( Plugin ):
 
-	def __init__( self, name ):
+	def __init__( self, name = None ):
 		"""Constructor"""
-		MObject.__init__( self, name )
+		Plugin.__init__( self, name )
 		self.__url = None
 		self.__revision = None
 		self.__committer = None

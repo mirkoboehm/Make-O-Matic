@@ -1,5 +1,4 @@
 # This file implements the ShellCommandAction class
-import os
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_nonnegative_int
 from core.Exceptions import MomError
 from core.helpers.RunCommand import RunCommand

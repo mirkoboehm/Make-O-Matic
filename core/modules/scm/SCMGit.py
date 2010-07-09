@@ -98,7 +98,7 @@ class SCMGit( SourceCodeProvider ):
 			runner.setWorkingDir( hiddenClone )
 			runner.run()
 			if runner.getReturnCode() == 0:
-				project.debugN( self, 2, 'updated the hidden clone at "{0}"'.format( hiddenClone ) )
+				project.debugN( self, 4, 'updated the hidden clone at "{0}"'.format( hiddenClone ) )
 			else:
 				raise MomError( 'cannot update the clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 		else:

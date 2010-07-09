@@ -21,6 +21,7 @@ from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.modules.DoxygenGenerator import DoxygenGenerator
+from core.modules.reporters.ExecutomatReport import ExecutomatReport
 
 project = Project( "Simple Project Run Test", "0.5.0" )
 # add a console logger
@@ -32,12 +33,22 @@ project.addLogger( logger )
 scm = SCMGit()
 scm.setSrcDir( 'src' )
 scm.setRevision( 'HEAD' )
-# scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
-scm.setUrl( 'file:////d/kdab/products/charm/src' )
+scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
+# scm.setUrl( 'file:////d/kdab/products/charm/src' )
 project.setScm( scm )
 
 # add a doxygen generator
 dox = DoxygenGenerator()
 dox.setDoxygenFile( 'doxygen.cfg' )
 project.addPlugin( dox )
-project.build()
+project.buildAndReturn()
+
+# temp 
+report = ExecutomatReport( project.getExecutomat() )
+report.prepare()
+
+print( report.getSummary() )
+for stepReport in report.getStepReports():
+	print( '{0}: {1}'.format( stepReport.getStep().getName(), stepReport.getSummary() ) )
+	if stepReport.getHasDetails():
+		print( '   *** {0} ***'.format( stepReport.getDescription() ) )

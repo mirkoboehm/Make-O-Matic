@@ -44,6 +44,7 @@ class MkDirAction( Action ):
 			return True
 		except ( OSError, IOError ) as e:
 			project.debug( self, 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) ) )
+			self._setResult( 1 )
 			return False
 
 	def getLogDescription( self ):

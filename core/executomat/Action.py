@@ -70,6 +70,7 @@ class Action( MObject ):
 
 	def _setResult( self, result ):
 		check_for_nonnegative_int( result, 'The result of an action must be a non-negative integer!' )
+		self.__result = result
 
 	def getResult( self ):
 		return self.__result

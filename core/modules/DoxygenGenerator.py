@@ -31,7 +31,7 @@ class DoxygenGenerator( Plugin ):
 		self.__doxygenFile = None
 		self.__docsDir = 'docs'
 
-	def setDoygenPath( self, doxygenPath ):
+	def setDoxygenPath( self, doxygenPath ):
 		check_for_nonempty_string( doxygenPath, 'The doxygen doxygenPath must be the full doxygenPath to the doxygen program!' )
 		self.__doxygenPath = doxygenPath
 

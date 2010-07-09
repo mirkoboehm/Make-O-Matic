@@ -81,56 +81,11 @@ class Step( MObject ):
 		"""Add a post command"""
 		self.__addAction( self.getPostActions(), action )
 
+	def getTimeKeeper( self ):
+		return self.__timeKeeper
+
 	def __addAction( self, container, action ):
 		container.append( action )
-
-	def report( self ):
-		"""Generate a human readable report about the command execution.
-		Every report is a tuple like this: ( 'stepName', 'ok', 'pre: ok, main: ok, post: ok', 'logFileName.log' )"""
-		details = ''
-		result = [ self.name(), '', '', self.__logfileName ]
-		if not self.__enabled:
-			result[1] = 'disabled'
-			result[2] = result[1]
-			return result
-		else:
-			workSet = ( ['precmds', '', self.__preActions ],
-						['maincmds', '', self.__mainActions ],
-						['postcmds', '', self.__postActions ] )
-			notRun = True
-			failed = False
-			report = ''
-			for phase in workSet:
-				if not phase[2]: # no commands for this phase
-					phase[1] = 'none'
-				else:
-					for Cmd in phase[2]:
-						if not Cmd.executed():
-							phase[1] = 'skipped'
-							break
-						elif Cmd.timedOut():
-							phase[1] = 'timeout (failed)'
-							failed = True
-							notRun = False
-							break
-						elif Cmd.exitCode() != 0:
-							phase[1] = 'failed'
-							failed = True
-							notRun = False
-							break
-						else: # success
-							notRun = False
-							phase[1] = 'ok'
-				if result[2]:
-					result[2] += ', '
-				result[2] += phase[0] + ': ' + phase[1]
-			if notRun:
-				result[1] = 'SKIPPED'
-			elif failed:
-				result[1] += 'FAILED'
-			else:
-				result[1] += 'success'
-			return result
 
 	def _logEnvironment( self, project, executomat ):
 		project.debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )
