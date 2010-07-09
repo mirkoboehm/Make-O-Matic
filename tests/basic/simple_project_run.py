@@ -21,12 +21,12 @@ from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.modules.DoxygenGenerator import DoxygenGenerator
-from core.modules.reporters.ExecutomatReport import ExecutomatReport
+from core.modules.reporters.ProjectReport import ProjectReport
 
 project = Project( "Simple Project Run Test", "0.5.0" )
 # add a console logger
 logger = ConsoleLogger()
-logger.setLevel( 2 )
+logger.setLevel( 1 )
 project.addLogger( logger )
 
 # add a git SCM
@@ -44,11 +44,6 @@ project.addPlugin( dox )
 project.buildAndReturn()
 
 # temp 
-report = ExecutomatReport( project.getExecutomat() )
+report = ProjectReport( project )
 report.prepare()
-
-print( report.getSummary() )
-for stepReport in report.getStepReports():
-	print( '{0}: {1}'.format( stepReport.getStep().getName(), stepReport.getSummary() ) )
-	if stepReport.getHasDetails():
-		print( '   *** {0} ***'.format( stepReport.getDescription() ) )
+print( report.getReport() )
