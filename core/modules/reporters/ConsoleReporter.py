@@ -16,3 +16,15 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from core.modules.Reporter import Reporter
+from core.modules.reporters.ProjectReport import ProjectReport
+
+class ConsoleReporter( Reporter ):
+
+	def __init__( self, name = None ):
+		Reporter.__init__( self, name )
+
+	def shutDown( self, project ):
+		report = ProjectReport( project )
+		report.prepare()
+		print( report.getReport() )
