@@ -29,6 +29,10 @@ logger = ConsoleLogger()
 logger.setLevel( 1 )
 project.addLogger( logger )
 
+# add a console reporter
+reporter = ConsoleReporter()
+project.addPlugin( reporter )
+
 # add a git SCM
 scm = SCMGit()
 scm.setSrcDir( 'src' )
@@ -41,10 +45,6 @@ project.setScm( scm )
 dox = DoxygenGenerator()
 dox.setDoxygenFile( 'doxygen.cfg' )
 project.addPlugin( dox )
-
-# add a console reporter
-reporter = ConsoleReporter()
-project.addPlugin( reporter )
 
 # run:
 project.build()

@@ -107,6 +107,7 @@ class Project( MObject ):
 		# ignore configurations for now
 		try:
 			[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
+			self.getSettings().evalConfigurationFiles( self )
 			self.setup()
 			[ plugin.setup( self ) for plugin in self.getPlugins() ]
 			self.getExecutomat().run( self )

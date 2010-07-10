@@ -70,8 +70,12 @@ class TimeKeeper( object ):
 		return self.__stopTime
 
 	def delta( self ):
+		if not self.getStartTime() or not self.getStopTime():
+			return 0
 		return self.getStopTime() - self.getStartTime()
 
 	def deltaString( self ):
+		if not self.getStartTime() or not self.getStopTime():
+			return '[--:--.---]'
 		return formattedTimeDelta( self.delta() )
 
