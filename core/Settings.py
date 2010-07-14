@@ -41,11 +41,13 @@ class Settings( MObject ):
 			if not os.path.isfile( configFile ):
 				project.debug( self, 'Configuration file "{0}" does not exist, continuing.'.format( configFile ) )
 				continue
+			project.debugN( self, 2, 'Loading configuration file "{0}"'.format( configFile ) )
 			try:
 				globals = { 'project' : project }
 				with open( configFile ) as f:
 					code = f.read()
 					exec( code, globals )
+				project.debug( self, 'Configuration file "{0}" loaded successfully'.format( configFile ) )
 			except SyntaxError as e:
 				raise ConfigurationError( 'The configuration file "{0}" contains a syntax error: "{1}"'.format( configFile, str( e ) ) )
 			except Exception as e: # we need to catch all exceptions, since we are calling user code 
