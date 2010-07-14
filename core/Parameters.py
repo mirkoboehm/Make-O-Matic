@@ -56,7 +56,7 @@ class Parameters( MObject ):
 			help = 'ignore commit message commands (like "MOM:BuildType=S")' )
 		parser.add_option( '-s', '--build-steps', action = 'store', dest = 'buildSteps',
 			help = 'enable or disable individual builds steps on top of the defaults for the build type' )
-		parser.add_option( '-v', '--verbose', action = 'count', dest = 'verbosity',
+		parser.add_option( '-v', '--verbose', action = 'count', dest = 'verbosity', default = 0,
 			help = 'level of debug output' )
 		# parse options:
 		( self.__options, self.__args ) = parser.parse_args( sys.argv )
@@ -108,3 +108,6 @@ class Parameters( MObject ):
 			settings.set( Settings.ScriptIgnoreCommitMessageCommands, self.getIgnoreCommitMessage() )
 		if self.getDebugLevel():
 			settings.set( Settings.ScriptLogLevel, self.getDebugLevel() )
+		if len( self._getArgs() ) > 1:
+			runMode = self._getArgs()[1]
+			settings.set( settings.ScriptRunMode, runMode )

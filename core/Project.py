@@ -40,6 +40,7 @@ class Project( MObject ):
 		"""Set up the build steps, parse the command line arguments."""
 		MObject.__init__( self, projectName )
 		self.__settings = Settings()
+		self.getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__parameters = Parameters()
 		self.__scm = None
@@ -113,7 +114,8 @@ class Project( MObject ):
 	def buildAndReturn( self, configurations = [] ):
 		"""BuildAndReturn executes the build and returns the exit code of the script.
 		It is useful for scripts that need to perform other code after the build method.
-		build wraps this function and exits with the error code."""
+		build wraps this function and exits with the error code.
+		The method does not always return, though, only in build mode."""
 		# enable and disable the steps according to the settings for the build mode
 		# FIXME
 		# ignore configurations for now
@@ -123,12 +125,22 @@ class Project( MObject ):
 			[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
 			self.setup()
 			[ plugin.setup( self ) for plugin in self.getPlugins() ]
-			self.getExecutomat().run( self )
+			if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
+				self.getExecutomat().run( self )
+			elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
+				self.queryAndExit()
+			elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:
+				raise MomError( 'Not implemented: run mode "print"' )
+			else:
+				assert self.getSettings().get( Settings.ScriptRunMode ) not in Settings.RunModes
+				raise MomError( 'Unknown run mode "{0}". Known run modes are: {1}'.format( 
+						self.getSettings().get( Settings.ScriptRunMode ),
+						', '.join( Settings.RunModes ) ) )
 			self.getTimeKeeper().stop()
 			[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
 			return 0
 		except MomException as e:
-			self.debug( self, 'Error during build, return code {0}: "{1}"'.format( str( e ), e.getReturnCode() ) )
+			self.message( self, 'Error during build, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )
 			return e.getReturnCode()
 		except KeyboardInterrupt:
 			self.message( 'Interrupted. Have a nice day.' )
@@ -147,3 +159,22 @@ This error will not change the return code of the script!'''.format( str( e ), p
 	def build( self, configurations = [] ):
 		"""build executes the build and exits the process with the correct return code."""
 		sys.exit( self.buildAndReturn( configurations ) )
+
+	def queryAndExit( self ):
+		try:
+			args = self.getParameters()._getArgs()[2:] # filter script name, 'query'
+			settings = self.getSettings().getSettings()
+			if args:
+				for key in args:
+					if key in settings:
+						print( '{0}: {1}'.format( key, settings[key] ) )
+					else:
+						raise MomError( 'Undefind setting "{0}"'.format( key ) )
+			else:
+				# print all
+				for key in settings:
+					print( '{0}: {1}'.format( key, settings[key] ) )
+			sys.exit( 0 )
+		except Exception as e:
+			print( 'Error: {0}'.format( str( e ) ) )
+			sys.exit( 1 )

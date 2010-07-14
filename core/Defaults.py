@@ -24,12 +24,20 @@ from core.Exceptions import ConfigurationError
 class Defaults( MObject ):
 	"""Defaults stores all hard-coded default values of make-o-matic."""
 
+	# Constants (build script values)
+	RunMode_Build = 'build'
+	RunMode_Query = 'query'
+	RunMode_Print = 'print'
+	RunModes = [ RunMode_Build, RunMode_Query, RunMode_Print ]
+
 	# Constants (setting variable names)
 	# ----- script settings:
 	ScriptLogLevel = 'script.loglevel'
 	ScriptClientName = 'script.clientname'
 	ScriptIgnoreCommitMessageCommands = 'script.ignorecommitmessagecommands'
+	ScriptRunMode = 'script.runmode'
 	# ----- project settings 
+	ProjectName = 'project.name'
 	ProjectExecutomatLogfileName = 'project.executomat.logfilename'
 	ProjectBuildType = 'project.buildtype'
 	ProjectBuildSteps = 'project.buildsteps'
@@ -46,8 +54,10 @@ class Defaults( MObject ):
 		self.__settings = {}
 		# store defaults:
 		# ----- script settings:
-		self.getSettings()[ Defaults.ScriptClientName ] = gethostname()
 		self.getSettings()[ Defaults.ScriptLogLevel ] = 0
+		self.getSettings()[ Defaults.ScriptClientName ] = gethostname()
+		self.getSettings()[ Defaults.ScriptRunMode ] = Defaults.RunMode_Build
+		self.getSettings()[ Defaults.ScriptIgnoreCommitMessageCommands ] = False
 		# ----- project settings:
 		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'
