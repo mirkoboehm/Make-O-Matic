@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import sys
 import datetime
 from core.MObject import MObject
 from core.modules.FolderManager import FolderManager
@@ -27,8 +28,8 @@ from core.helpers.TimeKeeper import TimeKeeper
 from core.executomat.Executomat import Executomat
 from core.executomat.Step import Step
 from core.Settings import Settings
-import sys
 from core.Exceptions import InterruptedException, MomError, MomException
+from core.Parameters import Parameters
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -39,6 +40,7 @@ class Project( MObject ):
 		"""Set up the build steps, parse the command line arguments."""
 		MObject.__init__( self, projectName )
 		self.__timeKeeper = TimeKeeper()
+		self.__parameters = Parameters()
 		self.__settings = Settings()
 		self.__scm = None
 		self.__loggers = []
@@ -47,9 +49,15 @@ class Project( MObject ):
 		self.__plugins = [ FolderManager() ]
 		self.__returnCode = 0
 		self.__executomat = Executomat( 'Exec-o-Matic' )
+		# all we do during construction is to evaluate the build script options:
+		# the option parser will exit the script if any of the options are not valid
+		self.getParameters().parse()
 
 	def getSettings( self ):
 		return self.__settings
+
+	def getParameters( self ):
+		return self.__parameters
 
 	def setScm( self, scm ):
 		if self.getScm():
