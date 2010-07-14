@@ -24,7 +24,7 @@ class ConsoleReporter( Reporter ):
 	def __init__( self, name = None ):
 		Reporter.__init__( self, name )
 
-	def shutDown( self, project ):
+	def wrapUp( self, project ):
 		report = ProjectReport( project )
 		report.prepare()
 		print( report.getReport() )

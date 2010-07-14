@@ -34,9 +34,7 @@ class ProjectReport( object ):
 		return self.__summary
 
 	def getReport( self ):
-		report = '''{0}
-
-'''.format( self.getSummary() )
+		report = '{0}\n'''.format( self.getSummary() )
 
 		for stepReport in self.__executomatReport.getStepReports():
 			report += '{0}: {1}\n'.format( stepReport.getStep().getName(), stepReport.getSummary() )
@@ -48,6 +46,6 @@ class ProjectReport( object ):
 		self.__summary = '''\
 Build report for "{0}"
 Total build time: {1}
-'''.format( self.getProject().getName(), '00:00.0000' )
+'''.format( self.getProject().getName(), self.getProject().getTimeKeeper().deltaString() )
 		self.__executomatReport.prepare()
 

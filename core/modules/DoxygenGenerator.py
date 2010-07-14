@@ -53,7 +53,7 @@ class DoxygenGenerator( Plugin ):
 		else:
 			lines = runner.getStdOut().decode().split( '\n' )
 			version = lines[0].rstrip()
-			project.debugN( self, 2, 'doxygen found: "{0}"'.format( version ) )
+			project.debugN( self, 1, 'doxygen found: "{0}"'.format( version ) )
 
 	def setup( self, project ):
 		check_for_nonempty_string( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )

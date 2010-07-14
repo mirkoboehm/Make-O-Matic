@@ -23,11 +23,12 @@ from core.modules.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
+from core.helpers.TimeKeeper import TimeKeeper
 from core.executomat.Executomat import Executomat
 from core.executomat.Step import Step
 from core.Settings import Settings
 import sys
-from core.Exceptions import InterruptedException, MomError
+from core.Exceptions import InterruptedException, MomError, MomException
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -37,6 +38,7 @@ class Project( MObject ):
 	def __init__( self, projectName, minimalMomVersion = None ):
 		"""Set up the build steps, parse the command line arguments."""
 		MObject.__init__( self, projectName )
+		self.__timeKeeper = TimeKeeper()
 		self.__settings = Settings()
 		self.__scm = None
 		self.__loggers = []
@@ -44,7 +46,7 @@ class Project( MObject ):
 		self.__buildMode = 'm'
 		self.__plugins = [ FolderManager() ]
 		self.__returnCode = 0
-		self.__executomat = Executomat( "Project Executomat" )
+		self.__executomat = Executomat( 'Exec-o-Matic' )
 
 	def getSettings( self ):
 		return self.__settings
@@ -74,6 +76,9 @@ class Project( MObject ):
 
 	def getLoggers( self ):
 		return self.__loggers
+
+	def getTimeKeeper( self ):
+		return self.__timeKeeper
 
 	def setReturnCode( self, code ):
 		check_for_nonnegative_int( code, "The return code of the build script has to be a non-negative integer number!" )
@@ -106,18 +111,31 @@ class Project( MObject ):
 		# FIXME
 		# ignore configurations for now
 		try:
+			self.getTimeKeeper().start()
 			[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
 			self.getSettings().evalConfigurationFiles( self )
 			self.setup()
 			[ plugin.setup( self ) for plugin in self.getPlugins() ]
 			self.getExecutomat().run( self )
+			self.getTimeKeeper().stop()
 			[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
 			return 0
+		except MomException as e:
+			self.debug( self, 'Error during build, return code {0}: "{1}"'.format( str( e ), e.getReturnCode() ) )
+			return e.getReturnCode()
 		except KeyboardInterrupt:
 			self.message( 'Interrupted. Have a nice day.' )
 			return InterruptedException().getReturnCode()
 		finally:
-			[ plugin.shutDown( self ) for plugin in self.getPlugins() ]
+			for plugin in self.getPlugins():
+				try:
+					plugin.shutDown( self )
+				except Exception as e:
+					text = '''\
+An error occurred during shutdown: "{0}"
+Offending module: "{1}" 
+This error will not change the return code of the script!'''.format( str( e ), plugin.getName() )
+					self.message( self, text )
 
 	def build( self, configurations = [] ):
 		"""build executes the build and exits the process with the correct return code."""
