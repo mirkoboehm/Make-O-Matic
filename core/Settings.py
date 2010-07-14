@@ -16,20 +16,31 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.MObject import MObject
 from core.Defaults import Defaults
 import os
 from core.Exceptions import ConfigurationError
 
-class Settings( MObject ):
+class Settings( Defaults ):
 	"""Settings stores all configurable values for a build script run."""
 
 	def __init__( self ):
 		'''Constructor'''
-		MObject.__init__( self )
-		defaults = Defaults()
-		self._setProjectBuildSteps( defaults.getProjectBuildSteps() )
-		self._setDefaultBuildSteps( defaults.getProjectDefaultBuildSteps() )
+		# this applies the defaults:
+		Defaults.__init__( self )
+
+	def initialize( self, project ):
+		'''Determine the script run settings. 
+		In the constructor, defaults will be applied. 
+		First, configuration files will be parsed.
+		Second, command line arguments will be applied. 
+		Third, commit message commands will be applied. This can be disabled by a parameter (step three).'''
+		# ...
+		# first, parse configuration files:
+		self.evalConfigurationFiles( project )
+		# second, apply parameters:
+		project.getParameters().apply( self )
+		# third, apply commit message commands:
+		# ...
 
 	def evalConfigurationFiles( self, project ):
 		filename = 'config.py'
@@ -55,11 +66,9 @@ class Settings( MObject ):
 			except: # we need to catch all exceptions, since we are calling user code 
 				raise ConfigurationError( 'The configuration file "{0}" contains an unknown error!'.format( configFile ) )
 
-	def _setProjectBuildSteps( self, steps ):
-		self.__projectBuildSteps = steps
-
 	def getProjectBuildSteps( self ):
-		return self.__projectBuildSteps
-
-	def _setDefaultBuildSteps( self, stepsDict ):
-		self.__defaultSteps = stepsDict
+		"""Return all defined build steps on the project level."""
+		steps = []
+		for step in self.get( Settings.ProjectBuildSteps, True ):
+			steps.append( step[0] )
+		return steps

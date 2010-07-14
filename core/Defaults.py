@@ -17,38 +17,67 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
+from socket import gethostname
+from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.Exceptions import ConfigurationError
 
 class Defaults( MObject ):
 	"""Defaults stores all hard-coded default values of make-o-matic."""
 
+	# Constants (setting variable names)
+	# ----- script settings:
+	ScriptLogLevel = 'script.loglevel'
+	ScriptClientName = 'script.clientname'
+	ScriptIgnoreCommitMessageCommands = 'script.ignorecommitmessagecommands'
+	# ----- project settings 
+	ProjectExecutomatLogfileName = 'project.executomat.logfilename'
+	ProjectBuildType = 'project.buildtype'
+	ProjectBuildSteps = 'project.buildsteps'
+	ProjectSourceLocation = 'project.sourcelocation'
+	ProjectRevision = 'project.revision'
+	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
+	# ----- reporter settings:
+	EmailReporterSender = 'reporter.email.sender'
+	EmailReporterRecipients = 'reporter.email.recipient'
+
 	def __init__( self ):
 		'''Constructor'''
 		MObject.__init__( self )
+		self.__settings = {}
+		# store defaults:
+		# ----- script settings:
+		self.getSettings()[ Defaults.ScriptClientName ] = gethostname()
+		self.getSettings()[ Defaults.ScriptLogLevel ] = 0
+		# ----- project settings:
+		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
+		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'
+		self.getSettings()[ Defaults.ProjectBuildSteps] = [ # name, modes
+			[ 'project-create-folders', 'mcdsf' ],
+			[ 'project-checkout', 'mcdsf' ],
+			[ 'project-build-configurations', 'mcdsf' ],
+			[ 'project-create-docs', 'mcdsf' ],
+			[ 'project-package', 'mdsf' ],
+			[ 'project-upload-docs', 'mdsf' ],
+			[ 'project-upload-packages', 'mdsf' ],
+			[ 'project-cleanup-docs', 'mcdsf' ],
+			[ 'project-cleanup-packages', 'mcdsf' ],
+			[ 'project-cleanup', 'mcdsf' ] ]
 
-	def getExecutomatLogfileName( self ):
-		return 'execution.log'
+	def getSettings( self ):
+		return self.__settings
 
-	def getProjectBuildSteps( self ):
-		"""Return all defined build steps on the project level."""
-		return [
-			'project-create-folders',
-			'project-checkout',
-			'project-build-configurations',
-			'project-create-docs',
-			'project-package',
-			'project-upload-docs',
-			'project-upload-packages',
-			'project-cleanup-docs',
-			'project-cleanup-packages',
-			'project-cleanup' ]
+	# FIXME type checking
+	def get( self, name, required = True ):
+		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
+		try:
+			return self.getSettings()[ name ]
+		except KeyError:
+			if required:
+				raise ConfigurationError( 'The required setting "{0}" is undefined!'.format( name ) )
+			else:
+				return None
 
-	def getProjectDefaultBuildSteps( self ):
-		"""Returns the build steps enabled by default, per mode."""
-		defaultSteps = {
-			'c' : [ 'project-create-folders', 'project-checkout', 'project-build-configurations',
-					'project-cleanup-packages', 'project-cleanup-docs', 'project-cleanup' ]
-		# FIXME add other build modes
-		}
-		# FIXME verify that the defaults are actually known steps :-)
-		return defaultSteps
+	def set( self, name, value ):
+		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
+		self.getSettings()[ name ] = value
 

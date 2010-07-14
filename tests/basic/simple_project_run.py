@@ -25,8 +25,7 @@ from core.modules.reporters.ConsoleReporter import ConsoleReporter
 
 project = Project( "Simple Project Run Test", "0.5.0" )
 # add a console logger
-logger = ConsoleLogger()
-logger.setLevel( 2 )
+logger = ConsoleLogger( project.getParameters().getDebugLevel() )
 project.addLogger( logger )
 
 # add a console reporter

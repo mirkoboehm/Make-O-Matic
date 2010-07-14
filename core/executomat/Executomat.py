@@ -22,8 +22,8 @@ from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_strin
 from core.executomat.Step import Step
 from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.MObject import MObject
-from core.Defaults import Defaults
 from core.helpers.TimeKeeper import TimeKeeper
+from core.Settings import Settings
 
 class Executomat( MObject ):
 	"""Executomat executes actions in steps which can be individually enabled and disabled.
@@ -35,11 +35,11 @@ class Executomat( MObject ):
 	Every step can be enabled or disabled individually. If a step is enabled, all 
 	of it's actions need to finish successfully."""
 
-	def __init__( self, name = None ):
+	def __init__( self, project, name = None ):
 		"""Constructor."""
 		MObject.__init__( self, name )
 		self.__steps = []
-		self.__logfileName = Defaults().getExecutomatLogfileName()
+		self.__logfileName = project.getSettings().get( Settings.ProjectExecutomatLogfileName )
 		self.__timeKeeper = TimeKeeper()
 		self.__logDir = '.'
 		self.__logfile = None

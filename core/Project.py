@@ -39,16 +39,15 @@ class Project( MObject ):
 	def __init__( self, projectName, minimalMomVersion = None ):
 		"""Set up the build steps, parse the command line arguments."""
 		MObject.__init__( self, projectName )
+		self.__settings = Settings()
 		self.__timeKeeper = TimeKeeper()
 		self.__parameters = Parameters()
-		self.__settings = Settings()
 		self.__scm = None
 		self.__loggers = []
 		self.__startTime = datetime.datetime.utcnow()
-		self.__buildMode = 'm'
 		self.__plugins = [ FolderManager() ]
 		self.__returnCode = 0
-		self.__executomat = Executomat( 'Exec-o-Matic' )
+		self.__executomat = Executomat( self, 'Exec-o-Matic' )
 		# all we do during construction is to evaluate the build script options:
 		# the option parser will exit the script if any of the options are not valid
 		self.getParameters().parse()
@@ -120,8 +119,8 @@ class Project( MObject ):
 		# ignore configurations for now
 		try:
 			self.getTimeKeeper().start()
+			self.getSettings().initialize( self )
 			[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
-			self.getSettings().evalConfigurationFiles( self )
 			self.setup()
 			[ plugin.setup( self ) for plugin in self.getPlugins() ]
 			self.getExecutomat().run( self )

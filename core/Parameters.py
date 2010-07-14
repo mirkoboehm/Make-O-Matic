@@ -19,7 +19,8 @@
 from core.MObject import MObject
 import optparse
 import sys
-from core.Exceptions import MomError
+from core.Settings import Settings
+from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class Parameters( MObject ):
 	'''Parameters parses and stores the command line parameters (arguments) of a script.'''
@@ -49,7 +50,7 @@ class Parameters( MObject ):
 			help = 'Full SCM URL' )
 		parser.add_option( '-e', '--email-recipients', action = 'store', dest = 'mailTo',
 			help = 'comma separated list of email recipients for emailed build reports' )
-		parser.add_option( '-t', '--type', action = 'store', dest = 'buildtype',
+		parser.add_option( '-t', '--type', action = 'store', dest = 'buildType',
 			help = 'selects the build type (for example manual, continuous, daily, snapshot, full)' )
 		parser.add_option( '-m', '--ignore-commit-message', action = 'store_true', dest = 'ignoreCommitMessage',
 			help = 'ignore commit message commands (like "MOM:BuildType=S")' )
@@ -65,10 +66,13 @@ class Parameters( MObject ):
 		return self._getOptions().revision
 
 	def getScmLocation( self ):
-		return self._getOptions().options
+		return self._getOptions().url
 
 	def getBuildType( self ):
-		buildType = self._getOptions().buildType.lower()
+		buildType = self._getOptions().buildType
+		if buildType:
+			check_for_nonempty_string( buildType, 'The build type must be a single character!' )
+			buildType = buildType.lower()
 # FIXME Mirko
 #		if buildType not in self.knownBuildTypes():
 #				raise MomError( 'There are only these build types: ' + self.knownBuildTypes() )
@@ -87,3 +91,20 @@ class Parameters( MObject ):
 
 	def getDebugLevel( self ):
 		return self._getOptions().verbosity
+
+	def apply( self, settings ):
+		assert isinstance( settings, Settings )
+		if self.getRevision():
+			settings.set( Settings.ProjectRevision, self.getRevision() )
+		if self.getScmLocation():
+			settings.set( Settings.ProjectSourceLocation, self.getScmLocation() )
+		if self.getBuildType():
+			settings.set( Settings.ProjectBuildType, self.getBuildType() )
+		if self.getBuildSteps():
+			settings.set( Settings.ProjectBuildSequenceSwitches, self.getBuildSteps() )
+		if self.getRecipients():
+			settings.set( Settings.EmailReporterRecipients, self.getRecipients() )
+		if self.getIgnoreCommitMessage():
+			settings.set( Settings.ScriptIgnoreCommitMessageCommands, self.getIgnoreCommitMessage() )
+		if self.getDebugLevel():
+			settings.set( Settings.ScriptLogLevel, self.getDebugLevel() )

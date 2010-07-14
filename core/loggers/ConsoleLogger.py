@@ -19,6 +19,7 @@
 import sys
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
+from core.Settings import Settings
 
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
@@ -49,3 +50,10 @@ class ConsoleLogger( Logger ):
 	def debugN( self, mobject, level , msg ):
 		if self.getLevel() >= level:
 			self.debug( mobject, msg )
+
+	def preFlightCheck( self, project ):
+		level = project.getSettings().get( Settings.ScriptLogLevel, True )
+		check_for_nonnegative_int( level, 'The debug level must be a non-negative integer!' )
+		self.setLevel( level or 0 )
+		if self.getLevel() > 0:
+			project.debug( self, 'debug level is {0}'.format( level ) )
