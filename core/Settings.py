@@ -56,11 +56,12 @@ class Settings( Defaults ):
 			stepName = Step( name )
 			stepName.setEnabled( buildType in types )
 			buildSteps.append( stepName )
+		project.debug( self, 'build type: {0} ({1})'.format( buildType.upper(), self.getBuildTypeDescription( buildType ) ) )
 		# apply customizations passed as command line parameters:
 		switches = project.getParameters().getBuildSteps()
 		if switches:
-			project.debugN( self, 3, 'build sequence before command line parameters (build type {0}): {1}'
-						.format( buildType.upper(), self.__getBuildSequenceDescription( buildSteps ) ) )
+			project.debugN( self, 3, 'build sequence before command line parameters: {0}'
+						.format( self.__getBuildSequenceDescription( buildSteps ) ) )
 			customSteps = switches.split( ',' )
 			for switch in customSteps:
 				stepName = None
@@ -82,8 +83,7 @@ class Settings( Defaults ):
 						found = True
 				if not found:
 					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
-		project.debug( self, 'build sequence (build type {0}): {1}'
-					.format( buildType.upper(), self.__getBuildSequenceDescription( buildSteps ) ) )
+		project.debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
 		return buildSteps
 
 	def __getBuildSequenceDescription( self, buildSteps ):
@@ -117,9 +117,9 @@ class Settings( Defaults ):
 			except: # we need to catch all exceptions, since we are calling user code 
 				raise ConfigurationError( 'The configuration file "{0}" contains an unknown error!'.format( configFile ) )
 
-	def getProjectBuildSteps( self ):
-		"""Return all build steps defined at project level."""
-		steps = []
-		for step in self.get( Settings.ProjectBuildSteps, True ):
-			steps.append( step[0] )
-		return steps
+	def getBuildTypeDescription( self, type ):
+		descriptions = self.get( Settings.ProjectBuildTypeDescriptions )
+		if type in descriptions:
+			return descriptions[type]
+		else:
+			return None

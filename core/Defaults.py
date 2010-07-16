@@ -40,6 +40,7 @@ class Defaults( MObject ):
 	ProjectName = 'project.name'
 	ProjectExecutomatLogfileName = 'project.executomat.logfilename'
 	ProjectBuildType = 'project.buildtype'
+	ProjectBuildTypeDescriptions = 'project.buildtypedescriptions'
 	ProjectBuildSteps = 'project.buildsteps'
 	ProjectSourceLocation = 'project.sourcelocation'
 	ProjectRevision = 'project.revision'
@@ -62,16 +63,26 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'
 		self.getSettings()[ Defaults.ProjectBuildSteps] = [ # name, modes
-			[ 'project-create-folders', 'mcdsf' ],
-			[ 'project-checkout', 'mcdsf' ],
-			[ 'project-build-configurations', 'mcdsf' ],
-			[ 'project-create-docs', 'mcdsf' ],
+			[ 'project-create-folders', 'mcdhpsf' ],
+			[ 'project-checkout', 'mcdhpsf' ],
+			[ 'project-build-configurations', 'mcdhpsf' ],
+			[ 'project-create-docs', 'mcdhpsf' ],
 			[ 'project-package', 'dsf' ],
 			[ 'project-upload-docs', 'dsf' ],
 			[ 'project-upload-packages', 'dsf' ],
 			[ 'project-cleanup-docs', 'cdsf' ],
 			[ 'project-cleanup-packages', 'cdsf' ],
 			[ 'project-cleanup', 'mcdsf' ] ]
+		self.getSettings()[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
+			'e' : 'Empty build. All build steps are disabled. Useful for debugging build scripts.',
+			'm' : 'Manual build. Does not modify environment variables. Deletes temporary folders.',
+			'c' : 'Continuous build. Builds configurations against the latest matching environment. Deletes temporary folders.',
+			'd' : 'Daily build. Builds configurations against every matching environment. Deletes temporary folders.',
+			'h' : 'Hacker build. Similar to manual builds. Does not delete temporary folders.',
+			'p' : '1337 coder build. Similar to daily builds. Does not delete temporary folders.',
+			's' : 'Snapshot build. Similar to daily builds. Creates and uploads packages and documentation.',
+			'f' : 'Full build. All build steps are enabled. Useful for debugging build scripts.'
+		}
 
 	def getSettings( self ):
 		return self.__settings
