@@ -41,7 +41,7 @@ class Step( MObject ):
 		return self.__failed
 
 	def setEnabled( self, enabled = True ):
-		self.__enabled = True
+		self.__enabled = enabled
 
 	def getEnabled( self ):
 		return self.__enabled

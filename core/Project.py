@@ -108,8 +108,8 @@ class Project( MObject ):
 		[ logger.debugN( mobject, level, text ) for logger in self.getLoggers() ]
 
 	def setup( self ):
-		for step in self.getSettings().getProjectBuildSteps():
-			self.getExecutomat().addStep( Step( step ) )
+		for step in self.getSettings().calculateBuildSequence( self ):
+			self.getExecutomat().addStep( step )
 
 	def buildAndReturn( self, configurations = [] ):
 		"""BuildAndReturn executes the build and returns the exit code of the script.

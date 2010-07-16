@@ -66,11 +66,11 @@ class Defaults( MObject ):
 			[ 'project-checkout', 'mcdsf' ],
 			[ 'project-build-configurations', 'mcdsf' ],
 			[ 'project-create-docs', 'mcdsf' ],
-			[ 'project-package', 'mdsf' ],
-			[ 'project-upload-docs', 'mdsf' ],
-			[ 'project-upload-packages', 'mdsf' ],
-			[ 'project-cleanup-docs', 'mcdsf' ],
-			[ 'project-cleanup-packages', 'mcdsf' ],
+			[ 'project-package', 'dsf' ],
+			[ 'project-upload-docs', 'dsf' ],
+			[ 'project-upload-packages', 'dsf' ],
+			[ 'project-cleanup-docs', 'cdsf' ],
+			[ 'project-cleanup-packages', 'cdsf' ],
 			[ 'project-cleanup', 'mcdsf' ] ]
 
 	def getSettings( self ):

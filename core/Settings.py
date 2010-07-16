@@ -19,6 +19,7 @@
 from core.Defaults import Defaults
 import os
 from core.Exceptions import ConfigurationError
+from core.executomat.Step import Step
 
 class Settings( Defaults ):
 	"""Settings stores all configurable values for a build script run."""
@@ -41,6 +42,42 @@ class Settings( Defaults ):
 		project.getParameters().apply( self )
 		# third, apply commit message commands:
 		# ...
+
+	def calculateBuildSequence( self, project ):
+		buildType = self.get( Settings.ProjectBuildType, True ).lower()
+		assert len( buildType ) == 1
+		allBuildSteps = self.get( Settings.ProjectBuildSteps, True )
+		buildSteps = []
+		for buildStep in allBuildSteps:
+			# FIXME maybe this could be a unit test?
+			assert len( buildStep ) == 2
+			name, types = buildStep
+			assert types.lower() == types
+			step = Step( name )
+			step.setEnabled( buildType in types )
+			buildSteps.append( step )
+		# debug info:
+		texts = []
+		for step in buildSteps:
+			texts.append( '{0} ({1})'.format( step.getName(), 'enabled' if step.getEnabled() else 'disabled' ) )
+		project.debugN( self, 1, 'build sequence (build type {0}): {1}'.format( buildType.upper(), ', '.join( texts ) ) )
+		return buildSteps
+		# FIXME:
+		buildSteps = list( self.DefaultBuildsSteps[ buildType ] )
+		# first apply installation customizations, then build script settings, then command line settings: 
+		settingsSwitches = ''
+		if self.getSettings().getSiteBuildSequenceSwitches().has_key( buildType ):
+				settingsSwitches = self.getSettings().getSiteBuildSequenceSwitches()[ buildType ]
+		scriptSwitches = ''
+		if self.getBuildSequenceSwitches().has_key( buildType ):
+				scriptSwitches = self.getBuildSequenceSwitches()[ buildType ]
+		for switches in ( settingsSwitches, scriptSwitches, self.__commandLineBuildSequence ):
+				buildSteps = self.__applyBuildStepCustomization( buildSteps, switches )
+		# create a new set of build steps that are in the order of BuildSequence 
+		self.__buildSteps = []
+		for buildStep in self.buildSequence():
+				if buildStep in buildSteps:
+						self.__buildSteps.append( buildStep )
 
 	def evalConfigurationFiles( self, project ):
 		filename = 'config.py'
@@ -67,7 +104,7 @@ class Settings( Defaults ):
 				raise ConfigurationError( 'The configuration file "{0}" contains an unknown error!'.format( configFile ) )
 
 	def getProjectBuildSteps( self ):
-		"""Return all defined build steps on the project level."""
+		"""Return all build steps defined at project level."""
 		steps = []
 		for step in self.get( Settings.ProjectBuildSteps, True ):
 			steps.append( step[0] )
