@@ -56,11 +56,11 @@ class Settings( Defaults ):
 			stepName = Step( name )
 			stepName.setEnabled( buildType in types )
 			buildSteps.append( stepName )
-		project.debugN( self, 2, 'build sequence before command line parameters (build type {0}): {1}'
-					.format( buildType.upper(), self.__getBuildSequenceDescription( buildSteps ) ) )
 		# apply customizations passed as command line parameters:
 		switches = project.getParameters().getBuildSteps()
 		if switches:
+			project.debugN( self, 3, 'build sequence before command line parameters (build type {0}): {1}'
+						.format( buildType.upper(), self.__getBuildSequenceDescription( buildSteps ) ) )
 			customSteps = switches.split( ',' )
 			for switch in customSteps:
 				stepName = None
@@ -82,7 +82,7 @@ class Settings( Defaults ):
 						found = True
 				if not found:
 					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
-		project.debugN( self, 1, 'build sequence (build type {0}): {1}'
+		project.debug( self, 'build sequence (build type {0}): {1}'
 					.format( buildType.upper(), self.__getBuildSequenceDescription( buildSteps ) ) )
 		return buildSteps
 
@@ -101,7 +101,7 @@ class Settings( Defaults ):
 		configFiles = [ globalConfigFile, localConfigFile]
 		for configFile in configFiles:
 			if not os.path.isfile( configFile ):
-				project.debug( self, 'Configuration file "{0}" does not exist, continuing.'.format( configFile ) )
+				project.debugN( self, 3, 'Configuration file "{0}" does not exist, continuing.'.format( configFile ) )
 				continue
 			project.debugN( self, 2, 'Loading configuration file "{0}"'.format( configFile ) )
 			try:

@@ -143,8 +143,8 @@ class Project( MObject ):
 			self.message( self, 'Error during build, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )
 			return e.getReturnCode()
 		except KeyboardInterrupt:
-			self.message( 'Interrupted. Have a nice day.' )
-			return InterruptedException().getReturnCode()
+			self.message( self, 'Interrupted. Have a nice day.' )
+			return InterruptedException( '' ).getReturnCode()
 		finally:
 			for plugin in self.getPlugins():
 				try:
