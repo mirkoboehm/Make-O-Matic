@@ -53,31 +53,45 @@ class Settings( Defaults ):
 			assert len( buildStep ) == 2
 			name, types = buildStep
 			assert types.lower() == types
-			step = Step( name )
-			step.setEnabled( buildType in types )
-			buildSteps.append( step )
+			stepName = Step( name )
+			stepName.setEnabled( buildType in types )
+			buildSteps.append( stepName )
+		project.debugN( self, 2, 'build sequence before command line parameters (build type {0}): {1}'
+					.format( buildType.upper(), self.__getBuildSequenceDescription( buildSteps ) ) )
+		# apply customizations passed as command line parameters:
+		switches = project.getParameters().getBuildSteps()
+		if switches:
+			customSteps = switches.split( ',' )
+			for switch in customSteps:
+				stepName = None
+				enable = None
+				if switch.startswith( 'enable-' ):
+					stepName = switch[ len( 'enable-' ) : ].strip()
+					enable = True
+				elif switch.startswith( 'disable-' ):
+					stepName = switch[ len( 'disable-' ) : ].strip()
+					enable = False
+				else:
+					raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
+											.format( switch ) )
+				# apply:
+				found = False
+				for step in buildSteps:
+					if step.getName() == stepName:
+						step.setEnabled( enable )
+						found = True
+				if not found:
+					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
+		project.debugN( self, 1, 'build sequence (build type {0}): {1}'
+					.format( buildType.upper(), self.__getBuildSequenceDescription( buildSteps ) ) )
+		return buildSteps
+
+	def __getBuildSequenceDescription( self, buildSteps ):
 		# debug info:
 		texts = []
-		for step in buildSteps:
-			texts.append( '{0} ({1})'.format( step.getName(), 'enabled' if step.getEnabled() else 'disabled' ) )
-		project.debugN( self, 1, 'build sequence (build type {0}): {1}'.format( buildType.upper(), ', '.join( texts ) ) )
-		return buildSteps
-		# FIXME:
-		buildSteps = list( self.DefaultBuildsSteps[ buildType ] )
-		# first apply installation customizations, then build script settings, then command line settings: 
-		settingsSwitches = ''
-		if self.getSettings().getSiteBuildSequenceSwitches().has_key( buildType ):
-				settingsSwitches = self.getSettings().getSiteBuildSequenceSwitches()[ buildType ]
-		scriptSwitches = ''
-		if self.getBuildSequenceSwitches().has_key( buildType ):
-				scriptSwitches = self.getBuildSequenceSwitches()[ buildType ]
-		for switches in ( settingsSwitches, scriptSwitches, self.__commandLineBuildSequence ):
-				buildSteps = self.__applyBuildStepCustomization( buildSteps, switches )
-		# create a new set of build steps that are in the order of BuildSequence 
-		self.__buildSteps = []
-		for buildStep in self.buildSequence():
-				if buildStep in buildSteps:
-						self.__buildSteps.append( buildStep )
+		for stepName in buildSteps:
+			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
+		return ', '.join( texts )
 
 	def evalConfigurationFiles( self, project ):
 		filename = 'config.py'
