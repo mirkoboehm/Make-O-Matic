@@ -26,7 +26,6 @@ from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.helpers.TimeKeeper import TimeKeeper
 from core.executomat.Executomat import Executomat
-from core.executomat.Step import Step
 from core.Settings import Settings
 from core.Exceptions import InterruptedException, MomError, MomException
 from core.Parameters import Parameters
@@ -50,8 +49,11 @@ class Project( MObject ):
 		self.__returnCode = 0
 		self.__executomat = Executomat( self, 'Exec-o-Matic' )
 		# all we do during construction is to evaluate the build script options:
-		# the option parser will exit the script if any of the options are not valid
-		self.getParameters().parse()
+		try:
+			self.getSettings().initialize( self )
+		except MomException as e:
+			print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
+			sys.exit( e.getReturnCode() )
 
 	def getSettings( self ):
 		return self.__settings
@@ -121,7 +123,6 @@ class Project( MObject ):
 		# ignore configurations for now
 		try:
 			self.getTimeKeeper().start()
-			self.getSettings().initialize( self )
 			[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
 			self.setup()
 			[ plugin.setup( self ) for plugin in self.getPlugins() ]

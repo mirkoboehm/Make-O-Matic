@@ -34,11 +34,14 @@ class Settings( Defaults ):
 		In the constructor, defaults will be applied. 
 		First, configuration files will be parsed.
 		Second, command line arguments will be applied. 
-		Third, commit message commands will be applied. This can be disabled by a parameter (step three).'''
+		Third, commit message commands will be applied. This can be disabled by a parameter (step three).
+		On error, a subclass of MomException is thrown.'''
 		# ...
 		# first, parse configuration files:
 		self.evalConfigurationFiles( project )
 		# second, apply parameters:
+		# the option parser will exit the script if any of the options are not valid
+		project.getParameters().parse()
 		project.getParameters().apply( self )
 		# third, apply commit message commands:
 		# ...
