@@ -22,6 +22,7 @@ import datetime
 from core.MObject import MObject
 from core.modules.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
+from core.loggers.ConsoleLogger import ConsoleLogger
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.helpers.TimeKeeper import TimeKeeper
@@ -48,12 +49,14 @@ class Project( MObject ):
 		self.__plugins = [ FolderManager() ]
 		self.__returnCode = 0
 		self.__executomat = Executomat( self, 'Exec-o-Matic' )
-		# all we do during construction is to evaluate the build script options:
 		try:
 			self.getSettings().initialize( self )
 		except MomException as e:
 			print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
 			sys.exit( e.getReturnCode() )
+		logger = ConsoleLogger( self.getSettings().get( Settings.ScriptLogLevel ) )
+		self.addLogger( logger )
+
 
 	def getSettings( self ):
 		return self.__settings

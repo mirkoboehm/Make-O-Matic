@@ -35,8 +35,8 @@ class Settings( Defaults ):
 		First, configuration files will be parsed.
 		Second, command line arguments will be applied. 
 		Third, commit message commands will be applied. This can be disabled by a parameter (step three).
-		On error, a subclass of MomException is thrown.'''
-		# ...
+		On error, a subclass of MomException is thrown.
+		Logging and reporting is not available at this stage yet.'''
 		# first, parse configuration files:
 		self.evalConfigurationFiles( project )
 		# second, apply parameters:
@@ -44,7 +44,7 @@ class Settings( Defaults ):
 		project.getParameters().parse()
 		project.getParameters().apply( self )
 		# third, apply commit message commands:
-		# ...
+		# FIXME
 
 	def calculateBuildSequence( self, project ):
 		buildType = self.get( Settings.ProjectBuildType, True ).lower()
