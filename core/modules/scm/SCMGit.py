@@ -70,7 +70,7 @@ class SCMGit( SourceCodeProvider ):
 		step = project.getExecutomat().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
-		updateClone = ShellCommandAction( 'git clone --depth 1 {0} .'.format ( self._getHiddenClonePath() ) )
+		updateClone = ShellCommandAction( 'git clone --local --depth 1 {0} .'.format ( self._getHiddenClonePath() ) )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
 		checkout = ShellCommandAction( 'git checkout {0}'.format( self.getRevision() ) )
