@@ -22,6 +22,7 @@ from core.modules.scm.SCMGit import SCMGit
 from core.modules.DoxygenGenerator import DoxygenGenerator
 from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
+from core.modules.Preprocessor import Preprocessor
 
 project = Project( "Simple Project Run Test", "0.5.0" )
 
@@ -33,9 +34,14 @@ project.addPlugin( reporter )
 scm = SCMGit()
 scm.setSrcDir( 'src' )
 scm.setRevision( 'HEAD' )
-scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
-# scm.setUrl( 'file:////d/kdab/products/charm/src' )
+# scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
+scm.setUrl( 'file:////d/kdab/products/charm/src' )
 project.setScm( scm )
+
+# add a preprocessor that generates the Doxygen input file
+prep = Preprocessor( inputFilename = 'doxygen.cfg.in', outputFilename = 'doxygen.cfg' )
+# FIXME add variables
+project.addPlugin( prep )
 
 # add a doxygen generator
 dox = DoxygenGenerator()

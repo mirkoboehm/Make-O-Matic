@@ -33,6 +33,11 @@ def check_for_nonempty_string( expression, description ):
 	if not isinstance( expression, str ) or not expression:
 		raise ConfigurationError( description )
 
+def check_for_nonempty_string_or_none( expression, description ):
+	if expression == None:
+		return
+	check_for_nonempty_string( expression, description )
+
 def check_for_int( expression, description ):
 	try:
 		int( expression )

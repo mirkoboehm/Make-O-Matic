@@ -20,7 +20,7 @@ from core.Plugin import Plugin
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
 from core.executomat.ShellCommandAction import ShellCommandAction
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
 import platform, os, re
 
 class RSyncPublisher( Plugin ):
@@ -33,16 +33,14 @@ class RSyncPublisher( Plugin ):
 		self.setLocalDir( localDir )
 
 	def setUploadLocation( self, location ):
-		if location != None:
-			check_for_nonempty_string( location, 'The rsync upload location must be a nonempty string!' )
+		check_for_nonempty_string_or_none( location, 'The rsync upload location must be a nonempty string!' )
 		self.__uploadLocation = location
 
 	def getUploadLocation( self ):
 		return self.__uploadLocation
 
 	def setLocalDir( self, dir ):
-		if dir != None:
-			check_for_nonempty_string( dir, 'The local directory must be a nonempty string!' )
+		check_for_nonempty_string_or_none( dir, 'The local directory must be a nonempty string!' )
 		self.__localDir = dir
 
 	def getLocalDir( self ):
