@@ -22,12 +22,35 @@ from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.Exceptions import ConfigurationError
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
+from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.Settings import Settings
 
 class FolderManager( Plugin ):
 	"""FolderManager creates and deletes the project folders."""
 
 	def __init__( self ):
 		Plugin.__init__( self, self.__class__.__name__ )
+		self.__baseDir = None
+
+	def getBaseDir( self ):
+		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
+		return self.__baseDir
+
+	def __getNormPath( self, project, name ):
+		path = os.path.join( self.getBaseDir(), project.getSettings().get( name ) )
+		return os.path.normpath( path )
+
+	def getSourceDir( self, project ):
+		return self.__getNormPath( project, Settings.ProjectSourceDir )
+
+	def getPackagesDir( self, project ):
+		return self.__getNormPath( project, Settings.ProjectPackagesDir )
+
+	def getTempDir( self, project ):
+		return self.__getNormPath( project, Settings.ProjectTempDir )
+
+	def getDocsDir( self, project ):
+		return self.__getNormPath( project, Settings.ProjectDocsDir )
 
 	def preFlightCheck( self, project ):
 		buildfolderName = make_foldername_from_string( project.getName() )
@@ -41,12 +64,14 @@ class FolderManager( Plugin ):
 			try:
 				os.rename( directory, newFolder )
 			except OSError as o:
-				raise ConfigurationError( 'Cannot move existing project build folder at "{0}" to "{1}": {2}'.format( directory, newFolder, str( o ) ) )
+				raise ConfigurationError( 'Cannot move existing project build folder at "{0}" to "{1}": {2}'
+										.format( directory, newFolder, str( o ) ) )
 			project.debug( self, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
 		try:
 			os.mkdir( directory )
 		except OSError as o:
 			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( directory, str( o ) ) )
+		self.__baseDir = directory
 		os.chdir( directory )
 		project.debug( self, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
 
@@ -55,7 +80,7 @@ class FolderManager( Plugin ):
 		delete = project.getExecutomat().getStep( 'project-cleanup' )
 		# log is never deleted
 		create.addMainAction( MkDirAction( 'log' ) )
-		for folder in ( 'src', 'tmp' ):
+		for folder in ( self.getSourceDir( project ), self.getPackagesDir( project ), self.getTempDir( project ) ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
 

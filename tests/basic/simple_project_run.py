@@ -21,6 +21,7 @@ from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
 from core.modules.DoxygenGenerator import DoxygenGenerator
 from core.modules.reporters.ConsoleReporter import ConsoleReporter
+from core.modules.publishers.RSyncPublisher import RSyncPublisher
 
 project = Project( "Simple Project Run Test", "0.5.0" )
 
@@ -40,6 +41,10 @@ project.setScm( scm )
 dox = DoxygenGenerator()
 dox.setDoxygenFile( 'doxygen.cfg' )
 project.addPlugin( dox )
+
+# add a RSync publisher:
+rsync = RSyncPublisher( uploadLocation = 'localhost://home/mirko/temp' )
+project.addPlugin( rsync )
 
 # run:
 project.build()

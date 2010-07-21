@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import sys
-import datetime
 from core.MObject import MObject
 from core.modules.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
@@ -45,8 +44,7 @@ class Project( MObject ):
 		self.__parameters = Parameters()
 		self.__scm = None
 		self.__loggers = []
-		self.__startTime = datetime.datetime.utcnow()
-		self.__plugins = [ FolderManager() ]
+		self.__plugins = []
 		self.__returnCode = 0
 		self.__executomat = Executomat( self, 'Exec-o-Matic' )
 		try:
@@ -56,6 +54,8 @@ class Project( MObject ):
 			sys.exit( e.getReturnCode() )
 		logger = ConsoleLogger( self.getSettings().get( Settings.ScriptLogLevel ) )
 		self.addLogger( logger )
+		self.__folderManager = FolderManager()
+		self.addPlugin( self.getFolderManager() )
 
 
 	def getSettings( self ):
@@ -74,6 +74,9 @@ class Project( MObject ):
 
 	def getScm( self ):
 		return self.__scm
+
+	def getFolderManager( self ):
+		return self.__folderManager
 
 	def getPlugins( self ):
 		return self.__plugins

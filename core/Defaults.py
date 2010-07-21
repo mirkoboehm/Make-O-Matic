@@ -44,6 +44,10 @@ class Defaults( MObject ):
 	ProjectBuildSteps = 'project.buildsteps'
 	ProjectSourceLocation = 'project.sourcelocation'
 	ProjectRevision = 'project.revision'
+	ProjectSourceDir = 'project.srcdir'
+	ProjectPackagesDir = 'project.packagesdir'
+	ProjectDocsDir = 'project.docsdir'
+	ProjectTempDir = 'project.tempdir'
 	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
 	# ----- reporter settings:
 	EmailReporterSender = 'reporter.email.sender'
@@ -83,6 +87,10 @@ class Defaults( MObject ):
 			's' : 'Snapshot build. Similar to daily builds. Creates and uploads packages and documentation.',
 			'f' : 'Full build. All build steps are enabled. Useful for debugging build scripts.'
 		}
+		self.getSettings()[ Defaults.ProjectSourceDir ] = 'src'
+		self.getSettings()[ Defaults.ProjectPackagesDir ] = 'packages'
+		self.getSettings()[ Defaults.ProjectDocsDir ] = 'docs'
+		self.getSettings()[ Defaults.ProjectTempDir ] = 'tmp'
 
 	def getSettings( self ):
 		return self.__settings
