@@ -18,20 +18,39 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
 from core.executomat.Action import Action
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_string
 
+# FIXME add unit test
 class _PreprocessorAction( Action ):
 	'''The _PreprocessorAction performs the input file conversion.'''
 
 	def __init__( self, preprocessor, name = None ):
 		Action.__init__( self, name )
+		self.setPreprocessor( preprocessor )
 
 	def setPreprocessor( self, preprocessor ):
-		assert isinstance( preprocessor, Preprocessor )
+		assert preprocessor == None or isinstance( preprocessor, Preprocessor )
 		self.__preprocessor = preprocessor
 
 	def _getPreprocessor( self ):
 		return self.__preprocessor
+
+	def _process( self ):
+		# open input file for reading
+		# ...
+		# open output file for writing
+		# ...
+
+		# read line by line, replace contents, write line by line
+		# ...
+		pass
+
+	def processLine( self, line ):
+		'''Process a line of text, and return the result.'''
+		check_for_string( line, 'processLine only accepts string input.' )
+		if not line:
+			return ''
+		return None
 
 class Preprocessor( Plugin ):
 	'''Preprocessor takes a textual input file, applies variables from various dictionaries, and produces an output file.
