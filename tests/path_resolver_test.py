@@ -18,15 +18,32 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from core.helpers.PathResolver import PathResolver
+import unittest
 
-# FIXME change to unit test
-class Test( object ):
-
+class FolderTester( object ):
 	def pathMethod( self ):
 		return os.getcwd()
 
-t = Test()
-sr = PathResolver( t.pathMethod, 'hello world!' )
+class PathResolverTest( unittest.TestCase ):
 
-os.chdir( '/tmp' )
-print( 'resolving to: {0}'.format( sr ) )
+	def testPathResolver( self ):
+		t = FolderTester()
+		filename = 'test.txt'
+		sr = PathResolver( t.pathMethod, filename )
+		path = str( sr )
+		filepath = os.path.join( os.getcwd(), filename )
+		self.assertEqual( path, filepath )
+		tmpdir = 'test_folder'
+		if os.path.isdir( tmpdir ):
+			os.rmdir( tmpdir )
+		os.mkdir( tmpdir )
+		oldpwd = os.getcwd()
+		os.chdir( tmpdir )
+		newfilepath = os.path.join( os.getcwd(), filename )
+		self.assertEqual( str( sr ), newfilepath )
+		os.chdir( oldpwd )
+		os.rmdir( tmpdir )
+		self.assertEqual( str( sr ), filepath )
+
+if __name__ == "__main__":
+	unittest.main()
