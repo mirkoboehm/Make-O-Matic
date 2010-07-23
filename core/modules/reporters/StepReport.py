@@ -59,7 +59,7 @@ class StepReport( object ):
 					['postcmds', self.getStep().getPostActions() ] )
 		notRun = True
 		failed = False
-		result = ''
+		results = []
 		empty = True
 		for phase in workSet:
 			description = ''
@@ -84,15 +84,14 @@ class StepReport( object ):
 				else: # success
 					notRun = False
 					description = 'ok'
-			if result:
-				result += ', '
-			result += phase[0] + ': ' + description
+			results.append( '{0}: {1}'.format( phase[0], description ) )
+		result = ', '.join( results )
 		if empty:
 			self._setSummary( 'empty' )
 		elif notRun:
 			self._setSummary( 'SKIPPED' )
 		elif failed:
-			self._setSummary( 'FAILED ({0}'.format( self.getStep().getTimeKeeper().deltaString() ) )
+			self._setSummary( 'FAILED ({0})'.format( self.getStep().getTimeKeeper().deltaString() ) )
 		else:
 			self._setSummary( 'success ({0})'.format( self.getStep().getTimeKeeper().deltaString() ) )
 		self._setDescription( result )
