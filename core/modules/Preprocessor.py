@@ -22,7 +22,6 @@ from core.executomat.Action import Action
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_nonempty_string_or_none
 import re
 from core.Exceptions import BuildError
-from _pyio import open
 
 class _PreprocessorAction( Action ):
 	'''The _PreprocessorAction performs the input file conversion.'''
@@ -49,6 +48,8 @@ class _PreprocessorAction( Action ):
 					self._getPreprocessor().getOutputFilename().getFilename() )
 
 	def run( self, project ):
+		try:
+			self.__project = project
 			project.debugN( self, 3, 'Creating "{0}" from "{1}"'.format( 
 					self._getPreprocessor().getOutputFilename(),
 					self._getPreprocessor().getInputFilename() ) )
@@ -56,14 +57,16 @@ class _PreprocessorAction( Action ):
 			project.debugN( self, 2, 'Successfully created "{0}" from "{1}"'.format( 
 					self._getPreprocessor().getOutputFilename(),
 					self._getPreprocessor().getInputFilename() ) )
+		finally:
+			self.__project = None
 
 	def _process( self ):
 		# open input file for reading
-		inputPath = os.path.join( self._getPreprocessor().getInputFilename() )
-		if not os.path.isfile( str( inputPath ) ):
+		inputPath = os.path.join( str( self._getPreprocessor().getInputFilename() ) )
+		if not os.path.isfile( inputPath ):
 			raise BuildError( 'Input file "{0}" does not exist.'.format( inputPath ) )
 		with open( inputPath ) as input:
-			with open( self._getPreprocessor().getOutputFilename(), 'w' ) as output:
+			with open( str( self._getPreprocessor().getOutputFilename() ), 'w' ) as output:
 				# read line by line, replace contents, write line by line
 				while True:
 					line = input.readline()
@@ -116,9 +119,37 @@ class _PreprocessorAction( Action ):
 		code = pattern[3:-1]
 		if code == '@@':
 			return '@@'
+		elif code == '':
+			return ''
+		pieces = code.split( '.' )
+		if pieces[0] == 'project':
+			if len( pieces ) < 2:
+				return '[MOM PP: not understood: {0}'.format( code )
+			if pieces[1] == 'settings':
+				if len( pieces ) < 3:
+					return '[MOM PP: missing setting name: {0}'.format( code )
+				setting = '.'.join( pieces[2:] )
+				return self._getSettingText( setting )
+			if pieces[1] == 'folders':
+				if len( pieces ) < 3:
+					return '[MOM PP: missing folder name: {0}'.format( code )
+				setting = '.'.join( pieces[2:] )
+				return self._getFolderName( setting )
+			return '[MOM PP: unknown place holder: {0}'.format( code )
+		return '[MOM PP: unknown: {0}]'.format( code )
+
+	def _getSettingText( self, setting ):
+		if self.__project:
+			value = self.__project.getSettings().get( setting, False )
+			if not value:
+				self.__project.debugN( self, 2, 'Undefined setting "{0}"'.format( setting ) )
+				return ''
+			return str( value )
 		else:
-			# Unknown codes are simply returned, to avoid for syntax errors breaking the build scripts
-			return code
+			return '[MOM PP: project not initialized]'
+
+	def _getFolderName( self, setting ):
+		return 'FOLDER NI'
 
 class Preprocessor( Plugin ):
 	'''Preprocessor takes a textual input file, applies variables from various dictionaries, and produces an output file.

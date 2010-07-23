@@ -24,8 +24,11 @@ from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
 from core.modules.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
+from core.Settings import Settings
 
 project = Project( "Simple Project Run Test", "0.5.0" )
+project.getSettings().set( Settings.ProjectVersionNumber, '0.5.0' )
+project.getSettings().set( Settings.ProjectVersionName, 'French Fries' )
 
 # add a console reporter
 reporter = ConsoleReporter()

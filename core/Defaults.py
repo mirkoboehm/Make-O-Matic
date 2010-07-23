@@ -38,6 +38,8 @@ class Defaults( MObject ):
 	ScriptRunMode = 'script.runmode'
 	# ----- project settings 
 	ProjectName = 'project.name'
+	ProjectVersionNumber = 'project.version.number'
+	ProjectVersionName = 'project.version.name'
 	ProjectExecutomatLogfileName = 'project.executomat.logfilename'
 	ProjectBuildType = 'project.buildtype'
 	ProjectBuildTypeDescriptions = 'project.buildtypedescriptions'
