@@ -69,16 +69,16 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'
 		self.getSettings()[ Defaults.ProjectBuildSteps] = [ # name, modes, execute-on-failure
-			[ 'project-create-folders', 'mcdhpsf' ],
-			[ 'project-checkout', 'mcdhpsf' ],
-			[ 'project-build-configurations', 'mcdhpsf' ],
-			[ 'project-create-docs', 'mcdhpsf' ],
-			[ 'project-package', 'dsf' ],
-			[ 'project-upload-docs', 'dsf' ],
-			[ 'project-upload-packages', 'dsf' ],
-			[ 'project-cleanup-docs', 'cdsf' ],
-			[ 'project-cleanup-packages', 'cdsf' ],
-			[ 'project-cleanup', 'mcdsf' ] ]
+			[ 'project-create-folders', 'mcdhpsf', False ],
+			[ 'project-checkout', 'mcdhpsf', False ],
+			[ 'project-build-configurations', 'mcdhpsf', False ],
+			[ 'project-create-docs', 'mcdhpsf', False ],
+			[ 'project-package', 'dsf', False ],
+			[ 'project-upload-docs', 'dsf', False ],
+			[ 'project-upload-packages', 'dsf', False ],
+			[ 'project-cleanup-docs', 'cdsf', True ],
+			[ 'project-cleanup-packages', 'cdsf', True ],
+			[ 'project-cleanup', 'mcdsf', True ] ]
 		self.getSettings()[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
 			'e' : 'Empty build. All build steps are disabled. Useful for debugging build scripts.',
 			'm' : 'Manual build. Does not modify environment variables. Deletes temporary folders.',

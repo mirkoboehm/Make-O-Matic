@@ -53,11 +53,12 @@ class Settings( Defaults ):
 		buildSteps = []
 		for buildStep in allBuildSteps:
 			# FIXME maybe this could be a unit test?
-			assert len( buildStep ) == 2
-			name, types = buildStep
+			assert len( buildStep ) == 3
+			name, types, executeOnFailure = buildStep
 			assert types.lower() == types
 			stepName = Step( name )
 			stepName.setEnabled( buildType in types )
+			stepName.setExecuteOnFailure( executeOnFailure )
 			buildSteps.append( stepName )
 		project.debug( self, 'build type: {0} ({1})'.format( buildType.upper(), self.getBuildTypeDescription( buildType ) ) )
 		# apply customizations passed as command line parameters:
