@@ -40,12 +40,11 @@ class RmDirAction( Action ):
 		project.debugN( self, 2, 'deleting directory "{0}"'.format( self.getPath() ) )
 		try:
 			shutil.rmtree( self.getPath(), False )
-			return True
+			return 0
 		except ( OSError, IOError ) as e:
 			project.debug( self, 'error deleting directory "{0}": {1}'
 						.format( self.getPath(), str( e ) ) )
-			self._setResult( 1 )
-			return False
+			return 1
 
 	def getLogDescription( self ):
 		"""Overload"""

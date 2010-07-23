@@ -128,10 +128,10 @@ class Step( MObject ):
 			for action in actions:
 				result = action.executeAction( project, executomat, self )
 				resultText = 'successful (or skipped)'
-				if not result:
+				if result != 0:
 					resultText = 'failed'
 				executomat.log( '# {0} "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
-				if not result:
+				if result != 0:
 					self.__failed = True
 					return False # do not continue with the remaining actions
 		return True

@@ -68,7 +68,7 @@ class Defaults( MObject ):
 		# ----- project settings:
 		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'
-		self.getSettings()[ Defaults.ProjectBuildSteps] = [ # name, modes
+		self.getSettings()[ Defaults.ProjectBuildSteps] = [ # name, modes, execute-on-failure
 			[ 'project-create-folders', 'mcdhpsf' ],
 			[ 'project-checkout', 'mcdhpsf' ],
 			[ 'project-build-configurations', 'mcdhpsf' ],

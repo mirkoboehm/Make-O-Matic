@@ -32,7 +32,7 @@ class _UpdateHiddenCloneAction( Action ):
 
 	def run( self, project ):
 		self.__scmgit._updateHiddenClone( project )
-		return True
+		return 0
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""

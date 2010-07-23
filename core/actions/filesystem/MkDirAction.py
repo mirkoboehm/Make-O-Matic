@@ -41,11 +41,10 @@ class MkDirAction( Action ):
 		project.debugN( self, 4, 'creating directory "{0}"'.format( self.getPath() ) )
 		try:
 			os.makedirs( self.getPath() )
-			return True
+			return 0
 		except ( OSError, IOError ) as e:
 			project.debug( self, 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) ) )
-			self._setResult( 1 )
-			return False
+			return 1
 
 	def getLogDescription( self ):
 		"""Overload"""

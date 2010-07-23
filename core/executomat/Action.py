@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-from core.helpers.TypeCheckers import check_for_string, check_for_nonnegative_int
+from core.helpers.TypeCheckers import check_for_string, check_for_nonnegative_int, check_for_int
 from core.Exceptions import AbstractMethodCalledError, MomError, MomException, BuildError
 import os
 from core.helpers.TimeKeeper import TimeKeeper
@@ -30,6 +30,9 @@ class Action( MObject ):
 	"""
 
 	def run( self, project ):
+		'''run() executes the workload of the action. 
+		Run must return a non-negative integer number. 
+		A return value or zero indicates success. Any value different from zero is considered an error.'''
 		raise AbstractMethodCalledError()
 
 	def getLogDescription( self ):
@@ -113,9 +116,16 @@ class Action( MObject ):
 				except ( OSError, IOError ) as e:
 					raise BuildError( str( e ) )
 			self._aboutToStart()
-			self._setResult( 0 )
-			result = self.run( project )
-			self._finished()
+			try:
+				result = self.run( project )
+				if result == None or not isinstance( result, int ):
+					raise MomError( 'Action {0} ({1}) did not return a valid non-negative integer return value from run()!'
+								.format( self.getName(), self.getLogDescription() ) )
+				self._setResult( int( result ) )
+				self._finished()
+			except MomException as e:
+				project.debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
+				self._setResult( e.getReturnCode() )
 			if step.getLogfileName():
 				file = open( step.getLogfileName(), 'a' )
 				if file:
@@ -126,11 +136,7 @@ class Action( MObject ):
 					file.close()
 				else:
 					raise MomError( 'cannot write to log file "{0}"'.format( step.getLogfileName() ) )
-			return result
-		except MomException as e:
-			project.debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
-			self._setResult( e.getReturnCode() )
-			return False
+			return self.getResult()
 		finally:
 			if oldPwd:
 				executomat.log( '# changing back to "{0}"'.format( oldPwd ) )
