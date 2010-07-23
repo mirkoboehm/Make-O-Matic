@@ -145,7 +145,7 @@ class Project( MObject ):
 						', '.join( Settings.RunModes ) ) )
 			self.getTimeKeeper().stop()
 			[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
-			return 0
+			return self.getReturnCode()
 		except MomException as e:
 			self.message( self, 'Error during build, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )
 			return e.getReturnCode()
