@@ -47,9 +47,9 @@ prep = Preprocessor( inputFilename = PathResolver( project.getFolderManager().ge
 					 outputFilename = PathResolver( project.getFolderManager().getTempDir, 'doxygen.cfg' ) )
 project.addPlugin( prep )
 # add a preprocessor that generates the Doxygen footer
-footer = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen-footer.html.in' ),
-					 outputFilename = PathResolver( project.getFolderManager().getTempDir, 'doxygen-footer.html' ) )
-project.addPlugin( footer )
+#footer = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen-footer.html.in' ),
+#					 outputFilename = PathResolver( project.getFolderManager().getTempDir, 'doxygen-footer.html' ) )
+#project.addPlugin( footer )
 # add a doxygen generator
 dox = DoxygenGenerator()
 dox.setDoxygenFile( prep.getOutputFilename() )

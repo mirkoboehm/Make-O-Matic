@@ -57,6 +57,7 @@ class _PreprocessorAction( Action ):
 			project.debugN( self, 2, 'Successfully created "{0}" from "{1}"'.format( 
 					self._getPreprocessor().getOutputFilename(),
 					self._getPreprocessor().getInputFilename() ) )
+			return True
 		finally:
 			self.__project = None
 
