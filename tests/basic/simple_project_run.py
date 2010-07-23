@@ -55,10 +55,8 @@ dox = DoxygenGenerator()
 dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 
-# add a RSync publisher:
-rsync = RSyncPublisher( uploadLocation = 'localhost://Users/mirko/temp',
-					localDir = PathResolver( project.getFolderManager().getDocsDir ) )
-project.addPlugin( rsync )
+# add a RSync publisher (remember to set the default upload location in the configuration file!):
+project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getDocsDir ) ) )
 
 # run:
 project.build()

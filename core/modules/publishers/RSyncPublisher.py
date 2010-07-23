@@ -22,6 +22,7 @@ from core.Exceptions import ConfigurationError
 from core.executomat.ShellCommandAction import ShellCommandAction
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none
 import platform, os, re
+from core.Settings import Settings
 
 class RSyncPublisher( Plugin ):
 	'''A publisher that uses RSync to send results to a remote site.'''
@@ -58,12 +59,17 @@ class RSyncPublisher( Plugin ):
 			project.debugN( self, 1, 'rsync found: "{0}"'.format( version ) )
 
 	def setup( self, project ):
-		if self.getUploadLocation() == None:
-			project.debugN( 2, 'Upload location is empty. Not generating any actions.' )
-			return
+		uploadLocation = self.getUploadLocation()
+		if not uploadLocation:
+			defaultLocation = project.getSettings().get( Settings.RSyncPublisherUploadLocation, False )
+			project.debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
+			uploadLocation = defaultLocation
+			if not uploadLocation:
+				project.message( self, 'Upload location is empty. Not generating any actions.' )
+				return
 		step = project.getExecutomat().getStep( 'project-upload-docs' )
 		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-		action = ShellCommandAction( 'rsync -avz {0} {1}'.format( fromDir, self.getUploadLocation() ), 7200 )
+		action = ShellCommandAction( 'rsync -avz {0} {1}'.format( fromDir, uploadLocation ), 7200 )
 		action.setWorkingDirectory( project.getFolderManager().getBaseDir() )
 		step.addMainAction( action )
 

@@ -51,6 +51,8 @@ class Defaults( MObject ):
 	ProjectDocsDir = 'project.docsdir'
 	ProjectTempDir = 'project.tempdir'
 	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
+	# ----- rsync publisher settings (should be set in .mom/config.py):
+	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
 	# ----- reporter settings:
 	EmailReporterSender = 'reporter.email.sender'
 	EmailReporterRecipients = 'reporter.email.recipient'
