@@ -133,23 +133,34 @@ class _PreprocessorAction( Action ):
 			if pieces[1] == 'folders':
 				if len( pieces ) < 3:
 					return '[MOM PP: missing folder name: {0}'.format( code )
-				setting = '.'.join( pieces[2:] )
-				return self._getFolderName( setting )
+				folder = '.'.join( pieces[2:] )
+				return self._getFolderName( folder )
 			return '[MOM PP: unknown place holder: {0}'.format( code )
 		return '[MOM PP: unknown: {0}]'.format( code )
 
 	def _getSettingText( self, setting ):
-		if self.__project:
-			value = self.__project.getSettings().get( setting, False )
-			if not value:
-				self.__project.debugN( self, 2, 'Undefined setting "{0}"'.format( setting ) )
-				return ''
-			return str( value )
-		else:
+		if not self.__project:
 			return '[MOM PP: project not initialized]'
+		value = self.__project.getSettings().get( setting, False )
+		if not value:
+			self.__project.debugN( self, 2, 'Undefined setting "{0}"'.format( setting ) )
+			return ''
+		return str( value )
 
-	def _getFolderName( self, setting ):
-		return 'FOLDER NI'
+	def _getFolderName( self, folder ):
+		if not self.__project:
+			return '[MOM PP: project not initialized]'
+		if folder == 'src':
+			return self.__project.getFolderManager().getSourceDir()
+		elif folder == 'tmp':
+			return self.__project.getFolderManager().getTempDir()
+		elif folder == 'docs':
+			return self.__project.getFolderManager().getDocsDir()
+		elif folder == 'packages':
+			return self.__project.getFolderManager().getPackagesDir()
+		else:
+			self.__project.debugN( self, 2, 'Unknown folder id "{0}"'.format( folder ) )
+			return ''
 
 class Preprocessor( Plugin ):
 	'''Preprocessor takes a textual input file, applies variables from various dictionaries, and produces an output file.
