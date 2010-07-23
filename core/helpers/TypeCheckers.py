@@ -38,6 +38,16 @@ def check_for_nonempty_string_or_none( expression, description ):
 		return
 	check_for_nonempty_string( expression, description )
 
+def check_for_path( expression, description ):
+	# import locally, because PathResolver uses the type checkers as well
+	from core.helpers.PathResolver import PathResolver
+	if not isinstance( expression, PathResolver ):
+		check_for_nonempty_string( expression, description )
+
+def check_for_path_or_none( expression, description ):
+	if expression:
+		check_for_path( expression, description )
+
 def check_for_int( expression, description ):
 	try:
 		int( expression )

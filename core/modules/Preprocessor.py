@@ -16,17 +16,22 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import os
 from core.Plugin import Plugin
 from core.executomat.Action import Action
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_string
+from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_nonempty_string_or_none
+import re
+from core.Exceptions import BuildError
+from _pyio import open
 
-# FIXME add unit test
 class _PreprocessorAction( Action ):
 	'''The _PreprocessorAction performs the input file conversion.'''
 
 	def __init__( self, preprocessor, name = None ):
 		Action.__init__( self, name )
 		self.setPreprocessor( preprocessor )
+		# set up a regular expression that searches for the place holders:
+		self.__regex = re.compile( r'{(@@\(.*\))}*' )
 
 	def setPreprocessor( self, preprocessor ):
 		assert preprocessor == None or isinstance( preprocessor, Preprocessor )
@@ -35,28 +40,93 @@ class _PreprocessorAction( Action ):
 	def _getPreprocessor( self ):
 		return self.__preprocessor
 
+	def getRegex( self ):
+		return self.__regex
+
+	def getLogDescription( self ):
+		return '"{0}" -> "{1}"'.format( 
+					self._getPreprocessor().getInputFilename().getFilename(),
+					self._getPreprocessor().getOutputFilename().getFilename() )
+
+	def run( self, project ):
+			project.debugN( self, 3, 'Creating "{0}" from "{1}"'.format( 
+					self._getPreprocessor().getOutputFilename(),
+					self._getPreprocessor().getInputFilename() ) )
+			self._process()
+			project.debugN( self, 2, 'Successfully created "{0}" from "{1}"'.format( 
+					self._getPreprocessor().getOutputFilename(),
+					self._getPreprocessor().getInputFilename() ) )
+
 	def _process( self ):
 		# open input file for reading
-		# ...
-		# open output file for writing
-		# ...
-
-		# read line by line, replace contents, write line by line
-		# ...
-		pass
+		inputPath = os.path.join( self._getPreprocessor().getInputFilename() )
+		if not os.path.isfile( str( inputPath ) ):
+			raise BuildError( 'Input file "{0}" does not exist.'.format( inputPath ) )
+		with open( inputPath ) as input:
+			with open( self._getPreprocessor().getOutputFilename(), 'w' ) as output:
+				# read line by line, replace contents, write line by line
+				while True:
+					line = input.readline()
+					if not line: break
+					result = self.processLine( line )
+					output.write( result )
 
 	def processLine( self, line ):
 		'''Process a line of text, and return the result.'''
 		check_for_string( line, 'processLine only accepts string input.' )
 		if not line:
 			return ''
-		return None
+		result = ''
+		text = line[:]
+		while text:
+			result, text = self.__processToken( result, text )
+		return result
+
+	def __processToken( self, result, text ):
+		index = text.find( '@@(' )
+		if index == -1:
+			# no place holder was found, append all text to the result, return text empty
+			result += text
+			return result, ''
+		# a place holder was found at index
+		# ... copy text before the place holder into result
+		result += text[:index]
+		text = text[index:]
+		# now the token begins at zero, find closing bracket
+		pos = 3
+		level = 1
+		while level > 0:
+			if pos == len( text ):
+				raise BuildError( 'Unbalanced place holders in "{0}"'.format( text ) )
+			if text[pos] == ')':
+				level -= 1
+			elif text[pos] == '(':
+				level += 1
+			else:
+				pass
+			pos += 1
+		pattern = text[:pos]
+		replacement = self.replace( pattern )
+		result += replacement
+		text = text[pos:]
+		return result, text
+
+	def replace( self, pattern ):
+		assert pattern.startswith( '@@(' ) and pattern.endswith( ')' )
+		code = pattern[3:-1]
+		if code == '@@':
+			return '@@'
+		else:
+			# Unknown codes are simply returned, to avoid for syntax errors breaking the build scripts
+			return code
 
 class Preprocessor( Plugin ):
 	'''Preprocessor takes a textual input file, applies variables from various dictionaries, and produces an output file.
 	The preprocessor generates an action that performs the conversion of the input file, and adds it as a post action to a step. 
 	By default, the action is added to the project-checkout step. It can be changed by setting the step property of the 
-	preprocessor.'''
+	preprocessor.
+	The preprocessor searches place holders in the format of @@(variable-name) in the input file, and replaces them with the 
+	content provided by the internal dictionary. A place holder in the form of @@(@@) resolves to @@.'''
 
 	def __init__( self, name = None, inputFilename = None, outputFilename = None, step = 'project-checkout' ):
 		Plugin.__init__( self, name )
@@ -65,14 +135,14 @@ class Preprocessor( Plugin ):
 		self.setStep( step )
 
 	def setInputFilename( self, name ):
-		check_for_nonempty_string_or_none( name, 'The input filename must be a non-empty string, or None.' )
+		check_for_path_or_none( name, 'The input filename must be a non-empty string, or None.' )
 		self.__inputFilename = name
 
 	def getInputFilename( self ):
 		return self.__inputFilename
 
 	def setOutputFilename( self, name ):
-		check_for_nonempty_string_or_none( name, 'The output filename must be a non-empty string, or None.' )
+		check_for_path_or_none( name, 'The output filename must be a non-empty string, or None.' )
 		self.__outputFilename = name
 
 	def getOutputFilename( self ):

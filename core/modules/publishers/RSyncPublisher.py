@@ -20,7 +20,7 @@ from core.Plugin import Plugin
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
 from core.executomat.ShellCommandAction import ShellCommandAction
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none
 import platform, os, re
 
 class RSyncPublisher( Plugin ):
@@ -40,7 +40,7 @@ class RSyncPublisher( Plugin ):
 		return self.__uploadLocation
 
 	def setLocalDir( self, dir ):
-		check_for_nonempty_string_or_none( dir, 'The local directory must be a nonempty string!' )
+		check_for_path_or_none( dir, 'The local directory must be a nonempty string!' )
 		self.__localDir = dir
 
 	def getLocalDir( self ):
@@ -62,7 +62,7 @@ class RSyncPublisher( Plugin ):
 			project.debugN( 2, 'Upload location is empty. Not generating any actions.' )
 			return
 		step = project.getExecutomat().getStep( 'project-upload-docs' )
-		fromDir = self.__makeCygwinPathForRsync( project.getFolderManager().getDocsDir( project ) + os.sep )
+		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
 		action = ShellCommandAction( 'rsync -avz {0} {1}'.format( fromDir, self.getUploadLocation() ), 7200 )
 		action.setWorkingDirectory( project.getFolderManager().getBaseDir() )
 		step.addMainAction( action )

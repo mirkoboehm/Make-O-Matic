@@ -28,29 +28,33 @@ from core.Settings import Settings
 class FolderManager( Plugin ):
 	"""FolderManager creates and deletes the project folders."""
 
-	def __init__( self ):
+	def __init__( self, project ):
 		Plugin.__init__( self, self.__class__.__name__ )
+		self.__project = project
 		self.__baseDir = None
+
+	def getProject( self ):
+		return self.__project
 
 	def getBaseDir( self ):
 		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		return self.__baseDir
 
-	def __getNormPath( self, project, name ):
-		path = os.path.join( self.getBaseDir(), project.getSettings().get( name ) )
+	def __getNormPath( self, name ):
+		path = os.path.join( self.getBaseDir(), self.getProject().getSettings().get( name ) )
 		return os.path.normpath( path )
 
-	def getSourceDir( self, project ):
-		return self.__getNormPath( project, Settings.ProjectSourceDir )
+	def getSourceDir( self ):
+		return self.__getNormPath( Settings.ProjectSourceDir )
 
-	def getPackagesDir( self, project ):
-		return self.__getNormPath( project, Settings.ProjectPackagesDir )
+	def getPackagesDir( self ):
+		return self.__getNormPath( Settings.ProjectPackagesDir )
 
-	def getTempDir( self, project ):
-		return self.__getNormPath( project, Settings.ProjectTempDir )
+	def getTempDir( self ):
+		return self.__getNormPath( Settings.ProjectTempDir )
 
-	def getDocsDir( self, project ):
-		return self.__getNormPath( project, Settings.ProjectDocsDir )
+	def getDocsDir( self ):
+		return self.__getNormPath( Settings.ProjectDocsDir )
 
 	def preFlightCheck( self, project ):
 		buildfolderName = make_foldername_from_string( project.getName() )
@@ -80,7 +84,7 @@ class FolderManager( Plugin ):
 		delete = project.getExecutomat().getStep( 'project-cleanup' )
 		# log is never deleted
 		create.addMainAction( MkDirAction( 'log' ) )
-		for folder in ( self.getSourceDir( project ), self.getPackagesDir( project ), self.getTempDir( project ) ):
+		for folder in ( self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
 

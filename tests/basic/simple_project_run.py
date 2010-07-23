@@ -23,6 +23,7 @@ from core.modules.DoxygenGenerator import DoxygenGenerator
 from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
 from core.modules.Preprocessor import Preprocessor
+from core.helpers.PathResolver import PathResolver
 
 project = Project( "Simple Project Run Test", "0.5.0" )
 
@@ -34,22 +35,26 @@ project.addPlugin( reporter )
 scm = SCMGit()
 scm.setSrcDir( 'src' )
 scm.setRevision( 'HEAD' )
-# scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
-scm.setUrl( 'file:////d/kdab/products/charm/src' )
+scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
+# scm.setUrl( 'file:////d/kdab/products/charm/src' )
 project.setScm( scm )
 
 # add a preprocessor that generates the Doxygen input file
-prep = Preprocessor( inputFilename = 'doxygen.cfg.in', outputFilename = 'doxygen.cfg' )
-# FIXME add variables
+prep = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen.cfg.in' ),
+					 outputFilename = PathResolver( project.getFolderManager().getTempDir, 'doxygen.cfg' ) )
 project.addPlugin( prep )
-
+# add a preprocessor that generates the Doxygen footer
+footer = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen-footer.html.in' ),
+					 outputFilename = PathResolver( project.getFolderManager().getTempDir, 'doxygen-footer.html' ) )
+project.addPlugin( footer )
 # add a doxygen generator
 dox = DoxygenGenerator()
-dox.setDoxygenFile( 'doxygen.cfg' )
+dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 
 # add a RSync publisher:
-rsync = RSyncPublisher( uploadLocation = 'localhost://home/mirko/temp' )
+rsync = RSyncPublisher( uploadLocation = 'localhost://home/mirko/temp',
+					localDir = PathResolver( project.getFolderManager().getDocsDir ) )
 project.addPlugin( rsync )
 
 # run:

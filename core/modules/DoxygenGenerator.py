@@ -19,7 +19,7 @@
 from core.Plugin import Plugin
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_path
 from core.executomat.ShellCommandAction import ShellCommandAction
 
 class DoxygenGenerator( Plugin ):
@@ -32,7 +32,7 @@ class DoxygenGenerator( Plugin ):
 		self.__docsDir = 'docs'
 
 	def setDoxygenPath( self, doxygenPath ):
-		check_for_nonempty_string( doxygenPath, 'The doxygen doxygenPath must be the full doxygenPath to the doxygen program!' )
+		check_for_nonempty_string( doxygenPath, 'The doxygen path must be the full path to the doxygen program!' )
 		self.__doxygenPath = doxygenPath
 
 	def getDoxygenPath( self ):
@@ -56,7 +56,7 @@ class DoxygenGenerator( Plugin ):
 			project.debugN( self, 1, 'doxygen found: "{0}"'.format( version ) )
 
 	def setup( self, project ):
-		check_for_nonempty_string( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
+		check_for_path( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
 		step = project.getExecutomat().getStep( 'project-create-docs' )
 		doxygenCall = ShellCommandAction( '{0} {1}'
 			.format ( self.getDoxygenPath(), self.getDoxygenFile() ) )

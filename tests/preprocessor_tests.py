@@ -19,13 +19,16 @@
 
 import unittest
 from core.modules.Preprocessor import _PreprocessorAction
+from core.Exceptions import BuildError
 
 class Test( unittest.TestCase ):
 
-	def _runTest( self, input, output, msg ):
+	def _runTest( self, input, output, msg = None ):
 		'''Helper method to run a single test'''
 		prep = _PreprocessorAction( None )
-		self.assertEqual( output, prep.processLine( input ) )
+		if not msg:
+			msg = '{0} should resolve to {1}'.format( input, output )
+		self.assertEqual( output, prep.processLine( input ), msg )
 
 	def testEmptyInput( self ):
 		self._runTest( '', '', 'An empty input line should result in an empty output line' )
@@ -35,6 +38,25 @@ class Test( unittest.TestCase ):
 		output = input
 		self._runTest( input, output, 'A line without any replacement place holders should return the input string unchanged' )
 
+	def testEscapePattern( self ):
+		input = '@@(@@)'
+		output = '@@'
+		self._runTest( input, output )
+
+	def testMultipleEscapePatterns( self ):
+		input = 's @@(@@) @@(@@) e'
+		output = 's @@ @@ e'
+		self._runTest( input, output )
+
+	def testUnbalancedBrackets( self ):
+		input = '@@(@@'
+		prep = _PreprocessorAction( None )
+		self.assertRaises( BuildError, prep.processLine, input )
+
+	def testBalancedAndUnbalancedBrackets( self ):
+		input = 's @@(@@) @@(@@ e'
+		prep = _PreprocessorAction( None )
+		self.assertRaises( BuildError, prep.processLine, input )
 
 if __name__ == "__main__":
 	#import sys;sys.argv = ['', 'Test.testName']

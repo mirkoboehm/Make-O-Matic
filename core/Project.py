@@ -54,7 +54,7 @@ class Project( MObject ):
 			sys.exit( e.getReturnCode() )
 		logger = ConsoleLogger( self.getSettings().get( Settings.ScriptLogLevel ) )
 		self.addLogger( logger )
-		self.__folderManager = FolderManager()
+		self.__folderManager = FolderManager( self )
 		self.addPlugin( self.getFolderManager() )
 
 

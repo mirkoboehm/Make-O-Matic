@@ -23,7 +23,7 @@ class PathResolver( object ):
 	'''A path resolver resolves a project filename to its full path at the time it is converted to a string.
 	It calls a function that must return a path, and extends that path with the filename.'''
 
-	def __init__( self, function, filename ):
+	def __init__( self, function, filename = None ):
 		self.setFunction( function )
 		self.setFilename( filename )
 
@@ -42,5 +42,7 @@ class PathResolver( object ):
 		return self.__function
 
 	def __str__( self ):
-		path = os.path.join( self.getFunction()(), self.getFilename() )
-		return path
+		if( self.getFilename() ):
+			return os.path.join( self.getFunction()(), self.getFilename() )
+		else:
+			return os.path.join( self.getFunction()() )
