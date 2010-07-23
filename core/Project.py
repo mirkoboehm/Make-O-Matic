@@ -29,6 +29,7 @@ from core.executomat.Executomat import Executomat
 from core.Settings import Settings
 from core.Exceptions import InterruptedException, MomError, MomException
 from core.Parameters import Parameters
+from core.helpers.VersionChecker import checkMinimumMomVersion
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -56,13 +57,16 @@ class Project( MObject ):
 		self.addLogger( logger )
 		self.__folderManager = FolderManager( self )
 		self.addPlugin( self.getFolderManager() )
-
+		checkMinimumMomVersion( self, minimalMomVersion )
 
 	def getSettings( self ):
 		return self.__settings
 
 	def getParameters( self ):
 		return self.__parameters
+
+	def getMomVersion( self ):
+		return '0.5.0'
 
 	def setScm( self, scm ):
 		if self.getScm():
