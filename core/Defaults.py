@@ -50,6 +50,7 @@ class Defaults( MObject ):
 	ProjectPackagesDir = 'project.packagesdir'
 	ProjectDocsDir = 'project.docsdir'
 	ProjectTempDir = 'project.tempdir'
+	ProjectLogDir = 'project.logdir'
 	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
 	# ----- rsync publisher settings (should be set in .mom/config.py):
 	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
@@ -95,6 +96,7 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ProjectPackagesDir ] = 'packages'
 		self.getSettings()[ Defaults.ProjectDocsDir ] = 'docs'
 		self.getSettings()[ Defaults.ProjectTempDir ] = 'tmp'
+		self.getSettings()[ Defaults.ProjectLogDir ] = 'log'
 
 	def getSettings( self ):
 		return self.__settings

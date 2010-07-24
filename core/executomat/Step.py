@@ -105,7 +105,7 @@ class Step( MObject ):
 		if not self.getName():
 			raise MomError( "Cannot execute a step with no name!" )
 		if not self.__enabled:
-			executomat.log( 'disabled, skipping.' )
+			executomat.log( '# step "{0}" disabled, skipping.'.format( self.getName() ) )
 			return True
 		if project.getReturnCode() != 0 and not self.getExecuteOnFailure():
 			project.debugN( self, 4, 'aborting because of errors earlier in the build' )
@@ -115,7 +115,7 @@ class Step( MObject ):
 		self._logEnvironment( project, executomat )
 
 		logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
-		logfileName = executomat.getLogDir() + os.sep + logfileName
+		logfileName = os.path.join( executomat.getLogDir(), logfileName )
 		self.setLogfileName( logfileName )
 
 		phases = { 'preparatory actions' : self.__preActions,
@@ -130,7 +130,7 @@ class Step( MObject ):
 				resultText = 'successful (or skipped)'
 				if result != 0:
 					resultText = 'failed'
-				executomat.log( '# {0} "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
+				executomat.log( '# {0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
 				if result != 0:
 					self.__failed = True
 					return False # do not continue with the remaining actions

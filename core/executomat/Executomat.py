@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_path_or_none
 from core.executomat.Step import Step
 from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.MObject import MObject
@@ -39,15 +39,15 @@ class Executomat( MObject ):
 		"""Constructor."""
 		MObject.__init__( self, name )
 		self.__steps = []
-		self.__logfileName = project.getSettings().get( Settings.ProjectExecutomatLogfileName )
 		self.__timeKeeper = TimeKeeper()
 		self.__logDir = '.'
 		self.__logfile = None
 		self.__failedStep = None
+		self.setLogfileName( project.getSettings().get( Settings.ProjectExecutomatLogfileName ) )
 
 	def setLogDir( self, path ):
 		"""Set the directory where all log information is stored."""
-		check_for_string( path, "The log directory name must be a string containing a path name." )
+		check_for_path_or_none( path, "The log directory name must be a string containing a path name." )
 		self.__logDir = path
 
 	def getLogDir( self ):
@@ -56,7 +56,7 @@ class Executomat( MObject ):
 
 	def setLogfileName( self, filename ):
 		"""Set the file to log activity to."""
-		check_for_string( filename, "The log file name must be a string containing a path name." )
+		check_for_path_or_none( filename, "The log file name must be a string containing a path name." )
 		self.__logfileName = filename
 
 	def getLogfileName( self ):
@@ -68,7 +68,7 @@ class Executomat( MObject ):
 
 	def logFilePathForFailedStep( self ):
 		if self.__failedStep:
-			return self.__failedStep.logFileName()
+			return self.__failedStep.getLogFileName()
 
 	def addStep( self, newStep ):
 		"""Add a newStep identified by identifier. If the identifier already exists, the new 
@@ -105,7 +105,6 @@ class Executomat( MObject ):
 			project.debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
 	def _runTimed( self, project ):
-		self.__logfileName = None
 		try:
 			if not os.path.isdir( self.getLogDir() ):
 				raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( self.logDir() ) ) )
@@ -114,12 +113,14 @@ class Executomat( MObject ):
 					self.__logfile = open( self.getLogDir() + os.sep + self.getLogfileName(), 'a' )
 				except:
 					raise ConfigurationError( 'Cannot open log file at "{0}"'.format( self.getLogfileName() ) )
-			self.log( '# Starting execution of ' + self.getName() )
+			self.log( '# Starting execution of "{0}"'.format( self.getName() ) )
 			for step in self._getSteps():
 				project.debugN( self, 1, 'now executing step "{0}"'.format( step.getName() ) )
 				if step.execute( self, project ):
 					project.debugN( self, 2, 'success: "{0}"'.format( step.getName() ) )
+					self.log( '# step "{0}": success.'.format( step.getName() ) )
 				else:
+					self.log( '# step "{0}": ERROR!'.format( step.getName() ) )
 					self.log( '# aborting execution except for execute-even-on-failure commands\n########' )
 					if self.__failedStep == None:
 						# we are only interested in the log files for the first failure 

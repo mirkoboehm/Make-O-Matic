@@ -24,6 +24,8 @@ from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
 from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.Settings import Settings
+import tempfile
+import shutil
 
 class FolderManager( Plugin ):
 	"""FolderManager creates and deletes the project folders."""
@@ -32,6 +34,7 @@ class FolderManager( Plugin ):
 		Plugin.__init__( self, self.__class__.__name__ )
 		self.__project = project
 		self.__baseDir = None
+		self._tmpLogDir = None
 
 	def getProject( self ):
 		return self.__project
@@ -39,6 +42,12 @@ class FolderManager( Plugin ):
 	def getBaseDir( self ):
 		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		return self.__baseDir
+
+	def _setTmpLogDir( self, dir ):
+		self._tmpLogDir = dir
+
+	def getTmpLogDir( self ):
+		return self._tmpLogDir
 
 	def __getNormPath( self, name ):
 		path = os.path.join( self.getBaseDir(), self.getProject().getSettings().get( name ) )
@@ -56,8 +65,14 @@ class FolderManager( Plugin ):
 	def getDocsDir( self ):
 		return self.__getNormPath( Settings.ProjectDocsDir )
 
+	def getLogDir( self ):
+		return self.__getNormPath( Settings.ProjectLogDir )
+
 	def preFlightCheck( self, project ):
 		buildfolderName = make_foldername_from_string( project.getName() )
+		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( buildfolderName ), 'mom_' ) )
+		project.debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir ) )
+		project.getExecutomat().setLogDir( self.getTmpLogDir() )
 		directory = os.path.normpath( os.getcwd() + os.sep + buildfolderName )
 		project.debugN( self, 3, 'Project build folder is "{0}"'.format( directory ) )
 		if os.path.isdir( directory ):
@@ -87,4 +102,21 @@ class FolderManager( Plugin ):
 		for folder in ( self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
+
+	def shutDown( self, project ):
+		'''Move the temporary log dir into the base folder.'''
+		try:
+			# first, move a possibly existing log directory out of the way:
+			if os.path.isdir( self.getLogDir() ):
+				gmt = time.gmtime( os.path.getatime( self.getLogDir() ) )
+				atime = time.strftime( '%Y%m%d-%H-%M-%S', gmt )
+				shutil.move( self.getLogDir(), self.getLogDir() + '-' + atime )
+			if self.getTmpLogDir():
+				shutil.copytree( self.getTmpLogDir(), self.getLogDir() )
+				shutil.rmtree( self.getTmpLogDir(), True )
+			self._setTmpLogDir( None )
+			project.debugN( self, 2, 'logs moved from temporary to final location at "{0}"'.format( self.getLogDir() ) )
+		except ( IOError, os.error ) as why:
+			project.message( 'Cannot move build logs to log directory "{0}", log data remains at "{1}": {2}'
+				.format( self.getlogDir(), self.getTmpLogDir(), str( why ).strip() ) )
 
