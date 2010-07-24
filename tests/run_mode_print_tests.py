@@ -28,7 +28,7 @@ class RunModePrintTests( unittest.TestCase ):
 		result = self._getRevisions( revision, 1 )
 		self.assertEqual( len( result ), 1, 'The test asked for only one revision to be listed.' )
 		line = result[0]
-		expected = '1e0aba98cd29438576e92f2e233b1177fd822620'
+		expected = '795a9394bf3e4f7c46a88c81446cc691a662ec9b'
 		self.assertEqual( line[1], expected,
 			'The next revision after {0} should be {1}'.format( revision, expected ) )
 		self.assertEqual( line[0].lower(), 'c', 'Revision {0} should be a C type build!'.format( expected ) )

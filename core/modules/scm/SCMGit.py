@@ -75,10 +75,10 @@ class SCMGit( SourceCodeProvider ):
 		revision = options[0]
 		cap = None
 		if len( options ) == 2:
-			cap = '-{0} '.format( int( options[1] ) )
+			cap = int( options[1] )
 
 		self._updateHiddenClone( project )
-		runner = RunCommand( project, 'git log {0}{1}..'.format( cap or '', revision ), 3600 )
+		runner = RunCommand( project, 'git log {1}..'.format( cap or '', revision ), 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -95,7 +95,10 @@ class SCMGit( SourceCodeProvider ):
 					else:
 						data = ( 'C', hash, self.getUrl() )
 						revisions.append( data )
-			return revisions
+			if cap:
+				return revisions[-cap:]
+			else:
+				return revisions
 		elif runner.getTimedOut() == True:
 			raise ConfigurationError( 'Getting git log for "{0}" timed out.'.format( self.url() ) )
 		else:

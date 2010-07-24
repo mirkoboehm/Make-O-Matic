@@ -71,7 +71,7 @@ class FolderManager( Plugin ):
 	def preFlightCheck( self, project ):
 		buildfolderName = make_foldername_from_string( project.getName() )
 		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( buildfolderName ), 'mom_' ) )
-		project.debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir ) )
+		project.debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir() ) )
 		project.getExecutomat().setLogDir( self.getTmpLogDir() )
 		directory = os.path.normpath( os.getcwd() + os.sep + buildfolderName )
 		project.debugN( self, 3, 'Project build folder is "{0}"'.format( directory ) )
@@ -114,8 +114,8 @@ class FolderManager( Plugin ):
 			if self.getTmpLogDir():
 				shutil.copytree( self.getTmpLogDir(), self.getLogDir() )
 				shutil.rmtree( self.getTmpLogDir(), True )
+				project.debugN( self, 2, 'logs moved from temporary to final location at "{0}"'.format( self.getLogDir() ) )
 			self._setTmpLogDir( None )
-			project.debugN( self, 2, 'logs moved from temporary to final location at "{0}"'.format( self.getLogDir() ) )
 		except ( IOError, os.error ) as why:
 			project.message( 'Cannot move build logs to log directory "{0}", log data remains at "{1}": {2}'
 				.format( self.getlogDir(), self.getTmpLogDir(), str( why ).strip() ) )
