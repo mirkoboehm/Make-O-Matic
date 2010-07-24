@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-from core.helpers.TypeCheckers import check_for_string, check_for_nonnegative_int, check_for_int
+from core.helpers.TypeCheckers import check_for_string, check_for_nonnegative_int
 from core.Exceptions import AbstractMethodCalledError, MomError, MomException, BuildError
 import os
 from core.helpers.TimeKeeper import TimeKeeper

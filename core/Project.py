@@ -111,13 +111,13 @@ class Project( MObject ):
 		return self.__executomat
 
 	def message( self, mobject, text ):
-		[ logger.message( mobject, text ) for logger in self.getLoggers() ]
+		[ logger.message( self, mobject, text ) for logger in self.getLoggers() ]
 
 	def debug( self, mobject, text ):
-		[ logger.debug( mobject, text ) for logger in self.getLoggers() ]
+		[ logger.debug( self, mobject, text ) for logger in self.getLoggers() ]
 
 	def debugN( self, mobject, level, text ):
-		[ logger.debugN( mobject, level, text ) for logger in self.getLoggers() ]
+		[ logger.debugN( self, mobject, level, text ) for logger in self.getLoggers() ]
 
 	def setup( self ):
 		for step in self.getSettings().calculateBuildSequence( self ):

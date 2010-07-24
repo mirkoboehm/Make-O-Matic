@@ -27,29 +27,28 @@ class ConsoleLogger( Logger ):
 	def __init__( self, level = 0 ):
 		"""Constructor"""
 		Logger.__init__( self, self.__class__.__name__ )
-		self.setLevel( level )
 
-	def setLevel( self, level ):
-		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )
-		self.__level = level
+	def __getLevel( self, project ):
+		verbosity = project.getSettings().get( Settings.ScriptLogLevel )
+		check_for_nonnegative_int( verbosity, "The debug level needs to be an integer of zero or more" )
+		return verbosity
 
-	def getLevel( self ):
-		return self.__level
-
-	def message( self, mobject, msg ):
+	def message( self, project, mobject, msg ):
 		text = str( msg )
 		if not text.endswith( '\n' ): text = text + '\n'
 		fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
 		sys.stderr.write( fulltext )
 
-	def debug( self, mobject, msg ):
+	def debug( self, project, mobject, msg ):
 		text = str( msg )
-		if self.getLevel() > 0:
-			self.message( mobject, 'DEBUG: ' + str( text ) )
+		if self.__getLevel( project ) > 0:
+			self.message( project, mobject, 'DEBUG: ' + str( text ) )
 
-	def debugN( self, mobject, level , msg ):
-		if self.getLevel() >= level:
-			self.debug( mobject, msg )
+	def debugN( self, project, mobject, level , msg ):
+		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )
+		verbosity = self.__getLevel( project )
+		if verbosity >= level:
+			self.debug( project, mobject, msg )
 
 	def preFlightCheck( self, project ):
 		level = project.getSettings().get( Settings.ScriptLogLevel, True )

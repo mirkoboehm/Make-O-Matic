@@ -29,13 +29,13 @@ class Logger( Plugin ):
 		"""Constructor"""
 		Plugin.__init__( self, name )
 
-	def message( self, mobject, msg ):
+	def message( self, project, mobject, msg ):
 		raise AbstractMethodCalledError()
 
-	def debug( self, mobject, msg ):
+	def debug( self, project, mobject, msg ):
 		raise AbstractMethodCalledError()
 
-	def debugN( self, mobject, level , msg ):
+	def debugN( self, project, mobject, level , msg ):
 		raise AbstractMethodCalledError()
 
 	def timeStampPrefix( self ):
@@ -44,6 +44,6 @@ class Logger( Plugin ):
 	def messagePrefix( self ):
 		prefix = ''
 		try:
-			prefix = os.environ['AUTOBUILD_DEBUG_INDENT']
+			prefix = os.environ['MOM_INTERNAL_DEBUG_INDENT']
 		except: pass
 		return prefix
