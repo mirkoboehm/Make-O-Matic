@@ -18,32 +18,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Project import Project
-import sys
 from core.helpers.RunCommand import RunCommand
+import unittest
 
-project = Project( "Simple Project Run Test", "0.5.0" )
-try:
-	timeout = int( sys.argv[1] )
-	command = ' '.join( sys.argv[2:] )
-	runner = RunCommand( project, command, timeout, True )
-	runner.run()
-	print( """\
-RunCommand exited.
+class RunWithTimeoutTest( unittest.TestCase ):
 
-return code:
-{0}
+	def testRunWithTimeout( self ):
+		project = Project( "Simple Project Run Test", "0.5.0" )
+		timeout = 5
+		command = 'sleep 10'
+		runner = RunCommand( project, command, timeout, True )
+		runner.run()
+		self.assertTrue( runner.getTimedOut() )
+		self.assertTrue( runner.getReturnCode() != 0 )
 
-combined output:
-""".format( runner.getReturnCode() ) )
-	out = runner.getStdOut().decode()
-	print( out )
-except Exception as e:
-	print( """{0} Run with timeout tester
-Usage: {0} <timeout seconds> command args
-Example: {0} 30 make -j4
-{1}
-""".format( sys.argv[0], str( e ) ) )
-	sys.exit( 1 )
+	def testRunWithoutTimeout( self ):
+		project = Project( "Simple Project Run Test", "0.5.0" )
+		timeout = 10
+		command = 'sleep 5'
+		runner = RunCommand( project, command, timeout, True )
+		runner.run()
+		self.assertFalse( runner.getTimedOut() )
+		self.assertTrue( runner.getReturnCode() == 0 )
 
-
-
+if __name__ == "__main__":
+	#import sys;sys.argv = ['', 'Test.testName']
+	unittest.main()

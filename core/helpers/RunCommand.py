@@ -80,7 +80,10 @@ class _CommandRunner( Thread ):
 			self.kill( self._pid, signal.SIGTERM )
 		if not self.hasFinished():
 			self.join( 5 )
-			self.kill( self._pid, signal.SIGKILL )
+			try:
+				self.kill( self._pid, signal.SIGKILL )
+			except OSError:
+				pass # process finished in the meantime (the error is "[Errno 3] No such process")
 			self.join( 5 )
 		self._pid = -1
 
