@@ -31,7 +31,6 @@ from core.Exceptions import InterruptedException, MomError, MomException
 from core.Parameters import Parameters
 from core.helpers.VersionChecker import checkMinimumMomVersion
 from core.modules.scm.Factory import SourceCodeProviderFactory
-from core.modules import scm
 from core.helpers.PathResolver import PathResolver
 from test.test_iterlen import len
 
