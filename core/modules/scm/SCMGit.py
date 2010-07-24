@@ -23,6 +23,7 @@ from core.executomat.ShellCommandAction import ShellCommandAction
 from core.executomat.Action import Action
 import os
 from core.helpers.FilesystemAccess import make_foldername_from_string
+from core.helpers.PathResolver import PathResolver
 
 class _UpdateHiddenCloneAction( Action ):
 	def __init__( self, scmgit ):
@@ -73,7 +74,8 @@ class SCMGit( SourceCodeProvider ):
 		updateClone = ShellCommandAction( 'git clone --local --depth 1 {0} .'.format ( self._getHiddenClonePath() ) )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
-		checkout = ShellCommandAction( 'git checkout {0}'.format( self.getRevision() ) )
+		revision = self.getRevision() or 'HEAD'
+		checkout = ShellCommandAction( 'git checkout {0}'.format( revision ) )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 

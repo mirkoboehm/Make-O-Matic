@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Exceptions import AbstractMethodCalledError
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_path
 from core.Plugin import Plugin
 
 class SourceCodeProvider( Plugin ):
@@ -41,7 +41,7 @@ class SourceCodeProvider( Plugin ):
 		return self.__url
 
 	def setSrcDir( self, dir ):
-		check_for_nonempty_string( dir, 'The course folder needs to be a non-empty string!' )
+		check_for_path( dir, 'The course folder needs to be a non-empty string!' )
 		self.__srcDir = dir
 
 	def getSrcDir( self ):

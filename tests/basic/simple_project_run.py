@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Project import Project
-from core.modules.scm.SCMGit import SCMGit
 from core.modules.DoxygenGenerator import DoxygenGenerator
 from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
@@ -29,18 +28,10 @@ from core.Settings import Settings
 project = Project( "Simple Project Run Test", "0.5.0" )
 project.getSettings().set( Settings.ProjectVersionNumber, '0.5.0' )
 project.getSettings().set( Settings.ProjectVersionName, 'French Fries' )
-
+project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
 # add a console reporter
 reporter = ConsoleReporter()
 project.addPlugin( reporter )
-
-# add a git SCM
-scm = SCMGit()
-scm.setSrcDir( 'src' )
-scm.setRevision( 'HEAD' )
-scm.setUrl( 'git@gitorious.org:make-o-matic/mom.git' )
-# scm.setUrl( 'file:////d/kdab/products/charm/src' )
-project.setScm( scm )
 
 # add a preprocessor that generates the Doxygen input file
 prep = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen.cfg.in' ),

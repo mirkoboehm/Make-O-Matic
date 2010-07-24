@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-from core.helpers.TypeCheckers import check_for_string, check_for_nonnegative_int
+from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_path
 from core.Exceptions import AbstractMethodCalledError, MomError, MomException, BuildError
 import os
 from core.helpers.TimeKeeper import TimeKeeper
@@ -52,7 +52,7 @@ class Action( MObject ):
 
 	def setWorkingDirectory( self, dir ):
 		"""Set the directory to execute the command in."""
-		check_for_string( dir, "The working directory parameter must be a string containing a directory name." )
+		check_for_path( dir, "The working directory parameter must be a string containing a directory name." )
 		self.__workingDir = dir
 
 	def getWorkingDirectory( self ):
@@ -112,7 +112,7 @@ class Action( MObject ):
 				oldPwd = os.getcwd()
 				executomat.log( '# changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
 				try:
-					os.chdir( self.getWorkingDirectory() )
+					os.chdir( str( self.getWorkingDirectory() ) )
 				except ( OSError, IOError ) as e:
 					raise BuildError( str( e ) )
 			self._aboutToStart()

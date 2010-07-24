@@ -53,6 +53,5 @@ class ConsoleLogger( Logger ):
 	def preFlightCheck( self, project ):
 		level = project.getSettings().get( Settings.ScriptLogLevel, True )
 		check_for_nonnegative_int( level, 'The debug level must be a non-negative integer!' )
-		self.setLevel( level or 0 )
-		if self.getLevel() > 0:
+		if level > 0:
 			project.debug( self, 'debug level is {0}'.format( level ) )

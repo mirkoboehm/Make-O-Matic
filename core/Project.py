@@ -30,6 +30,9 @@ from core.Settings import Settings
 from core.Exceptions import InterruptedException, MomError, MomException
 from core.Parameters import Parameters
 from core.helpers.VersionChecker import checkMinimumMomVersion
+from core.modules.scm.Factory import SourceCodeProviderFactory
+from core.modules import scm
+from core.helpers.PathResolver import PathResolver
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -67,6 +70,12 @@ class Project( MObject ):
 
 	def getMomVersion( self ):
 		return '0.5.0'
+
+	def createScm( self, description ):
+		factory = SourceCodeProviderFactory()
+		scm = factory.makeScmImplementation( self, description )
+		scm.setSrcDir( PathResolver( self.getFolderManager().getSourceDir ) )
+		self.setScm( scm )
 
 	def setScm( self, scm ):
 		if self.getScm():
