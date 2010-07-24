@@ -83,6 +83,23 @@ class SourceCodeProvider( Plugin ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
 		raise AbstractMethodCalledError
 
+	def printRevisionsSince( self, project, options ):
+		"""Print revisions committed since the specified revision."""
+		revisions = self._getRevisionsSince( project, options )
+		lines = []
+		for revision in revisions:
+			line = '{0} {1} {2}'.format( revision[0], revision[1], revision[2] )
+			lines.append( line )
+		return '\n'.join( lines )
+
+	def _getRevisionsSince( self, project, options ):
+		"""Return revisions committed since the specified revision."""
+		raise AbstractMethodCalledError
+
+	def printCurrentRevision( self, project, options ):
+		"""Print current (most recent) revision."""
+		raise AbstractMethodCalledError
+
 	def makeCheckoutStep( self, project ):
 		"""Create steps to check out the source code"""
 		raise AbstractMethodCalledError()

@@ -23,7 +23,7 @@ from core.executomat.ShellCommandAction import ShellCommandAction
 from core.executomat.Action import Action
 import os
 from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.helpers.PathResolver import PathResolver
+import re
 
 class _UpdateHiddenCloneAction( Action ):
 	def __init__( self, scmgit ):
@@ -65,6 +65,41 @@ class SCMGit( SourceCodeProvider ):
 			lines = runner.getStdOut().decode().split( '\n' )
 			self._setDescription( lines[0].rstrip() )
 			project.debugN( self, 4, 'git found: "{0}"'.format( self.getDescription() ) )
+
+	def _getRevisionsSince( self, project, options ):
+		"""Print revisions committed since the specified revision."""
+		if not options:
+			raise MomError( 'No revision specified to start with!' )
+		if len( options ) > 2:
+			raise MomError( 'Error, extra options. Specify revision and optionally the maximum number of revisions to print.' )
+		revision = options[0]
+		cap = None
+		if len( options ) == 2:
+			cap = '-{0} '.format( int( options[1] ) )
+
+		runner = RunCommand( project, 'git log {0}{1}..'.format( cap or '', revision ), 3600 )
+		runner.setWorkingDir( self._getHiddenClonePath() )
+		runner.run()
+
+		# catch timeout errors, prepare result collection, stop service, send mail
+		if runner.getReturnCode() == 0:
+			output = runner.getStdOut().decode()
+			revisions = []
+			lines = output.split( '\n' )
+			for line in lines:
+				if re.match( '^commit.+', line ):
+					parts = line.split( ' ' )
+					hash = parts[1].strip()
+					if hash == revision:
+						break
+					else:
+						data = ( 'C', hash, self.getUrl() )
+						revisions.append( data )
+			return revisions
+		elif runner.getTimedOut() == True:
+			raise MomError( 'Getting git log for "{0}" timed out.'.format( self.url() ) )
+		else:
+			raise MomError( 'Getting git log failed, is there no git in the path?' )
 
 	def makeCheckoutStep( self, project ):
 		"""Create steps to check out the source code"""

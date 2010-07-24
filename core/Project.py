@@ -33,6 +33,7 @@ from core.helpers.VersionChecker import checkMinimumMomVersion
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.modules import scm
 from core.helpers.PathResolver import PathResolver
+from test.test_iterlen import len
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -150,7 +151,7 @@ class Project( MObject ):
 			elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
 				self.queryAndExit()
 			elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:
-				raise MomError( 'Not implemented: run mode "print"' )
+				self.printAndExit()
 			else:
 				assert self.getSettings().get( Settings.ScriptRunMode ) not in Settings.RunModes
 				raise MomError( 'Unknown run mode "{0}". Known run modes are: {1}'.format( 
@@ -198,3 +199,25 @@ This error will not change the return code of the script!'''.format( str( e ), p
 		except Exception as e:
 			print( 'Error: {0}'.format( str( e ) ) )
 			sys.exit( 1 )
+
+	def printAndExit( self ):
+		# program name, "print", argument, [options] 
+		if len( self.getParameters()._getArgs() ) < 3:
+			raise MomError( 'Please specify parameter to print!' )
+		command = self.getParameters()._getArgs()[2]
+		options = self.getParameters()._getArgs()[3:]
+		commands = {
+			'revisions-since' : [ self.getScm().printRevisionsSince, 'print revisions committed since specified revision' ],
+			'current-revision': [ self.getScm().printCurrentRevision, 'print current revision' ]
+		}
+		if command in commands:
+			method = commands[ command ][0]
+			print( method( self, options ) )
+			sys.exit( 0 )
+		else:
+			text = 'Unknown command "{0}" for run mode "print". Known commands are:'.format( command )
+			for cmd in commands:
+				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
+			print( text, file = sys.stderr )
+			sys.exit( 1 )
+
