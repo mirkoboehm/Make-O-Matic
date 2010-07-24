@@ -77,11 +77,11 @@ class SCMGit( SourceCodeProvider ):
 		if len( options ) == 2:
 			cap = '-{0} '.format( int( options[1] ) )
 
+		self._updateHiddenClone( project )
 		runner = RunCommand( project, 'git log {0}{1}..'.format( cap or '', revision ), 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
-		# catch timeout errors, prepare result collection, stop service, send mail
 		if runner.getReturnCode() == 0:
 			output = runner.getStdOut().decode()
 			revisions = []
@@ -97,9 +97,27 @@ class SCMGit( SourceCodeProvider ):
 						revisions.append( data )
 			return revisions
 		elif runner.getTimedOut() == True:
-			raise MomError( 'Getting git log for "{0}" timed out.'.format( self.url() ) )
+			raise ConfigurationError( 'Getting git log for "{0}" timed out.'.format( self.url() ) )
 		else:
-			raise MomError( 'Getting git log failed, is there no git in the path?' )
+			raise ConfigurationError( 'Getting git log failed, is there no git in the path?' )
+
+	def _getCurrentRevision( self, project ):
+		'''Return the identifier of the current revisions.'''
+		self._updateHiddenClone( project )
+		runner = RunCommand( project, 'git log -n1' )
+		runner.setWorkingDir( self._getHiddenClonePath() )
+		runner.run()
+
+		if runner.getReturnCode() == 0:
+			output = runner.getStdOut().decode()
+			lines = output.split( '\n' )
+			line1 = lines[0].strip()
+			parts = line1.split()
+			assert len( parts ) == 2 and parts[0] == 'commit'
+			return parts[1]
+		else:
+			raise ConfigurationError( 'cannot get log for the clone of "{0}" at "{1}"'
+				.format( self.getUrl(), self._getHiddenClonePath() ) )
 
 	def makeCheckoutStep( self, project ):
 		"""Create steps to check out the source code"""

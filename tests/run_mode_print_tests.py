@@ -24,16 +24,25 @@ from test.test_iterlen import len
 class RunModePrintTests( unittest.TestCase ):
 
 	def testPrintRevisionsSince( self ):
-		result = self._getRevisions( '57307ee83930c089d0eb9b4e7342c87784257071', 1 )
+		revision = '57307ee83930c089d0eb9b4e7342c87784257071'
+		result = self._getRevisions( revision, 1 )
 		self.assertEqual( len( result ), 1, 'The test asked for only one revision to be listed.' )
 		line = result[0]
-		self.assertEqual( line[1], '6647cbb26cf8cc511ffa541a090030fe0613172c',
-			'The next revision after 57307ee83930c089d0eb9b4e7342c87784257071 should be 6647cbb26cf8cc511ffa541a090030fe0613172c' )
-		self.assertEqual( line[0].lower(), 'c', 'Revision 6647cbb26cf8cc511ffa541a090030fe0613172c should be a C type build!' )
+		expected = '1e0aba98cd29438576e92f2e233b1177fd822620'
+		self.assertEqual( line[1], expected,
+			'The next revision after {0} should be {1}'.format( revision, expected ) )
+		self.assertEqual( line[0].lower(), 'c', 'Revision {0} should be a C type build!'.format( expected ) )
 
 	def testPrintAllRevisionsSince( self ):
 		result = self._getRevisions( '57307ee83930c089d0eb9b4e7342c87784257071' )
 		self.assertTrue( len( result ) > 1, 'The test asked for only one revision to be listed.' )
+
+	def testPrintCurrentRevision( self ):
+		project = Project( 'ScmFactoryTest' )
+		project.getSettings().set( Settings.ScriptLogLevel, 3 )
+		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
+		result = project.getScm()._getCurrentRevision( project )
+		self.assertTrue( result, 'The current revision cannot be None.' )
 
 	def _getRevisions( self, revision, count = None ):
 		project = Project( 'ScmFactoryTest' )

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import AbstractMethodCalledError
+from core.Exceptions import AbstractMethodCalledError, MomError
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_path
 from core.Plugin import Plugin
 
@@ -98,6 +98,13 @@ class SourceCodeProvider( Plugin ):
 
 	def printCurrentRevision( self, project, options ):
 		"""Print current (most recent) revision."""
+		if options:
+			raise MomError( 'print current-revision does not understand any extra options!' )
+		revision = self._getCurrentRevision( project )
+		return revision
+
+	def _getCurrentRevision( self, project ):
+		'''Return the identifier of the current revisions.'''
 		raise AbstractMethodCalledError
 
 	def makeCheckoutStep( self, project ):
