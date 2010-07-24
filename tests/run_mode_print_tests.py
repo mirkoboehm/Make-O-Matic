@@ -49,9 +49,9 @@ class RunModePrintTests( unittest.TestCase ):
 		project.getSettings().set( Settings.ScriptLogLevel, 3 )
 		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
 		if count:
-			result = project.getScm()._getRevisionsSince( project, [ revision, str( count ) ] )
+			result = project.getScm()._getRevisionsSince( project, revision, count )
 		else:
-			result = project.getScm()._getRevisionsSince( project, [ revision ] )
+			result = project.getScm()._getRevisionsSince( project, revision )
 		return result
 
 if __name__ == "__main__":

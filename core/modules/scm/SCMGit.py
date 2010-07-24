@@ -66,17 +66,8 @@ class SCMGit( SourceCodeProvider ):
 			self._setDescription( lines[0].rstrip() )
 			project.debugN( self, 4, 'git found: "{0}"'.format( self.getDescription() ) )
 
-	def _getRevisionsSince( self, project, options ):
+	def _getRevisionsSince( self, project, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
-		if not options:
-			raise MomError( 'No revision specified to start with!' )
-		if len( options ) > 2:
-			raise MomError( 'Error, extra options. Specify revision and optionally the maximum number of revisions to print.' )
-		revision = options[0]
-		cap = None
-		if len( options ) == 2:
-			cap = int( options[1] )
-
 		self._updateHiddenClone( project )
 		runner = RunCommand( project, 'git log {1}..'.format( cap or '', revision ), 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )

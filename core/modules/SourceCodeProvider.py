@@ -85,14 +85,23 @@ class SourceCodeProvider( Plugin ):
 
 	def printRevisionsSince( self, project, options ):
 		"""Print revisions committed since the specified revision."""
-		revisions = self._getRevisionsSince( project, options )
+		if not options:
+			raise MomError( 'No revision specified to start with!' )
+		if len( options ) > 2:
+			raise MomError( 'Error, extra options. Specify revision and optionally the maximum number of revisions to print.' )
+		revision = options[0]
+		cap = None
+		if len( options ) == 2:
+			cap = int( options[1] )
+
+		revisions = self._getRevisionsSince( project, revision, cap )
 		lines = []
 		for revision in revisions:
 			line = '{0} {1} {2}'.format( revision[0], revision[1], revision[2] )
 			lines.append( line )
 		return '\n'.join( lines )
 
-	def _getRevisionsSince( self, project, options ):
+	def _getRevisionsSince( self, project, revision, cap = None ):
 		"""Return revisions committed since the specified revision."""
 		raise AbstractMethodCalledError
 
