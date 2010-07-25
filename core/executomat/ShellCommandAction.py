@@ -56,6 +56,8 @@ class ShellCommandAction( Action ):
 		check_for_nonempty_string( self.getCommand(), 'trying to run a command without a command' )
 		self.__runner = RunCommand( project, self.__command, self.__timeOutPeriod, True )
 		self._getRunner().run()
+		self._setStdOut( self._getRunner().getStdOut() )
+		self._setStdErr( self._getRunner().getStdErr() )
 		return self._getRunner().getReturnCode()
 
 	def hasTimedOut( self ):

@@ -69,7 +69,7 @@ class RSyncPublisher( Plugin ):
 				return
 		step = project.getExecutomat().getStep( 'project-upload-docs' )
 		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-		action = ShellCommandAction( 'rsync -avz {0} {1}'.format( fromDir, uploadLocation ), 7200 )
+		action = ShellCommandAction( 'rsync -avz -e \'ssh -o "BatchMode yes"\' {0} {1}'.format( fromDir, uploadLocation ), 7200 )
 		action.setWorkingDirectory( project.getFolderManager().getBaseDir() )
 		step.addMainAction( action )
 

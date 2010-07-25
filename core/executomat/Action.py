@@ -47,8 +47,8 @@ class Action( MObject ):
 		self.__started = False
 		self.__finished = False
 		self.__result = None
-		self.__stdOut = None
-		self.__stdErr = None
+		self._setStdOut( None )
+		self._setStdErr( None )
 
 	def setWorkingDirectory( self, dir ):
 		"""Set the directory to execute the command in."""
@@ -84,11 +84,17 @@ class Action( MObject ):
 			raise MomError( 'exitCode() queried before the command was finished' )
 		return self.__exitCode
 
+	def _setStdErr( self, err ):
+		self.__stdErr = err
+
 	def getStdErr( self ):
 		"""Returns the stderr output of the action. Can only be called after execution."""
 		if not self.didFinish():
 			raise MomError( 'stdErr() queried before the action was finished' )
 		return self.__stdErr
+
+	def _setStdOut( self, out ):
+		self.__stdOut = out
 
 	def getStdOut( self ):
 		"""Returns the stdout output of the action. Can only be called after execution."""
