@@ -32,6 +32,7 @@ from core.Parameters import Parameters
 from core.helpers.VersionChecker import checkMinimumMomVersion
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
+from core.modules.reporters.ConsoleReporter import ConsoleReporter
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -50,13 +51,6 @@ class Project( MObject ):
 		self.__plugins = []
 		self.__returnCode = 0
 		self.__executomat = Executomat( self, 'Exec-o-Matic' )
-		try:
-			self.getSettings().initialize( self )
-		except MomException as e:
-			print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
-			sys.exit( e.getReturnCode() )
-		logger = ConsoleLogger( self.getSettings().get( Settings.ScriptLogLevel ) )
-		self.addLogger( logger )
 		self.__folderManager = FolderManager( self )
 		self.addPlugin( self.getFolderManager() )
 		checkMinimumMomVersion( self, minimalMomVersion )
@@ -219,3 +213,24 @@ This error will not change the return code of the script!'''.format( str( e ), p
 			print( text, file = sys.stderr )
 			sys.exit( 1 )
 
+def makeProject( projectName = None, minimalMomVersion = None,
+				projectVersionNumber = None, projectVersionName = None,
+				scmUrl = None ):
+	'''Create a standard default Project object.
+	A default project will have a ConsoleLogger, and a ConsoleReporter.
+	makeProject will also parse the configuration files.
+	'''
+	project = Project( projectName, minimalMomVersion )
+	try:
+		project.getSettings().initialize( project )
+	except MomException as e:
+		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
+		sys.exit( e.getReturnCode() )
+	logger = ConsoleLogger( project.getSettings().get( Settings.ScriptLogLevel ) )
+	project.addLogger( logger )
+	reporter = ConsoleReporter()
+	project.addPlugin( reporter )
+	project.getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
+	project.getSettings().set( Settings.ProjectVersionName, projectVersionName )
+	project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
+	return project

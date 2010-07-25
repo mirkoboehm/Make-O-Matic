@@ -16,12 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Project import Project
 from core.modules.reporters.ExecutomatReport import ExecutomatReport
 
 class ProjectReport( object ):
 
 	def __init__( self, project ):
+		from core.Project import Project
 		assert isinstance( project, Project )
 		self.__project = project
 		self.__executomatReport = ExecutomatReport( project.getExecutomat() )

@@ -17,21 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Project import Project
+from core.Project import makeProject
 from core.modules.DoxygenGenerator import DoxygenGenerator
-from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
 from core.modules.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
-from core.Settings import Settings
 
-project = Project( "Simple Project Run Test", "0.5.0" )
-project.getSettings().set( Settings.ProjectVersionNumber, '0.5.0' )
-project.getSettings().set( Settings.ProjectVersionName, 'French Fries' )
-project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
-# add a console reporter
-reporter = ConsoleReporter()
-project.addPlugin( reporter )
+project = makeProject( projectName = "Simple Project Run Test", minimalMomVersion = "0.5.0",
+	projectVersionNumber = '0.5.0', projectVersionName = 'French Fries' )
 
 # add a preprocessor that generates the Doxygen input file
 prep = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen.cfg.in' ),

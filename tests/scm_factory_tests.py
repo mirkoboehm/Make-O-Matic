@@ -23,7 +23,6 @@ from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
 from core.Settings import Settings
 from core.Exceptions import ConfigurationError
-from test.test_deque import fail
 
 class ScmFactoryTests( unittest.TestCase ):
 
@@ -45,7 +44,7 @@ class ScmFactoryTests( unittest.TestCase ):
 		except ConfigurationError:
 			pass # just as expected
 		else:
-			fail( "Trying to create an unknown source code provider implementation should throw a configuration error!" )
+			self.fail( "Trying to create an unknown source code provider implementation should throw a configuration error!" )
 
 if __name__ == "__main__":
 	#import sys;sys.argv = ['', 'Test.testName']
