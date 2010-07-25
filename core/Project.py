@@ -32,7 +32,6 @@ from core.Parameters import Parameters
 from core.helpers.VersionChecker import checkMinimumMomVersion
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
-from test.test_iterlen import len
 
 """A Project represents an entity to build. 
 FIXME documentation
