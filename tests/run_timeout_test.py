@@ -26,7 +26,7 @@ class RunWithTimeoutTest( unittest.TestCase ):
 	def testRunWithTimeout( self ):
 		project = Project( "Simple Project Run Test", "0.5.0" )
 		timeout = 5
-		command = 'sleep 10'
+		command = 'sleep 20'
 		runner = RunCommand( project, command, timeout, True )
 		runner.run()
 		self.assertTrue( runner.getTimedOut() )

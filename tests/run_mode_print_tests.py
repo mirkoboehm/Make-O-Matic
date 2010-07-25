@@ -19,7 +19,6 @@
 import unittest
 from core.Project import Project
 from core.Settings import Settings
-from test.test_iterlen import len
 
 class RunModePrintTests( unittest.TestCase ):
 
