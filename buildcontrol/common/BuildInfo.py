@@ -21,19 +21,44 @@ from core.MObject import MObject
 class BuildInfo( MObject ):
 	'''BuildInfo represents a single build script run.'''
 
+	class Status( object ):
+		NoStatus = 0
+		NewRevision = 1
+		Pending = 3
+		Completed = 4
+
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
-		self.__projectName = None
-		self.__buildType = None
-		self.__revision = None
-		self.__url = None
-		self.__buildScript = None
+		self.setProjectName( None )
+		self.setBuildStatus( BuildInfo.Status.NoStatus )
+		self.setBuildType( None )
+		self.setRevision( None )
+		self.setUrl( None )
+		self.setBuildScript( None )
 
 	def getProjectName( self ):
 		return self.__projectName
 
 	def setProjectName( self, name ):
 		self.__projectName = name
+
+	def getBuildId( self ):
+		return self.__buildId
+
+	def setBuildId( self, id ):
+		self.__buildId = id
+
+	def setPriority( self, priority ):
+		self.__priority = priority
+
+	def getPriority( self ):
+		return self.__priority
+
+	def setBuildStatus( self, status ):
+		self.__buildStatus = status
+
+	def getBuildStatus( self ):
+		return self.__buildStatus
 
 	def getBuildType( self ):
 		return self.__buildType
