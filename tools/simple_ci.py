@@ -63,7 +63,41 @@ class SimpleCI( MObject ):
 		return self.__buildScripts
 
 	def beMaster( self ):
-		pass
+		"""This is the main driver method when the control process is run as the master.
+		In an endless loop, it invokes itself in slave mode to perform all builds that have accumulated since the last start.
+		After every run, the master takes a short sleep."""
+		while True:
+			# FIXME re-implement self-updating of the mom installation before calling the slace
+			try:
+				autobuildPath = os.environ['AUTOBUILD_DIR']
+				cmd = 'cd ' + autobuildPath + ' && svn up'
+				result = RunCommand( cmd )
+				if result[0] == 0:
+					DebugN( 1, 'self-update of Autobuild installation successful.' )
+				else:
+					DebugN( 1, 'self-update of Autobuild installation failed, proceeding.' )
+			except KeyError:
+				DebugN( 1, 'AUTOBUILD_DIR is not set in the environment. self-update of the installation is disabled.' )
+			# execute the build control process slave:
+			program = sys.argv[0]
+			cmd = 'python '
+			for arg in sys.argv + [ ' --slave' ]:
+				cmd += arg + ' '
+			DebugN( 3, '*** now starting slave build control process ***' )
+			os.environ['AUTOBUILD_DEBUG_INDENT'] = 'slave> '
+			result = os.system( cmd ) # do not use runcommand, it catches the output
+			os.environ['AUTOBUILD_DEBUG_INDENT'] = ''
+			if options.test_run:
+				break
+			if result == 0:
+				time.sleep( 10 * 60 )
+			else:
+				DebugN( 1, '*** slave build control process failed with return code ' \
+					+ str( result ) + ', better check it while I sleep ***' )
+				# in case an error returned, we wait even longer, to not flood the server in case of a broken build script
+				time.sleep( 30 * 60 )
+
+			pass
 
 	def beServant( self ):
 		return
