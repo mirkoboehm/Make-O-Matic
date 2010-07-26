@@ -24,7 +24,8 @@ from core.modules.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
 
 project = makeProject( projectName = "Simple Project Run Test", minimalMomVersion = "0.5.0",
-	projectVersionNumber = '0.5.0', projectVersionName = 'French Fries' )
+	projectVersionNumber = '0.5.0', projectVersionName = 'French Fries',
+	scmUrl = 'git:git@gitorious.org:make-o-matic/mom.git' )
 
 # add a preprocessor that generates the Doxygen input file
 prep = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen.cfg.in' ),

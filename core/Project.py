@@ -232,5 +232,5 @@ def makeProject( projectName = None, minimalMomVersion = None,
 	project.addPlugin( reporter )
 	project.getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
 	project.getSettings().set( Settings.ProjectVersionName, projectVersionName )
-	project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
+	project.createScm( scmUrl )
 	return project
