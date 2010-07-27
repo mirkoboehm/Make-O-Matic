@@ -26,6 +26,7 @@ import os
 import time
 from core.loggers.ConsoleLogger import ConsoleLogger
 from buildcontrol.common.BuildStatus import BuildStatus
+from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 
 class SimpleCI( MObject ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -96,16 +97,12 @@ class SimpleCI( MObject ):
 			# execute the build control process slave:
 			cmd = '{0} {1}'.format( sys.executable, ' '.join( sys.argv + [ '--slave' ] ) )
 			self.getProject().debug( self, '*** now starting slave CI process ***' )
-			indentVar = self.getProject().getSettings().get( Settings.MomDebugIndentVariable )
-			oldIndent = None
-			if indentVar in os.environ:
-				oldIndent = os.environ[ indentVar ]
-			os.environ[ indentVar ] = '{0}{1}slave> '.format( oldIndent or '', ' ' if oldIndent else '' )
+			oldIndent = extend_debug_prefix( self.getProject(), 'slave' )
 			result = -1
 			try:
 				result = os.system( cmd ) # do not use RunCommand, it catches the output
 			finally:
-				os.environ[ indentVar ] = oldIndent or ''
+				restore_debug_prefix( self.getProject(), oldIndent )
 			self.getProject().debug( self, '*** slave finished with exit code {0}. ***'.format( result ) )
 			if self.getPerformTestBuilds():
 				break

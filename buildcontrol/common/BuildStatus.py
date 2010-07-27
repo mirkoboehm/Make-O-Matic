@@ -21,9 +21,13 @@ import sqlite3
 from buildcontrol.common.BuildInfo import BuildInfo
 from core.helpers.RunCommand import RunCommand
 import sys
-from core.Exceptions import MomError
+from core.Exceptions import MomError, ConfigurationError
 from core.Settings import Settings
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
+from core.helpers.FilesystemAccess import make_foldername_from_string
+import os
+import shutil
+from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -73,6 +77,26 @@ script text
 values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				c.execute( query, values )
 				buildInfo.setBuildId( c.lastrowid )
+			conn.commit()
+		finally:
+			c.close()
+
+	def updateBuildInfo( self, buildInfo ):
+		conn = self.getConnection()
+		try:
+			c = conn.cursor()
+			values = [
+				buildInfo.getProjectName(),
+				buildInfo.getBuildStatus(),
+				buildInfo.getPriority(),
+				buildInfo.getBuildType(),
+				buildInfo.getRevision(),
+				buildInfo.getUrl(),
+				buildInfo.getBuildScript(),
+				buildInfo.getBuildId() ]
+			query = '''update {0} set project_name=?, status=?, priority=?, type=?, revision=?, url=?, script=? where id=?'''\
+				.format( BuildStatus.TableName )
+			c.execute( query, values )
 			conn.commit()
 		finally:
 			c.close()
@@ -137,21 +161,96 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			query = 'select * from {0} where status=? order by priority desc'.format( BuildStatus.TableName )
 			c.execute( query, [ BuildInfo.Status.NewRevision ] )
 			buildInfos = []
-			project.debug( self, 'build queue:' )
 			for row in c:
 				buildInfo = self.__makeBuildInfoFromRow( row )
 				buildInfos.append( buildInfo )
+			if buildInfos:
+				project.debug( self, 'build queue:' )
 				project.debug( self, '{0} {1}: {2} - {3}'.format( 
 					buildInfo.getBuildType().upper() or ' ',
 					buildInfo.getProjectName(),
 					buildInfo.getRevision(),
 					buildInfo.getUrl() ) )
+			else:
+				project.debug( self, 'build queue is empty.' )
 			return buildInfos
 		finally:
 			c.close()
 
 	def performBuild( self, project, buildInfo ):
-		pass
+		"""Start a build process for a new revision. baseDir is the directory where all builds go. To build 
+		different revisions and build types under it, subdirectories have to be used."""
+		buildType = buildInfo.getBuildType().lower()
+		rev = buildInfo.getRevision()
+		name = make_foldername_from_string( buildInfo.getProjectName() )
+		# find suitable names for the different build dirs:
+		# <build type>/<project, branch or tag name>-revision/
+		# FIXME baseDir needs to be in settings
+		baseDir = 'builds'
+		subfolder = ''
+		if buildType in 'ecsf':
+			subfolder = str( rev ).rjust( 8, '0' )
+		elif buildType == 'd':
+			subfolder = str( rev )
+		else:
+			assert not 'implemented'
+		subfolder = make_foldername_from_string( subfolder )
+		directory = os.path.normpath( os.path.join( os.getcwd(), baseDir, buildType, name, subfolder ) )
+		# prepare build directory:
+		if os.path.isdir( directory ):
+			project.debug( self, 'found remainders of a previous build, nuking it...' )
+			try:
+				shutil.rmtree( directory )
+				project.debug( self, '...that was good!' )
+			except ( OSError, IOError ) as e:
+				raise ConfigurationError( 'Remnants of a previous build exist at "{0}" and cannot be deleted, bad Reason: {1}.'
+					.format( directory, e ) )
+		try:
+			os.makedirs( directory )
+		except ( OSError, IOError )as e:
+			raise ConfigurationError( 'Cannot create required build directory "{0}"!'.format( directory ) )
+		# now run the build script:
+		cmd = '{0} {1} -t {2}'.format( sys.executable, os.path.abspath( buildInfo.getBuildScript() ), buildType )
+		if buildInfo.getUrl():
+			cmd += ' -u {0}'.format( buildInfo.getUrl() )
+		if rev:
+			cmd += ' -r "{0}"'.format( str( rev ) )
+			rev = 'revision ' + str( rev )
+		else:
+			rev = 'latest revision'
+		project.message( self, 'starting build job for project "{0}" at revision {1}.'.format( buildInfo.getProjectName(), rev ) )
+		oldPwd = os.getcwd()
+		os.chdir( directory )
+		oldIndent = extend_debug_prefix( project, buildInfo.getProjectName() )
+		runner = RunCommand( project, cmd, 24 * 60 * 60 ) # we have builds that run 15h
+		try:
+			runner.run()
+		finally:
+			os.chdir( oldPwd )
+			restore_debug_prefix( project, oldIndent )
+			buildInfo.setBuildStatus( BuildInfo.Status.Completed )
+			self.updateBuildInfo( buildInfo )
+		if runner.getReturnCode() != 0:
+			project.message( self, 'build failed for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
+			# FIXME send out email reports on configuration or MOM errors
+			project.message( self, 'exit code {0}'.format( runner.getReturnCode() ) )
+			print( """\
+-->   ____        _ _     _   _____     _ _          _ 
+-->  | __ ) _   _(_) | __| | |  ___|_ _(_) | ___  __| |
+-->  |  _ \| | | | | |/ _` | | |_ / _` | | |/ _ \/ _` |
+-->  | |_) | |_| | | | (_| | |  _| (_| | | |  __/ (_| |
+-->  |____/ \__,_|_|_|\__,_| |_|  \__,_|_|_|\___|\__,_|
+--> 
+""" )
+		else:
+			project.message( self, 'build succeeded for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
+			print( """\
+-->   _         _ _    _      _
+-->  | |__ _  _(_) |__| |  __| |___ _ _  ___
+-->  | '_ \ || | | / _` | / _` / _ \ ' \/ -_)
+-->  |_.__/\_,_|_|_\__,_| \__,_\___/_||_\___|
+--> 
+""" )
 
 	def getNewestBuildInfo( self, buildScript ):
 		conn = self.getConnection()

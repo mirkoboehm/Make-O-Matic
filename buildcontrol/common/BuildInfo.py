@@ -30,6 +30,7 @@ class BuildInfo( MObject ):
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
+		self.setBuildId( None )
 		self.setProjectName( None )
 		self.setPriority( None )
 		self.setBuildStatus( BuildInfo.Status.NoStatus )
