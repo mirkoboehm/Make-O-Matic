@@ -21,12 +21,11 @@ import optparse
 from core.Project import Project
 from core.Settings import Settings
 import sys
-from core.Exceptions import ConfigurationError, MomError
+from core.Exceptions import ConfigurationError, MomError, MomException
 import os
 import time
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.helpers.RunCommand import RunCommand
-from buildcontrol.common.BuildInfo import BuildInfo
 from buildcontrol.common.BuildStatus import BuildStatus
 import re
 
@@ -93,30 +92,34 @@ class SimpleCI( MObject ):
 +-+ +-+-+-+-+-+ +-+ +-+-+-+-+-+ +-+-+-+-+ +-+-+-+-+ +-+-+-+-+-+-+-+-+
 """ )
 		while True:
+			self.getProject().debug( self, 'running in master mode' )
 			# FIXME re-implement self-updating of the mom installation before calling the slave
 			# ...
 			# execute the build control process slave:
 			cmd = '{0} {1}'.format( sys.executable, ' '.join( sys.argv + [ '--slave' ] ) )
-			self.getProject().debugN( self, 3, '*** now starting slave build control process ***' )
+			self.getProject().debug( self, '*** now starting slave CI process ***' )
 			indentVar = self.getProject().getSettings().get( Settings.MomDebugIndentVariable )
 			oldIndent = None
 			if indentVar in os.environ:
 				oldIndent = os.environ[ indentVar ]
 			os.environ[ indentVar ] = '{0}{1}slave> '.format( oldIndent or '', ' ' if oldIndent else '' )
+			result = -1
 			try:
 				result = os.system( cmd ) # do not use RunCommand, it catches the output
 			finally:
-				os.environ[ indentVar ] = oldIndent
+				os.environ[ indentVar ] = oldIndent or ''
+			self.getProject().debug( self, '*** slave finished with exit code {0}. ***'.format( result ) )
 			if self.getPerformTestBuilds():
 				break
-			if result == 0:
-				time.sleep( 10 * 60 )
-			else:
-				text = '*** slave build control process failed with return code {0}, better check it while I sleep ***'\
-					.format( str( result ) )
-				self.getProject().debug( self, text )
+			delay = 10 * 60
+			if result != 0:
 				# in case an error returned, we wait even longer, to not flood the server in case of a broken build script
-				time.sleep( 30 * 60 )
+				delay = 30 * 60
+			self.getProject().debug( self, 'sleeping for {0} seconds.'.format( delay ) )
+			self.getProject().debugN( self, 2, 'Z' )
+			self.getProject().debugN( self, 2, 'z' )
+			self.getProject().debugN( self, 2, '.' )
+			time.sleep( delay )
 
 	def beServant( self ):
 		self.getProject().debug( self, 'running in slave mode' )
@@ -147,19 +150,25 @@ class SimpleCI( MObject ):
 		# FIXME Mirko
 		# buildScripts = BuildControl.DoSanityChecks( BaseDir, buildScripts, buildType )
 		# do the stuff
-		if self.getPerformTestBuilds():
-			self.getProject().message( self, 'will do a test build for every product' )
-			# FIXME Mirko
-			# runTestBuildJobs( Options, folderScripts )
-		elif buildType == 'c':
-			self.doContinuousBuilds( buildScripts )
-		elif buildType == 'd':
-			# FIXME Mirko
-			pass
-			# doDailyBuilds( Options, RunDir, folderScripts )
-		else:
-			raise MomError( 'simple_ci only knows about C and D builds!' )
-		self.getProject().debugN( self, 1, 'done, exiting.' )
+		try:
+			if self.getPerformTestBuilds():
+				self.getProject().message( self, 'will do a test build for every product' )
+				raise MomError( 'Not implemented: text builds mode!' )
+				# FIXME Mirko
+				# runTestBuildJobs( Options, folderScripts )
+			elif buildType == 'c':
+				self.doContinuousBuilds( buildScripts )
+			elif buildType == 'd':
+				# FIXME Mirko
+				raise MomError( 'Not implemented: daily build mode!' )
+				# doDailyBuilds( Options, RunDir, folderScripts )
+			else:
+				raise MomError( 'simple_ci only knows about C and D builds!' )
+		except MomException as e:
+			exitCode = e.getReturnCode()
+			self.getProject().message( self, 'error during slave run, exit code {0}: {1}'.format( exitCode, e ) )
+			sys.exit( exitCode )
+		self.getProject().debug( self, 'done, exiting.' )
 
 	def querySetting( self, buildScript, setting ):
 		cmd = '{0} {1} query {2}'.format( sys.executable, buildScript, setting )
@@ -181,9 +190,10 @@ class SimpleCI( MObject ):
 
 
 	def doContinuousBuilds( self, buildScripts ):
-		self.getProject().debug( self, 'build control: running in continuous build mode' )
+		self.getProject().debug( self, 'build control: performing continuous builds.' )
 		project = self.getProject()
 		bs = self.getBuildStatus()
+		error = []
 		for buildScript in buildScripts:
 			try:
 				projectName = self.querySetting( buildScript, Settings.ProjectName )
@@ -208,8 +218,11 @@ class SimpleCI( MObject ):
 						.format( buildInfo.getRevision(), buildScript, projectName ) )
 					bs.saveBuildInfo( [ buildInfo ] )
 			except MomError as e:
+				error.append( 'error while processing build script "{0}": {1}'.format( buildScript, e ) )
 				msg = 'error while processing build script "{0}", continuing: {1}'.format( buildScript, e )
 				project.message( self, msg )
+		if error:
+			raise MomError( '. '.join( error ) )
 
 	def parseParameters ( self ):
 		"""Parse command line options, give help"""
