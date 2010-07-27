@@ -24,7 +24,7 @@ from core.Settings import Settings
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
 
-	def __init__( self, level = 0 ):
+	def __init__( self ):
 		"""Constructor"""
 		Logger.__init__( self, self.__class__.__name__ )
 

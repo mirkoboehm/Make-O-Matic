@@ -226,7 +226,7 @@ def makeProject( projectName = None, minimalMomVersion = None,
 	except MomException as e:
 		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
 		sys.exit( e.getReturnCode() )
-	logger = ConsoleLogger( project.getSettings().get( Settings.ScriptLogLevel ) )
+	logger = ConsoleLogger()
 	project.addLogger( logger )
 	reporter = ConsoleReporter()
 	project.addPlugin( reporter )

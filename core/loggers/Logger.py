@@ -39,7 +39,7 @@ class Logger( Plugin ):
 		raise AbstractMethodCalledError()
 
 	def timeStampPrefix( self ):
-		return datetime.now().strftime( '%y%m%d-%H:%M:%S' ) + ' '
+		return datetime.now().strftime( '%y%m%d-%H:%M:%S' )
 
 	def messagePrefix( self ):
 		prefix = ''

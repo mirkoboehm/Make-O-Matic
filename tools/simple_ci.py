@@ -22,6 +22,9 @@ from core.Project import Project
 from core.Settings import Settings
 import sys
 from core.Exceptions import ConfigurationError, MomError
+import os
+import time
+from core.loggers.ConsoleLogger import ConsoleLogger
 
 class SimpleCI( MObject ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -34,6 +37,7 @@ class SimpleCI( MObject ):
 		self.setPerformTestBuilds( False )
 		self.setSlaveMode( False )
 		self.setBuildScripts( None )
+		self.setBuildType( None )
 
 	def getProject( self ):
 		return self.__project
@@ -62,95 +66,104 @@ class SimpleCI( MObject ):
 	def getBuildScripts( self ):
 		return self.__buildScripts
 
+	def setBuildType( self, type ):
+		self.__buildType = type
+
+	def getBuildType( self ):
+		return self.__buildType
+
 	def beMaster( self ):
 		"""This is the main driver method when the control process is run as the master.
 		In an endless loop, it invokes itself in slave mode to perform all builds that have accumulated since the last start.
 		After every run, the master takes a short sleep."""
+		print( """\
++-+-+-+-+-+-+-+-+-+-+-+-+                     +-+ +-+-+-+-+ +-+-+-+-+
+|m|a|k|e|-|o|-|m|a|t|i|c|                     |C| |K|D|A|B| |2|0|1|0|
++-+-+-+-+-+-+-+-+-+-+-+-+                     +-+ +-+-+-+-+ +-+-+-+-+
++-+ +-+-+-+-+-+ +-+ +-+-+-+-+-+ +-+-+-+-+ +-+-+-+-+ +-+-+-+-+-+-+-+-+
+|i| |m|4|k|e|s| |u| |n|o|o|b|s| |k|n|o|w| |w|4|z|z| |f|0|0|b|4|r|3|d|
++-+ +-+-+-+-+-+ +-+ +-+-+-+-+-+ +-+-+-+-+ +-+-+-+-+ +-+-+-+-+-+-+-+-+
+""" )
 		while True:
-			# FIXME re-implement self-updating of the mom installation before calling the slace
-			try:
-				autobuildPath = os.environ['AUTOBUILD_DIR']
-				cmd = 'cd ' + autobuildPath + ' && svn up'
-				result = RunCommand( cmd )
-				if result[0] == 0:
-					DebugN( 1, 'self-update of Autobuild installation successful.' )
-				else:
-					DebugN( 1, 'self-update of Autobuild installation failed, proceeding.' )
-			except KeyError:
-				DebugN( 1, 'AUTOBUILD_DIR is not set in the environment. self-update of the installation is disabled.' )
+			# FIXME re-implement self-updating of the mom installation before calling the slave
+			# ...
 			# execute the build control process slave:
-			program = sys.argv[0]
-			cmd = 'python '
-			for arg in sys.argv + [ ' --slave' ]:
-				cmd += arg + ' '
-			DebugN( 3, '*** now starting slave build control process ***' )
-			os.environ['AUTOBUILD_DEBUG_INDENT'] = 'slave> '
+			cmd = '{0} {1}'.format( sys.executable, ' '.join( sys.argv + [ '--slave' ] ) )
+			self.getProject().debugN( self, 3, '*** now starting slave build control process ***' )
+			# FIXME load from settings:
+			indentVar = 'MOM_INTERNAL_DEBUG_INDENT'
+			oldIndent = ''
+			if indentVar in os.environ:
+				oldIndent = os.environ[ indentVar ] + ' '
+			os.environ[ indentVar ] = '{0}slave> '.format( oldIndent )
 			result = os.system( cmd ) # do not use runcommand, it catches the output
-			os.environ['AUTOBUILD_DEBUG_INDENT'] = ''
-			if options.test_run:
+			os.environ[ indentVar ] = oldIndent
+			if self.getPerformTestBuilds():
 				break
 			if result == 0:
 				time.sleep( 10 * 60 )
 			else:
-				DebugN( 1, '*** slave build control process failed with return code ' \
-					+ str( result ) + ', better check it while I sleep ***' )
+				text = '*** slave build control process failed with return code {0}, better check it while I sleep ***'\
+					.format( str( result ) )
+				self.getProject().debug( self, text )
 				# in case an error returned, we wait even longer, to not flood the server in case of a broken build script
 				time.sleep( 30 * 60 )
 
-			pass
-
 	def beServant( self ):
-		return
-#		DebugN( 1, 'running in slave mode' )
-#		# we are now in slave mode
-#		# branch by build type:
-#		buildType = 'c'
-#		if Options.build_type:
-#			buildType = str( Options.build_type ).lower()
-#			KnownBuildTypes = 'CD'
-#			if buildType.upper() not in KnownBuildTypes:
-#				raise ConfigureError( "I don't know about \"" + buildType + "\" builds, known build types are " + KnownBuildTypes )
-#			Message( 'will do ' + buildType + ' type builds' )
-#		# find the build scripts
-#		BaseDir = 'continuous'
-#		if buildType == 'd': BaseDir = 'daily'
-#		if Options.control_dir != None:
-#			BaseDir = str( Options.control_dir )
-#			Message( 'using "' + BaseDir + '" as control directory' )
-#			BaseDir = os.sep + BaseDir # + os.sep one can never have too many separators :-)
-#		ControlDir = os.path.normpath( os.getcwd() + os.sep + BaseDir )
-#		if not os.path.isdir( ControlDir ):
-#			raise ConfigureError( 'the control directory ' + ControlDir + ' does not exist' )
-#		RunDir = ControlDir + os.sep + 'builds'
-#		if not ensureEmptyWritableFolder( RunDir, True, 'Found existing run directory' ):
-#			raise AutoBuildError( 'trouble preparing run directory, sorry. Exiting.' )
-#		ProductBuildScripts = filter( lambda x: x.endswith( 'py' ), os.listdir( ControlDir ) )
-#		ProductBuildScripts = map( lambda x: ControlDir + os.sep + x, ProductBuildScripts )
-#		ProductBuildScripts = map( lambda x: os.path.normpath( x ), ProductBuildScripts )
-#		ProductBuildScripts = BuildControl.DoSanityChecks( BaseDir, ProductBuildScripts, buildType )
-#		# do the stuff
-#		if Options.test_run:
-#			Message( 'will do a test build for every product' )
-#			runTestBuildJobs( Options, ProductBuildScripts )
-#		elif buildType == 'c':
-#			doContinuousBuilds( Options, RunDir, ProductBuildScripts )
-#		elif buildType == 'd':
-#			doDailyBuilds( Options, RunDir, ProductBuildScripts )
-#		else:
-#			raise AutoBuildError( 'build control process only knows about C and D builds' )
-#		DebugN( 1, 'done, exiting.' )
-#		pass
+		self.getProject().debug( self, 'running in slave mode' )
+		# we are now in slave mode
+		# branch by build type:
+		buildType = 'c'
+		if self.getBuildType():
+			buildType = str( self.getBuildType() ).lower()
+			knownBuildTypes = 'cd'
+			if buildType not in knownBuildTypes:
+				raise ConfigurationError( 'I don\'t know about {0} type builds. Known build types are {1}.'
+					.format( buildType.upper(), ', '.join( knownBuildTypes ) ) )
+			self.getProject().message( self, 'will do {0} type builds.'.format( buildType.upper() ) )
+		# find the build scripts
+		buildScripts = self.getBuildScripts() or []
+		if self.getControlDir():
+			BaseDir = str( self.getControlDir() )
+			self.getProject().message( self, 'using "{0}" as control directory.'.format( BaseDir ) )
+			ControlDir = os.path.normpath( os.path.join( os.getcwd(), BaseDir ) )
+			if not os.path.isdir( ControlDir ):
+				raise ConfigurationError( 'The control directory "{0}" does not exist!'.format( ControlDir ) )
+			folderScripts = filter( lambda x: x.endswith( '.py' ), os.listdir( ControlDir ) )
+			folderScripts = map( lambda x: ControlDir + os.sep + x, folderScripts )
+			folderScripts = map( lambda x: os.path.normpath( x ), folderScripts )
+			buildScripts += folderScripts
+		if not buildScripts:
+			self.getProject().message( self, 'FYI: no build scripts specified.' )
+		# FIXME Mirko
+		# buildScripts = BuildControl.DoSanityChecks( BaseDir, buildScripts, buildType )
+		# do the stuff
+		if self.getPerformTestBuilds():
+			self.getProject().message( self, 'will do a test build for every product' )
+			# FIXME Mirko
+			# runTestBuildJobs( Options, folderScripts )
+		elif buildType == 'c':
+			# FIXME Mirko
+			pass
+			# doContinuousBuilds( Options, RunDir, folderScripts )
+		elif buildType == 'd':
+			# FIXME Mirko
+			pass
+			# doDailyBuilds( Options, RunDir, folderScripts )
+		else:
+			raise MomError( 'simple_ci only knows about C and D builds!' )
+		self.getProject().debugN( self, 1, 'done, exiting.' )
 
 	def parseParameters ( self ):
 		"""Parse command line options, give help"""
 		parser = optparse.OptionParser()
-		parser.add_option( "-c", "--control-dir", type = "string", dest = "control_dir",
+		parser.add_option( "-c", "--control-folder", type = "string", dest = "control_dir",
 			help = "select control folder that contains the build scripts" )
 		parser.add_option( '-v', '--verbose', action = 'count', dest = 'verbosity',
 			help = 'level of debug output' )
-		parser.add_option( "-t", "--test-run", action = "store_true", dest = "test_run",
+		parser.add_option( "-d", "--test-run", action = "store_true", dest = "test_run",
 			help = "compile the last revision of every product for testing" )
-		parser.add_option( "-b", "--build-type", type = "string", dest = "build_type",
+		parser.add_option( "-t", "--build-type", type = "string", dest = "build_type",
 			help = "build type, known types are (C)ontinuous and (D)aily" )
 		parser.add_option( "-s", "--slave", action = "store_true", dest = "slaveMode",
 			help = "run in slave mode (the one that actually does the builds)" )
@@ -167,16 +180,7 @@ class SimpleCI( MObject ):
 			self.setBuildType( options.build_type )
 		if options.slaveMode:
 			self.setSlaveMode( True )
-		self.setBuildScripts( args )
-		if not options.slaveMode:
-			print( """\
-+-+-+-+-+-+-+-+-+-+-+-+-+                     +-+ +-+-+-+-+ +-+-+-+-+
-|m|a|k|e|-|o|-|m|a|t|i|c|                     |C| |K|D|A|B| |2|0|1|0|
-+-+-+-+-+-+-+-+-+-+-+-+-+                     +-+ +-+-+-+-+ +-+-+-+-+
-+-+ +-+-+-+-+-+ +-+ +-+-+-+-+-+ +-+-+-+-+ +-+-+-+-+ +-+-+-+-+-+-+-+-+
-|i| |m|4|k|e|s| |u| |n|o|o|b|s| |k|n|o|w| |w|4|z|z| |f|0|0|b|4|r|3|d|
-+-+ +-+-+-+-+-+ +-+ +-+-+-+-+-+ +-+-+-+-+ +-+-+-+-+ +-+-+-+-+-+-+-+-+
-""" )
+		self.setBuildScripts( args[1:] )
 
 # "main":
 # startup: get the current list of revisions, remember the highest one
@@ -186,6 +190,7 @@ class SimpleCI( MObject ):
 # (easier self-repair)
 try:
 	ci = SimpleCI()
+	ci.getProject().addLogger( ConsoleLogger() )
 	ci.parseParameters()
 	if ci.getSlaveMode():
 		ci.beServant()
