@@ -179,13 +179,13 @@ class SimpleCI( MObject ):
 				error.append( 'error while processing build script "{0}": {1}'.format( buildScript, e ) )
 				msg = 'error while processing build script "{0}", continuing: {1}'.format( buildScript, e )
 				self.getProject().message( self, msg )
-		if error:
-			raise MomError( '. '.join( error ) )
 		# retrieve BuildInfo objects for all pending builds:
 		buildInfos = self.getBuildStatus().listNewBuildInfos( self.getProject() )
 		# perform the builds:
 		for buildInfo in buildInfos:
 			self.getBuildStatus().performBuild( self.getProject(), buildInfo )
+		if error:
+			raise MomError( '. '.join( error ) )
 
 	def parseParameters ( self ):
 		"""Parse command line options, give help"""
