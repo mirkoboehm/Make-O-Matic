@@ -36,6 +36,8 @@ class Defaults( MObject ):
 	ScriptClientName = 'script.clientname'
 	ScriptIgnoreCommitMessageCommands = 'script.ignorecommitmessagecommands'
 	ScriptRunMode = 'script.runmode'
+	# ----- internal settings
+	MomDebugIndentVariable = 'defaults.debug.indentvariable'
 	# ----- project settings 
 	ProjectName = 'project.name'
 	ProjectVersionNumber = 'project.version.number'
@@ -68,6 +70,8 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ScriptClientName ] = gethostname()
 		self.getSettings()[ Defaults.ScriptRunMode ] = Defaults.RunMode_Build
 		self.getSettings()[ Defaults.ScriptIgnoreCommitMessageCommands ] = False
+		# ----- internal settings
+		self.getSettings()[ Defaults.MomDebugIndentVariable ] = 'MOM_INTERNAL_DEBUG_INDENT'
 		# ----- project settings:
 		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'

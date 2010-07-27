@@ -98,14 +98,15 @@ class SimpleCI( MObject ):
 			# execute the build control process slave:
 			cmd = '{0} {1}'.format( sys.executable, ' '.join( sys.argv + [ '--slave' ] ) )
 			self.getProject().debugN( self, 3, '*** now starting slave build control process ***' )
-			# FIXME load from settings:
-			indentVar = 'MOM_INTERNAL_DEBUG_INDENT'
-			oldIndent = ''
+			indentVar = self.getProject().getSettings().get( Settings.MomDebugIndentVariable )
+			oldIndent = None
 			if indentVar in os.environ:
-				oldIndent = os.environ[ indentVar ] + ' '
-			os.environ[ indentVar ] = '{0}slave> '.format( oldIndent )
-			result = os.system( cmd ) # do not use runcommand, it catches the output
-			os.environ[ indentVar ] = oldIndent
+				oldIndent = os.environ[ indentVar ]
+			os.environ[ indentVar ] = '{0}{1}slave> '.format( oldIndent or '', ' ' if oldIndent else '' )
+			try:
+				result = os.system( cmd ) # do not use RunCommand, it catches the output
+			finally:
+				os.environ[ indentVar ] = oldIndent
 			if self.getPerformTestBuilds():
 				break
 			if result == 0:
@@ -193,6 +194,10 @@ class SimpleCI( MObject ):
 						.format( buildScript, projectName, revision ) )
 					buildInfos = bs.getBuildInfoForRevisionsSince( project, buildScript, projectName, revision )
 					if buildInfos:
+						project.message( self, 'build script "{0}" ({1}):'.format( buildScript, projectName ) )
+						for buildInfo in buildInfos:
+							msg = 'new revision "{0}"'.format( buildInfo.getRevision() )
+							project.message( self, msg )
 						bs.saveBuildInfo( buildInfos )
 					else:
 						project.debug( self, 'no new revisions found for build script "{0}" ({1})'

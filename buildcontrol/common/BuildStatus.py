@@ -133,7 +133,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 	def getBuildInfoForRevisionsSince( self, project, buildScript, projectName, revision ):
 		'''Return all revisions that modified the project since the specified revision.
 		@return a list of BuildInfo object, with the latest commit last
-		@throws MomError, if any of the operations fail
+		@throws MomEception, if any of the operations fail
 		'''
 		buildInfos = []
 		cmd = '{0} {1} print revisions-since {2}'.format( sys.executable, buildScript, revision )
@@ -152,8 +152,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			if not line: continue
 			parts = line.split( ' ' )
 			if len( parts ) != 3:
-				project.message( self, 'Not understood, skipping: "{0}"'.format( line ) )
-				continue
+				MomError( 'Error in build script output in line "{0}"'.format( line ) )
 			buildInfo = BuildInfo()
 			buildInfo.setProjectName( projectName )
 			buildInfo.setBuildStatus( buildInfo.Status.NewRevision )
@@ -161,9 +160,6 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			buildInfo.setRevision( parts[1] )
 			buildInfo.setUrl( parts[2] )
 			buildInfo.setBuildScript( buildScript )
-			msg = 'new revision "{0}" for build script "{1}" ({2})'\
-				.format( buildInfo.getRevision(), buildScript, projectName )
-			project.message( self, msg )
 			buildInfos.append( buildInfo )
 		buildInfos.reverse()
 		return buildInfos
