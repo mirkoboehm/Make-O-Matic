@@ -25,6 +25,10 @@ from core.Exceptions import ConfigurationError, MomError
 import os
 import time
 from core.loggers.ConsoleLogger import ConsoleLogger
+from core.helpers.RunCommand import RunCommand
+from buildcontrol.common.BuildInfo import BuildInfo
+from buildcontrol.common.BuildStatus import BuildStatus
+import re
 
 class SimpleCI( MObject ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -38,9 +42,13 @@ class SimpleCI( MObject ):
 		self.setSlaveMode( False )
 		self.setBuildScripts( None )
 		self.setBuildType( None )
+		self.__buildStatus = BuildStatus()
 
 	def getProject( self ):
 		return self.__project
+
+	def getBuildStatus( self ):
+		return self.__buildStatus
 
 	def setControlDir( self, dir ):
 		self.__controlDir = dir
@@ -143,9 +151,7 @@ class SimpleCI( MObject ):
 			# FIXME Mirko
 			# runTestBuildJobs( Options, folderScripts )
 		elif buildType == 'c':
-			# FIXME Mirko
-			pass
-			# doContinuousBuilds( Options, RunDir, folderScripts )
+			self.doContinuousBuilds( buildScripts )
 		elif buildType == 'd':
 			# FIXME Mirko
 			pass
@@ -153,6 +159,82 @@ class SimpleCI( MObject ):
 		else:
 			raise MomError( 'simple_ci only knows about C and D builds!' )
 		self.getProject().debugN( self, 1, 'done, exiting.' )
+
+	def querySetting( self, buildScript, setting ):
+		cmd = '{0} {1} query {2}'.format( sys.executable, buildScript, setting )
+		runner = RunCommand( self.getProject(), cmd, 1800 )
+		runner.run()
+		if runner.getReturnCode() != 0:
+			stderr = runner.getStdErr().decode()
+			raise MomError( 'Cannot query project name for build script "{0}"!'.format( stderr ) )
+		output = runner.getStdOut()
+		if not output:
+			raise MomError( 'The build script "{0}" did not specify a project name!'.format( stderr ) )
+		line = output.decode().strip()
+		groups = re.search( '^(.+?): (.+)$', line )
+		if not groups:
+			raise MomError( 'Did not understand this output: "{0}"!'.format( line ) )
+		variable = groups.groups()[1]
+		return variable
+
+
+	def doContinuousBuilds( self, buildScripts ):
+		self.getProject().debug( self, 'build control: running in continuous build mode' )
+		buildInfos = []
+		for buildScript in buildScripts:
+			projectName = self.querySetting( buildScript, Settings.ProjectName )
+			newestBuildInfo = self.getBuildStatus().getNewestBuildInfo( buildScript )
+			if newestBuildInfo:
+				self.getProject().debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
+					.format( buildScript, projectName, newestBuildInfo.getRevision() ) )
+				cmd = '{0} {1} print revisions-since {2}'.format( sys.executable, buildScript, newestBuildInfo.getRevision() )
+				runner = RunCommand( self.getProject(), cmd, 1800 )
+				runner.run()
+				if runner.getReturnCode() != 0:
+					msg = 'Cannot get revision list for build script "{0}" ({1}), continuing with next project.'\
+						.format( buildScript, projectName )
+					self.getProject().message( msg )
+					continue
+				output = runner.getStdOut()
+				if not output: continue
+				lines = output.decode().split( '\n' )
+				for line in lines:
+					line = line.strip()
+					if not line: continue
+					parts = line.split( ' ' )
+					if len( parts ) != 3:
+						self.getProject().message( self, 'Not understood, skipping: "{0}"'.format( line ) )
+						continue
+					buildInfo = BuildInfo()
+					buildInfo.setProjectName( projectName )
+					buildInfo.setBuildStatus( buildInfo.Status.NewRevision )
+					buildInfo.setBuildType( parts[0] )
+					buildInfo.setRevision( parts[1] )
+					buildInfo.setUrl( parts[2] )
+					buildInfo.setBuildScript( buildScript )
+					buildInfos.append( buildInfo )
+			#	 persist all newly discovered revisions:
+				buildInfos.reverse()
+				self.getBuildStatus().saveBuildInfo( buildInfos )
+			else:
+				cmd = '{0} {1} print current-revision'.format( sys.executable, buildScript )
+				runner = RunCommand( self.getProject(), cmd, 1800 )
+				runner.run()
+				if runner.getReturnCode() != 0:
+					msg = 'Cannot get initial revision for build script "{0}" ({1}), continuing with next project.'\
+						.format( buildScript, projectName )
+					self.getProject().message( msg )
+					continue
+				revision = runner.getStdOut().decode().strip()
+				buildInfo = BuildInfo()
+				buildInfo.setProjectName( projectName )
+				buildInfo.setBuildStatus( buildInfo.Status.InitialRevision )
+				buildInfo.setRevision( revision )
+				buildInfo.setBuildScript( buildScript )
+				buildInfos.append( buildInfo )
+				self.getProject().debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
+					.format( revision, buildScript, projectName ) )
+				self.getBuildStatus().saveBuildInfo( [ buildInfo ] )
 
 	def parseParameters ( self ):
 		"""Parse command line options, give help"""
@@ -190,6 +272,8 @@ class SimpleCI( MObject ):
 # (easier self-repair)
 try:
 	ci = SimpleCI()
+	# FIXME 
+	ci.getBuildStatus().setDatabaseFilename( '/tmp/test-buildstatus.sqlite' )
 	ci.getProject().addLogger( ConsoleLogger() )
 	ci.parseParameters()
 	if ci.getSlaveMode():

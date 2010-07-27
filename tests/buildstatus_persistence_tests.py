@@ -30,7 +30,7 @@ class BuildStatusPersistenceTests( unittest.TestCase ):
 	def testPersistBuildInfo( self ):
 		bs = BuildStatus()
 		filename = self.getTemporaryDatabaseFilename()[1]
-		bs.setDatabaseFile( filename )
+		bs.setDatabaseFilename( filename )
 		bi = BuildInfo()
 		bi.setProjectName( bs.getName() )
 		bi.setPriority( 0 )

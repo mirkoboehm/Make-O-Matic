@@ -26,10 +26,12 @@ class BuildInfo( MObject ):
 		NewRevision = 1
 		Pending = 3
 		Completed = 4
+		InitialRevision = 5
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
 		self.setProjectName( None )
+		self.setPriority( None )
 		self.setBuildStatus( BuildInfo.Status.NoStatus )
 		self.setBuildType( None )
 		self.setRevision( None )
