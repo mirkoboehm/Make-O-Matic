@@ -25,9 +25,7 @@ from core.Exceptions import ConfigurationError, MomError, MomException
 import os
 import time
 from core.loggers.ConsoleLogger import ConsoleLogger
-from core.helpers.RunCommand import RunCommand
 from buildcontrol.common.BuildStatus import BuildStatus
-import re
 
 class SimpleCI( MObject ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -170,59 +168,24 @@ class SimpleCI( MObject ):
 			sys.exit( exitCode )
 		self.getProject().debug( self, 'done, exiting.' )
 
-	def querySetting( self, buildScript, setting ):
-		cmd = '{0} {1} query {2}'.format( sys.executable, buildScript, setting )
-		runner = RunCommand( self.getProject(), cmd, 1800 )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			stderr = runner.getStdErr().decode()
-			raise MomError( 'Cannot query setting "{0}" for build script "{1}": {2}!'\
-				.format( setting, buildScript, stderr ) )
-		output = runner.getStdOut()
-		if not output:
-			raise MomError( 'The build script "{0}" did not specify a project name! It said: {1}'.format( buildScript, stderr ) )
-		line = output.decode().strip()
-		groups = re.search( '^(.+?): (.+)$', line )
-		if not groups:
-			raise MomError( 'Did not understand this output: "{0}"!'.format( line ) )
-		variable = groups.groups()[1]
-		return variable
-
-
 	def doContinuousBuilds( self, buildScripts ):
 		self.getProject().debug( self, 'build control: performing continuous builds.' )
-		project = self.getProject()
-		bs = self.getBuildStatus()
 		error = []
+		# register all revisions committed since the last run in the database:
 		for buildScript in buildScripts:
 			try:
-				projectName = self.querySetting( buildScript, Settings.ProjectName )
-				newestBuildInfo = bs.getNewestBuildInfo( buildScript )
-				if newestBuildInfo:
-					revision = newestBuildInfo.getRevision()
-					self.getProject().debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
-						.format( buildScript, projectName, revision ) )
-					buildInfos = bs.getBuildInfoForRevisionsSince( project, buildScript, projectName, revision )
-					if buildInfos:
-						project.message( self, 'build script "{0}" ({1}):'.format( buildScript, projectName ) )
-						for buildInfo in buildInfos:
-							msg = 'new revision "{0}"'.format( buildInfo.getRevision() )
-							project.message( self, msg )
-						bs.saveBuildInfo( buildInfos )
-					else:
-						project.debug( self, 'no new revisions found for build script "{0}" ({1})'
-							.format( buildScript, projectName ) )
-				else:
-					buildInfo = bs.getBuildInfoForInitialRevision( project, buildScript, projectName )
-					project.debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
-						.format( buildInfo.getRevision(), buildScript, projectName ) )
-					bs.saveBuildInfo( [ buildInfo ] )
+				self.getBuildStatus().registerNewRevisions( self.getProject(), buildScript )
 			except MomError as e:
 				error.append( 'error while processing build script "{0}": {1}'.format( buildScript, e ) )
 				msg = 'error while processing build script "{0}", continuing: {1}'.format( buildScript, e )
-				project.message( self, msg )
+				self.getProject().message( self, msg )
 		if error:
 			raise MomError( '. '.join( error ) )
+		# retrieve BuildInfo objects for all pending builds:
+		buildInfos = self.getBuildStatus().listNewBuildInfos( self.getProject() )
+		# perform the builds:
+		for buildInfo in buildInfos:
+			self.getBuildStatus().performBuild( self.getProject(), buildInfo )
 
 	def parseParameters ( self ):
 		"""Parse command line options, give help"""

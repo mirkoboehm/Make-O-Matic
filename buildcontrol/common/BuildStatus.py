@@ -22,6 +22,8 @@ from buildcontrol.common.BuildInfo import BuildInfo
 from core.helpers.RunCommand import RunCommand
 import sys
 from core.Exceptions import MomError
+from core.Settings import Settings
+from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -102,6 +104,55 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		finally:
 			c.close()
 
+	def registerNewRevisions( self, project, buildScript ):
+		'''Determines new revisions committed since the last call with the same build script, 
+		and adds those to the database.'''
+		iface = BuildScriptInterface( buildScript )
+		projectName = iface.querySetting( project, Settings.ProjectName )
+		newestBuildInfo = self.getNewestBuildInfo( buildScript )
+		if newestBuildInfo:
+			revision = newestBuildInfo.getRevision()
+			project.debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
+				.format( buildScript, projectName, revision ) )
+			buildInfos = self.getBuildInfoForRevisionsSince( project, buildScript, projectName, revision )
+			if buildInfos:
+				project.message( self, 'build script "{0}" ({1}):'.format( buildScript, projectName ) )
+				for buildInfo in buildInfos:
+					msg = 'new revision "{0}"'.format( buildInfo.getRevision() )
+					project.message( self, msg )
+				self.saveBuildInfo( buildInfos )
+			else:
+				project.debug( self, 'no new revisions found for build script "{0}" ({1})'
+					.format( buildScript, projectName ) )
+		else:
+			buildInfo = self.getBuildInfoForInitialRevision( project, buildScript, projectName )
+			project.debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
+				.format( buildInfo.getRevision(), buildScript, projectName ) )
+			self.saveBuildInfo( [ buildInfo ] )
+
+	def listNewBuildInfos( self, project ):
+		conn = self.getConnection()
+		try:
+			c = conn.cursor()
+			query = 'select * from {0} where status=? order by priority desc'.format( BuildStatus.TableName )
+			c.execute( query, [ BuildInfo.Status.NewRevision ] )
+			buildInfos = []
+			project.debug( self, 'build queue:' )
+			for row in c:
+				buildInfo = self.__makeBuildInfoFromRow( row )
+				buildInfos.append( buildInfo )
+				project.debug( self, '{0} {1}: {2} - {3}'.format( 
+					buildInfo.getBuildType().upper() or ' ',
+					buildInfo.getProjectName(),
+					buildInfo.getRevision(),
+					buildInfo.getUrl() ) )
+			return buildInfos
+		finally:
+			c.close()
+
+	def performBuild( self, project, buildInfo ):
+		pass
+
 	def getNewestBuildInfo( self, buildScript ):
 		conn = self.getConnection()
 		try:
@@ -115,14 +166,8 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			c.close()
 
 	def getBuildInfoForInitialRevision( self, project, buildScript, projectName ):
-		cmd = '{0} {1} print current-revision'.format( sys.executable, buildScript )
-		runner = RunCommand( project, cmd, 1800 )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			msg = 'Cannot get initial revision for build script "{0}" ({1}), continuing with next project.'\
-				.format( buildScript, projectName )
-			raise MomError( msg )
-		revision = runner.getStdOut().decode().strip()
+		iface = BuildScriptInterface( buildScript )
+		revision = iface.queryCurrentRevision( project )
 		buildInfo = BuildInfo()
 		buildInfo.setProjectName( projectName )
 		buildInfo.setBuildStatus( BuildInfo.Status.InitialRevision )
@@ -135,18 +180,9 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		@return a list of BuildInfo object, with the latest commit last
 		@throws MomEception, if any of the operations fail
 		'''
+		iface = BuildScriptInterface( buildScript )
 		buildInfos = []
-		cmd = '{0} {1} print revisions-since {2}'.format( sys.executable, buildScript, revision )
-		runner = RunCommand( project, cmd, 1800 )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			msg = 'Cannot get revision list for build script "{0}" ({1}), continuing with next project.'\
-				.format( buildScript, projectName )
-			raise MomError( msg )
-		output = runner.getStdOut()
-		if not output:
-			return buildInfos
-		lines = output.decode().split( '\n' )
+		lines = iface.queryRevisionsSince( project, revision )
 		for line in lines:
 			line = line.strip()
 			if not line: continue
