@@ -166,10 +166,11 @@ class SimpleCI( MObject ):
 		runner.run()
 		if runner.getReturnCode() != 0:
 			stderr = runner.getStdErr().decode()
-			raise MomError( 'Cannot query project name for build script "{0}"!'.format( stderr ) )
+			raise MomError( 'Cannot query setting "{0}" for build script "{1}": {2}!'\
+				.format( setting, buildScript, stderr ) )
 		output = runner.getStdOut()
 		if not output:
-			raise MomError( 'The build script "{0}" did not specify a project name!'.format( stderr ) )
+			raise MomError( 'The build script "{0}" did not specify a project name! It said: {1}'.format( buildScript, stderr ) )
 		line = output.decode().strip()
 		groups = re.search( '^(.+?): (.+)$', line )
 		if not groups:
@@ -180,61 +181,30 @@ class SimpleCI( MObject ):
 
 	def doContinuousBuilds( self, buildScripts ):
 		self.getProject().debug( self, 'build control: running in continuous build mode' )
-		buildInfos = []
+		project = self.getProject()
+		bs = self.getBuildStatus()
 		for buildScript in buildScripts:
-			projectName = self.querySetting( buildScript, Settings.ProjectName )
-			newestBuildInfo = self.getBuildStatus().getNewestBuildInfo( buildScript )
-			if newestBuildInfo:
-				self.getProject().debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
-					.format( buildScript, projectName, newestBuildInfo.getRevision() ) )
-				cmd = '{0} {1} print revisions-since {2}'.format( sys.executable, buildScript, newestBuildInfo.getRevision() )
-				runner = RunCommand( self.getProject(), cmd, 1800 )
-				runner.run()
-				if runner.getReturnCode() != 0:
-					msg = 'Cannot get revision list for build script "{0}" ({1}), continuing with next project.'\
-						.format( buildScript, projectName )
-					self.getProject().message( msg )
-					continue
-				output = runner.getStdOut()
-				if not output: continue
-				lines = output.decode().split( '\n' )
-				for line in lines:
-					line = line.strip()
-					if not line: continue
-					parts = line.split( ' ' )
-					if len( parts ) != 3:
-						self.getProject().message( self, 'Not understood, skipping: "{0}"'.format( line ) )
-						continue
-					buildInfo = BuildInfo()
-					buildInfo.setProjectName( projectName )
-					buildInfo.setBuildStatus( buildInfo.Status.NewRevision )
-					buildInfo.setBuildType( parts[0] )
-					buildInfo.setRevision( parts[1] )
-					buildInfo.setUrl( parts[2] )
-					buildInfo.setBuildScript( buildScript )
-					buildInfos.append( buildInfo )
-			#	 persist all newly discovered revisions:
-				buildInfos.reverse()
-				self.getBuildStatus().saveBuildInfo( buildInfos )
-			else:
-				cmd = '{0} {1} print current-revision'.format( sys.executable, buildScript )
-				runner = RunCommand( self.getProject(), cmd, 1800 )
-				runner.run()
-				if runner.getReturnCode() != 0:
-					msg = 'Cannot get initial revision for build script "{0}" ({1}), continuing with next project.'\
-						.format( buildScript, projectName )
-					self.getProject().message( msg )
-					continue
-				revision = runner.getStdOut().decode().strip()
-				buildInfo = BuildInfo()
-				buildInfo.setProjectName( projectName )
-				buildInfo.setBuildStatus( buildInfo.Status.InitialRevision )
-				buildInfo.setRevision( revision )
-				buildInfo.setBuildScript( buildScript )
-				buildInfos.append( buildInfo )
-				self.getProject().debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
-					.format( revision, buildScript, projectName ) )
-				self.getBuildStatus().saveBuildInfo( [ buildInfo ] )
+			try:
+				projectName = self.querySetting( buildScript, Settings.ProjectName )
+				newestBuildInfo = bs.getNewestBuildInfo( buildScript )
+				if newestBuildInfo:
+					revision = newestBuildInfo.getRevision()
+					self.getProject().debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
+						.format( buildScript, projectName, revision ) )
+					buildInfos = bs.getBuildInfoForRevisionsSince( project, buildScript, projectName, revision )
+					if buildInfos:
+						bs.saveBuildInfo( buildInfos )
+					else:
+						project.debug( self, 'no new revisions found for build script "{0}" ({1})'
+							.format( buildScript, projectName ) )
+				else:
+					buildInfo = bs.getBuildInfoForInitialRevision( project, buildScript, projectName )
+					project.debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
+						.format( buildInfo.getRevision(), buildScript, projectName ) )
+					bs.saveBuildInfo( [ buildInfo ] )
+			except MomError as e:
+				msg = 'error while processing build script "{0}", continuing: {1}'.format( buildScript, e )
+				project.message( self, msg )
 
 	def parseParameters ( self ):
 		"""Parse command line options, give help"""
@@ -285,16 +255,12 @@ except KeyboardInterrupt:
 	print( 'Interrupted, exiting. Have a nice day.', file = sys.stderr )
 	sys.exit( 1 )
 except ConfigurationError as e:
-	print( """\
-FATAL: A configuration error has been discovered. This means that a pre-
-requisite of the build process is missing. The following error message
-should explain the details:\n{0}""".format( str( e ) ) )
+	print( 'FATAL: A configuration error has been discovered. This means that a prerequisite of the build process is missing. '
+		+ 'The following error message should explain the details:\n{0}'.format( str( e ) ) )
 	sys.exit( 1 )
 except MomError as e:
-	print( """\
-FATAL: A MomError has been raised. This means there is a problem
-with the environment, system configuration or make-o-matic itself that
-causes make-o-matic to malfunction. The following error message should 
-explain the details:\n{0}""".format( str( e ) ) )
+	print( 'FATAL: A MomError has been raised. This means there is a problem with the environment, system configuration or '
+		+ 'make-o-matic itself that causes make-o-matic to malfunction. The following error message should explain the '
+		+ 'details:\n{0}'.format( str( e ) ) )
 	sys.exit( 1 )
 
