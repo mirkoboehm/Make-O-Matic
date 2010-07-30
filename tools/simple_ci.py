@@ -27,6 +27,7 @@ import time
 from core.loggers.ConsoleLogger import ConsoleLogger
 from buildcontrol.common.BuildStatus import BuildStatus
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
+from core.helpers.FilesystemAccess import make_foldername_from_string
 
 class SimpleCI( MObject ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -84,6 +85,38 @@ class SimpleCI( MObject ):
 
 	def getPerformBuilds( self ):
 		return self.__build
+
+	def getInstanceDir( self ):
+		folder = make_foldername_from_string( self.getName() )
+		# FIXME verify on Windows
+		path = os.path.join( os.path.expanduser( '~' ), '.mom', folder )
+		if not os.path.isdir( path ):
+			try:
+				os.makedirs( path )
+				self.getProject().debug( self, 'instance  directory "{0}" created.'.format( path ) )
+			except OSError as e:
+				raise ConfigurationError( 'cannot create instance directory "{0}": {1}!'.format( path, e ) )
+		return path
+
+	def getDataDir( self ):
+		path = os.path.join( self.getInstanceDir(), 'data' )
+		if not os.path.isdir( path ):
+			try:
+				os.makedirs( path )
+				self.getProject().debug( self, 'instance data directory "{0}" created.'.format( path ) )
+			except OSError as e:
+				raise ConfigurationError( 'cannot create instance data directory "{0}": {1}!'.format( path, e ) )
+		return path
+
+	def setup( self ):
+		configFilePath = os.path.join( self.getInstanceDir(), 'config.py' )
+		# FIXME add to configuration files for settings:
+		# ...
+		# set database filename:
+		database = os.path.join( self.getDataDir(), 'buildstatus.sqlite' )
+		self.getBuildStatus().setDatabaseFilename( database )
+		self.getProject().addLogger( ConsoleLogger() )
+		self.parseParameters()
 
 	def beMaster( self ):
 		"""This is the main driver method when the control process is run as the master.
@@ -199,6 +232,8 @@ class SimpleCI( MObject ):
 			help = "do not start build jobs for new revisions (default: do build)" )
 		parser.add_option( "-s", "--slave", action = "store_true", dest = "slaveMode",
 			help = "run in slave mode (the one that actually does the builds)" )
+		parser.add_option( "-n", "--instance-name", type = "string", dest = "instance_name",
+			help = "the instance name is used to locate the configuration and database files (see debug output)" )
 		( options, args ) = parser.parse_args( sys.argv )
 		if options.control_dir:
 			self.setControlDir( str( options.control_dir ) )
@@ -214,6 +249,8 @@ class SimpleCI( MObject ):
 			self.setFindRevisions( False )
 		if options.no_build:
 			self.setPerformBuilds( False )
+		if options.instance_name:
+			self.setName( options.instance_name )
 		self.setBuildScripts( args[1:] )
 
 # "main":
@@ -224,10 +261,7 @@ class SimpleCI( MObject ):
 # (easier self-repair)
 try:
 	ci = SimpleCI()
-	# FIXME 
-	ci.getBuildStatus().setDatabaseFilename( '/tmp/test-buildstatus.sqlite' )
-	ci.getProject().addLogger( ConsoleLogger() )
-	ci.parseParameters()
+	ci.setup()
 	if ci.getSlaveMode():
 		ci.beServant()
 	else:
