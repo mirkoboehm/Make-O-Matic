@@ -54,11 +54,13 @@ class Defaults( MObject ):
 	ProjectTempDir = 'project.tempdir'
 	ProjectLogDir = 'project.logdir'
 	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
-	# ----- rsync publisher settings (should be set in .mom/config.py):
+	# ----- RSync publisher settings (should be set in .mom/config.py):
 	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
 	# ----- reporter settings:
 	EmailReporterSender = 'reporter.email.sender'
 	EmailReporterRecipients = 'reporter.email.recipient'
+	# ----- simple_ci settings: 
+	SimpleCIBuildJobCap = 'simple_ci.build.cap'
 
 	def __init__( self ):
 		'''Constructor'''
@@ -101,6 +103,8 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ProjectDocsDir ] = 'docs'
 		self.getSettings()[ Defaults.ProjectTempDir ] = 'tmp'
 		self.getSettings()[ Defaults.ProjectLogDir ] = 'log'
+		# ----- simple_ci settings:
+		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
 
 	def getSettings( self ):
 		return self.__settings

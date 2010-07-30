@@ -172,12 +172,13 @@ class SimpleCI( MObject ):
 		else:
 			self.getProject().debugN( self, 2, 'build control: skipping discovery of new revisions' )
 		if self.getPerformBuilds():
-			self.getProject().debug( self, 'build control: performing builds for new revisions' )
-			# retrieve BuildInfo objects for all pending builds:
-			buildInfos = self.getBuildStatus().listNewBuildInfos( self.getProject() )
-			# perform the builds:
-			for buildInfo in buildInfos:
-				self.getBuildStatus().performBuild( self.getProject(), buildInfo )
+			cap = self.getProject().getSettings().get( Settings.SimpleCIBuildJobCap )
+			self.getProject().debug( self, 'build control: performing up to {0} builds for new revisions'.format( cap ) )
+			self.getBuildStatus().listNewBuildInfos( self.getProject() )
+			for x in range( cap ):
+				x = x
+				if not self.getBuildStatus().takeBuildInfoAndBuild( self.getProject() ):
+					break
 		else:
 			self.getProject().debugN( self, 2, 'build control: skipping build phase' )
 		if error:

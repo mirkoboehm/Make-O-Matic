@@ -59,10 +59,9 @@ script text
 		conn.commit()
 		return conn
 
-	def saveBuildInfo( self, buildInfos ):
-		conn = self.getConnection()
+	def _saveBuildInfo( self, connection, buildInfos ):
 		try:
-			c = conn.cursor()
+			c = connection.cursor()
 			for buildInfo in buildInfos:
 				values = [
 					buildInfo.getProjectName(),
@@ -77,14 +76,16 @@ script text
 values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				c.execute( query, values )
 				buildInfo.setBuildId( c.lastrowid )
-			conn.commit()
 		finally:
 			c.close()
 
-	def updateBuildInfo( self, buildInfo ):
-		conn = self.getConnection()
+	def saveBuildInfo( self, buildInfos ):
+		with self.getConnection() as connection:
+			self._saveBuildInfo( connection, buildInfos )
+
+	def _updateBuildInfo( self, connection, buildInfo, ):
 		try:
-			c = conn.cursor()
+			c = connection.cursor()
 			values = [
 				buildInfo.getProjectName(),
 				buildInfo.getBuildStatus(),
@@ -97,9 +98,12 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			query = '''update {0} set project_name=?, status=?, priority=?, type=?, revision=?, url=?, script=? where id=?'''\
 				.format( BuildStatus.TableName )
 			c.execute( query, values )
-			conn.commit()
 		finally:
 			c.close()
+
+	def updateBuildInfo( self, buildInfo ):
+		with self.getConnection() as conn:
+			self._updateBuildInfo( conn, buildInfo )
 
 	def __makeBuildInfoFromRow( self, row ):
 		buildInfo = BuildInfo()
@@ -113,11 +117,9 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		buildInfo.setBuildScript( row[7] )
 		return buildInfo
 
-	def loadBuildInfo( self, status = BuildInfo.Status.NewRevision ):
-		'''Load all BuildInfo objects from the database that are in the specified status.'''
-		conn = self.getConnection()
+	def _loadBuildInfo( self, connection , status ):
 		try:
-			c = conn.cursor()
+			c = connection.cursor()
 			query = 'select * from {0} where status=? order by priority desc'.format( BuildStatus.TableName )
 			c.execute( query, [ status ] )
 			buildInfos = []
@@ -127,6 +129,11 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			return buildInfos
 		finally:
 			c.close()
+
+	def loadBuildInfo( self, status = BuildInfo.Status.NewRevision ):
+		'''Load all BuildInfo objects from the database that are in the specified status.'''
+		with self.getConnection() as connection:
+			self._loadBuildInfo( connection, status )
 
 	def registerNewRevisions( self, project, buildScript ):
 		'''Determines new revisions committed since the last call with the same build script, 
@@ -222,14 +229,25 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		oldPwd = os.getcwd()
 		os.chdir( directory )
 		oldIndent = extend_debug_prefix( project, buildInfo.getProjectName() )
-		runner = RunCommand( project, cmd, 24 * 60 * 60 ) # we have builds that run 15h
+		runner = RunCommand( project, cmd, 24 * 60 * 60, True ) # we have builds that run 15h
 		try:
 			runner.run()
 		finally:
+			try:
+				with open( 'buildscript.log', 'w' ) as f:
+					text = runner.getStdOut() or b''
+					f.write( text.decode() )
+			except Exception as e:
+				project.message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
+					.format( e ) )
 			os.chdir( oldPwd )
 			restore_debug_prefix( project, oldIndent )
-			buildInfo.setBuildStatus( BuildInfo.Status.Completed )
-			self.updateBuildInfo( buildInfo )
+			try:
+				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
+				self.updateBuildInfo( buildInfo )
+			except Exception as e:
+				project.message( self, 'Problem! updating the build status failed during handling an exception! {0}1'
+					.format( e ) )
 		if runner.getReturnCode() != 0:
 			project.message( self, 'build failed for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
 			# FIXME send out email reports on configuration or MOM errors
@@ -298,3 +316,21 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			buildInfos.append( buildInfo )
 		buildInfos.reverse()
 		return buildInfos
+
+	def takeBuildInfoAndBuild( self, project ):
+		'''Take a new revision from the build job list. Mark it as pending, and build it. Mark it as done afterwards.'''
+		with self.getConnection() as conn:
+			buildInfos = self._loadBuildInfo( conn, BuildInfo.Status.NewRevision )
+			if buildInfos:
+				buildInfo = buildInfos[0] # one of the highest priority builds
+				buildInfo.setBuildStatus( BuildInfo.Status.Pending )
+				self._updateBuildInfo( conn, buildInfo )
+			else:
+				return False
+		try:
+			self.performBuild( project, buildInfo )
+		finally:
+			with self.getConnection() as conn:
+				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
+				self._updateBuildInfo( conn, buildInfo )
+		return True
