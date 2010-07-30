@@ -39,7 +39,8 @@ class SimpleCI( MObject ):
 		self.setPerformTestBuilds( False )
 		self.setSlaveMode( False )
 		self.setBuildScripts( None )
-		self.setBuildType( None )
+		self.setFindRevisions( True )
+		self.setPerformBuilds( True )
 		self.__buildStatus = BuildStatus()
 
 	def getProject( self ):
@@ -72,11 +73,17 @@ class SimpleCI( MObject ):
 	def getBuildScripts( self ):
 		return self.__buildScripts
 
-	def setBuildType( self, type ):
-		self.__buildType = type
+	def setFindRevisions( self, doIt ):
+		self.__find = doIt
 
-	def getBuildType( self ):
-		return self.__buildType
+	def getFindRevisions( self ):
+		return self.__find
+
+	def setPerformBuilds( self, doIt ):
+		self.__build = doIt
+
+	def getPerformBuilds( self ):
+		return self.__build
 
 	def beMaster( self ):
 		"""This is the main driver method when the control process is run as the master.
@@ -119,15 +126,6 @@ class SimpleCI( MObject ):
 	def beServant( self ):
 		self.getProject().debug( self, 'running in slave mode' )
 		# we are now in slave mode
-		# branch by build type:
-		buildType = 'c'
-		if self.getBuildType():
-			buildType = str( self.getBuildType() ).lower()
-			knownBuildTypes = 'cd'
-			if buildType not in knownBuildTypes:
-				raise ConfigurationError( 'I don\'t know about {0} type builds. Known build types are {1}.'
-					.format( buildType.upper(), ', '.join( knownBuildTypes ) ) )
-			self.getProject().message( self, 'will do {0} type builds.'.format( buildType.upper() ) )
 		# find the build scripts
 		buildScripts = self.getBuildScripts() or []
 		if self.getControlDir():
@@ -151,36 +149,37 @@ class SimpleCI( MObject ):
 				raise MomError( 'Not implemented: text builds mode!' )
 				# FIXME Mirko
 				# runTestBuildJobs( Options, folderScripts )
-			elif buildType == 'c':
-				self.doContinuousBuilds( buildScripts )
-			elif buildType == 'd':
-				# FIXME Mirko
-				raise MomError( 'Not implemented: daily build mode!' )
-				# doDailyBuilds( Options, RunDir, folderScripts )
 			else:
-				raise MomError( 'simple_ci only knows about C and D builds!' )
+				self.performBuilds( buildScripts )
 		except MomException as e:
 			exitCode = e.getReturnCode()
 			self.getProject().message( self, 'error during slave run, exit code {0}: {1}'.format( exitCode, e ) )
 			sys.exit( exitCode )
 		self.getProject().debug( self, 'done, exiting.' )
 
-	def doContinuousBuilds( self, buildScripts ):
-		self.getProject().debug( self, 'build control: performing continuous builds.' )
+	def performBuilds( self, buildScripts ):
 		error = []
 		# register all revisions committed since the last run in the database:
-		for buildScript in buildScripts:
-			try:
-				self.getBuildStatus().registerNewRevisions( self.getProject(), buildScript )
-			except MomError as e:
-				error.append( 'error while processing build script "{0}": {1}'.format( buildScript, e ) )
-				msg = 'error while processing build script "{0}", continuing: {1}'.format( buildScript, e )
-				self.getProject().message( self, msg )
-		# retrieve BuildInfo objects for all pending builds:
-		buildInfos = self.getBuildStatus().listNewBuildInfos( self.getProject() )
-		# perform the builds:
-		for buildInfo in buildInfos:
-			self.getBuildStatus().performBuild( self.getProject(), buildInfo )
+		if self.getFindRevisions():
+			self.getProject().debug( self, 'build control: discovering new revisions' )
+			for buildScript in buildScripts:
+				try:
+					self.getBuildStatus().registerNewRevisions( self.getProject(), buildScript )
+				except MomError as e:
+					error.append( 'error while processing build script "{0}": {1}'.format( buildScript, e ) )
+					msg = 'error while processing build script "{0}", continuing: {1}'.format( buildScript, e )
+					self.getProject().message( self, msg )
+		else:
+			self.getProject().debugN( self, 2, 'build control: skipping discovery of new revisions' )
+		if self.getPerformBuilds():
+			self.getProject().debug( self, 'build control: performing builds for new revisions' )
+			# retrieve BuildInfo objects for all pending builds:
+			buildInfos = self.getBuildStatus().listNewBuildInfos( self.getProject() )
+			# perform the builds:
+			for buildInfo in buildInfos:
+				self.getBuildStatus().performBuild( self.getProject(), buildInfo )
+		else:
+			self.getProject().debugN( self, 2, 'build control: skipping build phase' )
 		if error:
 			raise MomError( '. '.join( error ) )
 
@@ -193,8 +192,10 @@ class SimpleCI( MObject ):
 			help = 'level of debug output' )
 		parser.add_option( "-d", "--test-run", action = "store_true", dest = "test_run",
 			help = "compile the last revision of every product for testing" )
-		parser.add_option( "-t", "--build-type", type = "string", dest = "build_type",
-			help = "build type, known types are (C)ontinuous and (D)aily" )
+		parser.add_option( "-f" , "--no-find", action = "store_true", dest = "no_find",
+			help = "do not try to discover new revisions for the projects (default: do try)" )
+		parser.add_option( "-b", "--no-build", action = "store_true", dest = "no_build",
+			help = "do not start build jobs for new revisions (default: do build)" )
 		parser.add_option( "-s", "--slave", action = "store_true", dest = "slaveMode",
 			help = "run in slave mode (the one that actually does the builds)" )
 		( options, args ) = parser.parse_args( sys.argv )
@@ -206,10 +207,12 @@ class SimpleCI( MObject ):
 			self.getProject().debug( self, 'debug level is {0}'.format( level ) )
 		if options.test_run:
 			self.setPerformTestBuilds( True )
-		if options.build_type:
-			self.setBuildType( options.build_type )
 		if options.slaveMode:
 			self.setSlaveMode( True )
+		if options.no_find:
+			self.setFindRevisions( False )
+		if options.no_build:
+			self.setPerformBuilds( False )
 		self.setBuildScripts( args[1:] )
 
 # "main":

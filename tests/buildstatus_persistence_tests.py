@@ -19,7 +19,6 @@
 import unittest
 from buildcontrol.common.BuildStatus import BuildStatus
 from buildcontrol.common.BuildInfo import BuildInfo
-from test.test_iterlen import len
 import tempfile
 import os
 
