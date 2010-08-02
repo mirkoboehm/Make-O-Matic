@@ -86,20 +86,34 @@ class SimpleCI( MObject ):
 	def getPerformBuilds( self ):
 		return self.__build
 
+	def __setDebugLevelParameter( self, level ):
+		self.__debugLevelParameter = level
+
+	def __getDebugLevelParameter( self ):
+		return self.__debugLevelParameter
+
+	def getToolName( self ):
+		name = make_foldername_from_string( self.__class__.__name__ )
+		return name
+
+	def getInstanceName( self ):
+		name = make_foldername_from_string( self.getName() )
+		return name
+
 	def getInstanceDir( self ):
-		folder = make_foldername_from_string( self.getName() )
+		folder = make_foldername_from_string( self.getToolName() )
 		# FIXME verify on Windows
 		path = os.path.join( os.path.expanduser( '~' ), '.mom', folder )
 		if not os.path.isdir( path ):
 			try:
 				os.makedirs( path )
-				self.getProject().debug( self, 'instance  directory "{0}" created.'.format( path ) )
+				self.getProject().debug( self, 'instance directory "{0}" created.'.format( path ) )
 			except OSError as e:
 				raise ConfigurationError( 'cannot create instance directory "{0}": {1}!'.format( path, e ) )
 		return path
 
 	def getDataDir( self ):
-		path = os.path.join( self.getInstanceDir(), 'data' )
+		path = os.path.join( self.getInstanceDir(), '{0}-data'.format( self.getInstanceName() ) )
 		if not os.path.isdir( path ):
 			try:
 				os.makedirs( path )
@@ -109,14 +123,16 @@ class SimpleCI( MObject ):
 		return path
 
 	def setup( self ):
-		configFilePath = os.path.join( self.getInstanceDir(), 'config.py' )
-		# FIXME add to configuration files for settings:
-		# ...
+		self.parseParameters()
+		self.getProject().getSettings().set( Settings.ScriptLogLevel, self.__getDebugLevelParameter() )
+		self.getProject().addLogger( ConsoleLogger() )
+		# parse settings:
+		self.getProject().getSettings().evalConfigurationFiles( self.getProject(), self.getToolName() )
+		self.getProject().getSettings().set( Settings.ScriptLogLevel, self.__getDebugLevelParameter() )
+		self.getProject().debug( self, 'debug level is {0}'.format( self.__getDebugLevelParameter() ) )
 		# set database filename:
 		database = os.path.join( self.getDataDir(), 'buildstatus.sqlite' )
 		self.getBuildStatus().setDatabaseFilename( database )
-		self.getProject().addLogger( ConsoleLogger() )
-		self.parseParameters()
 
 	def beMaster( self ):
 		"""This is the main driver method when the control process is run as the master.
@@ -239,8 +255,7 @@ class SimpleCI( MObject ):
 			self.setControlDir( str( options.control_dir ) )
 		if options.verbosity:
 			level = int( options.verbosity )
-			self.getProject().getSettings().set( Settings.ScriptLogLevel, level )
-			self.getProject().debug( self, 'debug level is {0}'.format( level ) )
+			self.__setDebugLevelParameter( level )
 		if options.test_run:
 			self.setPerformTestBuilds( True )
 		if options.slaveMode:

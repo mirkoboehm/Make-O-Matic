@@ -221,13 +221,16 @@ def makeProject( projectName = None, minimalMomVersion = None,
 	makeProject will also parse the configuration files.
 	'''
 	project = Project( projectName, minimalMomVersion )
+# the option parser will exit the script if any of the options are not valid
+	project.getParameters().parse()
+	logger = ConsoleLogger()
+	project.addLogger( logger )
+	project.getSettings().set( Settings.ScriptLogLevel, project.getParameters().getDebugLevel() )
 	try:
 		project.getSettings().initialize( project )
 	except MomException as e:
 		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
 		sys.exit( e.getReturnCode() )
-	logger = ConsoleLogger()
-	project.addLogger( logger )
 	reporter = ConsoleReporter()
 	project.addPlugin( reporter )
 	project.getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
