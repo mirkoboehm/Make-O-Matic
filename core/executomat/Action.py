@@ -46,6 +46,7 @@ class Action( MObject ):
 		self.__workingDir = None
 		self.__started = False
 		self.__finished = False
+		self.__aborted = False
 		self.__result = None
 		self._setStdOut( None )
 		self._setStdErr( None )
@@ -71,6 +72,12 @@ class Action( MObject ):
 	def didFinish( self ):
 		return self.__finished != False
 
+	def _aborted( self ):
+		self.__aborted = True
+
+	def getAborted( self ):
+		return self.__aborted
+
 	def _setResult( self, result ):
 		check_for_nonnegative_int( result, 'The result of an action must be a non-negative integer!' )
 		self.__result = result
@@ -89,7 +96,7 @@ class Action( MObject ):
 
 	def getStdErr( self ):
 		"""Returns the stderr output of the action. Can only be called after execution."""
-		if not self.didFinish():
+		if not self.didFinish() and not self.getAborted():
 			raise MomError( 'stdErr() queried before the action was finished' )
 		return self.__stdErr
 
@@ -98,7 +105,7 @@ class Action( MObject ):
 
 	def getStdOut( self ):
 		"""Returns the stdout output of the action. Can only be called after execution."""
-		if not self.didFinish():
+		if not self.didFinish() and not self.getAborted():
 			raise MomError( 'stdOut() queried before the action was finished' )
 		return self.__stdOut
 
@@ -130,6 +137,7 @@ class Action( MObject ):
 				self._setResult( int( result ) )
 				self._finished()
 			except MomException as e:
+				self._aborted()
 				project.debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
 				self._setResult( e.getReturnCode() )
 			if step.getLogfileName():

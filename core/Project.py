@@ -130,16 +130,17 @@ class Project( MObject ):
 		It is useful for scripts that need to perform other code after the build method.
 		build wraps this function and exits with the error code.
 		The method does not always return, though, only in build mode."""
-		# enable and disable the steps according to the settings for the build mode
-		# FIXME
-		# ignore configurations for now
 		try:
-			self.getTimeKeeper().start()
 			[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
-			self.setup()
-			[ plugin.setup( self ) for plugin in self.getPlugins() ]
 			if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
-				self.getExecutomat().run( self )
+				self.getTimeKeeper().start()
+				try:
+					self.setup()
+					[ plugin.setup( self ) for plugin in self.getPlugins() ]
+					self.getExecutomat().run( self )
+				finally:
+					self.getTimeKeeper().stop()
+				[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
 			elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
 				self.queryAndExit()
 			elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:
@@ -149,8 +150,6 @@ class Project( MObject ):
 				raise MomError( 'Unknown run mode "{0}". Known run modes are: {1}'.format( 
 						self.getSettings().get( Settings.ScriptRunMode ),
 						', '.join( Settings.RunModes ) ) )
-			self.getTimeKeeper().stop()
-			[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
 			return self.getReturnCode()
 		except MomException as e:
 			self.message( self, 'Error during build, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )
@@ -235,5 +234,5 @@ def makeProject( projectName = None, minimalMomVersion = None,
 	project.addPlugin( reporter )
 	project.getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
 	project.getSettings().set( Settings.ProjectVersionName, projectVersionName )
-	project.createScm( scmUrl )
+	project.createScm( project.getParameters().getScmLocation() or scmUrl )
 	return project

@@ -69,32 +69,32 @@ class FolderManager( Plugin ):
 		return self.__getNormPath( Settings.ProjectLogDir )
 
 	def preFlightCheck( self, project ):
-		buildfolderName = make_foldername_from_string( project.getName() )
-		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( buildfolderName ), 'mom_' ) )
-		project.debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir() ) )
-		project.getExecutomat().setLogDir( self.getTmpLogDir() )
-		directory = os.path.normpath( os.getcwd() + os.sep + buildfolderName )
-		project.debugN( self, 3, 'Project build folder is "{0}"'.format( directory ) )
-		if os.path.isdir( directory ):
-			stats = os.stat( directory )
-			mtime = time.localtime( stats[8] )
-			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
-			newFolder = directory + '-' + extension
-			try:
-				os.rename( directory, newFolder )
-			except OSError as o:
-				raise ConfigurationError( 'Cannot move existing project build folder at "{0}" to "{1}": {2}'
-										.format( directory, newFolder, str( o ) ) )
-			project.debug( self, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
-		try:
-			os.mkdir( directory )
-		except OSError as o:
-			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( directory, str( o ) ) )
+		directory = os.path.normpath( os.path.join( os.getcwd(), make_foldername_from_string( project.getName() ) ) )
 		self.__baseDir = directory
-		os.chdir( directory )
-		project.debug( self, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
+		project.debugN( self, 3, 'Project build folder is "{0}"'.format( self.getBaseDir() ) )
 
 	def setup( self, project ):
+		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( make_foldername_from_string( project.getName() ) ), 'mom_' ) )
+		project.debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir() ) )
+		project.getExecutomat().setLogDir( self.getTmpLogDir() )
+		if os.path.isdir( self.getBaseDir() ):
+			stats = os.stat( self.getBaseDir() )
+			mtime = time.localtime( stats[8] )
+			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
+			newFolder = self.getBaseDir() + '-' + extension
+			try:
+				os.rename( self.getBaseDir(), newFolder )
+			except OSError as o:
+				raise ConfigurationError( 'Cannot move existing project build folder at "{0}" to "{1}": {2}'
+										.format( self.getBaseDir(), newFolder, str( o ) ) )
+			project.debug( self, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
+		try:
+			os.mkdir( self.getBaseDir() )
+		except OSError as o:
+			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( self.getBaseDir(), str( o ) ) )
+		os.chdir( self.getBaseDir() )
+		project.debug( self, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
+		# now create actions:
 		create = project.getExecutomat().getStep( 'project-create-folders' )
 		delete = project.getExecutomat().getStep( 'project-cleanup' )
 		# log is never deleted
