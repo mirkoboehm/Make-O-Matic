@@ -118,5 +118,5 @@ class FolderManager( Plugin ):
 			self._setTmpLogDir( None )
 		except ( IOError, os.error ) as why:
 			project.message( 'Cannot move build logs to log directory "{0}", log data remains at "{1}": {2}'
-				.format( self.getlogDir(), self.getTmpLogDir(), str( why ).strip() ) )
+				.format( self.getLogDir(), self.getTmpLogDir(), str( why ).strip() ) )
 
