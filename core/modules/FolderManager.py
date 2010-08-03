@@ -26,12 +26,13 @@ from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.Settings import Settings
 import tempfile
 import shutil
+from core.MApplication import mApp
 
 class FolderManager( Plugin ):
 	"""FolderManager creates and deletes the project folders."""
 
 	def __init__( self, project ):
-		Plugin.__init__( self, self.__class__.__name__ )
+		Plugin.__init__( self )
 		self.__project = project
 		self.__baseDir = None
 		self._tmpLogDir = None
@@ -71,11 +72,11 @@ class FolderManager( Plugin ):
 	def preFlightCheck( self, project ):
 		directory = os.path.normpath( os.path.join( os.getcwd(), make_foldername_from_string( project.getName() ) ) )
 		self.__baseDir = directory
-		project.debugN( self, 3, 'Project build folder is "{0}"'.format( self.getBaseDir() ) )
+		mApp().debugN( self, 3, 'Project build folder is "{0}"'.format( self.getBaseDir() ) )
 
 	def setup( self, project ):
 		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( make_foldername_from_string( project.getName() ) ), 'mom_' ) )
-		project.debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir() ) )
+		mApp().debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir() ) )
 		project.getExecutomat().setLogDir( self.getTmpLogDir() )
 		if os.path.isdir( self.getBaseDir() ):
 			stats = os.stat( self.getBaseDir() )
@@ -114,9 +115,9 @@ class FolderManager( Plugin ):
 			if self.getTmpLogDir():
 				shutil.copytree( self.getTmpLogDir(), self.getLogDir() )
 				shutil.rmtree( self.getTmpLogDir(), True )
-				project.debugN( self, 2, 'logs moved from temporary to final location at "{0}"'.format( self.getLogDir() ) )
+				mApp().debugN( self, 2, 'logs moved from temporary to final location at "{0}"'.format( self.getLogDir() ) )
 			self._setTmpLogDir( None )
 		except ( IOError, os.error ) as why:
-			project.message( 'Cannot move build logs to log directory "{0}", log data remains at "{1}": {2}'
+			mApp().message( 'Cannot move build logs to log directory "{0}", log data remains at "{1}": {2}'
 				.format( self.getLogDir(), self.getTmpLogDir(), str( why ).strip() ) )
 

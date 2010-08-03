@@ -30,21 +30,6 @@ class Settings( Defaults ):
 		# this applies the defaults:
 		Defaults.__init__( self )
 
-	def initialize( self, project ):
-		'''Determine the script run settings. 
-		In the constructor, defaults will be applied. 
-		First, configuration files will be parsed.
-		Second, command line arguments will be applied. 
-		Third, commit message commands will be applied. This can be disabled by a parameter (step three).
-		On error, a subclass of MomException is thrown.
-		Logging and reporting is not available at this stage yet.'''
-		# first, parse configuration files:
-		self.evalConfigurationFiles( project )
-		# second, apply parameters:
-		project.getParameters().apply( self )
-		# third, apply commit message commands:
-		# FIXME
-
 	def calculateBuildSequence( self, project ):
 		buildType = self.get( Settings.ProjectBuildType, True ).lower()
 		assert len( buildType ) == 1
@@ -96,7 +81,8 @@ class Settings( Defaults ):
 			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
 		return ', '.join( texts )
 
-	def evalConfigurationFiles( self, project, toolName = None ):
+	def evalConfigurationFiles( self, toolName = None ):
+		from core.MApplication import mApp
 		momFolder = 'mom'
 		globalFolder = os.path.join( os.sep, 'etc', momFolder )
 		userFolder = os.path.join( os.environ['HOME'], '.{0}'.format( momFolder ) )
@@ -110,15 +96,15 @@ class Settings( Defaults ):
 			for file in files:
 				configFile = os.path.join( folder, file )
 				if not os.path.isfile( configFile ):
-					project.debugN( self, 3, 'Configuration file "{0}" does not exist, continuing.'.format( configFile ) )
+					mApp().debugN( self, 3, 'Configuration file "{0}" does not exist, continuing.'.format( configFile ) )
 					continue
-				project.debugN( self, 2, 'Loading configuration file "{0}"'.format( configFile ) )
+				mApp().debugN( self, 2, 'Loading configuration file "{0}"'.format( configFile ) )
 				try:
-					globals = { 'project' : project }
+					globals = { 'application' : mApp() }
 					with open( configFile ) as f:
 						code = f.read()
 						exec( code, globals )
-					project.debug( self, 'Configuration file "{0}" loaded successfully'.format( configFile ) )
+					mApp().debug( self, 'Configuration file "{0}" loaded successfully'.format( configFile ) )
 				except SyntaxError as e:
 					raise ConfigurationError( 'The configuration file "{0}" contains a syntax error: "{1}"'.format( configFile, str( e ) ) )
 				except Exception as e: # we need to catch all exceptions, since we are calling user code 

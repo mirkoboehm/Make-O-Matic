@@ -22,10 +22,31 @@ from core.modules.DoxygenGenerator import DoxygenGenerator
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
 from core.modules.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
+from core.Build import Build
+from core.loggers.ConsoleLogger import ConsoleLogger
+from core.MApplication import mApp
+from core.Settings import Settings
+from core.Exceptions import MomException
+import sys
 
-project = makeProject( projectName = "Simple Project Run Test", minimalMomVersion = "0.5.0",
+script = Build( minimumMomVersion = "0.5.0" )
+# FIXME this should go into a convenience function to set up a standard build
+script.getParameters().parse()
+mApp().getSettings().set( Settings.ScriptLogLevel, script.getParameters().getDebugLevel() )
+logger = ConsoleLogger()
+script.addLogger( logger )
+try:
+	script._initialize()
+except MomException as e:
+	print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
+	sys.exit( e.getReturnCode() )
+scmUrl = script.getParameters().getScmLocation() or 'git:git@gitorious.org:make-o-matic/mom.git'
+# ^^^
+
+project = makeProject( projectName = "Simple Project Run Test",
 	projectVersionNumber = '0.5.0', projectVersionName = 'French Fries',
-	scmUrl = 'git:git@gitorious.org:make-o-matic/mom.git' )
+	scmUrl = scmUrl )
+script.addProject( project )
 
 # add a preprocessor that generates the Doxygen input file
 prep = Preprocessor( inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen.cfg.in' ),
@@ -44,4 +65,4 @@ project.addPlugin( dox )
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getDocsDir ) ) )
 
 # run:
-project.build()
+script.build()

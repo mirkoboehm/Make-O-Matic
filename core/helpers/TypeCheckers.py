@@ -69,3 +69,4 @@ def check_for_positive_int( expression, description ):
 			raise ConfigurationError( description )
 	except ValueError:
 		raise ConfigurationError( description )
+

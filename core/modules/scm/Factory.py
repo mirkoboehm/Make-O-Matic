@@ -20,13 +20,14 @@ import re
 from core.Exceptions import ConfigurationError
 from core.modules.scm.SCMGit import SCMGit
 from core.MObject import MObject
+from core.MApplication import mApp
 
 class SourceCodeProviderFactory( MObject ):
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
 
-	def parseDescription( self, project, description ):
+	def parseDescription( self, description ):
 		# extract implementation identifier and SCM location part out of the description:
 		pattern = '^(.+?):(.*)$'
 		rx = re.compile( pattern )
@@ -36,7 +37,7 @@ class SourceCodeProviderFactory( MObject ):
 		implementation, location = groups.groups()
 		return implementation, location
 
-	def makeScmForImplementationIdentifier( self, project, implementation ):
+	def makeScmForImplementationIdentifier( self, implementation ):
 		# the factory part (not super-sophisticated):
 		scm = None
 		if implementation == 'git':
@@ -44,10 +45,10 @@ class SourceCodeProviderFactory( MObject ):
 		else:
 			raise ConfigurationError( 'Cannot create source code provider for identifier "{0}", unknown implementation'
 									.format( implementation ) )
-		project.debugN( self, 2, 'created "{0}" source code provider'.format( scm.getName() ) )
+		mApp().debugN( self, 2, 'created "{0}" source code provider'.format( scm.getName() ) )
 		return scm
 
-	def makeScmImplementation( self, project, description ):
+	def makeScmImplementation( self, description ):
 		'''Create a SourceCodeProvider object according to the specified description.
 		The description consists of an implementation identifier, and an implementation
 		specific location. Examples: 
@@ -55,9 +56,9 @@ class SourceCodeProviderFactory( MObject ):
 		'git:git@gitorious.org:make-o-matic/mom.git' describes a GIT repository.
 		'localdir:/home/dude/myproject/src' describes a local directory to be used.
 		'''
-		implementation, location = self.parseDescription( project, description )
-		project.debugN( self, 3, 'implementation identifier: "{0}", location: "{1}"'.format( implementation, location ) )
-		scm = self.makeScmForImplementationIdentifier( project, implementation )
+		implementation, location = self.parseDescription( description )
+		mApp().debugN( self, 3, 'implementation identifier: "{0}", location: "{1}"'.format( implementation, location ) )
+		scm = self.makeScmForImplementationIdentifier( implementation )
 		scm.setUrl( location )
 		return scm
 

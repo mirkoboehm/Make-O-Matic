@@ -23,7 +23,6 @@ from core.executomat.Step import Step
 from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.MObject import MObject
 from core.helpers.TimeKeeper import TimeKeeper
-from core.Settings import Settings
 
 class Executomat( MObject ):
 	"""Executomat executes actions in steps which can be individually enabled and disabled.
@@ -35,7 +34,7 @@ class Executomat( MObject ):
 	Every step can be enabled or disabled individually. If a step is enabled, all 
 	of it's actions need to finish successfully."""
 
-	def __init__( self, project, name = None ):
+	def __init__( self, name = None ):
 		"""Constructor."""
 		MObject.__init__( self, name )
 		self.__steps = []
@@ -43,7 +42,9 @@ class Executomat( MObject ):
 		self.__logDir = '.'
 		self.__logfile = None
 		self.__failedStep = None
-		self.setLogfileName( project.getSettings().get( Settings.ProjectExecutomatLogfileName ) )
+		# FIXME set outside the constructor somewhere
+		self.setLogfileName( 'givemeanothername.dummy' )
+		# self.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
 
 	def setLogDir( self, path ):
 		"""Set the directory where all log information is stored."""
