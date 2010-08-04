@@ -133,7 +133,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 	def loadBuildInfo( self, status = BuildInfo.Status.NewRevision ):
 		'''Load all BuildInfo objects from the database that are in the specified status.'''
 		with self.getConnection() as connection:
-			self._loadBuildInfo( connection, status )
+			return self._loadBuildInfo( connection, status )
 
 	def registerNewRevisions( self, project, buildScript ):
 		'''Determines new revisions committed since the last call with the same build script, 
