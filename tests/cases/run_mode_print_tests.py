@@ -20,8 +20,23 @@ import unittest
 from core.Project import Project
 from core.Settings import Settings
 from core.Build import Build
+from core.MApplication import MApplication
 
 class RunModePrintTests( unittest.TestCase ):
+
+	def setUp( self ):
+		if MApplication._instance:
+			# do not try this at home!
+			MApplication._instance = None
+		self.build = Build()
+		self.project = Project( 'ScmFactoryTest' )
+		self.build.setProject( self.project )
+		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
+		# self.build.addLogger( ConsoleLogger() )
+		self.project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
+
+	def tearDown( self ):
+		MApplication._instance = None
 
 	def testPrintRevisionsSince( self ):
 		revision = '57307ee83930c089d0eb9b4e7342c87784257071'
@@ -38,22 +53,14 @@ class RunModePrintTests( unittest.TestCase ):
 		self.assertTrue( len( result ) > 1, 'The test asked for only one revision to be listed.' )
 
 	def testPrintCurrentRevision( self ):
-		project = Project( 'ScmFactoryTest' )
-		project.getSettings().set( Settings.ScriptLogLevel, 3 )
-		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
-		result = project.getScm()._getCurrentRevision( project )
+		result = self.project.getScm()._getCurrentRevision()
 		self.assertTrue( result, 'The current revision cannot be None.' )
 
 	def _getRevisions( self, revision, count = None ):
-		build = Build()
-		project = Project( 'ScmFactoryTest' )
-		build.setProject( project )
-		build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
 		if count:
-			result = project.getScm()._getRevisionsSince( revision, count )
+			result = self.project.getScm()._getRevisionsSince( revision, count )
 		else:
-			result = project.getScm()._getRevisionsSince( revision )
+			result = self.project.getScm()._getRevisionsSince( revision )
 		return result
 
 if __name__ == "__main__":
