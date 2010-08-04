@@ -23,14 +23,28 @@ from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
 from core.Settings import Settings
 from core.Exceptions import ConfigurationError
+from core.Build import Build
+from core.MApplication import MApplication
 
 class ScmFactoryTests( unittest.TestCase ):
 
+	def setUp( self ):
+		if MApplication._instance:
+			# do not try this at home!
+			MApplication._instance = None
+		self.build = Build()
+		self.project = Project( 'ScmFactoryTest' )
+		self.build.setProject( self.project )
+		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
+		# self.build.addLogger( ConsoleLogger() )
+		self.project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
+
+	def tearDown( self ):
+		MApplication._instance = None
+
 	def __createAndReturnScm( self, description ):
-		project = Project( 'ScmFactoryTest' )
-		project.getSettings().set( Settings.ScriptLogLevel, 3 )
 		factory = SourceCodeProviderFactory()
-		return factory.makeScmImplementation( project, description )
+		return factory.makeScmImplementation( description )
 
 	def testCreateGitScm( self ):
 		description = 'git:git@gitorious.org:make-o-matic/mom.git'
