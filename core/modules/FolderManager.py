@@ -74,7 +74,7 @@ class FolderManager( Plugin ):
 	def preFlightCheck( self, project ):
 		directory = os.path.normpath( os.path.join( os.getcwd(), make_foldername_from_string( project.getName() ) ) )
 		self.__baseDir = directory
-		mApp().debugN( self, 3, 'Project build folder is "{0}"'.format( self.getBaseDir() ) )
+		mApp().debugN( self, 3, 'build folder is "{0}"'.format( self.getBaseDir() ) )
 
 	def setup( self, project ):
 		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( make_foldername_from_string( project.getName() ) ), 'mom_' ) )
@@ -88,15 +88,17 @@ class FolderManager( Plugin ):
 			try:
 				os.rename( self.getBaseDir(), newFolder )
 			except OSError as o:
-				raise ConfigurationError( 'Cannot move existing project build folder at "{0}" to "{1}": {2}'
+				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
 										.format( self.getBaseDir(), newFolder, str( o ) ) )
-			mApp().debug( self, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
+			mApp().debug( self, 'stale build folder exists, moving it.' )
+			mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
 		try:
 			os.mkdir( self.getBaseDir() )
 		except OSError as o:
 			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( self.getBaseDir(), str( o ) ) )
 		os.chdir( self.getBaseDir() )
-		mApp().debug( self, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
+		mApp().debug( self, 'build folder created' )
+		mApp().debugN( self, 2, 'CWD: "{0}"'.format( os.getcwd() ) )
 		# now create actions:
 		create = project.getExecutomat().getStep( 'project-create-folders' )
 		delete = project.getExecutomat().getStep( 'project-cleanup' )

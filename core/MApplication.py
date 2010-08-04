@@ -16,11 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import sys
 from core.loggers.Logger import Logger
-from core.Exceptions import MomError, AbstractMethodCalledError, MomException, InterruptedException
+from core.Exceptions import MomError, MomException, InterruptedException
+from core.helpers.GlobalMApp import mApp
 from core.helpers.VersionChecker import checkMinimumMomVersion
 from core.Settings import Settings
-import sys
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.Instructions import Instructions
 
@@ -77,7 +78,12 @@ class MApplication( Instructions ):
 		[ logger.debugN( self, mobject, level, text ) for logger in self.getLoggers() ]
 
 	def run( self ):
-		raise AbstractMethodCalledError()
+		mApp().debugN( self, 2, 'executing' )
+		try:
+			self.execute()
+			[ child.execute() for child in self.getChildren() ]
+		finally:
+			self.runWrapups()
 
 	def querySettings( self, names = None ):
 		try:
@@ -96,6 +102,16 @@ class MApplication( Instructions ):
 			print( 'Error: {0}'.format( str( e ) ) )
 			self.registerReturnCode( 1 )
 
+	def _buildAndReturn( self ):
+		'''Helper method that can be overloaded.'''
+		self.runPreFlightChecks()
+		try:
+			self.runSetups()
+			self.run()
+		finally:
+			self.runShutDowns()
+
+
 	def buildAndReturn( self ):
 		'''buildAndReturn executes the build and returns the exit code of the script.
 		It is useful for scripts that need to perform other code after the build method.
@@ -103,13 +119,7 @@ class MApplication( Instructions ):
 		The method does always return, though, if a MomException is caught. Any exception
 		that does not inherit MomException will pass. '''
 		try:
-			self.runPreFlightChecks()
-			try:
-				self.runSetups()
-				self.run()
-				self.runWrapups()
-			finally:
-				self.runShutDowns()
+			self._buildAndReturn()
 			return self.getReturnCode()
 		except MomException as e:
 			self.message( self, 'Error, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )

@@ -59,7 +59,7 @@ def check_for_nonnegative_int( expression, description ):
 		value = int( expression )
 		if( value < 0 ):
 			raise ConfigurationError( description )
-	except ValueError:
+	except ( ValueError, TypeError ):
 		raise ConfigurationError( description )
 
 def check_for_positive_int( expression, description ):
@@ -67,6 +67,6 @@ def check_for_positive_int( expression, description ):
 		value = int( expression )
 		if( value < 1 ):
 			raise ConfigurationError( description )
-	except ValueError:
+	except ( ValueError, TypeError ):
 		raise ConfigurationError( description )
 

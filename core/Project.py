@@ -141,27 +141,6 @@ class Project( Instructions ):
 		finally:
 			self.getTimeKeeper().stop()
 
-	def printAndExit( self ):
-		# program name, "print", argument, [options] 
-		if len( self.getParameters()._getArgs() ) < 3:
-			raise MomError( 'Please specify parameter to print!' )
-		command = self.getParameters()._getArgs()[2]
-		options = self.getParameters()._getArgs()[3:]
-		commands = {
-			'revisions-since' : [ self.getScm().printRevisionsSince, 'print revisions committed since specified revision' ],
-			'current-revision': [ self.getScm().printCurrentRevision, 'print current revision' ]
-		}
-		if command in commands:
-			method = commands[ command ][0]
-			print( method( self, options ) )
-			sys.exit( 0 )
-		else:
-			text = 'Unknown command "{0}" for run mode "print". Known commands are:'.format( command )
-			for cmd in commands:
-				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
-			print( text, file = sys.stderr )
-			sys.exit( 1 )
-
 def makeProject( projectName = None,
 				projectVersionNumber = None, projectVersionName = None,
 				scmUrl = None ):

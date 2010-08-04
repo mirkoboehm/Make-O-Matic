@@ -56,21 +56,25 @@ class Instructions( MObject ):
 		pass
 
 	def runPreFlightChecks( self ):
+		mApp().debugN( self, 2, 'performing pre-flight checks' )
 		[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
-		for child in self.getChildren():
-			child.runPreFlightChecks()
+		[ child.runPreFlightChecks() for child in self.getChildren() ]
+
 
 	def runSetups( self ):
+		mApp().debugN( self, 2, 'setting up' )
 		[ plugin.setup( self ) for plugin in self.getPlugins() ]
 		for child in self.getChildren():
 			child.runSetups()
 
 	def runWrapups( self ):
+		mApp().debugN( self, 2, 'wrapping up' )
 		[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
 		for child in self.getChildren():
 			child.runWrapups()
 
 	def runShutDowns( self ):
+		mApp().debugN( self, 2, 'shutting down' )
 		for plugin in self.getPlugins():
 			try:
 				plugin.shutDown( self )

@@ -21,6 +21,7 @@ from datetime import datetime
 from core.Exceptions import AbstractMethodCalledError
 from core.Plugin import Plugin
 from core.Defaults import Defaults
+from buildcontrol.SubprocessHelpers import get_debug_prefix
 
 class Logger( Plugin ):
 	"""Logger is the base class for Logger objects."""
@@ -42,9 +43,4 @@ class Logger( Plugin ):
 		return datetime.now().strftime( '%y%m%d-%H:%M:%S' )
 
 	def messagePrefix( self ):
-		prefix = ''
-		try:
-			from core.MApplication import mApp
-			prefix = mApp().getSettings().get( Defaults.MomDebugIndentVariable )
-		except: pass
-		return prefix
+		return get_debug_prefix()
