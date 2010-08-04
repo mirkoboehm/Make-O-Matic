@@ -21,7 +21,7 @@ import unittest
 from core.modules.Preprocessor import _PreprocessorAction
 from core.Exceptions import BuildError
 
-class Test( unittest.TestCase ):
+class PreprocessorTest( unittest.TestCase ):
 
 	def _runTest( self, input, output, msg = None ):
 		'''Helper method to run a single test'''
@@ -59,5 +59,5 @@ class Test( unittest.TestCase ):
 		self.assertRaises( BuildError, prep.processLine, input )
 
 if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
+	#import sys;sys.argv = ['', 'PreprocessorTest.testName']
 	unittest.main()
