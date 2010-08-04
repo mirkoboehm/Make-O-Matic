@@ -19,6 +19,7 @@
 import unittest
 from core.Project import Project
 from core.Settings import Settings
+from core.Build import Build
 
 class RunModePrintTests( unittest.TestCase ):
 
@@ -44,13 +45,15 @@ class RunModePrintTests( unittest.TestCase ):
 		self.assertTrue( result, 'The current revision cannot be None.' )
 
 	def _getRevisions( self, revision, count = None ):
+		build = Build()
 		project = Project( 'ScmFactoryTest' )
-		project.getSettings().set( Settings.ScriptLogLevel, 3 )
+		build.setProject( project )
+		build.getSettings().set( Settings.ScriptLogLevel, 3 )
 		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
 		if count:
-			result = project.getScm()._getRevisionsSince( project, revision, count )
+			result = project.getScm()._getRevisionsSince( revision, count )
 		else:
-			result = project.getScm()._getRevisionsSince( project, revision )
+			result = project.getScm()._getRevisionsSince( revision )
 		return result
 
 if __name__ == "__main__":
