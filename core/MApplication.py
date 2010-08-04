@@ -43,7 +43,7 @@ class MApplication( Instructions ):
 		checkMinimumMomVersion( minimumMomVersion )
 
 	def getMomVersion( self ):
-		return '0.5.0'
+		return self.getSettings().get( Settings.MomVersionNumber )
 
 	def addLogger( self, logger ):
 		if not isinstance( logger, Logger ):

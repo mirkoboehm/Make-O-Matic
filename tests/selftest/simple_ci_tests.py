@@ -16,22 +16,3 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import unittest
-from cases.buildstatus_persistence_tests import BuildStatusPersistenceTests
-from cases.path_resolver_tests import PathResolverTest
-from cases.preprocessor_tests import PreprocessorTest
-from cases.run_mode_print_tests import RunModePrintTests
-from cases.run_timeout_tests import RunWithTimeoutTest
-from cases.scm_factory_tests import ScmFactoryTests
-from selftest.simple_project import SimpleProjectTests
-
-classes = [ BuildStatusPersistenceTests,
-	PathResolverTest,
-	PreprocessorTest,
-	RunModePrintTests,
-	RunWithTimeoutTest,
-	ScmFactoryTests,
-	SimpleProjectTests
-]
-s = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, classes ) )
-unittest.TextTestRunner( verbosity = 2 ).run( s )

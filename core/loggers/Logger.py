@@ -20,7 +20,6 @@
 from datetime import datetime
 from core.Exceptions import AbstractMethodCalledError
 from core.Plugin import Plugin
-from core.Defaults import Defaults
 from buildcontrol.SubprocessHelpers import get_debug_prefix
 
 class Logger( Plugin ):

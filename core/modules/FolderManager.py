@@ -86,8 +86,8 @@ class FolderManager( Plugin ):
 			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
 			newFolder = self.getBaseDir() + '-' + extension
 			try:
-				os.rename( self.getBaseDir(), newFolder )
-			except OSError as o:
+				shutil.move( self.getBaseDir(), newFolder )
+			except ( OSError, shutil.Error ) as o:
 				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
 										.format( self.getBaseDir(), newFolder, str( o ) ) )
 			mApp().debug( self, 'stale build folder exists, moving it.' )

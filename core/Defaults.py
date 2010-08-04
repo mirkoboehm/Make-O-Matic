@@ -37,7 +37,8 @@ class Defaults( MObject ):
 	ScriptIgnoreCommitMessageCommands = 'script.ignorecommitmessagecommands'
 	ScriptRunMode = 'script.runmode'
 	# ----- internal settings
-	MomDebugIndentVariable = 'defaults.debug.indentvariable'
+	MomVersionNumber = 'mom.version.number'
+	MomDebugIndentVariable = 'mom.debug.indentvariable'
 	# ----- project settings 
 	ProjectName = 'project.name'
 	ProjectVersionNumber = 'project.version.number'
@@ -67,6 +68,8 @@ class Defaults( MObject ):
 		MObject.__init__( self )
 		self.__settings = {}
 		# store defaults:
+		# ----- store the make-o-matic version these scripts use:
+		self.getSettings()[ Defaults.MomVersionNumber ] = '0.5.0'
 		# ----- script settings:
 		self.getSettings()[ Defaults.ScriptLogLevel ] = 0
 		self.getSettings()[ Defaults.ScriptClientName ] = gethostname()
