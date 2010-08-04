@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import sys
 from core.MObject import MObject
 from core.modules.FolderManager import FolderManager

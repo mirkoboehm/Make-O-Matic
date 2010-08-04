@@ -21,12 +21,14 @@ def __checkPythonVersion():
 	# in this case, hard coded values make sense, because we do not even want to initialize the Settings object before 
 	# verifying the Python version:
 	import sys
-	requiredMajor = 3
-	requiredMinor = 1
+	requiredMajor = 2
+	requiredMinor = 6
 	detectedMajor = sys.version_info[0]
 	detectedMinor = sys.version_info[1]
 	detectedMicro = sys.version_info[2]
 	if detectedMajor >= requiredMajor:
+		return
+	else:
 		if detectedMajor == requiredMajor and detectedMinor >= requiredMinor:
 			return
 	# use old syntax :-) :
