@@ -23,6 +23,7 @@ from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, 
 import re
 from core.Exceptions import BuildError
 from core.helpers.GlobalMApp import mApp
+import core
 
 class _PreprocessorAction( Action ):
 	'''The _PreprocessorAction performs the input file conversion.'''
@@ -144,21 +145,21 @@ class _PreprocessorAction( Action ):
 		return str( value )
 
 	def _getFolderName( self, folder ):
-		assert False # FIXME there is no project
+		p = self._getPreprocessor().getProject()
+		if not p:
+			return '[MOM PP: project not initialized]'
 		if folder == 'src':
-			return self.__project.getFolderManager().getSourceDir()
+			return p.getFolderManager().getSourceDir()
 		elif folder == 'tmp':
-			return self.__project.getFolderManager().getTempDir()
+			return p.getFolderManager().getTempDir()
 		elif folder == 'docs':
-			return self.__project.getFolderManager().getDocsDir()
+			return p.getFolderManager().getDocsDir()
 		elif folder == 'packages':
-			return self.__project.getFolderManager().getPackagesDir()
+			return p.getFolderManager().getPackagesDir()
 		else:
 			mApp().debugN( self, 2, 'Unknown folder id "{0}"'.format( folder ) )
 			return ''
 
-# FIXME this relies on instructions being a project
-# (but otherwise, we cannot get to the project folder paths)
 class Preprocessor( Plugin ):
 	'''Preprocessor takes a textual input file, applies variables from various dictionaries, and produces an output file.
 	The preprocessor generates an action that performs the conversion of the input file, and adds it as a post action to a step. 
@@ -167,11 +168,12 @@ class Preprocessor( Plugin ):
 	The preprocessor searches place holders in the format of @@(variable-name) in the input file, and replaces them with the 
 	content provided by the internal dictionary. A place holder in the form of @@(@@) resolves to @@.'''
 
-	def __init__( self, name = None, inputFilename = None, outputFilename = None, step = 'project-checkout' ):
+	def __init__( self, project, name = None, inputFilename = None, outputFilename = None, step = 'project-checkout' ):
 		Plugin.__init__( self, name )
 		self.setInputFilename( inputFilename )
 		self.setOutputFilename( outputFilename )
 		self.setStep( step )
+		self.setProject( project )
 
 	def setInputFilename( self, name ):
 		check_for_path_or_none( name, 'The input filename must be a non-empty string, or None.' )
@@ -193,6 +195,13 @@ class Preprocessor( Plugin ):
 
 	def getStep( self ):
 		return self.__step
+
+	def setProject( self, project ):
+		assert isinstance( project, core.Project.Project )
+		self.__project = project
+
+	def getProject( self ):
+		return self.__project
 
 	def setup( self, instructions ):
 		step = instructions.getExecutomat().getStep( self.getStep() )

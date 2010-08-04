@@ -28,6 +28,7 @@ class Build( MApplication ):
 
 	def __init__( self, name = None, minimumMomVersion = None ):
 		MApplication.__init__( self, name, minimumMomVersion )
+		self.__project = None
 		self.__parameters = Parameters()
 
 	def getParameters( self ):
@@ -47,6 +48,15 @@ class Build( MApplication ):
 		self.getParameters().apply( self.getSettings() )
 		# third, apply commit message commands:
 		# FIXME
+
+	def setProject( self, project ):
+		'''Every build has one master project. This method sets the master project.'''
+		self.addProject( project )
+		self.__project = project
+
+	def getProject( self ):
+		'''Return the master project for this build.'''
+		return self.__project
 
 	def addProject( self, project ):
 		if not isinstance( project, Project ):

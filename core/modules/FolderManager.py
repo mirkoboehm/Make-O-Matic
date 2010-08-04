@@ -27,12 +27,14 @@ from core.Settings import Settings
 import tempfile
 import shutil
 from core.helpers.GlobalMApp import mApp
+import core
 
 class FolderManager( Plugin ):
-	"""FolderManager creates and deletes the project folders."""
+	"""FolderManager creates and deletes the project folders. It is specific to Project objects."""
 
 	def __init__( self, project ):
 		Plugin.__init__( self )
+		assert isinstance( project, core.Project.Project )
 		self.__project = project
 		self.__baseDir = None
 		self._tmpLogDir = None
