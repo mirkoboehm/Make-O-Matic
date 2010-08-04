@@ -229,7 +229,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		oldPwd = os.getcwd()
 		os.chdir( directory )
 		oldIndent = extend_debug_prefix( project, buildInfo.getProjectName() )
-		runner = RunCommand( project, cmd, 24 * 60 * 60, True ) # we have builds that run 15h
+		runner = RunCommand( cmd, 24 * 60 * 60, True ) # we have builds that run 15h
 		try:
 			runner.run()
 		finally:

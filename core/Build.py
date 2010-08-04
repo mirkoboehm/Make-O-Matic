@@ -16,7 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.MApplication import MApplication, mApp
+from core.MApplication import MApplication
 from core.Project import Project
 from core.Exceptions import ConfigurationError, MomError
 from core.Settings import Settings
@@ -42,31 +42,23 @@ class Build( MApplication ):
 		On error, a subclass of MomException is thrown.
 		Logging and reporting is not available at this stage yet.'''
 		# first, parse configuration files:
-		mApp().getSettings().evalConfigurationFiles()
+		self.getSettings().evalConfigurationFiles()
 		# second, apply parameters:
-		self.getParameters().apply( mApp().getSettings() )
+		self.getParameters().apply( self.getSettings() )
 		# third, apply commit message commands:
 		# FIXME
 
 	def addProject( self, project ):
 		if not isinstance( project, Project ):
 			raise ConfigurationError( 'The project variable needs to be an instance of the Project class!' )
+		project.setBuild( self )
 		self.addChild( project )
-		return project
 
 	def run( self ):
-		self.runPreFlightChecks()
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
-			try:
-				self.getTimeKeeper().start()
-				try:
-					self.runSetups()
-					self.getExecutomat().run( self )
-				finally:
-					self.getTimeKeeper().stop()
-				self.runWrapups()
-			finally:
-				self.runShutDowns()
+			self.execute()
+			for child in self.getChildren():
+				child.execute()
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
 			# filter script name, 'query'
 			self.querySettings( self.getParameters()._getArgs()[2:] )

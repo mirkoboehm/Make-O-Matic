@@ -24,7 +24,7 @@ class ConsoleReporter( Reporter ):
 	def __init__( self, name = None ):
 		Reporter.__init__( self, name )
 
-	def wrapUp( self, project ):
-		report = ProjectReport( project )
+	def wrapUp( self, instructions ):
+		report = ProjectReport( instructions )
 		report.prepare()
 		print( report.getReport() )

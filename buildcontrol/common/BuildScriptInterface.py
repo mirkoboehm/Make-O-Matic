@@ -37,7 +37,7 @@ class BuildScriptInterface( MObject ):
 
 	def querySetting( self, project, setting ):
 		cmd = '{0} {1} query {2}'.format( sys.executable, self.getBuildScript(), setting )
-		runner = RunCommand( project, cmd, 1800 )
+		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
 			stderr = runner.getStdErr().decode()
@@ -57,7 +57,7 @@ class BuildScriptInterface( MObject ):
 	def queryRevisionsSince( self, project, revision ):
 		'''Execute the build script, and return the lines it outputs for "query revisions-since"'''
 		cmd = '{0} {1} print revisions-since {2}'.format( sys.executable, self.getBuildScript(), revision )
-		runner = RunCommand( project, cmd, 1800 )
+		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
 			msg = 'Cannot get revision list for build script "{0}", continuing with next project.'\
@@ -71,7 +71,7 @@ class BuildScriptInterface( MObject ):
 
 	def queryCurrentRevision( self, project ):
 		cmd = '{0} {1} print current-revision'.format( sys.executable, self.getBuildScript() )
-		runner = RunCommand( project, cmd, 1800 )
+		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
 			raise MomError( 'Cannot get initial revision for build script "{0}".'.format( self.getBuildScript() ) )

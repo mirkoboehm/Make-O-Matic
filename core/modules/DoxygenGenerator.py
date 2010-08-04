@@ -21,6 +21,7 @@ from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_path
 from core.executomat.ShellCommandAction import ShellCommandAction
+from core.helpers.GlobalMApp import mApp
 
 class DoxygenGenerator( Plugin ):
 
@@ -44,22 +45,22 @@ class DoxygenGenerator( Plugin ):
 	def getDoxygenFile( self ):
 		return self.__doxygenFile
 
-	def preFlightCheck( self, project ):
-		assert project
-		runner = RunCommand( project, 'doxygen --version' )
+	def preFlightCheck( self, instructions ):
+		assert instructions
+		runner = RunCommand( 'doxygen --version' )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
 			raise ConfigurationError( "DoxygenGenerator: doxygen not found." )
 		else:
 			lines = runner.getStdOut().decode().split( '\n' )
 			version = lines[0].rstrip()
-			project.debugN( self, 1, 'doxygen found: "{0}"'.format( version ) )
+			mApp().debugN( self, 1, 'doxygen found: "{0}"'.format( version ) )
 
-	def setup( self, project ):
+	def setup( self, instructions ):
 		check_for_path( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
-		step = project.getExecutomat().getStep( 'project-create-docs' )
+		step = instructions.getExecutomat().getStep( 'project-create-docs' )
 		doxygenCall = ShellCommandAction( '{0} {1}'
 			.format ( self.getDoxygenPath(), self.getDoxygenFile() ) )
-		doxygenCall.setWorkingDirectory( project.getScm().getSrcDir() )
+		doxygenCall.setWorkingDirectory( instructions.getScm().getSrcDir() )
 		step.addMainAction( doxygenCall )
 

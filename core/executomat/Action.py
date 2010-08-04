@@ -21,6 +21,7 @@ from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_path
 from core.Exceptions import AbstractMethodCalledError, MomError, MomException, BuildError
 import os
 from core.helpers.TimeKeeper import TimeKeeper
+from core.helpers.GlobalMApp import mApp
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -29,7 +30,7 @@ class Action( MObject ):
 	saved to a log file. 
 	"""
 
-	def run( self, project ):
+	def run( self ):
 		'''run() executes the workload of the action. 
 		Run must return a non-negative integer number. 
 		A return value or zero indicates success. Any value different from zero is considered an error.'''
@@ -109,15 +110,15 @@ class Action( MObject ):
 			raise MomError( 'stdOut() queried before the action was finished' )
 		return self.__stdOut
 
-	def executeAction( self, project, executomat, step ):
+	def executeAction( self, executomat, step ):
 		try:
 			self.__timeKeeper.start()
-			return self._executeActionTimed( project, executomat, step )
+			return self._executeActionTimed( executomat, step )
 		finally:
 			self.__timeKeeper.stop()
-			project.debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
+			mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
 
-	def _executeActionTimed( self, project, executomat, step ):
+	def _executeActionTimed( self, executomat, step ):
 		oldPwd = None
 		try:
 			executomat.log( '# {0}'.format( self.getLogDescription() ) )
@@ -130,7 +131,7 @@ class Action( MObject ):
 					raise BuildError( str( e ) )
 			self._aboutToStart()
 			try:
-				result = self.run( project )
+				result = self.run()
 				if result == None or not isinstance( result, int ):
 					raise MomError( 'Action {0} ({1}) did not return a valid non-negative integer return value from run()!'
 								.format( self.getName(), self.getLogDescription() ) )
@@ -138,7 +139,7 @@ class Action( MObject ):
 				self._finished()
 			except MomException as e:
 				self._aborted()
-				project.debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
+				mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
 				self._setResult( e.getReturnCode() )
 			if step.getLogfileName():
 				file = open( step.getLogfileName(), 'a' )

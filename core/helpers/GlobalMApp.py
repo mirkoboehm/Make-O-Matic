@@ -17,34 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
-from core.Exceptions import AbstractMethodCalledError
-from core.Plugin import Plugin
-from core.Defaults import Defaults
+def mApp():
+	from core.MApplication import MApplication
+	from core.Exceptions import MomError
+	if not MApplication._instance:
+		raise MomError( 'mApp may only be called after the MApplication object has been created!' )
+	return MApplication._instance
 
-class Logger( Plugin ):
-	"""Logger is the base class for Logger objects."""
-
-	def __init__( self, name ):
-		"""Constructor"""
-		Plugin.__init__( self, name )
-
-	def message( self, mapp, mobject, msg ):
-		raise AbstractMethodCalledError()
-
-	def debug( self, mapp, mobject, msg ):
-		raise AbstractMethodCalledError()
-
-	def debugN( self, mapp, mobject, level , msg ):
-		raise AbstractMethodCalledError()
-
-	def timeStampPrefix( self ):
-		return datetime.now().strftime( '%y%m%d-%H:%M:%S' )
-
-	def messagePrefix( self ):
-		prefix = ''
-		try:
-			from core.MApplication import mApp
-			prefix = mApp().getSettings().get( Defaults.MomDebugIndentVariable )
-		except: pass
-		return prefix

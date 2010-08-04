@@ -16,30 +16,21 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os
+import os, platform, subprocess, signal, time
 from threading import Thread
-import platform
-import subprocess
-from subprocess import Popen
-import signal
-import time
 from core.MObject import MObject
+from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string
-import core
 
 class _CommandRunner( Thread ):
-	def __init__ ( self, project, runner ):
+	def __init__ ( self , runner ):
 		Thread.__init__( self )
-		self.__project = project
 		self.__started = None
 		self.__finished = None
 		assert runner
 		self._runner = runner
 		self._pid = None
 		self.__combineOutput = False
-
-	def getProject( self ):
-		return self.__project
 
 	def setCombineOutput( self, combine ):
 		if combine: # make sure combine is usable as a boolean
@@ -54,19 +45,19 @@ class _CommandRunner( Thread ):
 		return self._runner
 
 	def run( self ):
-		self.getProject().debugN( self._getRunner(), 4, 'executing "{0}"'.format( self._getRunner().getCommand() ) )
+		mApp().debugN( self._getRunner(), 4, 'executing "{0}"'.format( self._getRunner().getCommand() ) )
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
 		self.__started = True
-		p = Popen ( self._getRunner().getCommand(), shell = True, stdout = subprocess.PIPE, stderr = stderrValue )
+		p = subprocess.Popen ( self._getRunner().getCommand(), shell = True, stdout = subprocess.PIPE, stderr = stderrValue )
 		self._pid = p.pid
 		output, error = p.communicate()
 		self._getRunner()._setStdOut( output )
 		self._getRunner()._setStdErr( error )
 		self._getRunner()._setReturnCode( p.returncode )
 		self.__finished = True
-		self.getProject().debugN( self, 4, 'finished, return code {0}'.format( p.returncode ) )
+		mApp().debugN( self, 4, 'finished, return code {0}'.format( p.returncode ) )
 
 	def wasStarted( self ):
 		return self.__started
@@ -91,7 +82,7 @@ class _CommandRunner( Thread ):
 		""" replace os.kill on Windows, where it is not available"""
 		cmd = 'taskkill /PID ' + str( int( pid ) ) + ' /T /F'
 		if os.system( cmd ) == 0:
-			self.getProject().debugN( self, 4, 'windows-kill killed process {0}'.format( pid ) )
+			mApp().debugN( self, 4, 'windows-kill killed process {0}'.format( pid ) )
 
 	def kill( self, pid, signal ):
 		if 'Windows' in platform.platform():
@@ -100,10 +91,8 @@ class _CommandRunner( Thread ):
 			os.kill( pid, signal )
 
 class RunCommand( MObject ):
-	def __init__( self, project, cmd, timeoutSeconds = None, combineOutput = False ):
+	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False ):
 		MObject.__init__( self )
-		assert isinstance( project, core.Project.Project )
-		self.__project = project
 		self.__cmd = cmd
 		if timeoutSeconds:
 			check_for_positive_int( timeoutSeconds, "The timeout period must be a positive integer number! " )
@@ -137,9 +126,6 @@ class RunCommand( MObject ):
 	def getReturnCode( self ):
 		return self.__returnCode
 
-	def getProject( self ):
-		return self.__project
-
 	def _setStdOut( self, stdout ):
 		self.__stdOut = stdout
 
@@ -167,8 +153,8 @@ class RunCommand( MObject ):
 			combinedOutputString = 'and separate output for stdout and stderr'
 			if self.getCombineOutput():
 				combinedOutputString = 'and combined stdout and stderr output'
-			self.getProject().debugN( self, 4, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
-			runner = _CommandRunner ( self.getProject(), self )
+			mApp().debugN( self, 4, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
+			runner = _CommandRunner ( self )
 			runner.setCombineOutput( self.getCombineOutput() )
 			runner.start()
 			# this sucks, but seems to be needed on Windows at least
@@ -183,7 +169,7 @@ class RunCommand( MObject ):
 				runner.join( 5 )
 				self.__timedOut = True
 			timeoutString = "timed out" if self.getTimedOut() else "completed"
-			self.getProject().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( self.getCommand(), timeoutString, str( self.getReturnCode() ) ) )
+			mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( self.getCommand(), timeoutString, str( self.getReturnCode() ) ) )
 			return self.getReturnCode()
 		finally:
 			if oldCwd:

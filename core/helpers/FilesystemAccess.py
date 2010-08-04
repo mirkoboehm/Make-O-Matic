@@ -19,7 +19,7 @@
 import re
 
 def make_foldername_from_string( text ):
-	"""Create a name from the text that can safely be used as a foldername."""
+	"""Create a name from the text that can safely be used as a folder name."""
 	name = re.sub( '[\{\}\[\]\(\)\:]', '_', text )
 	name = re.sub( '\/', '+', name )
 	name = re.sub( '\s+', '_', name )

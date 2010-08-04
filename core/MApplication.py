@@ -24,11 +24,6 @@ import sys
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.Instructions import Instructions
 
-def mApp():
-	if not MApplication._instance:
-		raise MomError( 'mApp may only be called after the MApplication object has been created!' )
-	return MApplication._instance
-
 class MApplication( Instructions ):
 	'''MApplication represents the facilities provided by the currently running script.
 	It contains the loggers and reporters, for example. It also maintains the settings,
@@ -44,7 +39,7 @@ class MApplication( Instructions ):
 		self.__loggers = []
 		self.__settings = Settings()
 		self.__returnCode = 0
-		checkMinimumMomVersion( self, minimumMomVersion )
+		checkMinimumMomVersion( minimumMomVersion )
 
 	def getMomVersion( self ):
 		return '0.5.0'
@@ -61,9 +56,13 @@ class MApplication( Instructions ):
 	def getSettings( self ):
 		return self.__settings
 
-	def setReturnCode( self, code ):
+	def registerReturnCode( self, code ):
 		check_for_nonnegative_int( code, "The return code of the build script has to be a non-negative integer number!" )
-		self.__returnCode = code
+		if self.__returnCode == 0:
+			# only if there was no previous error:
+			self.__returnCode = code
+		else:
+			self.debugN( 3, 'new return code {0} ignored, return code is already set to {1}.'.format( code, self.getReturnCode() ) )
 
 	def getReturnCode( self ):
 		return self.__returnCode
@@ -82,7 +81,7 @@ class MApplication( Instructions ):
 
 	def querySettings( self, names = None ):
 		try:
-			settings = mApp().getSettings().getSettings()
+			settings = self.getSettings().getSettings()
 			if names:
 				for key in names:
 					if key in settings:
@@ -95,7 +94,7 @@ class MApplication( Instructions ):
 					print( '{0}: {1}'.format( key, settings[key] ) )
 		except Exception as e:
 			print( 'Error: {0}'.format( str( e ) ) )
-			self.setReturnCode( 1 )
+			self.registerReturnCode( 1 )
 
 	def buildAndReturn( self ):
 		'''buildAndReturn executes the build and returns the exit code of the script.
@@ -104,7 +103,13 @@ class MApplication( Instructions ):
 		The method does always return, though, if a MomException is caught. Any exception
 		that does not inherit MomException will pass. '''
 		try:
-			self.run()
+			self.runPreFlightChecks()
+			try:
+				self.runSetups()
+				self.run()
+				self.runWrapups()
+			finally:
+				self.runShutDowns()
 			return self.getReturnCode()
 		except MomException as e:
 			self.message( self, 'Error, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )

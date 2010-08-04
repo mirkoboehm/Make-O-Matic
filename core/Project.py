@@ -24,12 +24,13 @@ from core.modules.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Settings import Settings
-from core.Exceptions import MomError
+from core.Exceptions import MomError, ConfigurationError
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
 from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.Instructions import Instructions
-from core.MApplication import mApp
+from core.helpers.GlobalMApp import mApp
+from core.executomat.Step import Step
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -39,11 +40,18 @@ class Project( Instructions ):
 	def __init__( self, projectName ):
 		"""Set up the build steps, parse the command line arguments."""
 		Instructions.__init__( self, projectName )
+		self.setBuild( None )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
 		self.__folderManager = FolderManager( self )
 		self.addPlugin( self.getFolderManager() )
+
+	def setBuild( self, build ):
+		self.__build = build
+
+	def getBuild( self ):
+		return self.__build
 
 	def createScm( self, description ):
 		factory = SourceCodeProviderFactory()
@@ -68,10 +76,70 @@ class Project( Instructions ):
 	def getTimeKeeper( self ):
 		return self.__timeKeeper
 
-	def setup( self ):
-		assert False # this is the wrong setup method!
-		for step in mApp().getSettings().calculateBuildSequence( self ):
+	def runSetups( self ):
+		for step in self.calculateBuildSequence( self ):
 			self.getExecutomat().addStep( step )
+		Instructions.runSetups( self )
+
+	def __getBuildSequenceDescription( self, buildSteps ):
+		# debug info:
+		texts = []
+		for stepName in buildSteps:
+			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
+		return ', '.join( texts )
+
+	def calculateBuildSequence( self, project ):
+		assert self.getBuild()
+		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
+		assert len( buildType ) == 1
+		allBuildSteps = mApp().getSettings().get( Settings.ProjectBuildSteps, True )
+		buildSteps = []
+		for buildStep in allBuildSteps:
+			# FIXME maybe this could be a unit test?
+			assert len( buildStep ) == 3
+			name, types, executeOnFailure = buildStep
+			assert types.lower() == types
+			stepName = Step( name )
+			stepName.setEnabled( buildType in types )
+			stepName.setExecuteOnFailure( executeOnFailure )
+			buildSteps.append( stepName )
+		mApp().debug( self, 'build type: {0} ({1})'
+			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
+		# apply customizations passed as command line parameters:
+		switches = self.getBuild().getParameters().getBuildSteps()
+		if switches:
+			mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'
+						.format( self.__getBuildSequenceDescription( buildSteps ) ) )
+			customSteps = switches.split( ',' )
+			for switch in customSteps:
+				stepName = None
+				enable = None
+				if switch.startswith( 'enable-' ):
+					stepName = switch[ len( 'enable-' ) : ].strip()
+					enable = True
+				elif switch.startswith( 'disable-' ):
+					stepName = switch[ len( 'disable-' ) : ].strip()
+					enable = False
+				else:
+					raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
+											.format( switch ) )
+				# apply:
+				found = False
+				for step in buildSteps:
+					if step.getName() == stepName:
+						step.setEnabled( enable )
+						found = True
+				if not found:
+					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
+		mApp().debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
+		return buildSteps
+
+	def execute( self ):
+		self.getTimeKeeper().start()
+		try:
+			self.getExecutomat().run( self )
+		finally:
+			self.getTimeKeeper().stop()
 
 	def printAndExit( self ):
 		# program name, "print", argument, [options] 

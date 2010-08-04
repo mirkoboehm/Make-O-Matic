@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
+from core.helpers.GlobalMApp import mApp
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -48,6 +49,12 @@ class Instructions( MObject ):
 		assert isinstance( instructions, Instructions )
 		self.__instructions.append( instructions )
 
+	def execute( self ):
+		'''If execute is implemented, it is supposed to execute the pay load of the instructions. 
+		Execute is not required, many modules only need to act during the different phases.
+		To implement specific operations between setup and wrap-up, re-implement execute.'''
+		pass
+
 	def runPreFlightChecks( self ):
 		[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
 		for child in self.getChildren():
@@ -72,6 +79,6 @@ class Instructions( MObject ):
 An error occurred during shutdown: "{0}"
 Offending module: "{1}" 
 This error will not change the return code of the script!'''.format( str( e ), plugin.getName() )
-				self.message( self, text )
+				mApp().message( self, text )
 		for child in self.getChildren():
 			child.runShutDowns()

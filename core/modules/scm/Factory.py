@@ -20,7 +20,7 @@ import re
 from core.Exceptions import ConfigurationError
 from core.modules.scm.SCMGit import SCMGit
 from core.MObject import MObject
-from core.MApplication import mApp
+from core.helpers.GlobalMApp import mApp
 
 class SourceCodeProviderFactory( MObject ):
 

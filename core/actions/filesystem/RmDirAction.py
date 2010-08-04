@@ -19,6 +19,7 @@
 from core.executomat.Action import Action
 from core.helpers.TypeCheckers import check_for_nonempty_string
 import shutil
+from core.helpers.GlobalMApp import mApp
 
 class RmDirAction( Action ):
 	"""RmDirAction deletes a directory."""
@@ -35,14 +36,14 @@ class RmDirAction( Action ):
 		return self.__path
 
 	# FIXME Are result and the return value redundant? How to enforce setting result?
-	def run( self, project ):
+	def run( self ):
 		check_for_nonempty_string( self.getPath(), "No directory specified!" )
-		project.debugN( self, 2, 'deleting directory "{0}"'.format( self.getPath() ) )
+		mApp().debugN( self, 2, 'deleting directory "{0}"'.format( self.getPath() ) )
 		try:
 			shutil.rmtree( self.getPath(), False )
 			return 0
 		except ( OSError, IOError ) as e:
-			project.debug( self, 'error deleting directory "{0}": {1}'
+			mApp().debug( self, 'error deleting directory "{0}": {1}'
 						.format( self.getPath(), str( e ) ) )
 			return 1
 

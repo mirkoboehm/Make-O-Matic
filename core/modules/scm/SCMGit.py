@@ -24,6 +24,7 @@ from core.executomat.Action import Action
 import os
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import re
+from core.helpers.GlobalMApp import mApp
 
 class _UpdateHiddenCloneAction( Action ):
 	def __init__( self, scmgit ):
@@ -31,8 +32,8 @@ class _UpdateHiddenCloneAction( Action ):
 		assert scmgit
 		self.__scmgit = scmgit
 
-	def run( self, project ):
-		self.__scmgit._updateHiddenClone( project )
+	def run( self ):
+		self.__scmgit._updateHiddenClone()
 		return 0
 
 	def getLogDescription( self ):
@@ -54,22 +55,22 @@ class SCMGit( SourceCodeProvider ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
 		raise AbstractMethodCalledError
 
-	def _checkInstallation( self, project ):
+	def _checkInstallation( self, instructions ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-		assert project
-		runner = RunCommand( project, 'git --version' )
+		assert instructions
+		runner = RunCommand( 'git --version' )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
 			raise ConfigurationError( "SCMGit::checkInstallation: git not found." )
 		else:
 			lines = runner.getStdOut().decode().split( '\n' )
 			self._setDescription( lines[0].rstrip() )
-			project.debugN( self, 4, 'git found: "{0}"'.format( self.getDescription() ) )
+			mApp().debugN( self, 4, 'git found: "{0}"'.format( self.getDescription() ) )
 
-	def _getRevisionsSince( self, project, revision, cap = None ):
+	def _getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
-		self._updateHiddenClone( project )
-		runner = RunCommand( project, 'git log {1}..'.format( cap or '', revision ), 3600 )
+		self._updateHiddenClone()
+		runner = RunCommand( 'git log {1}..'.format( cap or '', revision ), 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -95,10 +96,10 @@ class SCMGit( SourceCodeProvider ):
 		else:
 			raise ConfigurationError( 'Getting git log failed, is there no git in the path?' )
 
-	def _getCurrentRevision( self, project ):
+	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
-		self._updateHiddenClone( project )
-		runner = RunCommand( project, 'git log -n1' )
+		self._updateHiddenClone()
+		runner = RunCommand( 'git log -n1' )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -113,9 +114,9 @@ class SCMGit( SourceCodeProvider ):
 			raise ConfigurationError( 'cannot get log for the clone of "{0}" at "{1}"'
 				.format( self.getUrl(), self._getHiddenClonePath() ) )
 
-	def makeCheckoutStep( self, project ):
+	def makeCheckoutStep( self, instructions ):
 		"""Create steps to check out the source code"""
-		step = project.getExecutomat().getStep( 'project-checkout' )
+		step = instructions.getExecutomat().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
 		updateClone = ShellCommandAction( 'git clone --local --depth 1 {0} .'.format ( self._getHiddenClonePath() ) )
@@ -126,16 +127,16 @@ class SCMGit( SourceCodeProvider ):
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 
-	def makePackageStep( self, project, ):
+	def makePackageStep( self, instructions, ):
 		"""Create a src tarball of the project and put it into the packages directory."""
 		# project.message( self, 'NOT IMPLEMENTED!' )
 
 	def _getHiddenClonePath( self ):
 		clonename = make_foldername_from_string( self.getUrl() )
-		hiddenClone = self.getCloneArmyDir() + os.sep + clonename
+		hiddenClone = os.path.join( self.getCloneArmyDir(), clonename )
 		return hiddenClone
 
-	def _updateHiddenClone( self, project ):
+	def _updateHiddenClone( self ):
 		# FIXME should this be a bare repository clone?
 		hiddenClone = self._getHiddenClonePath()
 		# check if the clone directory exists, create if necessary: 
@@ -143,18 +144,18 @@ class SCMGit( SourceCodeProvider ):
 			if not os.path.isdir( hiddenClone ):
 				raise MomError( 'hidden clone exists at "{0}", but is not a directory. Help!'.format( hiddenClone ) )
 			# FIXME get timeout value from settings
-			runner = RunCommand( project, 'git pull --all', 1200, True )
+			runner = RunCommand( 'git pull --all', 1200, True )
 			runner.setWorkingDir( hiddenClone )
 			runner.run()
 			if runner.getReturnCode() == 0:
-				project.debugN( self, 4, 'updated the hidden clone at "{0}"'.format( hiddenClone ) )
+				mApp().debugN( self, 4, 'updated the hidden clone at "{0}"'.format( hiddenClone ) )
 			else:
 				raise MomError( 'cannot update the clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 		else:
-			runner = RunCommand( project, 'git clone {0} {1}'.format( self.getUrl(), hiddenClone ), 1200, True )
+			runner = RunCommand( 'git clone {0} {1}'.format( self.getUrl(), hiddenClone ), 1200, True )
 			runner.run()
 			if runner.getReturnCode() == 0:
-				project.debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )
+				mApp().debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )
 			else:
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 

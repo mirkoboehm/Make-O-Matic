@@ -51,10 +51,10 @@ class ShellCommandAction( Action ):
 			raise MomError( "The command runner was not initialized before being queried" )
 		return self.__runner
 
-	def run( self, project ):
+	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
 		check_for_nonempty_string( self.getCommand(), 'trying to run a command without a command' )
-		self.__runner = RunCommand( project, self.__command, self.__timeOutPeriod, True )
+		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, True )
 		self._getRunner().run()
 		self._setStdOut( self._getRunner().getStdOut() )
 		self._setStdErr( self._getRunner().getStdErr() )

@@ -24,7 +24,7 @@ from core.modules.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
 from core.Build import Build
 from core.loggers.ConsoleLogger import ConsoleLogger
-from core.MApplication import mApp
+from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 from core.Exceptions import MomException
 import sys

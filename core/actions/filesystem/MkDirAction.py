@@ -20,6 +20,7 @@
 from core.executomat.Action import Action
 from core.helpers.TypeCheckers import check_for_nonempty_string
 import os
+from core.helpers.GlobalMApp import mApp
 
 class MkDirAction( Action ):
 	"""MkDirAction creates a directory.
@@ -36,14 +37,14 @@ class MkDirAction( Action ):
 	def getPath( self ):
 		return self.__path
 
-	def run( self, project ):
+	def run( self ):
 		check_for_nonempty_string( self.getPath(), "No directory specified!" )
-		project.debugN( self, 4, 'creating directory "{0}"'.format( self.getPath() ) )
+		mApp().debugN( self, 4, 'creating directory "{0}"'.format( self.getPath() ) )
 		try:
 			os.makedirs( self.getPath() )
 			return 0
 		except ( OSError, IOError ) as e:
-			project.debug( self, 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) ) )
+			mApp().debug( self, 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) ) )
 			return 1
 
 	def getLogDescription( self ):

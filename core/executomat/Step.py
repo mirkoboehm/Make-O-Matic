@@ -23,6 +23,7 @@ from core.MObject import MObject
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.TypeCheckers import check_for_string
 from core.helpers.TimeKeeper import TimeKeeper
+from core.helpers.GlobalMApp import mApp
 
 class Step( MObject ):
 	"""An individual step of an Executomat run."""
@@ -87,32 +88,32 @@ class Step( MObject ):
 	def __addAction( self, container, action ):
 		container.append( action )
 
-	def _logEnvironment( self, project, executomat ):
-		project.debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )
+	def _logEnvironment( self, executomat ):
+		mApp().debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )
 		for key in os.environ:
-			project.debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
+			mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
 
-	def execute( self, executomat, project ):
+	def execute( self, executomat, instructions ):
 		try:
 			self.__timeKeeper.start()
-			return self._executeTimed( executomat, project )
+			return self._executeTimed( executomat, instructions )
 		finally:
 			self.__timeKeeper.stop()
-			project.debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
+			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
-	def _executeTimed( self, executomat, project ):
+	def _executeTimed( self, executomat, instructions ):
 		"""Execute the step"""
 		if not self.getName():
 			raise MomError( "Cannot execute a step with no name!" )
 		if not self.__enabled:
 			executomat.log( '# step "{0}" disabled, skipping.'.format( self.getName() ) )
 			return True
-		if project.getReturnCode() != 0 and not self.getExecuteOnFailure():
-			project.debugN( self, 4, 'aborting because of errors earlier in the build' )
+		if mApp().getReturnCode() != 0 and not self.getExecuteOnFailure():
+			mApp().debugN( self, 4, 'aborting because of errors earlier in the build' )
 			return True
 		executomat.log( '# Executing step "{0}"'.format( self.getName() ) )
 		executomat.log( '# ... in directory "{0}"'.format( os.getcwd() ) )
-		self._logEnvironment( project, executomat )
+		self._logEnvironment( executomat )
 
 		logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
 		logfileName = os.path.join( executomat.getLogDir(), logfileName )
@@ -126,7 +127,7 @@ class Step( MObject ):
 			if not actions:
 				executomat.log( '# Phase "{0}" is empty (no actions registered)'.format( phase ) )
 			for action in actions:
-				result = action.executeAction( project, executomat, self )
+				result = action.executeAction( executomat, self )
 				resultText = 'successful (or skipped)'
 				if result != 0:
 					resultText = 'failed'

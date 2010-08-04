@@ -22,6 +22,7 @@ from core.executomat.Action import Action
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_nonempty_string_or_none
 import re
 from core.Exceptions import BuildError
+from core.helpers.GlobalMApp import mApp
 
 class _PreprocessorAction( Action ):
 	'''The _PreprocessorAction performs the input file conversion.'''
@@ -39,7 +40,7 @@ class _PreprocessorAction( Action ):
 	def _getPreprocessor( self ):
 		return self.__preprocessor
 
-	def getRegex( self ):
+	def _getRegex( self ):
 		return self.__regex
 
 	def getLogDescription( self ):
@@ -47,19 +48,15 @@ class _PreprocessorAction( Action ):
 					self._getPreprocessor().getInputFilename().getFilename(),
 					self._getPreprocessor().getOutputFilename().getFilename() )
 
-	def run( self, project ):
-		try:
-			self.__project = project
-			project.debugN( self, 3, 'Creating "{0}" from "{1}"'.format( 
-					self._getPreprocessor().getOutputFilename(),
-					self._getPreprocessor().getInputFilename() ) )
-			self._process()
-			project.debugN( self, 2, 'Successfully created "{0}" from "{1}"'.format( 
-					self._getPreprocessor().getOutputFilename(),
-					self._getPreprocessor().getInputFilename() ) )
-			return 0
-		finally:
-			self.__project = None
+	def run( self ):
+		mApp().debugN( self, 3, 'Creating "{0}" from "{1}"'.format( 
+				self._getPreprocessor().getOutputFilename(),
+				self._getPreprocessor().getInputFilename() ) )
+		self._process()
+		mApp().debugN( self, 2, 'Successfully created "{0}" from "{1}"'.format( 
+				self._getPreprocessor().getOutputFilename(),
+				self._getPreprocessor().getInputFilename() ) )
+		return 0
 
 	def _process( self ):
 		# open input file for reading
@@ -140,17 +137,14 @@ class _PreprocessorAction( Action ):
 		return '[MOM PP: unknown: {0}]'.format( code )
 
 	def _getSettingText( self, setting ):
-		if not self.__project:
-			return '[MOM PP: project not initialized]'
-		value = self.__project.getSettings().get( setting, False )
+		value = mApp().getSettings().get( setting, False )
 		if not value:
-			self.__project.debugN( self, 2, 'Undefined setting "{0}"'.format( setting ) )
+			mApp().debugN( self, 2, 'Undefined setting "{0}"'.format( setting ) )
 			return ''
 		return str( value )
 
 	def _getFolderName( self, folder ):
-		if not self.__project:
-			return '[MOM PP: project not initialized]'
+		assert False # FIXME there is no project
 		if folder == 'src':
 			return self.__project.getFolderManager().getSourceDir()
 		elif folder == 'tmp':
@@ -160,9 +154,11 @@ class _PreprocessorAction( Action ):
 		elif folder == 'packages':
 			return self.__project.getFolderManager().getPackagesDir()
 		else:
-			self.__project.debugN( self, 2, 'Unknown folder id "{0}"'.format( folder ) )
+			mApp().debugN( self, 2, 'Unknown folder id "{0}"'.format( folder ) )
 			return ''
 
+# FIXME this relies on instructions being a project
+# (but otherwise, we cannot get to the project folder paths)
 class Preprocessor( Plugin ):
 	'''Preprocessor takes a textual input file, applies variables from various dictionaries, and produces an output file.
 	The preprocessor generates an action that performs the conversion of the input file, and adds it as a post action to a step. 
@@ -198,7 +194,7 @@ class Preprocessor( Plugin ):
 	def getStep( self ):
 		return self.__step
 
-	def setup( self, project ):
-		step = project.getExecutomat().getStep( self.getStep() )
+	def setup( self, instructions ):
+		step = instructions.getExecutomat().getStep( self.getStep() )
 		action = _PreprocessorAction( self )
 		step.addPostAction( action )

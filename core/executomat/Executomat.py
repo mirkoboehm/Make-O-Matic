@@ -23,6 +23,7 @@ from core.executomat.Step import Step
 from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.MObject import MObject
 from core.helpers.TimeKeeper import TimeKeeper
+from core.helpers.GlobalMApp import mApp
 
 class Executomat( MObject ):
 	"""Executomat executes actions in steps which can be individually enabled and disabled.
@@ -76,7 +77,7 @@ class Executomat( MObject ):
 		command replaces the old one."""
 		if not isinstance( newStep, Step ):
 			raise MomError( 'only executomat.Step instances can be added to the queue' )
-		check_for_nonempty_string( newStep.getName(), "An Executomat step must have a name!" );
+		check_for_nonempty_string( newStep.getName(), "Every Executomat step must have a name!" );
 		self.__steps.append( newStep )
 
 	def _getSteps( self ):
@@ -97,15 +98,15 @@ class Executomat( MObject ):
 		if( self.__logfile ):
 			self.__logfile.write( text.rstrip() + '\n' )
 
-	def run( self, project ):
+	def run( self, instructions ):
 		try:
 			self.__timeKeeper.start()
-			return self._runTimed( project )
+			return self._runTimed( instructions )
 		finally:
 			self.__timeKeeper.stop()
-			project.debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
+			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
-	def _runTimed( self, project ):
+	def _runTimed( self, instructions ):
 		try:
 			if not os.path.isdir( self.getLogDir() ):
 				raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( self.logDir() ) ) )
@@ -116,9 +117,9 @@ class Executomat( MObject ):
 					raise ConfigurationError( 'Cannot open log file at "{0}"'.format( self.getLogfileName() ) )
 			self.log( '# Starting execution of "{0}"'.format( self.getName() ) )
 			for step in self._getSteps():
-				project.debugN( self, 1, 'now executing step "{0}"'.format( step.getName() ) )
-				if step.execute( self, project ):
-					project.debugN( self, 2, 'success: "{0}"'.format( step.getName() ) )
+				mApp().debugN( self, 1, 'now executing step "{0}"'.format( step.getName() ) )
+				if step.execute( self, instructions ):
+					mApp().debugN( self, 2, 'success: "{0}"'.format( step.getName() ) )
 					self.log( '# step "{0}": success.'.format( step.getName() ) )
 				else:
 					self.log( '# step "{0}": ERROR!'.format( step.getName() ) )
@@ -126,8 +127,8 @@ class Executomat( MObject ):
 					if self.__failedStep == None:
 						# we are only interested in the log files for the first failure 
 						self.__failedStep = step
-					project.setReturnCode( BuildError( 'dummy' ).getReturnCode() )
-					project.debugN( self, 2, 'failed: "{0}"'.format( step.getName() ) )
+					mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
+					mApp().debugN( self, 2, 'failed: "{0}"'.format( step.getName() ) )
 			self.log( '# execution finished \n########' )
 		finally: # make sure the log file is closed
 			if self.__logfile:

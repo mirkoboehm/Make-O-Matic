@@ -20,6 +20,7 @@ import sys
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
@@ -28,30 +29,30 @@ class ConsoleLogger( Logger ):
 		"""Constructor"""
 		Logger.__init__( self, self.__class__.__name__ )
 
-	def __getLevel( self, project ):
-		verbosity = project.getSettings().get( Settings.ScriptLogLevel )
+	def __getLevel( self, mapp ):
+		verbosity = mapp.getSettings().get( Settings.ScriptLogLevel )
 		check_for_nonnegative_int( verbosity, "The debug level needs to be an integer of zero or more" )
 		return verbosity
 
-	def message( self, project, mobject, msg ):
+	def message( self, mapp, mobject, msg ):
 		text = str( msg )
 		if not text.endswith( '\n' ): text = text + '\n'
 		fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
 		sys.stderr.write( fulltext )
 
-	def debug( self, project, mobject, msg ):
+	def debug( self, mapp, mobject, msg ):
 		text = str( msg )
-		if self.__getLevel( project ) > 0:
-			self.message( project, mobject, 'DEBUG: ' + str( text ) )
+		if self.__getLevel( mapp ) > 0:
+			self.message( mapp, mobject, 'DEBUG: ' + str( text ) )
 
-	def debugN( self, project, mobject, level , msg ):
+	def debugN( self, mapp, mobject, level , msg ):
 		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )
-		verbosity = self.__getLevel( project )
+		verbosity = self.__getLevel( mapp )
 		if verbosity >= level:
-			self.debug( project, mobject, msg )
+			self.debug( mapp, mobject, msg )
 
-	def preFlightCheck( self, project ):
-		level = project.getSettings().get( Settings.ScriptLogLevel, True )
+	def preFlightCheck( self, instructions ):
+		level = mApp().getSettings().get( Settings.ScriptLogLevel, True )
 		check_for_nonnegative_int( level, 'The debug level must be a non-negative integer!' )
 		if level > 0:
-			project.debug( self, 'debug level is {0}'.format( level ) )
+			mApp().debug( self, 'debug level is {0}'.format( level ) )

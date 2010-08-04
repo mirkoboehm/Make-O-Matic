@@ -21,6 +21,7 @@ import optparse
 import sys
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.Exceptions import ConfigurationError
 
 class Parameters( MObject ):
 	'''Parameters parses and stores the command line parameters (arguments) of a script.'''
@@ -72,12 +73,9 @@ class Parameters( MObject ):
 		buildType = self._getOptions().buildType
 		if buildType:
 			check_for_nonempty_string( buildType, 'The build type must be a single character!' )
+			if len( buildType ) != 1:
+				raise ConfigurationError( 'The build type must be a single character, not "{0}"'.format( buildType ) )
 			buildType = buildType.lower()
-# FIXME Mirko
-#		if buildType not in self.knownBuildTypes():
-#				raise MomError( 'There are only these build types: ' + self.knownBuildTypes() )
-#		if self.getBuildType() == 'e' and ( options.buildSteps == None or 'enable' not in options.buildSteps ):
-#				raise AutoBuildError( '(E)mpty build type requires to set the -s option, and to enable at least one build step (-s)' )
 		return buildType
 
 	def getBuildSteps( self ):

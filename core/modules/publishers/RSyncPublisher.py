@@ -23,6 +23,7 @@ from core.executomat.ShellCommandAction import ShellCommandAction
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none
 import platform, os, re
 from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 
 class RSyncPublisher( Plugin ):
 	'''A publisher that uses RSync to send results to a remote site.'''
@@ -47,30 +48,30 @@ class RSyncPublisher( Plugin ):
 	def getLocalDir( self ):
 		return self.__localDir
 
-	def preFlightCheck( self, project ):
-		assert project
-		runner = RunCommand( project, 'rsync --version' )
+	def preFlightCheck( self, instructions ):
+		assert instructions
+		runner = RunCommand( 'rsync --version' )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
 			raise ConfigurationError( "RSyncPublisher: rsync not found." )
 		else:
 			lines = runner.getStdOut().decode().split( '\n' )
 			version = lines[0].rstrip()
-			project.debugN( self, 1, 'rsync found: "{0}"'.format( version ) )
+			mApp().debugN( self, 1, 'rsync found: "{0}"'.format( version ) )
 
-	def setup( self, project ):
+	def setup( self, instructions ):
 		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
-			defaultLocation = project.getSettings().get( Settings.RSyncPublisherUploadLocation, False )
-			project.debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
+			defaultLocation = mApp().getSettings().get( Settings.RSyncPublisherUploadLocation, False )
+			mApp().debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
 			uploadLocation = defaultLocation
 			if not uploadLocation:
-				project.message( self, 'Upload location is empty. Not generating any actions.' )
+				mApp().message( self, 'Upload location is empty. Not generating any actions.' )
 				return
-		step = project.getExecutomat().getStep( 'project-upload-docs' )
+		step = instructions.getExecutomat().getStep( 'project-upload-docs' )
 		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
 		action = ShellCommandAction( 'rsync -avz -e \'ssh -o "BatchMode yes"\' {0} {1}'.format( fromDir, uploadLocation ), 7200 )
-		action.setWorkingDirectory( project.getFolderManager().getBaseDir() )
+		action.setWorkingDirectory( instructions.getFolderManager().getBaseDir() )
 		step.addMainAction( action )
 
 

@@ -20,7 +20,7 @@ from core.Defaults import Defaults
 import os
 from socket import gethostname
 from core.Exceptions import ConfigurationError
-from core.executomat.Step import Step
+from core.helpers.GlobalMApp import mApp
 
 class Settings( Defaults ):
 	"""Settings stores all configurable values for a build script run."""
@@ -30,59 +30,7 @@ class Settings( Defaults ):
 		# this applies the defaults:
 		Defaults.__init__( self )
 
-	def calculateBuildSequence( self, project ):
-		buildType = self.get( Settings.ProjectBuildType, True ).lower()
-		assert len( buildType ) == 1
-		allBuildSteps = self.get( Settings.ProjectBuildSteps, True )
-		buildSteps = []
-		for buildStep in allBuildSteps:
-			# FIXME maybe this could be a unit test?
-			assert len( buildStep ) == 3
-			name, types, executeOnFailure = buildStep
-			assert types.lower() == types
-			stepName = Step( name )
-			stepName.setEnabled( buildType in types )
-			stepName.setExecuteOnFailure( executeOnFailure )
-			buildSteps.append( stepName )
-		project.debug( self, 'build type: {0} ({1})'.format( buildType.upper(), self.getBuildTypeDescription( buildType ) ) )
-		# apply customizations passed as command line parameters:
-		switches = project.getParameters().getBuildSteps()
-		if switches:
-			project.debugN( self, 3, 'build sequence before command line parameters: {0}'
-						.format( self.__getBuildSequenceDescription( buildSteps ) ) )
-			customSteps = switches.split( ',' )
-			for switch in customSteps:
-				stepName = None
-				enable = None
-				if switch.startswith( 'enable-' ):
-					stepName = switch[ len( 'enable-' ) : ].strip()
-					enable = True
-				elif switch.startswith( 'disable-' ):
-					stepName = switch[ len( 'disable-' ) : ].strip()
-					enable = False
-				else:
-					raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
-											.format( switch ) )
-				# apply:
-				found = False
-				for step in buildSteps:
-					if step.getName() == stepName:
-						step.setEnabled( enable )
-						found = True
-				if not found:
-					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
-		project.debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
-		return buildSteps
-
-	def __getBuildSequenceDescription( self, buildSteps ):
-		# debug info:
-		texts = []
-		for stepName in buildSteps:
-			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
-		return ', '.join( texts )
-
 	def evalConfigurationFiles( self, toolName = None ):
-		from core.MApplication import mApp
 		momFolder = 'mom'
 		globalFolder = os.path.join( os.sep, 'etc', momFolder )
 		userFolder = os.path.join( os.environ['HOME'], '.{0}'.format( momFolder ) )

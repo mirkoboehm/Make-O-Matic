@@ -26,7 +26,7 @@ from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.Settings import Settings
 import tempfile
 import shutil
-from core.MApplication import mApp
+from core.helpers.GlobalMApp import mApp
 
 class FolderManager( Plugin ):
 	"""FolderManager creates and deletes the project folders."""
@@ -51,7 +51,7 @@ class FolderManager( Plugin ):
 		return self._tmpLogDir
 
 	def __getNormPath( self, name ):
-		path = os.path.join( self.getBaseDir(), self.getProject().getSettings().get( name ) )
+		path = os.path.join( self.getBaseDir(), mApp().getSettings().get( name ) )
 		return os.path.normpath( path )
 
 	def getSourceDir( self ):
@@ -88,13 +88,13 @@ class FolderManager( Plugin ):
 			except OSError as o:
 				raise ConfigurationError( 'Cannot move existing project build folder at "{0}" to "{1}": {2}'
 										.format( self.getBaseDir(), newFolder, str( o ) ) )
-			project.debug( self, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
+			mApp().debug( self, 'Project build folder exists. Existing folder moved to "{0}".'.format( newFolder ) )
 		try:
 			os.mkdir( self.getBaseDir() )
 		except OSError as o:
 			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( self.getBaseDir(), str( o ) ) )
 		os.chdir( self.getBaseDir() )
-		project.debug( self, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
+		mApp().debug( self, 'Project build folder created, current working directory is now "{0}"'.format( os.getcwd() ) )
 		# now create actions:
 		create = project.getExecutomat().getStep( 'project-create-folders' )
 		delete = project.getExecutomat().getStep( 'project-cleanup' )
