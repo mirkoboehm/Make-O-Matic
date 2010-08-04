@@ -19,9 +19,20 @@
 
 from core.helpers.RunCommand import RunCommand
 import unittest
+from core.MApplication import MApplication
+from core.Build import Build
 
 # FIXME the test will need a Build object now! setup/tearDown?
 class RunWithTimeoutTest( unittest.TestCase ):
+
+	def setUp( self ):
+		if MApplication._instance:
+			# do not try this at home!
+			MApplication._instance = None
+		self.build = Build()
+
+	def tearDown( self ):
+		MApplication._instance = None
 
 	def testRunWithTimeout( self ):
 		timeout = 5
