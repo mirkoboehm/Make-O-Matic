@@ -25,6 +25,8 @@ from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 import optparse
 import sys
+from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
+import time
 
 class SimpleCI( MApplication ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -150,6 +152,44 @@ class SimpleCI( MApplication ):
 		if options.instance_name:
 			self.setName( options.instance_name )
 		self.setBuildScripts( args[1:] )
+
+	def beMaster( self ):
+		"""This is the main driver method when the control process is run as the master.
+		In an endless loop, it invokes itself in slave mode to perform all builds that have accumulated since the last start.
+		After every run, the master takes a short sleep."""
+		print( """\
++-+-+-+-+-+-+-+-+-+-+-+-+                     +-+ +-+-+-+-+ +-+-+-+-+
+|m|a|k|e|-|o|-|m|a|t|i|c|                     |C| |K|D|A|B| |2|0|1|0|
++-+-+-+-+-+-+-+-+-+-+-+-+                     +-+ +-+-+-+-+ +-+-+-+-+
++-+ +-+-+-+-+-+ +-+ +-+-+-+-+-+ +-+-+-+-+ +-+-+-+-+ +-+-+-+-+-+-+-+-+
+|i| |m|4|k|e|s| |u| |n|o|o|b|s| |k|n|o|w| |w|4|z|z| |f|0|0|b|4|r|3|d|
++-+ +-+-+-+-+-+ +-+ +-+-+-+-+-+ +-+-+-+-+ +-+-+-+-+ +-+-+-+-+-+-+-+-+
+""" )
+		while True:
+			self.debug( self, 'running in master mode' )
+			# FIXME re-implement self-updating of the mom installation before calling the slave
+			# ...
+			# execute the build control process slave:
+			cmd = '{0} {1}'.format( sys.executable, ' '.join( sys.argv + [ '--slave' ] ) )
+			self.debug( self, '*** now starting slave CI process ***' )
+			oldIndent = extend_debug_prefix( 'slave' )
+			result = -1
+			try:
+				result = os.system( cmd ) # do not use RunCommand, it catches the output
+			finally:
+				restore_debug_prefix( oldIndent )
+			self.debug( self, '*** slave finished with exit code {0}. ***'.format( result ) )
+			if self.getPerformTestBuilds():
+				break
+			delay = 10 * 60
+			if result != 0:
+				# in case an error returned, we wait even longer, to not flood the server in case of a broken build script
+				delay = 30 * 60
+			self.debug( self, 'sleeping for {0} seconds.'.format( delay ) )
+			self.debugN( self, 2, 'Z' )
+			self.debugN( self, 2, 'z' )
+			self.debugN( self, 2, '.' )
+			time.sleep( delay )
 
 	def beServant( self ):
 		self.debug( self, 'running in slave mode' )

@@ -174,11 +174,12 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				buildInfos.append( buildInfo )
 			if buildInfos:
 				mApp().debug( self, 'build queue:' )
-				mApp().debug( self, '{0} {1}: {2} - {3}'.format( 
-					buildInfo.getBuildType().upper() or ' ',
-					buildInfo.getProjectName(),
-					buildInfo.getRevision(),
-					buildInfo.getUrl() ) )
+				for buildInfo in buildInfos:
+					mApp().debug( self, '{0} {1}: {2} - {3}'.format( 
+						buildInfo.getBuildType().upper() or ' ',
+						buildInfo.getProjectName(),
+						buildInfo.getRevision(),
+						buildInfo.getUrl() ) )
 			else:
 				mApp().debug( self, 'build queue is empty.' )
 			return buildInfos
