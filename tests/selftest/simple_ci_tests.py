@@ -32,5 +32,13 @@ class SimpleCITests( MomTestCase ):
 		runner = self.runCommand( cmd, 'simple_ci usage help' )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
+	def testSlaveRunFindRevisions( self ):
+		cmd = '{0} {1} --slave -b {2}'.format( 
+			sys.executable,
+			SimpleCITests.ToolName,
+			SimpleCITests.BuildScriptName )
+		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
+		self.assertEquals( runner.getReturnCode(), 0 )
+
 if __name__ == "__main__":
 	unittest.main()

@@ -28,6 +28,7 @@ from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
 import shutil
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
+from core.helpers.GlobalMApp import mApp
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -135,29 +136,29 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		with self.getConnection() as connection:
 			return self._loadBuildInfo( connection, status )
 
-	def registerNewRevisions( self, project, buildScript ):
+	def registerNewRevisions( self, buildScript ):
 		'''Determines new revisions committed since the last call with the same build script, 
 		and adds those to the database.'''
 		iface = BuildScriptInterface( buildScript )
-		projectName = iface.querySetting( project, Settings.ProjectName )
+		projectName = iface.querySetting( Settings.ProjectName )
 		newestBuildInfo = self.getNewestBuildInfo( buildScript )
 		if newestBuildInfo:
 			revision = newestBuildInfo.getRevision()
-			project.debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
+			mApp().debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
 				.format( buildScript, projectName, revision ) )
-			buildInfos = self.getBuildInfoForRevisionsSince( project, buildScript, projectName, revision )
+			buildInfos = self.getBuildInfoForRevisionsSince( buildScript, projectName, revision )
 			if buildInfos:
-				project.message( self, 'build script "{0}" ({1}):'.format( buildScript, projectName ) )
+				mApp().message( self, 'build script "{0}" ({1}):'.format( buildScript, projectName ) )
 				for buildInfo in buildInfos:
 					msg = 'new revision "{0}"'.format( buildInfo.getRevision() )
-					project.message( self, msg )
+					mApp().message( self, msg )
 				self.saveBuildInfo( buildInfos )
 			else:
-				project.debug( self, 'no new revisions found for build script "{0}" ({1})'
+				mApp().debug( self, 'no new revisions found for build script "{0}" ({1})'
 					.format( buildScript, projectName ) )
 		else:
-			buildInfo = self.getBuildInfoForInitialRevision( project, buildScript, projectName )
-			project.debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
+			buildInfo = self.getBuildInfoForInitialRevision( buildScript, projectName )
+			mApp().debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
 				.format( buildInfo.getRevision(), buildScript, projectName ) )
 			self.saveBuildInfo( [ buildInfo ] )
 
@@ -282,9 +283,9 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		finally:
 			c.close()
 
-	def getBuildInfoForInitialRevision( self, project, buildScript, projectName ):
+	def getBuildInfoForInitialRevision( self, buildScript, projectName ):
 		iface = BuildScriptInterface( buildScript )
-		revision = iface.queryCurrentRevision( project )
+		revision = iface.queryCurrentRevision()
 		buildInfo = BuildInfo()
 		buildInfo.setProjectName( projectName )
 		buildInfo.setBuildStatus( BuildInfo.Status.InitialRevision )
@@ -292,14 +293,14 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		buildInfo.setBuildScript( buildScript )
 		return buildInfo
 
-	def getBuildInfoForRevisionsSince( self, project, buildScript, projectName, revision ):
+	def getBuildInfoForRevisionsSince( self, buildScript, projectName, revision ):
 		'''Return all revisions that modified the project since the specified revision.
 		@return a list of BuildInfo object, with the latest commit last
 		@throws MomEception, if any of the operations fail
 		'''
 		iface = BuildScriptInterface( buildScript )
 		buildInfos = []
-		lines = iface.queryRevisionsSince( project, revision )
+		lines = iface.queryRevisionsSince( revision )
 		for line in lines:
 			line = line.strip()
 			if not line: continue

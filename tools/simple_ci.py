@@ -20,7 +20,7 @@ from core.MApplication import MApplication
 from buildcontrol.common.BuildStatus import BuildStatus
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
-from core.Exceptions import ConfigurationError
+from core.Exceptions import ConfigurationError, MomError, MomException
 from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 import optparse
@@ -32,6 +32,7 @@ class SimpleCI( MApplication ):
 
 	def __init__( self, name = None ):
 		MApplication.__init__( self, name )
+		self.__setDebugLevelParameter( 0 )
 		self.setControlDir( None )
 		self.setPerformTestBuilds( False )
 		self.setSlaveMode( False )
@@ -149,6 +150,67 @@ class SimpleCI( MApplication ):
 		if options.instance_name:
 			self.setName( options.instance_name )
 		self.setBuildScripts( args[1:] )
+
+	def beServant( self ):
+		self.debug( self, 'running in slave mode' )
+		# we are now in slave mode
+		# find the build scripts
+		buildScripts = self.getBuildScripts() or []
+		if self.getControlDir():
+			BaseDir = str( self.getControlDir() )
+			self.getProject().message( self, 'using "{0}" as control directory.'.format( BaseDir ) )
+			ControlDir = os.path.normpath( os.path.join( os.getcwd(), BaseDir ) )
+			if not os.path.isdir( ControlDir ):
+				raise ConfigurationError( 'The control directory "{0}" does not exist!'.format( ControlDir ) )
+			folderScripts = filter( lambda x: x.endswith( '.py' ), os.listdir( ControlDir ) )
+			folderScripts = map( lambda x: ControlDir + os.sep + x, folderScripts )
+			folderScripts = map( lambda x: os.path.normpath( x ), folderScripts )
+			buildScripts += folderScripts
+		if not buildScripts:
+			self.getProject().message( self, 'FYI: no build scripts specified.' )
+		# FIXME Mirko
+		# buildScripts = BuildControl.DoSanityChecks( BaseDir, buildScripts, buildType )
+		# do the stuff
+		try:
+			if self.getPerformTestBuilds():
+				self.getProject().message( self, 'will do a test build for every product' )
+				raise MomError( 'Not implemented: text builds mode!' )
+				# FIXME Mirko
+				# runTestBuildJobs( Options, folderScripts )
+			else:
+				self.performBuilds( buildScripts )
+		except MomException as e:
+			self.registerReturnCode( e.getReturnCode() )
+			self.message( self, 'error during slave run, exit code {0}: {1}'.format( 
+				self.getReturnCode(), e ) )
+			self.debug( self, 'done, exiting.' )
+
+	def performBuilds( self, buildScripts ):
+		error = []
+		# register all revisions committed since the last run in the database:
+		if self.getFindRevisions():
+			self.debug( self, 'build control: discovering new revisions' )
+			for buildScript in buildScripts:
+				try:
+					self.getBuildStatus().registerNewRevisions( buildScript )
+				except MomError as e:
+					error.append( 'error while processing build script "{0}": {1}'.format( buildScript, e ) )
+					msg = 'error while processing build script "{0}", continuing: {1}'.format( buildScript, e )
+					self.message( self, msg )
+		else:
+			self.debugN( self, 2, 'build control: skipping discovery of new revisions' )
+		if self.getPerformBuilds():
+			cap = self.getSettings().get( Settings.SimpleCIBuildJobCap )
+			self.debug( self, 'build control: performing up to {0} builds for new revisions'.format( cap ) )
+			self.getBuildStatus().listNewBuildInfos()
+			for x in range( cap ):
+				x = x
+				if not self.getBuildStatus().takeBuildInfoAndBuild():
+					break
+		else:
+			self.debugN( self, 2, 'build control: skipping build phase' )
+		if error:
+			raise MomError( '. '.join( error ) )
 
 	def execute( self ):
 		if self.getSlaveMode():

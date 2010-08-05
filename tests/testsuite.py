@@ -23,8 +23,9 @@ from cases.preprocessor_tests import PreprocessorTest
 from cases.run_mode_print_tests import RunModePrintTests
 from cases.run_timeout_tests import RunWithTimeoutTest
 from cases.scm_factory_tests import ScmFactoryTests
-from selftest.simple_project import SimpleProjectTests
 from cases.buildscript_interface_tests import BuildScriptInterfaceTests
+from selftest.simple_project_tests import SimpleProjectTests
+from selftest.simple_ci_tests import SimpleCITests
 
 classes = [ BuildStatusPersistenceTests,
 	PathResolverTest,
@@ -33,7 +34,8 @@ classes = [ BuildStatusPersistenceTests,
 	RunWithTimeoutTest,
 	ScmFactoryTests,
 	SimpleProjectTests,
-	BuildScriptInterfaceTests
+	BuildScriptInterfaceTests,
+	SimpleCITests
 ]
 s = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, classes ) )
 unittest.TextTestRunner( verbosity = 2 ).run( s )

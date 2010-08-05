@@ -37,6 +37,11 @@ class SimpleProjectTests( MomTestCase ):
 		runner.run()
 		return runner
 
+	def testUsageHelp( self ):
+		cmd = '{0} {1} -h'.format( sys.executable, SimpleProjectTests.BuildScriptName )
+		runner = self.runCommand( cmd, 'build script usage help' )
+		self.assertEquals( runner.getReturnCode(), 0 )
+
 	def testQueryProjectName( self ):
 		runner = self._querySetting( Settings.ProjectName )
 		self.assertEquals( runner.getReturnCode(), 0 )
