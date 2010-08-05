@@ -19,6 +19,7 @@
 import re
 from core.Exceptions import ConfigurationError
 from core.modules.scm.SCMGit import SCMGit
+from core.modules.scm.SCMSubversion import SCMSubversion
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
 
@@ -42,6 +43,8 @@ class SourceCodeProviderFactory( MObject ):
 		scm = None
 		if implementation == 'git':
 			scm = SCMGit()
+		if implementation == 'svn':
+			scm = SCMSubversion()
 		else:
 			raise ConfigurationError( 'Cannot create source code provider for identifier "{0}", unknown implementation'
 									.format( implementation ) )
