@@ -35,6 +35,9 @@ class SourceCodeProvider( Plugin ):
 		self.__srcDir = None
 		self.__description = None
 
+	def getIdentifier( self ):
+		raise AbstractMethodCalledError
+
 	def setUrl( self, url ):
 		self.__url = url
 
@@ -98,7 +101,7 @@ class SourceCodeProvider( Plugin ):
 		revisions = self._getRevisionsSince( revision, cap )
 		lines = []
 		for revision in revisions:
-			line = '{0} {1} {2}'.format( revision[0], revision[1], revision[2] )
+			line = '{0} {1} {2}:{3}'.format( revision[0], revision[1], self.getIdentifier(), revision[2] )
 			lines.append( line )
 		return '\n'.join( lines )
 

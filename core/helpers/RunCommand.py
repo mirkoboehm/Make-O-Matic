@@ -45,11 +45,11 @@ class _CommandRunner( Thread ):
 		return self._runner
 
 	def run( self ):
+		self.__started = True
 		mApp().debugN( self._getRunner(), 4, 'executing "{0}"'.format( self._getRunner().getCommand() ) )
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
-		self.__started = True
 		p = subprocess.Popen ( self._getRunner().getCommand(), shell = True, stdout = subprocess.PIPE, stderr = stderrValue )
 		self._pid = p.pid
 		output, error = p.communicate()
@@ -57,7 +57,7 @@ class _CommandRunner( Thread ):
 		self._getRunner()._setStdErr( error )
 		self._getRunner()._setReturnCode( p.returncode )
 		self.__finished = True
-		mApp().debugN( self, 4, 'finished, return code {0}'.format( p.returncode ) )
+		mApp().debugN( self._getRunner(), 4, 'finished, return code {0}'.format( p.returncode ) )
 
 	def wasStarted( self ):
 		return self.__started

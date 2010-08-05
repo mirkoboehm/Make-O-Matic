@@ -162,7 +162,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				.format( buildInfo.getRevision(), buildScript, projectName ) )
 			self.saveBuildInfo( [ buildInfo ] )
 
-	def listNewBuildInfos( self, project ):
+	def listNewBuildInfos( self ):
 		conn = self.getConnection()
 		try:
 			c = conn.cursor()
@@ -173,19 +173,19 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				buildInfo = self.__makeBuildInfoFromRow( row )
 				buildInfos.append( buildInfo )
 			if buildInfos:
-				project.debug( self, 'build queue:' )
-				project.debug( self, '{0} {1}: {2} - {3}'.format( 
+				mApp().debug( self, 'build queue:' )
+				mApp().debug( self, '{0} {1}: {2} - {3}'.format( 
 					buildInfo.getBuildType().upper() or ' ',
 					buildInfo.getProjectName(),
 					buildInfo.getRevision(),
 					buildInfo.getUrl() ) )
 			else:
-				project.debug( self, 'build queue is empty.' )
+				mApp().debug( self, 'build queue is empty.' )
 			return buildInfos
 		finally:
 			c.close()
 
-	def performBuild( self, project, buildInfo ):
+	def performBuild( self, buildInfo ):
 		"""Start a build process for a new revision. baseDir is the directory where all builds go. To build 
 		different revisions and build types under it, subdirectories have to be used."""
 		buildType = buildInfo.getBuildType().lower()
@@ -206,10 +206,10 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		directory = os.path.normpath( os.path.join( os.getcwd(), baseDir, buildType, name, subfolder ) )
 		# prepare build directory:
 		if os.path.isdir( directory ):
-			project.debug( self, 'found remainders of a previous build, nuking it...' )
+			mApp().debug( self, 'found remainders of a previous build, nuking it...' )
 			try:
 				shutil.rmtree( directory )
-				project.debug( self, '...that was good!' )
+				mApp().debug( self, '...that was good!' )
 			except ( OSError, IOError ) as e:
 				raise ConfigurationError( 'Remnants of a previous build exist at "{0}" and cannot be deleted, bad Reason: {1}.'
 					.format( directory, e ) )
@@ -226,10 +226,10 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			rev = 'revision ' + str( rev )
 		else:
 			rev = 'latest revision'
-		project.message( self, 'starting build job for project "{0}" at revision {1}.'.format( buildInfo.getProjectName(), rev ) )
+		mApp().message( self, 'starting build job for project "{0}" at revision {1}.'.format( buildInfo.getProjectName(), rev ) )
 		oldPwd = os.getcwd()
 		os.chdir( directory )
-		oldIndent = extend_debug_prefix( project, buildInfo.getProjectName() )
+		oldIndent = extend_debug_prefix( buildInfo.getProjectName() )
 		runner = RunCommand( cmd, 24 * 60 * 60, True ) # we have builds that run 15h
 		try:
 			runner.run()
@@ -239,20 +239,20 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 					text = runner.getStdOut() or b''
 					f.write( text.decode() )
 			except Exception as e:
-				project.message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
+				mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
 					.format( e ) )
 			os.chdir( oldPwd )
-			restore_debug_prefix( project, oldIndent )
+			restore_debug_prefix( oldIndent )
 			try:
 				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
 				self.updateBuildInfo( buildInfo )
 			except Exception as e:
-				project.message( self, 'Problem! updating the build status failed during handling an exception! {0}1'
+				mApp().message( self, 'Problem! updating the build status failed during handling an exception! {0}1'
 					.format( e ) )
 		if runner.getReturnCode() != 0:
-			project.message( self, 'build failed for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
+			mApp().message( self, 'build failed for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
 			# FIXME send out email reports on configuration or MOM errors
-			project.message( self, 'exit code {0}'.format( runner.getReturnCode() ) )
+			mApp().message( self, 'exit code {0}'.format( runner.getReturnCode() ) )
 			print( """\
 -->   ____        _ _     _   _____     _ _          _ 
 -->  | __ ) _   _(_) | __| | |  ___|_ _(_) | ___  __| |
@@ -262,7 +262,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 --> 
 """ )
 		else:
-			project.message( self, 'build succeeded for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
+			mApp().message( self, 'build succeeded for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
 			print( """\
 -->   _         _ _    _      _
 -->  | |__ _  _(_) |__| |  __| |___ _ _  ___
@@ -318,7 +318,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		buildInfos.reverse()
 		return buildInfos
 
-	def takeBuildInfoAndBuild( self, project ):
+	def takeBuildInfoAndBuild( self ):
 		'''Take a new revision from the build job list. Mark it as pending, and build it. Mark it as done afterwards.'''
 		with self.getConnection() as conn:
 			buildInfos = self._loadBuildInfo( conn, BuildInfo.Status.NewRevision )
@@ -329,7 +329,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			else:
 				return False
 		try:
-			self.performBuild( project, buildInfo )
+			self.performBuild( buildInfo )
 		finally:
 			with self.getConnection() as conn:
 				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
