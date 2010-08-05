@@ -20,6 +20,7 @@
 import unittest
 from core.MApplication import MApplication
 from core.Build import Build
+from core.helpers.RunCommand import RunCommand
 
 class MomTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
@@ -32,3 +33,18 @@ class MomTestCase( unittest.TestCase ):
 
 	def tearDown( self ):
 		MApplication._instance = None
+
+	def runCommand( self, cmd, description ):
+		'''Helper method to run shell commands in tests. It creates a RunCommand object, runs it, 
+		and returns it. If the return code is not zero, it dumps the output of the command.'''
+		runner = RunCommand( cmd )
+		runner.run()
+		if runner.getReturnCode() != 0:
+			print( '\n' )
+			print( 'command failed: {0}'.format( description ) )
+			print( 'output:' )
+			print( runner.getStdOut().decode() )
+			print( 'error output:' )
+			print( runner.getStdErr().decode() )
+		return runner
+

@@ -23,7 +23,7 @@ import sys
 from core.Settings import Settings
 from core.helpers.RunCommand import RunCommand
 from core.helpers.GlobalMApp import mApp
-from cases.MomTestCase import MomTestCase
+from tests.helpers.MomTestCase import MomTestCase
 
 class SimpleProjectTests( MomTestCase ):
 	'''SimpleProjectTests runs the simple_project_run test build script in the three major run modes.

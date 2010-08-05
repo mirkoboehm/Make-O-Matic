@@ -17,12 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
-from cases.MomTestCase import MomTestCase
+from tests.helpers.MomTestCase import MomTestCase
 import os
 from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
-from test.test_iterlen import len
 
 class BuildScriptInterfaceTests( MomTestCase ):
 

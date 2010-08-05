@@ -16,3 +16,21 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from  tests.helpers.MomTestCase import MomTestCase
+import os
+import unittest
+import sys
+
+class SimpleCITests( MomTestCase ):
+	'''SimpleCITests executes the simple_ci tool in different ways.'''
+
+	BuildScriptName = os.path.join( 'basic', 'simple_project_run.py' )
+	ToolName = os.path.join( '..', 'tools', 'simple_ci.py' )
+
+	def testUsageHelp( self ):
+		cmd = '{0} {1} -h'.format( sys.executable, SimpleCITests.ToolName )
+		runner = self.runCommand( cmd, 'simple_ci usage help' )
+		self.assertEquals( runner.getReturnCode(), 0 )
+
+if __name__ == "__main__":
+	unittest.main()
