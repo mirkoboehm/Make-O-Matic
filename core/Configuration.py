@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Instructions import Instructions
-import os
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.executomat.Step import Step
@@ -25,8 +24,8 @@ from core.executomat.Action import Action
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Exceptions import MomError
 from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.helpers.PathResolver import PathResolver
 from core.modules.configurations.ConfFolderManager import ConfFolderManager
+import os
 
 class _BuildConfigurationAction( Action ):
 	def __init__( self, configuration ):
@@ -37,6 +36,9 @@ class _BuildConfigurationAction( Action ):
 	def run( self ):
 		mApp().debug( self.__config, 'building configuration "{0}"'.format( self.__config.getName() ) )
 		self.__config.getTimeKeeper().start()
+		mApp().debugN( self, 2, 'saving working directory and environment variables' )
+		oldenv = os.environ.copy()
+		oldcwd = os.getcwd()
 		try:
 			self.__config.getExecutomat().run( self.__config )
 			return 0
@@ -45,6 +47,8 @@ class _BuildConfigurationAction( Action ):
 			# mApp().registerReturnCode( e.getReturnCode() )
 			return e.getReturnCode()
 		finally:
+			os.environ = oldenv
+			os.chdir( oldcwd )
 			self.__config.getTimeKeeper().stop()
 			mApp().debug( self.__config, 'finished building configuration "{0}"'.format( self.__config.getName() ) )
 
