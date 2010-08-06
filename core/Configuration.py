@@ -17,12 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Instructions import Instructions
+import os
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.executomat.Step import Step
 from core.executomat.Action import Action
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Exceptions import MomError
+from core.helpers.FilesystemAccess import make_foldername_from_string
+from core.helpers.PathResolver import PathResolver
+from core.modules.configurations.ConfFolderManager import ConfFolderManager
 
 class _BuildConfigurationAction( Action ):
 	def __init__( self, configuration ):
@@ -56,12 +60,20 @@ class Configuration( Instructions ):
 		self.setProject( project )
 		project.addChild( self )
 		self.__timeKeeper = TimeKeeper()
+		self.setBaseDir( make_foldername_from_string( configName ) )
+		self.addPlugin( ConfFolderManager( self ) )
 
 	def setProject( self, project ):
 		self.__project = project
 
 	def getProject( self ):
 		return self.__project
+
+	def setBaseDir( self, baseDir ):
+		self.__baseDir = baseDir
+
+	def getBaseDir( self ):
+		return self.__baseDir
 
 	def getTimeKeeper( self ):
 		return self.__timeKeeper

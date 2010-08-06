@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.executomat.Action import Action
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_path
 import os
 from core.helpers.GlobalMApp import mApp
 
@@ -31,17 +31,17 @@ class MkDirAction( Action ):
 		self.setPath( path )
 
 	def setPath( self, path ):
-		check_for_nonempty_string( path, "The directory to create must be a non-empty name of a directory!" )
+		check_for_path( path, "The directory to create must be a non-empty name of a directory!" )
 		self.__path = path
 
 	def getPath( self ):
 		return self.__path
 
 	def run( self ):
-		check_for_nonempty_string( self.getPath(), "No directory specified!" )
+		check_for_path( self.getPath(), "No directory specified!" )
 		mApp().debugN( self, 4, 'creating directory "{0}"'.format( self.getPath() ) )
 		try:
-			os.makedirs( self.getPath() )
+			os.makedirs( str( self.getPath() ) )
 			return 0
 		except ( OSError, IOError ) as e:
 			mApp().debug( self, 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) ) )

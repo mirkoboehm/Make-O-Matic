@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.executomat.Action import Action
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_path
 import shutil
 from core.helpers.GlobalMApp import mApp
 
@@ -29,7 +29,7 @@ class RmDirAction( Action ):
 		self.setPath( path )
 
 	def setPath( self, path ):
-		check_for_nonempty_string( path, "The directory to create must be a non-empty name of a directory!" )
+		check_for_path( path, "The directory to create must be a non-empty name of a directory!" )
 		self.__path = path
 
 	def getPath( self ):
@@ -37,10 +37,10 @@ class RmDirAction( Action ):
 
 	# FIXME Are result and the return value redundant? How to enforce setting result?
 	def run( self ):
-		check_for_nonempty_string( self.getPath(), "No directory specified!" )
+		check_for_path( self.getPath(), "No directory specified!" )
 		mApp().debugN( self, 2, 'deleting directory "{0}"'.format( self.getPath() ) )
 		try:
-			shutil.rmtree( self.getPath(), False )
+			shutil.rmtree( str( self.getPath() ), False )
 			return 0
 		except ( OSError, IOError ) as e:
 			mApp().debug( self, 'error deleting directory "{0}": {1}'

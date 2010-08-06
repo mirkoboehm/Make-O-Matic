@@ -57,6 +57,8 @@ class Defaults( MObject ):
 	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
 	# ----- Configuration settings (not specific to individual configurations, but to all)
 	ConfigurationBuildSteps = 'configuration.buildsteps'
+	ConfigurationBuildDir = 'configuration.builddir'
+	ConfigurationTargetDir = 'configuration.targetdir'
 	# ----- RSync publisher settings (should be set in .mom/config.py):
 	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
 	# ----- reporter settings:
@@ -117,8 +119,10 @@ class Defaults( MObject ):
 			[ 'conf-make-test', 'mcdhpsf', False ],
 			[ 'conf-make-install', 'mcdhpsf', False ],
 			[ 'conf-package', 'dsf', False ],
-			[ 'conf-cleanup', 'mcdhpsf', False ],
+			[ 'conf-cleanup', 'cdsf', False ],
 		]
+		self.getSettings()[ Defaults.ConfigurationBuildDir ] = 'build'
+		self.getSettings()[ Defaults.ConfigurationTargetDir ] = 'install'
 		# ----- simple_ci settings:
 		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
 
