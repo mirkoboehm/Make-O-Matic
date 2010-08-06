@@ -36,7 +36,7 @@ class _BuildConfigurationAction( Action ):
 	def run( self ):
 		mApp().debug( self.__config, 'building configuration "{0}"'.format( self.__config.getName() ) )
 		self.__config.getTimeKeeper().start()
-		mApp().debugN( self, 2, 'saving working directory and environment variables' )
+		mApp().debugN( self, 3, 'saving working directory and environment variables' )
 		oldenv = os.environ.copy()
 		oldcwd = os.getcwd()
 		try:
@@ -49,6 +49,7 @@ class _BuildConfigurationAction( Action ):
 		finally:
 			os.environ = oldenv
 			os.chdir( oldcwd )
+			mApp().debugN( self, 3, 'working directory and environment variables restored' )
 			self.__config.getTimeKeeper().stop()
 			mApp().debug( self.__config, 'finished building configuration "{0}"'.format( self.__config.getName() ) )
 
