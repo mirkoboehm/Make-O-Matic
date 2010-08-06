@@ -19,7 +19,6 @@
 
 from __future__ import print_function
 
-import sys
 from core.modules.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.helpers.TimeKeeper import TimeKeeper

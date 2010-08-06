@@ -43,7 +43,7 @@ class SourceCodeProviderFactory( MObject ):
 		scm = None
 		if implementation == 'git':
 			scm = SCMGit()
-		if implementation == 'svn':
+		elif implementation == 'svn':
 			scm = SCMSubversion()
 		else:
 			raise ConfigurationError( 'Cannot create source code provider for identifier "{0}", unknown implementation'

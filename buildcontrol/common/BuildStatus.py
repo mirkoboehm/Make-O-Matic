@@ -17,16 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-import sqlite3
+import sqlite3, sys, os, shutil
 from buildcontrol.common.BuildInfo import BuildInfo
 from core.helpers.RunCommand import RunCommand
-import sys
 from core.Exceptions import MomError, ConfigurationError
 from core.Settings import Settings
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.FilesystemAccess import make_foldername_from_string
-import os
-import shutil
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 from core.helpers.GlobalMApp import mApp
 
