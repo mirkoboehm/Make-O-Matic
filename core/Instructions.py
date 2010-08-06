@@ -74,6 +74,8 @@ class Instructions( MObject ):
 			child.runWrapups()
 
 	def runShutDowns( self ):
+		for child in self.getChildren():
+			child.runShutDowns()
 		mApp().debugN( self, 2, 'shutting down' )
 		for plugin in self.getPlugins():
 			try:
@@ -84,5 +86,4 @@ An error occurred during shutdown: "{0}"
 Offending module: "{1}" 
 This error will not change the return code of the script!'''.format( str( e ), plugin.getName() )
 				mApp().message( self, text )
-		for child in self.getChildren():
-			child.runShutDowns()
+
