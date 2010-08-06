@@ -51,9 +51,10 @@ class Configuration( Instructions ):
 	'''Configuration represents a variant of how a project is built.
 	It is always related to a project.'''
 
-	def __init__( self, configName ):
+	def __init__( self, project, configName ):
 		Instructions.__init__( self, configName )
-		self.setProject( None )
+		self.setProject( project )
+		project.addChild( self )
 		self.__timeKeeper = TimeKeeper()
 
 	def setProject( self, project ):

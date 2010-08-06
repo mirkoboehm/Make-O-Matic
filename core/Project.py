@@ -26,7 +26,6 @@ from core.Settings import Settings
 from core.Exceptions import MomError, ConfigurationError
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
-from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.Instructions import Instructions
 from core.helpers.GlobalMApp import mApp
 from core.executomat.Step import Step
@@ -51,10 +50,6 @@ class Project( Instructions ):
 
 	def getBuild( self ):
 		return self.__build
-
-	def addConfiguration( self, configuration ):
-		configuration.setProject( self )
-		self.addChild( configuration )
 
 	def createScm( self, description ):
 		factory = SourceCodeProviderFactory()
@@ -143,18 +138,3 @@ class Project( Instructions ):
 			self.getExecutomat().run( self )
 		finally:
 			self.getTimeKeeper().stop()
-
-def makeProject( projectName = None,
-				projectVersionNumber = None, projectVersionName = None,
-				scmUrl = None ):
-	'''Create a standard default Project object.
-	A default project will have a ConsoleLogger, and a ConsoleReporter.
-	makeProject will also parse the configuration files.
-	'''
-	project = Project( projectName )
-	reporter = ConsoleReporter()
-	project.addPlugin( reporter )
-	mApp().getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
-	mApp().getSettings().set( Settings.ProjectVersionName, projectVersionName )
-	project.createScm( scmUrl )
-	return project
