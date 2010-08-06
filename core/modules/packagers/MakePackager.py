@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.modules.PackageProvider import PackageProvider
+from core.modules.packagers.PackageProvider import PackageProvider
 from core.executomat.ShellCommandAction import ShellCommandAction
 
 class MakePackager( PackageProvider ):
