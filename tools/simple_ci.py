@@ -181,15 +181,9 @@ class SimpleCI( MApplication ):
 			self.debug( self, '*** slave finished with exit code {0}. ***'.format( result ) )
 			if self.getPerformTestBuilds():
 				break
-			delay = 10 * 60
-			if result != 0:
-				# in case an error returned, we wait even longer, to not flood the server in case of a broken build script
-				delay = 30 * 60
-			self.debug( self, 'sleeping for {0} seconds.'.format( delay ) )
-			self.debugN( self, 2, 'Z' )
-			self.debugN( self, 2, 'z' )
-			self.debugN( self, 2, '.' )
-			time.sleep( delay )
+			period = 5
+			self.debug( self, 'short break of {0} seconds'.format( period ) )
+			time.sleep( period )
 
 	def beServant( self ):
 		self.debug( self, 'running in slave mode' )
@@ -211,22 +205,33 @@ class SimpleCI( MApplication ):
 		# FIXME Mirko
 		# buildScripts = BuildControl.DoSanityChecks( BaseDir, buildScripts, buildType )
 		# do the stuff
+		sleepPeriod = 5 * 60 # if there was nothing to do, wait a little before retrying, to not hog the remote side
 		try:
 			if self.getPerformTestBuilds():
 				self.getProject().message( self, 'will do a test build for every product' )
-				raise MomError( 'Not implemented: text builds mode!' )
+				raise MomError( 'Not implemented: test builds mode!' )
 				# FIXME Mirko
 				# runTestBuildJobs( Options, folderScripts )
 			else:
-				self.performBuilds( buildScripts )
+				count = self.performBuilds( buildScripts )
+				if count:
+					sleepPeriod = 5 # just to avoid spawn races in case there is some problem
 		except MomException as e:
 			self.registerReturnCode( e.getReturnCode() )
 			self.message( self, 'error during slave run, exit code {0}: {1}'.format( 
 				self.getReturnCode(), e ) )
+			sleepPeriod = 15 * 60 # if there is a problem, the process interrupts for a little longer, to allow for it to be fixed
+		finally:
+			self.debug( self, 'sleeping for {0} seconds.'.format( sleepPeriod ) )
+			self.debugN( self, 2, 'Z' )
+			self.debugN( self, 2, 'z' )
+			self.debugN( self, 2, '.' )
+			time.sleep( sleepPeriod )
 			self.debug( self, 'done, exiting.' )
 
 	def performBuilds( self, buildScripts ):
 		error = []
+		x = 0
 		# register all revisions committed since the last run in the database:
 		if self.getFindRevisions():
 			self.debug( self, 'build control: discovering new revisions' )
@@ -244,13 +249,14 @@ class SimpleCI( MApplication ):
 			self.debug( self, 'build control: performing up to {0} builds for new revisions'.format( cap ) )
 			self.getBuildStatus().listNewBuildInfos()
 			for x in range( cap ):
-				x = x
 				if not self.getBuildStatus().takeBuildInfoAndBuild():
 					break
+			return x
 		else:
 			self.debugN( self, 2, 'build control: skipping build phase' )
 		if error:
 			raise MomError( '. '.join( error ) )
+		return x
 
 	def execute( self ):
 		if self.getSlaveMode():
