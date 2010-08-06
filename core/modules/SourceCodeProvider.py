@@ -128,10 +128,6 @@ class SourceCodeProvider( Plugin ):
 		"""Create a Step that will export the source code to the target directory."""
 		raise AbstractMethodCalledError()
 
-	def makePackageStep( self, instructions, ):
-		"""Create a src archive of the project and put it into the packages directory."""
-		raise AbstractMethodCalledError()
-
 	def preFlightCheck( self, instructions ):
 		"""Overload"""
 		self._checkInstallation( instructions )
@@ -142,7 +138,6 @@ class SourceCodeProvider( Plugin ):
 		options have been applied to them. It can be used to insert actions into the build
 		steps, for example."""
 		self.makeCheckoutStep( instructions )
-		self.makePackageStep( instructions )
 		# FIXME it needs to be decided by the builder if this gets called!
 		# self.makeExportStep( project )
 

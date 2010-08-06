@@ -130,10 +130,6 @@ class SCMGit( SourceCodeProvider ):
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 
-	def makePackageStep( self, instructions, ):
-		"""Create a src tarball of the project and put it into the packages directory."""
-		# project.message( self, 'NOT IMPLEMENTED!' )
-
 	def _getHiddenClonePath( self ):
 		clonename = make_foldername_from_string( self.getUrl() )
 		hiddenClone = os.path.join( self.getCloneArmyDir(), clonename )

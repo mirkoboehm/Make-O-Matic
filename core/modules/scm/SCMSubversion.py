@@ -102,10 +102,6 @@ class SCMSubversion(SourceCodeProvider):
         step.addMainAction( checkout )
         return step
 
-
-    def makePackageStep( self, project, ):
-        """Create a src tarball of the project and put it into the packages directory."""
-        # project.message( self, 'NOT IMPLEMENTED!' )
         
 def parseLogEntry( logentry ):
     """Parse one SVN log entry in XML format, return tuple (committer, message, revision, commitTime)"""
