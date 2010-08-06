@@ -28,6 +28,7 @@ from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 from core.Exceptions import MomException
 import sys
+from core.Configuration import Configuration
 
 build = Build( minimumMomVersion = "0.5.0" )
 # FIXME this should go into a convenience function to set up a standard build
@@ -62,6 +63,10 @@ project.addPlugin( prep )
 dox = DoxygenGenerator()
 dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
+
+# set up a configuration
+python3 = Configuration( 'Python 3' )
+project.addConfiguration( python3 )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getDocsDir ) ) )

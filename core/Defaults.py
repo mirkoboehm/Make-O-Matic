@@ -55,6 +55,8 @@ class Defaults( MObject ):
 	ProjectTempDir = 'project.tempdir'
 	ProjectLogDir = 'project.logdir'
 	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
+	# ----- Configuration settings (not specific to individual configurations, but to all)
+	ConfigurationBuildSteps = 'configuration.buildsteps'
 	# ----- RSync publisher settings (should be set in .mom/config.py):
 	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
 	# ----- reporter settings:
@@ -106,6 +108,17 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ProjectDocsDir ] = 'docs'
 		self.getSettings()[ Defaults.ProjectTempDir ] = 'tmp'
 		self.getSettings()[ Defaults.ProjectLogDir ] = 'log'
+		# ----- configuration settings:
+		self.getSettings()[ Defaults.ConfigurationBuildSteps ] = [ # name, modes, execute-on-failure
+			[ 'conf-create-folders', 'mcdhpsf', False ],
+			[ 'conf-export-sources', 'mcdhpsf', False ],
+			[ 'conf-configure', 'mcdhpsf', False ],
+			[ 'conf-make', 'mcdhpsf', False ],
+			[ 'conf-make-test', 'mcdhpsf', False ],
+			[ 'conf-make-install', 'mcdhpsf', False ],
+			[ 'conf-package', 'dsf', False ],
+			[ 'conf-cleanup', 'mcdhpsf', False ],
+		]
 		# ----- simple_ci settings:
 		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
 

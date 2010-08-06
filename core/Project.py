@@ -52,6 +52,10 @@ class Project( Instructions ):
 	def getBuild( self ):
 		return self.__build
 
+	def addConfiguration( self, configuration ):
+		configuration.setProject( self )
+		self.addChild( configuration )
+
 	def createScm( self, description ):
 		factory = SourceCodeProviderFactory()
 		scm = factory.makeScmImplementation( description )
