@@ -40,12 +40,10 @@ class Executomat( MObject ):
 		MObject.__init__( self, name )
 		self.__steps = []
 		self.__timeKeeper = TimeKeeper()
-		self.__logDir = '.'
+		self.setLogfileName( None )
+		self.setLogDir( None )
 		self.__logfile = None
 		self.__failedStep = None
-		# FIXME set outside the constructor somewhere
-		self.setLogfileName( 'givemeanothername.dummy' )
-		# self.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
 
 	def setLogDir( self, path ):
 		"""Set the directory where all log information is stored."""

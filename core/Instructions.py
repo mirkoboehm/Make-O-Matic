@@ -18,6 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
+from core.executomat.Executomat import Executomat
+from core.Settings import Settings
+from core.helpers.FilesystemAccess import make_foldername_from_string
+import os
+from core.Exceptions import ConfigurationError
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -28,7 +33,6 @@ class Instructions( MObject ):
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
-		from core.executomat.Executomat import Executomat
 		self.__executomat = Executomat( 'Exec-o-Matic' )
 		self.__plugins = []
 		self.__instructions = []
@@ -49,6 +53,18 @@ class Instructions( MObject ):
 		assert isinstance( instructions, Instructions )
 		self.__instructions.append( instructions )
 
+	def configureRelativeLogDir( self, parent ):
+		parentLogDir = parent.getExecutomat().getLogDir()
+		assert os.path.isdir( parentLogDir )
+		foldername = make_foldername_from_string( self.getName() )
+		abspath = os.path.abspath( os.path.join( parentLogDir, foldername ) )
+		try:
+			os.makedirs( abspath )
+			self.getExecutomat().setLogDir( abspath )
+		except ( OSError, IOError )as e:
+			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
+				.format( abspath, self.getName(), e ) )
+
 	def execute( self ):
 		'''If execute is implemented, it is supposed to execute the pay load of the instructions. 
 		Execute is not required, many modules only need to act during the different phases.
@@ -60,11 +76,14 @@ class Instructions( MObject ):
 		[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
 		[ child.runPreFlightChecks() for child in self.getChildren() ]
 
-
 	def runSetups( self ):
 		mApp().debugN( self, 2, 'setting up' )
+		# FIXME set log dir so that nested executomats do not override the file
+		self.__executomat.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
 		[ plugin.setup( self ) for plugin in self.getPlugins() ]
 		for child in self.getChildren():
+			if self.getExecutomat().getLogDir():
+				child.configureRelativeLogDir( self )
 			child.runSetups()
 
 	def runWrapups( self ):
