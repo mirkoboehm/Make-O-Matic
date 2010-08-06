@@ -64,9 +64,11 @@ dox = DoxygenGenerator()
 dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 
-# set up a configuration
-python3 = Configuration( 'Python 3' )
+# set up configurations:
+python3 = Configuration( 'build using Python 3' )
 project.addConfiguration( python3 )
+python2 = Configuration( 'build using Python 2.6' )
+project.addConfiguration( python2 )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getDocsDir ) ) )
