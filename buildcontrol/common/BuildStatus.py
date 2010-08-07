@@ -191,16 +191,9 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		name = make_foldername_from_string( buildInfo.getProjectName() )
 		# find suitable names for the different build dirs:
 		# <build type>/<project, branch or tag name>-revision/
-		# FIXME baseDir needs to be in settings
+		# FIXME get baseDir from settings
 		baseDir = 'builds'
-		subfolder = ''
-		if buildType in 'ecsf':
-			subfolder = str( rev ).rjust( 8, '0' )
-		elif buildType == 'd':
-			subfolder = str( rev )
-		else:
-			assert not 'implemented'
-		subfolder = make_foldername_from_string( subfolder )
+		subfolder = make_foldername_from_string( rev )
 		directory = os.path.normpath( os.path.join( os.getcwd(), baseDir, buildType, name, subfolder ) )
 		# prepare build directory:
 		if os.path.isdir( directory ):
@@ -209,7 +202,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				shutil.rmtree( directory )
 				mApp().debug( self, '...that was good!' )
 			except ( OSError, IOError ) as e:
-				raise ConfigurationError( 'Remnants of a previous build exist at "{0}" and cannot be deleted, bad Reason: {1}.'
+				raise ConfigurationError( 'Remnants of a previous build exist at "{0}" and cannot be deleted, bad. Reason: {1}.'
 					.format( directory, e ) )
 		try:
 			os.makedirs( directory )
@@ -259,6 +252,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 -->  |____/ \__,_|_|_|\__,_| |_|  \__,_|_|_|\___|\__,_|
 --> 
 """ )
+			return False
 		else:
 			mApp().message( self, 'build succeeded for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
 			print( """\
@@ -268,6 +262,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 -->  |_.__/\_,_|_|_\__,_| \__,_\___/_||_\___|
 --> 
 """ )
+		return True
 
 	def getNewestBuildInfo( self, buildScript ):
 		conn = self.getConnection()

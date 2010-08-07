@@ -208,10 +208,9 @@ class SimpleCI( MApplication ):
 		sleepPeriod = 5 * 60 # if there was nothing to do, wait a little before retrying, to not hog the remote side
 		try:
 			if self.getPerformTestBuilds():
-				self.getProject().message( self, 'will do a test build for every product' )
-				raise MomError( 'Not implemented: test builds mode!' )
-				# FIXME Mirko
-				# runTestBuildJobs( Options, folderScripts )
+				sleepPeriod = 0
+				self.message( self, 'will do a test build for the latest revision of every build script' )
+				self.runBuildScriptTestBuild( buildScripts )
 			else:
 				count = self.performBuilds( buildScripts )
 				if count:
@@ -222,11 +221,12 @@ class SimpleCI( MApplication ):
 				self.getReturnCode(), e ) )
 			sleepPeriod = 15 * 60 # if there is a problem, the process interrupts for a little longer, to allow for it to be fixed
 		finally:
-			self.debug( self, 'sleeping for {0} seconds.'.format( sleepPeriod ) )
-			self.debugN( self, 2, 'Z' )
-			self.debugN( self, 2, 'z' )
-			self.debugN( self, 2, '.' )
-			time.sleep( sleepPeriod )
+			if sleepPeriod:
+				self.debug( self, 'sleeping for {0} seconds.'.format( sleepPeriod ) )
+				self.debugN( self, 2, 'Z' )
+				self.debugN( self, 2, 'z' )
+				self.debugN( self, 2, '.' )
+				time.sleep( sleepPeriod )
 			self.debug( self, 'done, exiting.' )
 
 	def performBuilds( self, buildScripts ):
@@ -270,6 +270,30 @@ class SimpleCI( MApplication ):
 				self.message( self, 'ERROR in build script "{0}": error querying the project name. Build script disregarded.'
 					.format( buildScript ) )
 		return goodScripts
+
+	def runBuildScriptTestBuild( self, buildScripts ):
+		error = False
+		caughtException = False
+		for script in buildScripts:
+			iface = BuildScriptInterface( script )
+			name = iface.querySetting( Settings.ProjectName )
+			buildInfo = self.getBuildStatus().getBuildInfoForInitialRevision( script, name )
+			buildInfo.setBuildType( 's' )
+			try:
+				if self.getBuildStatus().performBuild( buildInfo ):
+					self.message( self, 'build script test run finished successfully for "{0}".'.format( script ) )
+				else:
+					self.message( self, 'build script test run finished with an error for "{0}".'.format( script ) )
+					error = True
+			except MomError:
+				self.message( 'self, build script test run triggered an exception for "{0}"'.format( script ) )
+				caughtException = True
+		if caughtException:
+			raise MomError( 'exception during build script test runs.' )
+		elif error:
+			self.registerReturnCode( 1 )
+		else:
+			pass
 
 	def execute( self ):
 		if self.getSlaveMode():
