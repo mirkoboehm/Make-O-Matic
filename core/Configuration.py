@@ -92,7 +92,6 @@ class Configuration( Instructions ):
 		Instructions.runSetups( self )
 
 	def calculateBuildSequence( self ):
-		assert self.getProject()
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
 		allBuildSteps = mApp().getSettings().get( Settings.ConfigurationBuildSteps, True )
 		buildSteps = []
@@ -105,5 +104,8 @@ class Configuration( Instructions ):
 			stepName.setEnabled( buildType in types )
 			stepName.setExecuteOnFailure( executeOnFailure )
 			buildSteps.append( stepName )
+		assert self.getProject()
+		params = self.getProject().getBuild().getParameters()
+		params.applyBuildSequenceSwitches( buildSteps, 'conf' )
 		return buildSteps
 

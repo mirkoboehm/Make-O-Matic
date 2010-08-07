@@ -23,7 +23,7 @@ from core.modules.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Settings import Settings
-from core.Exceptions import MomError, ConfigurationError
+from core.Exceptions import MomError
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
 from core.Instructions import Instructions
@@ -79,13 +79,6 @@ class Project( Instructions ):
 			self.getExecutomat().addStep( step )
 		Instructions.runSetups( self )
 
-	def __getBuildSequenceDescription( self, buildSteps ):
-		# debug info:
-		texts = []
-		for stepName in buildSteps:
-			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
-		return ', '.join( texts )
-
 	def calculateBuildSequence( self, project ):
 		assert self.getBuild()
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
@@ -104,32 +97,7 @@ class Project( Instructions ):
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		# apply customizations passed as command line parameters:
-		switches = self.getBuild().getParameters().getBuildSteps()
-		if switches:
-			mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'
-						.format( self.__getBuildSequenceDescription( buildSteps ) ) )
-			customSteps = switches.split( ',' )
-			for switch in customSteps:
-				stepName = None
-				enable = None
-				if switch.startswith( 'enable-' ):
-					stepName = switch[ len( 'enable-' ) : ].strip()
-					enable = True
-				elif switch.startswith( 'disable-' ):
-					stepName = switch[ len( 'disable-' ) : ].strip()
-					enable = False
-				else:
-					raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
-											.format( switch ) )
-				# apply:
-				found = False
-				for step in buildSteps:
-					if step.getName() == stepName:
-						step.setEnabled( enable )
-						found = True
-				if not found:
-					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
-		mApp().debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
+		self.getBuild().getParameters().applyBuildSequenceSwitches( buildSteps, 'project' )
 		return buildSteps
 
 	def execute( self ):

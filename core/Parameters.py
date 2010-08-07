@@ -22,6 +22,7 @@ import sys
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.Exceptions import ConfigurationError
+from core.helpers.GlobalMApp import mApp
 
 class Parameters( MObject ):
 	'''Parameters parses and stores the command line parameters (arguments) of a script.'''
@@ -109,3 +110,41 @@ class Parameters( MObject ):
 		if len( self._getArgs() ) > 1:
 			runMode = self._getArgs()[1]
 			settings.set( settings.ScriptRunMode, runMode )
+
+	def __getBuildSequenceDescription( self, buildSteps ):
+		# debug info:
+		texts = []
+		for stepName in buildSteps:
+			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
+		return ', '.join( texts )
+
+	def applyBuildSequenceSwitches( self, buildSteps, prefix ):
+		mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'
+			.format( self.__getBuildSequenceDescription( buildSteps ) ) )
+		switches = self.getBuildSteps()
+		if switches:
+			customSteps = switches.split( ',' )
+			for switch in customSteps:
+				stepName = None
+				enable = None
+				if switch.startswith( 'enable-' ):
+					stepName = switch[ len( 'enable-' ) : ].strip()
+					enable = True
+				elif switch.startswith( 'disable-' ):
+					stepName = switch[ len( 'disable-' ) : ].strip()
+					enable = False
+				else:
+					raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
+											.format( switch ) )
+				if stepName.startswith( prefix ):
+					# apply:
+					found = False
+					for step in buildSteps:
+						if step.getName() == stepName:
+							step.setEnabled( enable )
+							found = True
+							break
+					if not found:
+						raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
+			mApp().debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
+
