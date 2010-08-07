@@ -102,8 +102,6 @@ class FolderManager( Plugin ):
 		# now create actions:
 		create = project.getExecutomat().getStep( 'project-create-folders' )
 		delete = project.getExecutomat().getStep( 'project-cleanup' )
-		# log is never deleted
-		create.addMainAction( MkDirAction( 'log' ) )
 		for folder in ( self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
