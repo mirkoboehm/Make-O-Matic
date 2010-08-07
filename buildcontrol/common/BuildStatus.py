@@ -316,16 +316,20 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		buildInfos.reverse()
 		return buildInfos
 
-	def takeBuildInfoAndBuild( self ):
+	def takeBuildInfoAndBuild( self, buildScripts ):
 		'''Take a new revision from the build job list. Mark it as pending, and build it. Mark it as done afterwards.'''
+		buildInfo = None
 		with self.getConnection() as conn:
 			buildInfos = self._loadBuildInfo( conn, BuildInfo.Status.NewRevision )
-			if buildInfos:
-				buildInfo = buildInfos[0] # one of the highest priority builds
-				buildInfo.setBuildStatus( BuildInfo.Status.Pending )
-				self._updateBuildInfo( conn, buildInfo )
-			else:
-				return False
+			for build in buildInfos:
+				# the list is ordered by priority
+				if build.getBuildScript() in buildScripts:
+					build.setBuildStatus( BuildInfo.Status.Pending )
+					self._updateBuildInfo( conn, build )
+					buildInfo = build
+					break
+		if not buildInfo:
+			return False
 		try:
 			self.performBuild( buildInfo )
 		finally:

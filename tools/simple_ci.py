@@ -27,6 +27,7 @@ import optparse
 import sys
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 import time
+from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 
 class SimpleCI( MApplication ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -202,8 +203,7 @@ class SimpleCI( MApplication ):
 			buildScripts += folderScripts
 		if not buildScripts:
 			self.getProject().message( self, 'FYI: no build scripts specified.' )
-		# FIXME Mirko
-		# buildScripts = BuildControl.DoSanityChecks( BaseDir, buildScripts, buildType )
+		buildScripts = self.checkBuildScripts( buildScripts )
 		# do the stuff
 		sleepPeriod = 5 * 60 # if there was nothing to do, wait a little before retrying, to not hog the remote side
 		try:
@@ -249,7 +249,7 @@ class SimpleCI( MApplication ):
 			self.debug( self, 'build control: performing up to {0} builds for new revisions'.format( cap ) )
 			self.getBuildStatus().listNewBuildInfos()
 			for x in range( cap ):
-				if not self.getBuildStatus().takeBuildInfoAndBuild():
+				if not self.getBuildStatus().takeBuildInfoAndBuild( buildScripts ):
 					break
 			return x
 		else:
@@ -257,6 +257,19 @@ class SimpleCI( MApplication ):
 		if error:
 			raise MomError( '. '.join( error ) )
 		return x
+
+	def checkBuildScripts( self, buildScripts ):
+		goodScripts = []
+		for buildScript in buildScripts:
+			iface = BuildScriptInterface( buildScript )
+			try:
+				name = iface.querySetting( Settings.ProjectName )
+				if name:
+					goodScripts.append( buildScript )
+			except MomError:
+				self.message( self, 'ERROR in build script "{0}": error querying the project name. Build script disregarded.'
+					.format( buildScript ) )
+		return goodScripts
 
 	def execute( self ):
 		if self.getSlaveMode():
