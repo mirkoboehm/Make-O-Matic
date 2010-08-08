@@ -24,7 +24,7 @@ import sys
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
 
-	BuildScriptName = os.path.join( 'basic', 'simple_project_run.py' )
+	BuildScriptName = os.path.join( 'buildscripts', 'example_mom_buildscript.py' )
 	ToolName = os.path.join( '..', 'tools', 'simple_ci.py' )
 
 	def testUsageHelp( self ):

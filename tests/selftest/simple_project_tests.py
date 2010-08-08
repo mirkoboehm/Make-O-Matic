@@ -26,10 +26,10 @@ from core.helpers.GlobalMApp import mApp
 from tests.helpers.MomTestCase import MomTestCase
 
 class SimpleProjectTests( MomTestCase ):
-	'''SimpleProjectTests runs the simple_project_run test build script in the three major run modes.
+	'''SimpleProjectTests runs the example_mom_builscript in the three major run modes.
 	It assumes that it is executed in the tests/ sub-directory of the mom repository.'''
 
-	BuildScriptName = os.path.join( 'basic', 'simple_project_run.py' )
+	BuildScriptName = os.path.join( 'buildscripts', 'example_mom_buildscript.py' )
 
 	def _querySetting( self, name ):
 		cmd = '{0} {1} query {2}'.format( sys.executable, SimpleProjectTests.BuildScriptName, name )

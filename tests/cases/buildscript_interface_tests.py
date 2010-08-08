@@ -25,7 +25,7 @@ from core.helpers.GlobalMApp import mApp
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
-	BuildScriptName = os.path.join( 'basic', 'simple_project_run.py' )
+	BuildScriptName = os.path.join( 'buildscripts', 'example_mom_buildscript.py' )
 
 	def testQuerySetting( self ):
 		iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
