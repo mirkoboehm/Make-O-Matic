@@ -26,6 +26,7 @@ from cases.scm_factory_tests import ScmFactoryTests
 from cases.buildscript_interface_tests import BuildScriptInterfaceTests
 from selftest.simple_project_tests import SimpleProjectTests
 from selftest.simple_ci_tests import SimpleCITests
+from selftest.charm_build_tests import CharmBuildTests
 
 classes = [ BuildStatusPersistenceTests,
 	PathResolverTest,
@@ -35,7 +36,9 @@ classes = [ BuildStatusPersistenceTests,
 	ScmFactoryTests,
 	SimpleProjectTests,
 	BuildScriptInterfaceTests,
+	CharmBuildTests,
 	SimpleCITests
 ]
+
 s = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, classes ) )
 unittest.TextTestRunner( verbosity = 2 ).run( s )

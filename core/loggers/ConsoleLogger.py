@@ -51,7 +51,7 @@ class ConsoleLogger( Logger ):
 		if verbosity >= level:
 			self.debug( mapp, mobject, msg )
 
-	def preFlightCheck( self, instructions ):
+	def preFlightCheck( self ):
 		level = mApp().getSettings().get( Settings.ScriptLogLevel, True )
 		check_for_nonnegative_int( level, 'The debug level must be a non-negative integer!' )
 		if level > 0:

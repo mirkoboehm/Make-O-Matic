@@ -83,7 +83,7 @@ class SourceCodeProvider( Plugin ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
 		raise AbstractMethodCalledError
 
-	def _checkInstallation( self, instructions ):
+	def _checkInstallation( self ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
 		raise AbstractMethodCalledError
 
@@ -120,33 +120,33 @@ class SourceCodeProvider( Plugin ):
 		'''Return the identifier of the current revisions.'''
 		raise AbstractMethodCalledError
 
-	def makeCheckoutStep( self, instructions ):
+	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
 		raise AbstractMethodCalledError()
 
-	def makeExportStep( self, instructions, targetDir ):
+	def makeExportStep( self, targetDir ):
 		"""Create a Step that will export the source code to the target directory."""
 		raise AbstractMethodCalledError()
 
-	def preFlightCheck( self, instructions ):
+	def preFlightCheck( self ):
 		"""Overload"""
-		self._checkInstallation( instructions )
+		self._checkInstallation()
 		mApp().debug( self, 'SCM module initialized: {0}'.format( self.getDescription() ) )
 
-	def setup( self, instructions ):
+	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 
 		options have been applied to them. It can be used to insert actions into the build
 		steps, for example."""
-		self.makeCheckoutStep( instructions )
+		self.makeCheckoutStep()
 		# FIXME it needs to be decided by the builder if this gets called!
 		# self.makeExportStep( project )
 
-	def wrapUp( self, instructions ):
+	def wrapUp( self ):
 		"""WrapUp is called when the last step has finished. It could be used to publish 
 		the reports, for example."""
 		pass
 
-	def shutDown( self, instructions ):
+	def shutDown( self ):
 		"""Shutdown is called right before the build ends. It could be used to close
 		files or network connections.
 		ShutDown is called from the finally block of the build method, so in all normal cases, it will be called 

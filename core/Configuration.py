@@ -24,8 +24,9 @@ from core.executomat.Action import Action
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Exceptions import MomError
 from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.modules.configurations.ConfFolderManager import ConfFolderManager
+from core.modules.configurations.FolderManager import FolderManager
 import os
+from core.Project import Project
 
 class _BuildConfigurationAction( Action ):
 	def __init__( self, configuration ):
@@ -62,17 +63,18 @@ class Configuration( Instructions ):
 
 	def __init__( self, project, configName ):
 		Instructions.__init__( self, configName )
-		self.setProject( project )
 		project.addChild( self )
 		self.__timeKeeper = TimeKeeper()
 		self.setBaseDir( make_foldername_from_string( configName ) )
-		self.addPlugin( ConfFolderManager( self ) )
-
-	def setProject( self, project ):
-		self.__project = project
+		self.__folderManager = FolderManager()
+		self.addPlugin( self.__folderManager )
 
 	def getProject( self ):
-		return self.__project
+		assert isinstance( self.getParent(), Project )
+		return self.getParent()
+
+	def getFolderManager( self ):
+		return self.__folderManager
 
 	def setBaseDir( self, baseDir ):
 		self.__baseDir = baseDir

@@ -61,7 +61,6 @@ class Build( MApplication ):
 	def addProject( self, project ):
 		if not isinstance( project, Project ):
 			raise ConfigurationError( 'The project variable needs to be an instance of the Project class!' )
-		project.setBuild( self )
 		self.addChild( project )
 
 	def printAndExit( self ):

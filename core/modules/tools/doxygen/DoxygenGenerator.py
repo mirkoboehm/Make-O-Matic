@@ -45,8 +45,7 @@ class DoxygenGenerator( Plugin ):
 	def getDoxygenFile( self ):
 		return self.__doxygenFile
 
-	def preFlightCheck( self, instructions ):
-		assert instructions
+	def preFlightCheck( self ):
 		runner = RunCommand( 'doxygen --version' )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
@@ -56,11 +55,11 @@ class DoxygenGenerator( Plugin ):
 			version = lines[0].rstrip()
 			mApp().debugN( self, 1, 'doxygen found: "{0}"'.format( version ) )
 
-	def setup( self, instructions ):
+	def setup( self ):
 		check_for_path( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
-		step = instructions.getExecutomat().getStep( 'project-create-docs' )
+		step = self.getInstructions().getExecutomat().getStep( 'project-create-docs' )
 		doxygenCall = ShellCommandAction( '{0} {1}'
 			.format ( self.getDoxygenPath(), self.getDoxygenFile() ) )
-		doxygenCall.setWorkingDirectory( instructions.getScm().getSrcDir() )
+		doxygenCall.setWorkingDirectory( self.getInstructions().getScm().getSrcDir() )
 		step.addMainAction( doxygenCall )
 

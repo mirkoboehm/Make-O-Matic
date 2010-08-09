@@ -16,7 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from  tests.helpers.MomTestCase import MomTestCase
+from tests.helpers.MomTestCase import MomTestCase
 import os
 import unittest
 import sys

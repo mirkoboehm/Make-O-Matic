@@ -58,12 +58,11 @@ class SCMGit( SourceCodeProvider ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
 		raise AbstractMethodCalledError
 
-	def _checkInstallation( self, instructions ):
+	def _checkInstallation( self ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-		assert instructions
 		runner = RunCommand( 'git --version' )
 		runner.run()
-		if( runner.getReturnCode() != 0 ):
+		if runner.getReturnCode() != 0:
 			raise ConfigurationError( "SCMGit::checkInstallation: git not found." )
 		else:
 			lines = runner.getStdOut().decode().split( '\n' )
@@ -117,9 +116,10 @@ class SCMGit( SourceCodeProvider ):
 			raise ConfigurationError( 'cannot get log for the clone of "{0}" at "{1}"'
 				.format( self.getUrl(), self._getHiddenClonePath() ) )
 
-	def makeCheckoutStep( self, instructions ):
+	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
-		step = instructions.getExecutomat().getStep( 'project-checkout' )
+		assert self.getInstructions()
+		step = self.getInstructions().getExecutomat().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
 		updateClone = ShellCommandAction( 'git clone --local --depth 1 {0} .'.format ( self._getHiddenClonePath() ) )

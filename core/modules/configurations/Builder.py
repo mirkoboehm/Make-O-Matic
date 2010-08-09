@@ -16,15 +16,30 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.modules.Reporter import Reporter
-from core.modules.reporters.ProjectReport import ProjectReport
+from core.Plugin import Plugin
+from core.Exceptions import AbstractMethodCalledError
 
-class ConsoleReporter( Reporter ):
+class Builder( Plugin ):
+	'''A Builder creates the actions to build a configuration for a project. 
+	It needs to be assigned to a configuration.'''
 
 	def __init__( self, name = None ):
-		Reporter.__init__( self, name )
+		Plugin.__init__( self, name )
 
-	def wrapUp( self ):
-		report = ProjectReport( self.getInstructions() )
-		report.prepare()
-		print( report.getReport() )
+	def createPrepareSourceDirActions( self ):
+		raise AbstractMethodCalledError()
+
+	def createConfigureActions( self ):
+		raise AbstractMethodCalledError()
+
+	def createConfMakeActions( self ):
+		raise AbstractMethodCalledError()
+
+	def createConfMakeInstallActions( self ):
+		raise AbstractMethodCalledError()
+
+	def setup( self ):
+		self.createPrepareSourceDirActions()
+		self.createConfigureActions()
+		self.createConfMakeActions()
+		self.createConfMakeInstallActions()

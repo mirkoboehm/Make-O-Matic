@@ -19,7 +19,7 @@
 
 from __future__ import print_function
 
-from core.modules.FolderManager import FolderManager
+from core.modules.projects.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Settings import Settings
@@ -38,18 +38,16 @@ class Project( Instructions ):
 	def __init__( self, projectName ):
 		"""Set up the build steps, parse the command line arguments."""
 		Instructions.__init__( self, projectName )
-		self.setBuild( None )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
-		self.__folderManager = FolderManager( self )
+		self.__folderManager = FolderManager()
 		self.addPlugin( self.getFolderManager() )
 
-	def setBuild( self, build ):
-		self.__build = build
-
 	def getBuild( self ):
-		return self.__build
+		from core.Build import Build
+		assert isinstance( self.getParent(), Build )
+		return self.getParent()
 
 	def createScm( self, description ):
 		factory = SourceCodeProviderFactory()

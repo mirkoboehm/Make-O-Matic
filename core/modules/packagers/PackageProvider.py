@@ -26,22 +26,22 @@ class PackageProvider( Plugin ):
     def __init__( self, name = None ):
         """Constructor"""
         Plugin.__init__( self, name )
-        
-    def _checkInstallation( self, instructions ):
+
+    def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
         raise AbstractMethodCalledError
-    
-    def makePackageStep( self, instructions, ):
+
+    def makePackageStep( self ):
         """Create package for the project."""
         raise AbstractMethodCalledError()
-        
-    def preFlightCheck( self, instructions ):
+
+    def preFlightCheck( self ):
         """Overload"""
-        self._checkInstallation( instructions )
+        self._checkInstallation()
         mApp().debug( self, 'Packaging module initialized: {0}'.format( self.getDescription() ) )
-        
-    def setup( self, instructions ):
+
+    def setup( self ):
         """Setup is called after the package steps have been generated, and the command line 
         options have been applied to them. It can be used to insert actions into the build
         steps, for example."""
-        self.makePackageStep( instructions )
+        self.makePackageStep()

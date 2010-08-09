@@ -48,8 +48,7 @@ class RSyncPublisher( Plugin ):
 	def getLocalDir( self ):
 		return self.__localDir
 
-	def preFlightCheck( self, instructions ):
-		assert instructions
+	def preFlightCheck( self ):
 		runner = RunCommand( 'rsync --version' )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
@@ -59,7 +58,7 @@ class RSyncPublisher( Plugin ):
 			version = lines[0].rstrip()
 			mApp().debugN( self, 1, 'rsync found: "{0}"'.format( version ) )
 
-	def setup( self, instructions ):
+	def setup( self ):
 		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
 			defaultLocation = mApp().getSettings().get( Settings.RSyncPublisherUploadLocation, False )
@@ -68,10 +67,10 @@ class RSyncPublisher( Plugin ):
 			if not uploadLocation:
 				mApp().message( self, 'Upload location is empty. Not generating any actions.' )
 				return
-		step = instructions.getExecutomat().getStep( 'project-upload-docs' )
+		step = self.getInstructions().getExecutomat().getStep( 'project-upload-docs' )
 		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
 		action = ShellCommandAction( 'rsync -avz -e \'ssh -o "BatchMode yes"\' {0} {1}'.format( fromDir, uploadLocation ), 7200 )
-		action.setWorkingDirectory( instructions.getFolderManager().getBaseDir() )
+		action.setWorkingDirectory( self.getInstructions().getBaseDir() )
 		step.addMainAction( action )
 
 

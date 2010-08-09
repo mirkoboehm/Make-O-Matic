@@ -16,15 +16,20 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.modules.Reporter import Reporter
-from core.modules.reporters.ProjectReport import ProjectReport
+from tests.helpers.MomTestCase import MomTestCase
+import os
+from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
+from core.Settings import Settings
+import unittest
 
-class ConsoleReporter( Reporter ):
+class CharmBuildTests( MomTestCase ):
+	'''CharmBuildTests executes the example_charm build script with revisions known to work.'''
 
-	def __init__( self, name = None ):
-		Reporter.__init__( self, name )
+	BuildScriptName = os.path.join( 'buildscripts', 'example_charm.py' )
 
-	def wrapUp( self ):
-		report = ProjectReport( self.getInstructions() )
-		report.prepare()
-		print( report.getReport() )
+	def test_aaa_queryProjectName( self ):
+		iface = BuildScriptInterface( CharmBuildTests.BuildScriptName )
+		self.assertTrue( iface.querySetting( Settings.ProjectName ) )
+
+if __name__ == "__main__":
+	unittest.main()

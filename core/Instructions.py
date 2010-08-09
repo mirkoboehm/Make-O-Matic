@@ -23,6 +23,7 @@ from core.Settings import Settings
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
 from core.Exceptions import ConfigurationError
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -34,8 +35,28 @@ class Instructions( MObject ):
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
 		self.__executomat = Executomat( 'Exec-o-Matic' )
+		self.__parent = None # the parent instructions object
 		self.__plugins = []
 		self.__instructions = []
+
+	def _setParent( self, parent ):
+		assert isinstance( parent, Instructions )
+		self.__parent = parent
+
+	def getParent( self ):
+		return self.__parent
+
+	def _setBaseDir( self, folder ):
+		check_for_nonempty_string_or_none( folder, 'The instructions base directory must be a folder name, or None!' )
+		self.__baseDir = folder
+
+	def getBaseDir( self ):
+		try:
+			check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
+		except Exception:
+			print( 'Duh!' )
+			raise
+		return self.__baseDir
 
 	def getExecutomat( self ):
 		return self.__executomat
@@ -44,6 +65,7 @@ class Instructions( MObject ):
 		return self.__plugins
 
 	def addPlugin( self, plugin ):
+		plugin._setInstructions( self )
 		self.__plugins.append( plugin )
 
 	def getChildren( self ):
@@ -51,10 +73,24 @@ class Instructions( MObject ):
 
 	def addChild( self, instructions ):
 		assert isinstance( instructions, Instructions )
+		instructions._setParent( self )
 		self.__instructions.append( instructions )
 
-	def configureRelativeLogDir( self, parent ):
-		parentLogDir = parent.getExecutomat().getLogDir()
+	def configureRelativeBaseDir( self ):
+		parentBaseDir = self.getParent().getBaseDir()
+		if parentBaseDir:
+			assert os.path.isdir( parentBaseDir )
+			foldername = make_foldername_from_string( self.getName() )
+			abspath = os.path.abspath( os.path.join( parentBaseDir, foldername ) )
+			try:
+				os.makedirs( abspath )
+				self._setBaseDir( abspath )
+			except ( OSError, IOError )as e:
+				raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
+					.format( abspath, self.getName(), e ) )
+
+	def configureRelativeLogDir( self ):
+		parentLogDir = self.getParent().getExecutomat().getLogDir()
 		assert os.path.isdir( parentLogDir )
 		foldername = make_foldername_from_string( self.getName() )
 		abspath = os.path.abspath( os.path.join( parentLogDir, foldername ) )
@@ -73,22 +109,22 @@ class Instructions( MObject ):
 
 	def runPreFlightChecks( self ):
 		mApp().debugN( self, 2, 'performing pre-flight checks' )
-		[ plugin.preFlightCheck( self ) for plugin in self.getPlugins() ]
+		[ plugin.preFlightCheck() for plugin in self.getPlugins() ]
 		[ child.runPreFlightChecks() for child in self.getChildren() ]
 
 	def runSetups( self ):
 		mApp().debugN( self, 2, 'setting up' )
-		# FIXME set log dir so that nested executomats do not override the file
 		self.__executomat.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
-		[ plugin.setup( self ) for plugin in self.getPlugins() ]
+		[ plugin.setup() for plugin in self.getPlugins() ]
 		for child in self.getChildren():
 			if self.getExecutomat().getLogDir():
-				child.configureRelativeLogDir( self )
+				child.configureRelativeLogDir()
+				child.configureRelativeBaseDir()
 			child.runSetups()
 
 	def runWrapups( self ):
 		mApp().debugN( self, 2, 'wrapping up' )
-		[ plugin.wrapUp( self ) for plugin in self.getPlugins() ]
+		[ plugin.wrapUp() for plugin in self.getPlugins() ]
 		for child in self.getChildren():
 			child.runWrapups()
 
@@ -98,7 +134,7 @@ class Instructions( MObject ):
 		mApp().debugN( self, 2, 'shutting down' )
 		for plugin in self.getPlugins():
 			try:
-				plugin.shutDown( self )
+				plugin.shutDown()
 			except Exception as e:
 				text = '''\
 An error occurred during shutdown: "{0}"

@@ -203,7 +203,7 @@ class Preprocessor( Plugin ):
 	def getProject( self ):
 		return self.__project
 
-	def setup( self, instructions ):
-		step = instructions.getExecutomat().getStep( self.getStep() )
+	def setup( self ):
+		step = self.getInstructions().getExecutomat().getStep( self.getStep() )
 		action = _PreprocessorAction( self )
 		step.addPostAction( action )

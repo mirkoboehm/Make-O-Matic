@@ -59,6 +59,11 @@ class Defaults( MObject ):
 	ConfigurationBuildSteps = 'configuration.buildsteps'
 	ConfigurationBuildDir = 'configuration.builddir'
 	ConfigurationTargetDir = 'configuration.targetdir'
+	# ----- Builder settings
+	MakeBuilderMakeTool = 'configuration.builder.make.toolname'
+	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
+	# ----- CMake Builder settings
+	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- RSync publisher settings (should be set in .mom/config.py):
 	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
 	# ----- reporter settings:
@@ -123,6 +128,10 @@ class Defaults( MObject ):
 		]
 		self.getSettings()[ Defaults.ConfigurationBuildDir ] = 'build'
 		self.getSettings()[ Defaults.ConfigurationTargetDir ] = 'install'
+		# FIXME nmake on Windows
+		self.getSettings()[ Defaults.MakeBuilderMakeTool ] = 'make'
+		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
+		self.getSettings()[ Defaults.CMakeBuilderTool ] = 'cmake'
 		# ----- simple_ci settings:
 		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
 
