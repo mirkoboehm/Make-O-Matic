@@ -31,6 +31,7 @@ class MakeBasedBuilder( Builder ):
 	def __init__( self, name ):
 		Builder.__init__( self, name )
 		self.setMakeOptions( None )
+		self.setMakeInstallOptions( None )
 		self.setMakeToolName( mApp().getSettings().get( Settings.MakeBuilderMakeTool ) )
 
 	def setMakeOptions( self, options ):
@@ -38,6 +39,12 @@ class MakeBasedBuilder( Builder ):
 
 	def getMakeOptions( self ):
 		return self.__makeOptions
+
+	def setMakeInstallOptions( self, options ):
+		self.__makeInstallOptions = options
+
+	def getMakeInstallOptions( self ):
+		return self.__makeInstallOptions
 
 	def preFlightCheck( self ):
 		runner = RunCommand( '{0} {1}'.format( self.getMakeToolName(), '--version' ) )
@@ -61,19 +68,19 @@ class MakeBasedBuilder( Builder ):
 		return configuration.getFolderManager().getBuildDir()
 
 	def createConfMakeActions( self ):
-		options = self.getMakeOptions()
-		action = ShellCommandAction( '{0}{1}{2}'.format( 
-			self.getMakeToolName(),
-			' ' if options else '',
-			options if options else '' ) )
+		options = self.getMakeOptions() or ''
+		cmd = ' '.join( [ self.getMakeToolName(), options ] )
+		action = ShellCommandAction( cmd )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getExecutomat().getStep( 'conf-make' )
 		step.addMainAction( action )
 
 	def createConfMakeInstallActions( self ):
-		action = ShellCommandAction( '{0} {1}'.format( 
+		cmd = ' '.join( [
 			self.getMakeToolName(),
-			mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) ) )
+			self.getMakeInstallOptions() or '',
+			mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) ] )
+		action = ShellCommandAction( cmd )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getExecutomat().getStep( 'conf-make-install' )
 		step.addMainAction( action )
