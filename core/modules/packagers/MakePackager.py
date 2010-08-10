@@ -26,13 +26,14 @@ class MakePackager( PackageProvider ):
         """Constructor"""
         PackageProvider.__init__( self, name )
         
-    def _checkInstallation( self, instructions ):
+    def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
+        self._setDescription( 'make' )
         
-    def makePackageStep( self, instructions, ):
+    def makePackageStep( self ):
         """Create package for the project."""
-        step = instructions.getExecutomat().getStep( 'project-package' )
+        step = self.getInstructions().getExecutomat().getStep( 'project-package' )
         makePackage = ShellCommandAction( 'make package' )
-        makePackage.setWorkingDirectory( self.getSrcDir() )
+        makePackage.setWorkingDirectory( '/Users/kdab/Documents/charm/release/build/' )
         step.addMainAction( makePackage )
         
