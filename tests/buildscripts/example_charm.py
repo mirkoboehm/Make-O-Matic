@@ -23,6 +23,7 @@ from core.helpers.PathResolver import PathResolver
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
 from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder, CMakeVariable
 from core.modules.packagers.MakePackager import MakePackager
+from core.modules.testers.MakeTester import MakeTester
 
 build, project = setupStandardBuildAndProject( minimumMomVersion = "0.5.0",
 	projectName = "Charm", projectVersionNumber = '1.4.0',
@@ -43,6 +44,8 @@ cmakeRelease.addCMakeVariable( enableCharmTools )
 release.addPlugin( cmakeRelease )
 
 release.addPlugin( MakePackager() )
+
+release.addPlugin( MakeTester() )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getPackagesDir ) ) )
