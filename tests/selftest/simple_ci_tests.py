@@ -33,7 +33,7 @@ class SimpleCITests( MomTestCase ):
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunFindRevisions( self ):
-		cmd = '{0} {1} --slave -b {2}'.format( 
+		cmd = '{0} {1} --slave --pause 1 -b {2}'.format( 
 			sys.executable,
 			SimpleCITests.ToolName,
 			SimpleCITests.BuildScriptName )
@@ -41,7 +41,7 @@ class SimpleCITests( MomTestCase ):
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunPerformBuils( self ):
-		cmd = '{0} {1} --slave -f {2}'.format( 
+		cmd = '{0} {1} --slave --pause 1 -f {2}'.format( 
 			sys.executable,
 			SimpleCITests.ToolName,
 			SimpleCITests.BuildScriptName )

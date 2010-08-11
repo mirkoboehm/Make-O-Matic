@@ -28,6 +28,7 @@ import sys
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 import time
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
+from core.helpers.GlobalMApp import mApp
 
 class SimpleCI( MApplication ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
@@ -38,6 +39,7 @@ class SimpleCI( MApplication ):
 		self.__setDebugLevelParameter( 0 )
 		self.setControlDir( None )
 		self.setPerformTestBuilds( False )
+		self.setDelay( None )
 		self.setSlaveMode( False )
 		self.setBuildScripts( None )
 		self.setFindRevisions( True )
@@ -58,6 +60,12 @@ class SimpleCI( MApplication ):
 
 	def getPerformTestBuilds( self ):
 		return self.__performTestBuilds
+
+	def setDelay( self, delay ):
+		self.__delay = delay
+
+	def getDelay( self ):
+		return self.__delay
 
 	def setSlaveMode( self, onoff ):
 		self.__slaveMode = onoff
@@ -104,7 +112,7 @@ class SimpleCI( MApplication ):
 		if not os.path.isdir( path ):
 			try:
 				os.makedirs( path )
-				self.getProject().debug( self, 'instance directory "{0}" created.'.format( path ) )
+				mApp().debug( self, 'instance directory "{0}" created.'.format( path ) )
 			except OSError as e:
 				raise ConfigurationError( 'cannot create instance directory "{0}": {1}!'.format( path, e ) )
 		return path
@@ -114,7 +122,7 @@ class SimpleCI( MApplication ):
 		if not os.path.isdir( path ):
 			try:
 				os.makedirs( path )
-				self.getProject().debug( self, 'instance data directory "{0}" created.'.format( path ) )
+				mApp().debug( self, 'instance data directory "{0}" created.'.format( path ) )
 			except OSError as e:
 				raise ConfigurationError( 'cannot create instance data directory "{0}": {1}!'.format( path, e ) )
 		return path
@@ -136,6 +144,8 @@ class SimpleCI( MApplication ):
 			help = "run in slave mode (the one that actually does the builds)" )
 		parser.add_option( "-n", "--instance-name", type = "string", dest = "instance_name",
 			help = "the instance name is used to locate the configuration and database files (see debug output)" )
+		parser.add_option( '-p', '--pause', type = 'int', dest = 'delay',
+			help = 'pause after every slave run, in seconds' )
 		( options, args ) = parser.parse_args( sys.argv )
 		if options.control_dir:
 			self.setControlDir( str( options.control_dir ) )
@@ -150,6 +160,8 @@ class SimpleCI( MApplication ):
 			self.setFindRevisions( False )
 		if options.no_build:
 			self.setPerformBuilds( False )
+		if options.delay:
+			self.setDelay( options.delay )
 		if options.instance_name:
 			self.setName( options.instance_name )
 		self.setBuildScripts( args[1:] )
@@ -193,7 +205,7 @@ class SimpleCI( MApplication ):
 		buildScripts = self.getBuildScripts() or []
 		if self.getControlDir():
 			BaseDir = str( self.getControlDir() )
-			self.getProject().message( self, 'using "{0}" as control directory.'.format( BaseDir ) )
+			mApp().message( self, 'using "{0}" as control directory.'.format( BaseDir ) )
 			ControlDir = os.path.normpath( os.path.join( os.getcwd(), BaseDir ) )
 			if not os.path.isdir( ControlDir ):
 				raise ConfigurationError( 'The control directory "{0}" does not exist!'.format( ControlDir ) )
@@ -202,7 +214,7 @@ class SimpleCI( MApplication ):
 			folderScripts = map( lambda x: os.path.normpath( x ), folderScripts )
 			buildScripts += folderScripts
 		if not buildScripts:
-			self.getProject().message( self, 'FYI: no build scripts specified.' )
+			mApp().message( self, 'FYI: no build scripts specified.' )
 		buildScripts = self.checkBuildScripts( buildScripts )
 		# do the stuff
 		sleepPeriod = 5 * 60 # if there was nothing to do, wait a little before retrying, to not hog the remote side
@@ -221,6 +233,8 @@ class SimpleCI( MApplication ):
 				self.getReturnCode(), e ) )
 			sleepPeriod = 15 * 60 # if there is a problem, the process interrupts for a little longer, to allow for it to be fixed
 		finally:
+			if self.getDelay():
+				sleepPeriod = self.getDelay()
 			if sleepPeriod:
 				self.debug( self, 'sleeping for {0} seconds.'.format( sleepPeriod ) )
 				self.debugN( self, 2, 'Z' )
