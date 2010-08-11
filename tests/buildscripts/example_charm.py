@@ -42,7 +42,7 @@ cmakeRelease.setMakeOptions( '-j2' )
 cmakeRelease.addCMakeVariable( enableCharmTools )
 release.addPlugin( cmakeRelease )
 
-project.addPlugin( MakePackager() )
+release.addPlugin( MakePackager() )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getPackagesDir ) ) )

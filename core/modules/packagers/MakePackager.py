@@ -32,8 +32,9 @@ class MakePackager( PackageProvider ):
         
     def makePackageStep( self ):
         """Create package for the project."""
-        step = self.getInstructions().getExecutomat().getStep( 'project-package' )
+        step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
         makePackage = ShellCommandAction( 'make package' )
-        makePackage.setWorkingDirectory( '/Users/kdab/Documents/charm/release/build/' )
+        #FIXME: Set this to the build directory
+        makePackage.setWorkingDirectory( self.getInstructions().getFolderManager().getBuildDir() )
         step.addMainAction( makePackage )
         
