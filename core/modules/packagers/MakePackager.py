@@ -19,6 +19,9 @@
 
 from core.modules.packagers.PackageProvider import PackageProvider
 from core.executomat.ShellCommandAction import ShellCommandAction
+from core.helpers.RunCommand import RunCommand
+from core.Exceptions import ConfigurationError
+from core.helpers.GlobalMApp import mApp
 
 class MakePackager( PackageProvider ):
 
@@ -28,7 +31,14 @@ class MakePackager( PackageProvider ):
         
     def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
-        self._setDescription( 'make' )
+        runner = RunCommand( 'make --version' )
+        runner.run()
+        if runner.getReturnCode() != 0:
+            raise ConfigurationError( "MakePackager::checkInstallation: make not found." )
+        else:
+            lines = runner.getStdOut().decode().split( '\n' )
+            self._setDescription( lines[0].rstrip() )
+            mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
         
     def makePackageStep( self ):
         """Create package for the project."""

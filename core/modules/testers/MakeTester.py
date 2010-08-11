@@ -19,6 +19,9 @@
 
 from core.modules.testers.TestProvider import TestProvider
 from core.executomat.ShellCommandAction import ShellCommandAction
+from core.helpers.RunCommand import RunCommand
+from core.Exceptions import ConfigurationError
+from core.helpers.GlobalMApp import mApp
 
 class MakeTester( TestProvider ):
 
@@ -28,7 +31,14 @@ class MakeTester( TestProvider ):
         
     def _checkInstallation( self ):
         """Check if the tester's prerequisite are installed."""
-        self._setDescription( 'make' )
+        runner = RunCommand( 'make --version' )
+        runner.run()
+        if runner.getReturnCode() != 0:
+            raise ConfigurationError( "MakeTester::checkInstallation: make not found." )
+        else:
+            lines = runner.getStdOut().decode().split( '\n' )
+            self._setDescription( lines[0].rstrip() )
+            mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
         
     def makeTestStep( self ):
         """Run tests for the project."""
