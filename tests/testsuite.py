@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
-from cases.buildstatus_persistence_tests import BuildStatusPersistenceTests
-from cases.path_resolver_tests import PathResolverTest
-from cases.preprocessor_tests import PreprocessorTest
-from cases.run_mode_print_tests import RunModePrintTests
-from cases.run_timeout_tests import RunWithTimeoutTest
-from cases.scm_factory_tests import ScmFactoryTests
-from cases.buildscript_interface_tests import BuildScriptInterfaceTests
-from selftest.simple_project_tests import SimpleProjectTests
-from selftest.simple_ci_tests import SimpleCITests
-from selftest.charm_build_tests import CharmBuildTests
+from tests.cases.buildstatus_persistence_tests import BuildStatusPersistenceTests
+from tests.cases.path_resolver_tests import PathResolverTest
+from tests.cases.preprocessor_tests import PreprocessorTest
+from tests.cases.run_mode_print_tests import RunModePrintTests
+from tests.cases.run_timeout_tests import RunWithTimeoutTest
+from tests.cases.scm_factory_tests import ScmFactoryTests
+from tests.cases.buildscript_interface_tests import BuildScriptInterfaceTests
+from tests.selftest.simple_project_tests import SimpleProjectTests
+from tests.selftest.simple_ci_tests import SimpleCITests
+from tests.selftest.charm_build_tests import CharmBuildTests
 
 classes = [ BuildStatusPersistenceTests,
 	PathResolverTest,
