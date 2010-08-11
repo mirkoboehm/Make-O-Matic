@@ -44,7 +44,6 @@ class MakeTester( TestProvider ):
         """Run tests for the project."""
         step = self.getInstructions().getExecutomat().getStep( 'conf-make-test' )
         makeTest = ShellCommandAction( 'make test' )
-        #FIXME: Set this to the build directory
         makeTest.setWorkingDirectory( self.getInstructions().getFolderManager().getBuildDir() )
         step.addMainAction( makeTest )
         

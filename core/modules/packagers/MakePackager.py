@@ -44,7 +44,6 @@ class MakePackager( PackageProvider ):
         """Create package for the project."""
         step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
         makePackage = ShellCommandAction( 'make package' )
-        #FIXME: Set this to the build directory
         makePackage.setWorkingDirectory( self.getInstructions().getFolderManager().getBuildDir() )
         step.addMainAction( makePackage )
         
