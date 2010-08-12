@@ -92,6 +92,7 @@ class Configuration( Instructions ):
 		for step in self.calculateBuildSequence():
 			self.getExecutomat().addStep( step )
 		action = _BuildConfigurationAction( self )
+		action.setIgnorePreviousFailure( True )
 		step = self.getProject().getExecutomat().getStep( 'project-build-configurations' )
 		step.addMainAction( action )
 		Instructions.runSetups( self )

@@ -108,7 +108,7 @@ class Step( MObject ):
 		if not self.__enabled:
 			executomat.log( '# step "{0}" disabled, skipping.'.format( self.getName() ) )
 			return True
-		if mApp().getReturnCode() != 0 and not self.getExecuteOnFailure():
+		if executomat.hasFailed() and not self.getExecuteOnFailure():
 			mApp().debugN( self, 4, 'aborting because of errors earlier in the build' )
 			return True
 		executomat.log( '# Executing step "{0}"'.format( self.getName() ) )
@@ -127,13 +127,15 @@ class Step( MObject ):
 			if not actions:
 				executomat.log( '# Phase "{0}" is empty (no actions registered)'.format( phase ) )
 			for action in actions:
-				result = action.executeAction( executomat, self )
-				resultText = 'successful (or skipped)'
-				if result != 0:
-					resultText = 'failed'
-				executomat.log( '# {0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
-				if result != 0:
-					self.__failed = True
-					return False # do not continue with the remaining actions
-		return True
+				if not self.__failed or action.getIgnorePreviousFailure():
+					result = action.executeAction( executomat, self )
+					resultText = 'successful'
+					if result != 0:
+						resultText = 'failed'
+					executomat.log( '# {0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
+					if result != 0:
+						self.__failed = True
+				else:
+					resultText = 'skipped'
+		return not self.__failed
 

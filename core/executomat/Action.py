@@ -51,6 +51,7 @@ class Action( MObject ):
 		self.__result = None
 		self._setStdOut( None )
 		self._setStdErr( None )
+		self.setIgnorePreviousFailure( False )
 
 	def setWorkingDirectory( self, dir ):
 		"""Set the directory to execute the command in."""
@@ -66,6 +67,13 @@ class Action( MObject ):
 
 	def wasStarted( self ):
 		return self.__started != False
+
+	def setIgnorePreviousFailure( self, onOff ):
+		'''If true, the action will be executed even if a previous action of the same step failed.'''
+		self.__ignorePreviousFailure = onOff
+
+	def getIgnorePreviousFailure( self ):
+		return self.__ignorePreviousFailure
 
 	def _finished( self ):
 		self.__finished = True
@@ -121,7 +129,6 @@ class Action( MObject ):
 	def _executeActionTimed( self, executomat, step ):
 		oldPwd = None
 		try:
-			executomat.log( '# {0}'.format( self.getLogDescription() ) )
 			if self.getWorkingDirectory():
 				oldPwd = os.getcwd()
 				executomat.log( '# changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
@@ -130,6 +137,7 @@ class Action( MObject ):
 				except ( OSError, IOError ) as e:
 					raise BuildError( str( e ) )
 			self._aboutToStart()
+			executomat.log( '# {0}'.format( self.getLogDescription() ) )
 			try:
 				result = self.run()
 				if result == None or not isinstance( result, int ):
