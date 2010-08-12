@@ -22,6 +22,25 @@ from core.executomat.ShellCommandAction import ShellCommandAction
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
+from core.actions.filesystem.FileMoveAction import FileMoveAction
+
+class _CPackMovePackageAction( FileMoveAction ):
+    def __init__( self, cpackAction, destination ):
+        """Constructor"""
+        FileMoveAction.__init__( self )
+        self.__action = cpackAction
+        self.setDestination( destination )
+
+    def run( self ):
+        """Executes the shell command. Needs a command to be set."""
+        if (self.__action.getResult() != 0):
+            return 1
+        lines = self.__action.getStdOut().decode().split( '\n' )
+        packageLine = lines[-2].rstrip()
+        packageLine = packageLine.replace( 'CPack: Package ', '' )
+        packageFileName = packageLine.replace( ' generated.', '' )
+        self.setSource( packageFileName )
+        return FileMoveAction.run( self )
 
 class CPack( PackageProvider ):
 
@@ -42,7 +61,12 @@ class CPack( PackageProvider ):
     def makePackageStep( self ):
         """Create package for the project."""
         step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
+        buildDirectory = self.getInstructions().getFolderManager().getBuildDir()
+
         makePackage = ShellCommandAction( 'cpack' )
-        makePackage.setWorkingDirectory( self.getInstructions().getFolderManager().getBuildDir() )
+        makePackage.setWorkingDirectory( buildDirectory )
         step.addMainAction( makePackage )
-        
+
+        movePackageDestination = self.getInstructions().getProject().getFolderManager().getPackagesDir()
+        movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
+        step.addMainAction( movePackage )

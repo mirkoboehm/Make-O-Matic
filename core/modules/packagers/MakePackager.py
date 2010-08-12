@@ -46,4 +46,3 @@ class MakePackager( PackageProvider ):
         makePackage = ShellCommandAction( 'make package' )
         makePackage.setWorkingDirectory( self.getInstructions().getFolderManager().getBuildDir() )
         step.addMainAction( makePackage )
-        
