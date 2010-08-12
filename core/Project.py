@@ -86,11 +86,11 @@ class Project( Instructions ):
 		for buildStep in allBuildSteps:
 			# FIXME maybe this could be a unit test?
 			assert len( buildStep ) == 3
-			name, types, executeOnFailure = buildStep
+			name, types, ignorePreviousFailure = buildStep
 			assert types.lower() == types
 			stepName = Step( name )
 			stepName.setEnabled( buildType in types )
-			stepName.setExecuteOnFailure( executeOnFailure )
+			stepName.setIgnorePreviousFailure( ignorePreviousFailure )
 			buildSteps.append( stepName )
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )

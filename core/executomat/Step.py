@@ -31,7 +31,7 @@ class Step( MObject ):
 		MObject.__init__( self, stepName )
 		self.__timeKeeper = TimeKeeper()
 		self.__enabled = True
-		self.__executeOnFailure = False
+		self.__ignorePreviousFailure = False
 		self.__preActions = [] # list of preparation actions
 		self.__mainActions = [] # list of main actions
 		self.__postActions = [] # list of post actions
@@ -47,12 +47,12 @@ class Step( MObject ):
 	def getEnabled( self ):
 		return self.__enabled
 
-	def setExecuteOnFailure( self, doIt ):
+	def setIgnorePreviousFailure( self, doIt ):
 		"""Set execute-on-failure. If true, the command will be executed, even if a previous command of the same sequence failed."""
-		self.__executeOnFailure = doIt
+		self.__ignorePreviousFailure = doIt
 
 	def getExecuteOnFailure( self ):
-		return self.__executeOnFailure
+		return self.__ignorePreviousFailure
 
 	def setLogfileName( self, logfileName ):
 		check_for_string( logfileName, "The log file parameter must be a string containing a file name." )
