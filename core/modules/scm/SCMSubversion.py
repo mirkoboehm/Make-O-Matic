@@ -26,8 +26,9 @@ from core.helpers.FilesystemAccess import make_foldername_from_string
 import re
 import time
 from xml.dom import minidom
+from core.helpers.GlobalMApp import mApp
 
-class SCMSubversion(SourceCodeProvider):
+class SCMSubversion( SourceCodeProvider ):
 
     """Subversion SCM Provider Class"""
 
@@ -38,26 +39,25 @@ class SCMSubversion(SourceCodeProvider):
         """Set __committer, __commitMessage, __commitTime and __revision"""
         raise AbstractMethodCalledError
 
-    def _checkInstallation( self, project ):
+    def _checkInstallation( self ):
         """Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-        assert project
-        runner = RunCommand( project, 'svn --version' )
+        runner = RunCommand( 'svn --version' )
         runner.run()
         if( runner.getReturnCode() != 0 ):
             raise ConfigurationError( "SCMSubversion::checkInstallation: svn not found." )
-        else:            
+        else:
             lines = runner.getStdOut().decode().split( '\n' )
             self._setDescription( lines[0].rstrip() )
-            project.debugN( self, 4, 'svn found: "{0}"'.format( self.getDescription() ) )
+            mApp().debugN( self, 4, 'svn found: "{0}"'.format( self.getDescription() ) )
 
     def _getRevisionsSince( self, project, revision, cap = None ):
         """Print revisions committed since the specified revision."""
         revision = int( revision )
         assert revision
-        
+
         options = 'log --xml '
         if revision == 0:
-            options +='--limit 1 '
+            options += '--limit 1 '
         cmd = 'svn --non-interactive ' + options + '-rHEAD:' + str( revision ).strip() + ' ' + self.getUrl()
         runner = RunCommand( cmd, 3600 )
         runner.run()
@@ -69,7 +69,7 @@ class SCMSubversion(SourceCodeProvider):
             logentries = xmldoc.getElementsByTagName( 'logentry' )
             for entry in logentries:
                 result = parseLogEntry( entry )
-                if int(result[2]) != revision: # svn log always spits out the last revision 
+                if int( result[2] ) != revision: # svn log always spits out the last revision 
                     revisions.append( ['C', int( result[2] ), project.getScmUrl() ] )
             return revisions
         elif runner.getTimedOut() == True:
@@ -86,23 +86,26 @@ class SCMSubversion(SourceCodeProvider):
         if runner.getReturnCode() == 0:
             xmldoc = minidom.parseString( runner.getStdOut() )
             logentries = xmldoc.getElementsByTagName( 'logentry' )
-            assert len(logentries) == 1
-            result = parseLogEntry(logentries[0])
+            assert len( logentries ) == 1
+            result = parseLogEntry( logentries[0] )
             return result[2]
         else:
             raise ConfigurationError( 'cannot get log for "{0}"'
                 .format( self.getUrl() ) )
 
-    def makeCheckoutStep( self, project ):
+    def makeCheckoutStep( self ):
         """Create steps to check out the source code"""
-        step = project.getExecutomat().getStep( 'project-checkout' )
-        cmd = 'svn --non-interactive checkout -r"' + str( self.getRevision() ) + '" ' + self.getUrl()
+        assert self.getInstructions()
+        step = self.getInstructions().getExecutomat().getStep( 'project-checkout' )
+        cmd = 'svn --non-interactive checkout -r"{0}" {1} .'.format( 
+            self.getRevision() or 'HEAD',
+            self.getUrl() )
         checkout = ShellCommandAction( cmd )
         checkout.setWorkingDirectory( self.getSrcDir() )
         step.addMainAction( checkout )
         return step
 
-        
+
 def parseLogEntry( logentry ):
     """Parse one SVN log entry in XML format, return tuple (committer, message, revision, commitTime)"""
     revision = logentry.getAttribute( 'revision' )
