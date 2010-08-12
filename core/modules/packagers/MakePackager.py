@@ -36,7 +36,7 @@ class MakePackager( PackageProvider ):
         if runner.getReturnCode() != 0:
             raise ConfigurationError( "MakePackager::checkInstallation: make not found." )
         else:
-            lines = runner.getStdOut().decode().split( '\n' )
+            lines = runner.getStdOut().decode().splitlines()
             self._setDescription( lines[0].rstrip() )
             mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
         

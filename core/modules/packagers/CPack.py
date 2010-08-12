@@ -22,25 +22,30 @@ from core.executomat.ShellCommandAction import ShellCommandAction
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
-from core.actions.filesystem.FileMoveAction import FileMoveAction
+from core.actions.filesystem.FilesMoveAction import FilesMoveAction
 
-class _CPackMovePackageAction( FileMoveAction ):
+class _CPackMovePackageAction( FilesMoveAction ):
     def __init__( self, cpackAction, destination ):
         """Constructor"""
-        FileMoveAction.__init__( self )
+        FilesMoveAction.__init__( self )
         self.__action = cpackAction
         self.setDestination( destination )
 
     def run( self ):
-        """Executes the shell command. Needs a command to be set."""
+        """Finds the names of the CPack generated packages and moves them."""
         if (self.__action.getResult() != 0):
             return 1
-        lines = self.__action.getStdOut().decode().split( '\n' )
-        packageLine = lines[-2].rstrip()
-        packageLine = packageLine.replace( 'CPack: Package ', '' )
-        packageFileName = packageLine.replace( ' generated.', '' )
-        self.setSource( packageFileName )
-        return FileMoveAction.run( self )
+        lines = self.__action.getStdOut().decode().splitlines()
+        packageLinePrefix = 'CPack: Package '
+        packageLineSuffix = ' generated.'
+        packageFiles = []
+        for line in lines:
+            if line.startswith( packageLinePrefix ) and line.endswith( packageLineSuffix ):
+                line = line.replace( packageLinePrefix, '' )
+                packageFile = line.replace( packageLineSuffix, '' )
+                packageFiles.append( packageFile )
+        self.setFiles( packageFiles )
+        return FilesMoveAction.run(self)
 
 class CPack( PackageProvider ):
 
@@ -59,7 +64,7 @@ class CPack( PackageProvider ):
             mApp().debugN( self, 4, 'cpack found: "{0}"'.format( self.getDescription() ) )
         
     def makePackageStep( self ):
-        """Create package for the project."""
+        """Create packages for the project using CPack."""
         step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
         buildDirectory = self.getInstructions().getFolderManager().getBuildDir()
 

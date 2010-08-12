@@ -17,34 +17,33 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_nonnegative_int
-from core.Exceptions import MomError
-from core.helpers.RunCommand import RunCommand
 from core.executomat.Action import Action
 from shutil import move
+from core.helpers.GlobalMApp import mApp
+from os.path import isdir
 
-class FileMoveAction( Action ):
-    """FileMoveAction encapsulates the execution of one command in the Step class. 
+class FilesMoveAction( Action ):
+    """FilesMoveAction encapsulates the moving of files to a directory.
     It is mostly used internally, but can be of general use as well."""
-    def __init__( self, source = None, destination = None ):
+    def __init__( self, files = None, destination = None ):
         Action.__init__( self )
-        self.setSource( source )
+        self.setFiles( files )
         self.setDestination( destination )
         
-    def setSource( self, source ):
-        """Set the source file location to move"""
-        self.__source = source
+    def setFiles( self, sourceFiles ):
+        """Set the list of files to move"""
+        self.__sourceFiles = sourceFiles
         
-    def getSource( self ):
-        """Get the source file location to move"""
-        return self.__source
+    def getFiles( self ):
+        """Get the list of files to move"""
+        return self.__sourceFiles
     
     def setDestination( self, destination ):
-        """Set the destination file location to move to"""
+        """Set the destination directory to move to"""
         self.__destination = destination
         
     def getDestination( self ):
-        """Get the destination file location to move to"""
+        """Get the destination directory to move to"""
         return self.__destination
 
     def getLogDescription( self ):
@@ -53,8 +52,13 @@ class FileMoveAction( Action ):
 
     def run( self ):
         """Executes the shell command. Needs a command to be set."""
-        try:
-            move( self.__source, self.__destination )
-        except:
+        if not isdir( str( self.__destination ) ):
             return 1
+
+        for file in self.__sourceFiles:
+            try:
+                mApp().debugN( self, 4, 'moving file from "{0}" to "{1}'.format( file, self.__destination ) )
+                move( file, self.__destination )
+            except:
+                return 1
         return 0
