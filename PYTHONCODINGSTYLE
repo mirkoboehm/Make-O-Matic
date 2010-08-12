@@ -1,0 +1,21 @@
+  __,                                   ,_ _    __   ,_ _   
+ /  |      ()_|_      |\ o  ,  |)      /| | |  /\_\//| | |  
+|   |      /\ |  |  | |/ | / \_|/\      | | | |    | | | |  
+ \_/\_/   /(_)|_/ \/|/|_/|/ \/ |  |/    | | |_/\__/  | | |_/
+                   (|                                       
+Python coding styles vary, and are widely discussed. We are asking you
+to stick to the following standards: 
+
+- Tabs instead of spaces: In a language where indent levels matter, it
+  makes sense to use a single character for every indent. In Pydev,
+  uncheck "General/Editors/Text Editors/Insert spaces for tabs". It
+  makes sense to also check "Show whitespace characters" in the same
+  pane. Also, uncheck "Pydev/Editor/Replace tabs with spaces when
+  typing". 
+- Longer lines: Use up to 132 character per line.
+- Method and function names: camelCase with first lower
+  ("Pydev/Editor/Code Style").
+- Code formatter: Simply check all boxes in "Pydev/Editor/Code
+  Style/Code Formatter".
+
+
