@@ -42,7 +42,10 @@ class _BuildConfigurationAction( Action ):
 		oldcwd = os.getcwd()
 		try:
 			self.__config.getExecutomat().run( self.__config )
-			return 0
+			if self.__config.getExecutomat().hasFailed():
+				return 1
+			else:
+				return 0
 		except MomError as e:
 			mApp().message( self.__config, 'error while building configuration "{0}"'.format( e ) )
 			# mApp().registerReturnCode( e.getReturnCode() )
