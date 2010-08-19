@@ -32,8 +32,8 @@ class MApplication( Instructions ):
 
 	_instance = None
 
-	def __init__( self, name = None, minimumMomVersion = None ):
-		Instructions.__init__( self, name )
+	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
+		Instructions.__init__( self, name, parent )
 		if MApplication._instance:
 			raise MomError( 'The script tried to create more than one MApplication object!' )
 		MApplication._instance = self

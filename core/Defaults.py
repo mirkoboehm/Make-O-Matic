@@ -123,7 +123,7 @@ class Defaults( MObject ):
 			[ 'conf-make', 'mcdhpsf', False ],
 			[ 'conf-make-test', 'mcdhpsf', False ],
 			[ 'conf-make-install', 'mcdhpsf', False ],
-			[ 'conf-package', 'dsf', False ],
+			[ 'conf-package', 'dsfp', False ],
 			[ 'conf-cleanup', 'cdsf', False ],
 		]
 		self.getSettings()[ Defaults.ConfigurationBuildDir ] = 'build'

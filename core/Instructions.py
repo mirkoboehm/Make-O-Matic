@@ -22,7 +22,7 @@ from core.executomat.Executomat import Executomat
 from core.Settings import Settings
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
-from core.Exceptions import ConfigurationError
+from core.Exceptions import ConfigurationError, MomError
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
 
 class Instructions( MObject ):
@@ -32,15 +32,18 @@ class Instructions( MObject ):
 	Instructions implement the phased approach to executing the build script, and the 
 	idea of plug-ins that implement certain functionality.'''
 
-	def __init__( self, name = None ):
+	def __init__( self, name = None, parent = None ):
 		MObject.__init__( self, name )
 		self.__executomat = Executomat( 'Exec-o-Matic' )
-		self.__parent = None # the parent instructions object
+		self._setBaseDir( None )
+		self._setParent( None )
+		if parent: # the parent instructions object
+			parent.addChild( self )
 		self.__plugins = []
 		self.__instructions = []
 
 	def _setParent( self, parent ):
-		assert isinstance( parent, Instructions )
+		assert parent == None or isinstance( parent, Instructions )
 		self.__parent = parent
 
 	def getParent( self ):
@@ -73,8 +76,19 @@ class Instructions( MObject ):
 
 	def addChild( self, instructions ):
 		assert isinstance( instructions, Instructions )
+		if instructions in self.getChildren():
+			raise MomError( 'A child can be added to the same instruction object only once (offending object: {0})!'
+				.format( instructions.getName() ) )
 		instructions._setParent( self )
 		self.__instructions.append( instructions )
+
+	def removeChild( self, instructions ):
+		assert isinstance( instructions, Instructions )
+		if instructions in self.getChildren():
+			self.getChildren().remove( instructions )
+		else:
+			raise MomError( 'Cannot remove child {0}, I am not it\'s parent {1}!'
+				.format( instructions.getName(), self.getName() ) )
 
 	def configureRelativeBaseDir( self ):
 		parentBaseDir = self.getParent().getBaseDir()

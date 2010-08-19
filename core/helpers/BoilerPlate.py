@@ -27,7 +27,7 @@ from core.modules.reporters.ConsoleReporter import ConsoleReporter
 
 def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 	try:
-		build = Build( buildName, minimumMomVersion )
+		build = Build( minimumMomVersion, buildName )
 		build.getParameters().parse()
 		mApp().getSettings().set( Settings.ScriptLogLevel, build.getParameters().getDebugLevel() )
 		logger = ConsoleLogger()

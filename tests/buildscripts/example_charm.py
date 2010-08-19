@@ -24,29 +24,35 @@ from core.modules.publishers.RSyncPublisher import RSyncPublisher
 from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder, CMakeVariable
 from core.modules.packagers.CPack import CPack
 from core.modules.testers.CTest import CTest
+from core.environments.Environments import Environments
 
 build, project = setupStandardBuildAndProject( minimumMomVersion = "0.5.0",
 	projectName = "Charm", projectVersionNumber = '1.4.0',
 	scmUrl = 'git:git@gitorious.org:charm/charm.git' )
 
-# add a debug and a release configuration that build using CMake
+# helper variable to set a CMake parameter
 enableCharmTools = CMakeVariable( 'CHARM_ENABLE_TOOLS_BUILD', 'TRUE', 'BOOL' )
-debug = Configuration( project, 'Debug' )
+
+# find different Shared Debug build environments
+environments = Environments( [ 'Qt-Shared-Debug-4.[67].?' ], 'Qt 4', project )
+
+# add a debug and a release configuration that build using CMake
+debug = Configuration( 'Debug', environments, )
 cmakeDebug = CMakeBuilder()
 cmakeDebug.setMakeOptions( '-j2' )
 cmakeDebug.setMakeInstallOptions( '-j1' )
 cmakeDebug.addCMakeVariable( enableCharmTools )
 debug.addPlugin( cmakeDebug )
 
-release = Configuration( project, 'Release' )
-cmakeRelease = CMakeBuilder()
-cmakeRelease.setMakeOptions( '-j2' )
-cmakeDebug.setMakeInstallOptions( '-j1' )
-cmakeRelease.addCMakeVariable( enableCharmTools )
-release.addPlugin( cmakeRelease )
-
-release.addPlugin( CTest() )
-release.addPlugin( CPack() )
+#release = Configuration( 'Release', project )
+#cmakeRelease = CMakeBuilder()
+#cmakeRelease.setMakeOptions( '-j2' )
+#cmakeDebug.setMakeInstallOptions( '-j1' )
+#cmakeRelease.addCMakeVariable( enableCharmTools )
+#release.addPlugin( cmakeRelease )
+#
+#release.addPlugin( CTest() )
+#release.addPlugin( CPack() )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getPackagesDir ) ) )

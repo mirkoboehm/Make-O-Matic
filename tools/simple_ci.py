@@ -34,8 +34,8 @@ class SimpleCI( MApplication ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
 	"""
 
-	def __init__( self, name = None ):
-		MApplication.__init__( self, name )
+	def __init__( self, name = None, parent = None ):
+		MApplication.__init__( self, name, parent )
 		self.__setDebugLevelParameter( 0 )
 		self.setControlDir( None )
 		self.setPerformTestBuilds( False )

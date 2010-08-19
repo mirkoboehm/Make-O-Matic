@@ -26,8 +26,8 @@ class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
 	It contains the loggers and reporters, for example. It also maintains the settings.'''
 
-	def __init__( self, name = None, minimumMomVersion = None ):
-		MApplication.__init__( self, name, minimumMomVersion )
+	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
+		MApplication.__init__( self, minimumMomVersion, name, parent )
 		self.__project = None
 		self.__parameters = Parameters()
 

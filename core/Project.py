@@ -35,9 +35,9 @@ FIXME documentation
 """
 class Project( Instructions ):
 
-	def __init__( self, projectName ):
+	def __init__( self, projectName, parent = None ):
 		"""Set up the build steps, parse the command line arguments."""
-		Instructions.__init__( self, projectName )
+		Instructions.__init__( self, projectName, parent )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
