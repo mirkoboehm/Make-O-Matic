@@ -48,27 +48,27 @@ class Configuration( ConfigurationBase ):
 	def buildConfiguration( self ):
 		'''Helper method used by configuration-like objects that executes the whole instructions as part of a step of a superior 
 		instructions object.'''
-		mApp().debug( self.__instructions, 'building configuration "{0}"'.format( self.__instructions.getName() ) )
-		self.__instructions.getTimeKeeper().start()
+		mApp().debug( self, 'building configuration "{0}"'.format( self.getName() ) )
+		self.getTimeKeeper().start()
 		mApp().debugN( self, 3, 'saving working directory and environment variables' )
 		oldenv = os.environ.copy()
 		oldcwd = os.getcwd()
 		try:
-			self.__instructions.getExecutomat().run( self.__instructions )
-			if self.__instructions.getExecutomat().hasFailed():
+			self.getExecutomat().run( self )
+			if self.getExecutomat().hasFailed():
 				return 1
 			else:
 				return 0
 		except MomError as e:
-			mApp().message( self.__instructions, 'error while building configuration "{0}"'.format( e ) )
+			mApp().message( self, 'error while building configuration "{0}"'.format( e ) )
 			# mApp().registerReturnCode( e.getReturnCode() )
 			return e.getReturnCode()
 		finally:
 			os.environ = oldenv
 			os.chdir( oldcwd )
 			mApp().debugN( self, 3, 'working directory and environment variables restored' )
-			self.__instructions.getTimeKeeper().stop()
-			mApp().debug( self.__instructions, 'finished building configuration "{0}"'.format( self.__instructions.getName() ) )
+			self.getTimeKeeper().stop()
+			mApp().debug( self, 'finished building configuration "{0}"'.format( self.getName() ) )
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():

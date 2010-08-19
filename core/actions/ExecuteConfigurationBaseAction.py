@@ -25,7 +25,7 @@ class ExecuteConfigurationBaseAction( Action ):
 		self.__instructions = instructions
 
 	def run( self ):
-		self.__instructions.buildConfiguration()
+		return self.__instructions.buildConfiguration()
 
 	def getLogDescription( self ):
 		return self.__instructions.getName()

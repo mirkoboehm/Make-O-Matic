@@ -44,15 +44,14 @@ cmakeDebug.setMakeInstallOptions( '-j1' )
 cmakeDebug.addCMakeVariable( enableCharmTools )
 debug.addPlugin( cmakeDebug )
 
-#release = Configuration( 'Release', project )
-#cmakeRelease = CMakeBuilder()
-#cmakeRelease.setMakeOptions( '-j2' )
-#cmakeDebug.setMakeInstallOptions( '-j1' )
-#cmakeRelease.addCMakeVariable( enableCharmTools )
-#release.addPlugin( cmakeRelease )
-#
-#release.addPlugin( CTest() )
-#release.addPlugin( CPack() )
+release = Configuration( 'Release', environments )
+cmakeRelease = CMakeBuilder()
+cmakeRelease.setMakeOptions( '-j2' )
+cmakeDebug.setMakeInstallOptions( '-j1' )
+cmakeRelease.addCMakeVariable( enableCharmTools )
+release.addPlugin( cmakeRelease )
+release.addPlugin( CTest() )
+release.addPlugin( CPack() )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getPackagesDir ) ) )

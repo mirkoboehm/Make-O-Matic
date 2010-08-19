@@ -20,6 +20,7 @@
 from core.environments.Environment import Environment
 from core.actions.ExecuteConfigurationBaseAction import ExecuteConfigurationBaseAction
 from core.modules.ConfigurationBase import ConfigurationBase
+from core.helpers.GlobalMApp import mApp
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches 
@@ -30,16 +31,6 @@ class Environments( ConfigurationBase ):
 	def __init__( self, dependencies = None, name = None, parent = None ):
 		ConfigurationBase.__init__( self, name, parent )
 		self._setDependencies( dependencies )
-		self._setEnvironments( [] )
-
-	def _setEnvironments( self, envs ):
-		self.__environments = envs
-
-	def addEnvironment( self, environment ):
-		self.__environments.append( environment )
-
-	def getEnvironments( self ):
-		return self.__environments
 
 	def _setDependencies( self, deps ):
 		self.__dependencies = deps
@@ -49,8 +40,25 @@ class Environments( ConfigurationBase ):
 
 	def buildConfiguration( self ):
 		'''For every environment found during setup, apply the environment, and build the configuration.'''
-		for environment in self.getEnvironments():
-			environment.build()
+		error = False
+		for environment in self.getChildren():
+			if environment.build() != 0:
+				error = True
+		if error:
+			return 1
+		else:
+			return 0
+
+	def runPreFlightChecks( self ):
+		# discover matching environments:
+		configs = self.getChildren()[:]
+		environments = [ Environment( 'Qt-4.6.2-Shared-Release', self ) ] # FIXME
+		if environments:
+			for config in configs:
+				self.removeChild( config )
+			for environment in environments:
+				environment.cloneConfigurations( configs )
+		ConfigurationBase.runPreFlightChecks( self )
 
 	def runSetups( self ):
 		try:
@@ -60,11 +68,4 @@ class Environments( ConfigurationBase ):
 			step.addMainAction( action )
 		except Exception as e:
 			print( e )
-		ConfigurationBase.runSetups( self )
-		# discover matching environments:
-		environments = [ Environment( self ) ] # FIXME
-		for environment in environments:
-			environment.cloneConfigurations()
-			self.addEnvironment( environment )
-		# FIXME register action to build the environments, which will each build their configuration clone
 		ConfigurationBase.runSetups( self )

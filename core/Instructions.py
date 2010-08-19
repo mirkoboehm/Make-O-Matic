@@ -57,7 +57,7 @@ class Instructions( MObject ):
 		try:
 			check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		except Exception:
-			print( 'Duh!' )
+			mApp().debugN( self, 4, 'getBaseDir() was called before the base directory was set!' )
 			raise
 		return self.__baseDir
 
@@ -120,6 +120,19 @@ class Instructions( MObject ):
 		Execute is not required, many modules only need to act during the different phases.
 		To implement specific operations between setup and wrap-up, re-implement execute.'''
 		pass
+
+	def describe( self, prefix = '' ):
+		'''Describe this instruction object in human readable form.'''
+		basedir = '<no base directory set>'
+		try:
+			basedir = self.getBaseDir()
+		except ConfigurationError:
+			pass
+		me = '{0}[{1}] {2}'.format( prefix, self.getName(), basedir )
+		print( me )
+		prefix = '    {0}'.format( prefix )
+		for child in self.getChildren():
+			child.describe( prefix )
 
 	def runPreFlightChecks( self ):
 		mApp().debugN( self, 2, 'performing pre-flight checks' )
