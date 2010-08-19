@@ -20,6 +20,7 @@ from core.MObject import MObject
 from socket import gethostname
 from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.Exceptions import ConfigurationError
+import os
 
 class Defaults( MObject ):
 	"""Defaults stores all hard-coded default values of make-o-matic."""
@@ -59,6 +60,8 @@ class Defaults( MObject ):
 	ConfigurationBuildSteps = 'configuration.buildsteps'
 	ConfigurationBuildDir = 'configuration.builddir'
 	ConfigurationTargetDir = 'configuration.targetdir'
+	# ----- auto-detected environment settings:
+	EnvironmentsBaseDir = 'environments.basedir'
 	# ----- Builder settings
 	MakeBuilderMakeTool = 'configuration.builder.make.toolname'
 	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
@@ -76,6 +79,7 @@ class Defaults( MObject ):
 		'''Constructor'''
 		MObject.__init__( self )
 		self.__settings = {}
+		home = os.getenv( 'USERPROFILE' ) or os.getenv( 'HOME' ) or ''
 		# store defaults:
 		# ----- store the make-o-matic version these scripts use:
 		self.getSettings()[ Defaults.MomVersionNumber ] = '0.5.0'
@@ -132,6 +136,7 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.MakeBuilderMakeTool ] = 'make'
 		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
 		self.getSettings()[ Defaults.CMakeBuilderTool ] = 'cmake'
+		self.getSettings()[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
 		# ----- simple_ci settings:
 		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
 

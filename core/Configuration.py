@@ -19,7 +19,6 @@
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.executomat.Step import Step
-from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.modules.configurations.FolderManager import FolderManager
 from core.Build import Build
 from core.actions.ExecuteConfigurationBaseAction import ExecuteConfigurationBaseAction
@@ -34,7 +33,6 @@ class Configuration( ConfigurationBase ):
 
 	def __init__( self, configName, parent = None ):
 		ConfigurationBase.__init__( self, configName, parent )
-		# self._setBaseDir( make_foldername_from_string( configName ) )
 		self.__folderManager = FolderManager()
 		self.addPlugin( self.__folderManager )
 
