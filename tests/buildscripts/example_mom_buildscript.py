@@ -40,8 +40,8 @@ dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 
 # set up configurations:
-python3 = Configuration( project, 'test with Python 3' )
-python2 = Configuration( project, 'test with Python 2.6' )
+python3 = Configuration( 'test with Python 3', project )
+python2 = Configuration( 'test with Python 2.6', project )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getDocsDir ) ) )
