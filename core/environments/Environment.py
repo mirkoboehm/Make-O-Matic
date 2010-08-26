@@ -27,6 +27,7 @@ class Environment( ConfigurationBase ):
 		ConfigurationBase.__init__( self, name, parent )
 		from core.environments.Environments import Environments
 		assert isinstance( parent, Environments )
+		self.setDependencies( [] )
 
 	def _getEnvironments( self ):
 		return self.getParent()
@@ -37,6 +38,16 @@ class Environment( ConfigurationBase ):
 			for plugin in clone.getPlugins():
 				plugin._setInstructions( clone )
 			self.addChild( clone )
+
+	def setDependencies( self, deps ):
+		self.__deps = deps
+
+	def getDependencies( self ):
+		return self.__deps
+
+	def addDependency( self, dep ):
+		assert dep not in self.__deps
+		self.__deps.append( dep )
 
 	def build( self ):
 		'''Apply the environment, build the configuration, restore the environment.'''

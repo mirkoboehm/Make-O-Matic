@@ -22,9 +22,11 @@ from core.modules.ConfigurationBase import ConfigurationBase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 import os
-import re
-from core.Exceptions import ConfigurationError
+from core.Exceptions import MomError
 import glob
+from core.environments.Dependency import Dependency
+from test.test_iterlen import len
+from core.environments.Environment import Environment
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches 
@@ -32,15 +34,24 @@ class Environments( ConfigurationBase ):
 	The configuration is then cloned for every matching environment, if this functionality is enabled for the selected build type.
 	'''
 
-	def __init__( self, dependencies = None, name = None, parent = None ):
+	def __init__( self, dependencies = [], name = None, parent = None ):
 		ConfigurationBase.__init__( self, name, parent )
 		self._setDependencies( dependencies )
 
 	def _setDependencies( self, deps ):
 		self.__dependencies = deps
 
+	def addDependency( self, dep ):
+		self.__dependencies.append( dep )
+
 	def getDependencies( self ):
 		return self.__dependencies
+
+	def _setInstalledDependencies( self, deps ):
+		self.__installedDeps = deps
+
+	def _getInstalledDependencies( self ):
+		return self.__installedDeps
 
 	def buildConfiguration( self ):
 		'''For every environment found during setup, apply the environment, and build the configuration.'''
@@ -75,137 +86,59 @@ class Environments( ConfigurationBase ):
 			print( e )
 		ConfigurationBase.runSetups( self )
 
-	def _readControlFile( self, controlFile ):
-		mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
-		try:
-			packageEnabled = False
-			commands = []
-			for line in open( controlFile, 'r' ).readlines():
-				if re.match( '^\s*#', line ): continue # ignore comments
-				if re.match( '^\s*$', line ): continue # ignore empty lines
-				if re.match( '^AUTOBUILD_', line ): commands.append( line )
-				enabled = re.match( '^(AUTOBUILD_PACKAGE_ENABLED)\s+(\w+)$', line )
-				# parse for "enabled" commands:
-				try:
-					if enabled:
-						yesNo = str( enabled.group( 2 ) )
-						if yesNo.lower() == 'false':
-							packageEnabled = False
-						elif yesNo.lower() == 'true':
-							packageEnabled = True
-						else:
-							raise ConfigurationError( 'enable must be true or false' )
-						mApp().debugN( self, 3, 'setBuildEnvironment: >enabled< {0}'.format( str( packageEnabled ) ) )
-					else:
-						if re.match( '^AUTOBUILD_', line ): commands.append( line )
-				except ConfigurationError as value:
-					mApp().message( 'error ({0}) in control file {1}\n--> {2}'.
-						format( str( value ), controlFile, str( line ).strip() ) )
-				except IndexError:
-					mApp().message( 'syntax error in control file {0}\n--> {1}'.format( controlFile, str( line ).strip() ) )
-			return [ packageEnabled, commands ]
-		except IOError:
-			mApp().debugN( self, 3, 'no control file found at "{0}"'.format( controlFile ) )
-		return []
-
-	def _controlFileName( self, path ):
-		return os.path.join( path, 'AUTOBUILD_PACKAGE_CONFIGURATION' )
-
-	def _directoryIsLeafNode( self, Folder ):
-		"""find leave nodes. a leave node is a folder that contains exactly on software package,
-		but no other installation nodes. software that is installed within a leaf node will not
-		be found. a leaf node is discovered by the existence of the bin/ or lib/ subdirectory 
-		and an  include/ subdirectory"""
-		if os.path.isdir( Folder ):
-			controlData = self._readControlFile( self._controlFileName( Folder ) )
-			if controlData:
-				[ enabled, commands ] = controlData
-				if enabled:
-					return True
-				else:
-					return False
-			Elements = os.listdir( Folder )
-			if ( 'bin' in Elements or 'lib' in Elements ) and ( 'include' in Elements or 'Include' in Elements or 'src' in Elements or 'boost' in Elements ):
-				mApp().debugN( self, 3, '{0} is a leaf node'.format( str( Folder ) ) )
-				return True
-			else:
-				return False
-
-	def _findLeafNodes( self, Folder ):
+	def _findMomDependencies( self, folder ):
 		"""recursively find leaf nodes within folder"""
-		LeafNodes = []
-		if os.path.isdir( Folder ):
-			Elements = os.listdir( Folder )
-			for Element in Elements:
-				mApp().debugN( self, 5, 'checking {0} for being a leaf node'.format( Element ) )
-				Path = os.path.join( Folder, Element )
-				if os.path.isdir( Path ):
-					controlFileInfo = self._readControlFile( self._controlFileName( Path ) )
-					if controlFileInfo: # there *is* a control file, and it is readable:
-						if controlFileInfo[0] == False:
-							# [0] is "ignore"
-							mApp().debugN( self, 2, 'package directory is not enabled: "{0}"'.format( Path ) )
-							continue
-					if self._directoryIsLeafNode( Path ):
-						LeafNodes.append( Path )
-					else:
-						LeafNodes = LeafNodes + self._findLeafNodes( Path )
-		return LeafNodes
+		leafNodes = []
+		if os.path.isdir( folder ):
+			elements = os.listdir( folder )
+			for element in elements:
+				mApp().debugN( self, 4, 'checking if {0} is a MOM dependency'.format( element ) )
+				path = os.path.join( folder, element )
+				dependency = Dependency( path )
+				if dependency.verify():
+					# if self._directoryIsLeafNode( path ):
+					leafNodes.append( dependency )
+				elif os.path.isdir( path ):
+					leafNodes.extend( self._findMomDependencies( path ) )
+		return leafNodes
 
-	def _getInstallationNodes( self, LeafNodes ):
-		"""find installation nodes. an installation node is a folder that contains leaf nodes
-		or other installation nodes"""
-		OldCwd = os.getcwd()
-		InstallationNodes = []
-		for Folder in LeafNodes:
-			Parts = Folder.split( os.sep )
-			Parts = Parts[:-1]
-			Base = os.sep.join( Parts )
-			InstallationNodes.append( Base )
-		# uniquify:
-		UniqueInstallationNodes = []
-		for Node in InstallationNodes:
-			if Node not in UniqueInstallationNodes:
-				UniqueInstallationNodes.append( Node )
-		os.chdir( OldCwd )
-		return UniqueInstallationNodes
-
-	def _getMatchingPathList( self, EnvironmentsRoot, LeafNode, BuildDependencies ):
+	def _findEnvironmentsForDependencies( self, environmentsRoot, installationNode, dependencyDescriptions ):
 		"""Returns a path list, looks like that: ( ( EnvPathA1, EnvPathA2, ...), (EnvPathB1, EnvPathB2, ...), ... )
 		with one group (list) per dependency
 		Returns None if this is no match"""
-		Environments = []
-		AllDependencies = list( BuildDependencies )
-		OldCwd = os.getcwd()
-		Folders = LeafNode.split( os.sep )
-		IncrementalPaths = []
-		os.chdir( EnvironmentsRoot )
-		for Folder in Folders:
-			if os.path.isdir( Folder ):
-				os.chdir( Folder )
-				IncrementalPaths.append( os.getcwd() )
-		mApp().debugN( self, 4, 'incremental paths: {0}'.format( ', '.join( str( IncrementalPaths ) ) ) )
-		IncrementalPaths.reverse()
-		IncrementalPaths.append( '' ) # for empty paths, we check the host provided dependencies
-		for Path in IncrementalPaths:
-			os.chdir( Path )
-			OriginalDependencies = list( AllDependencies ) # cannot modify AllDependencies during iteration
-			for Glob in OriginalDependencies:
-				mApp().debugN( self, 3, 'getMatchingPathList: checking for matches to ' + str( Glob ) + ' in ' + str( os.getcwd() ) )
-				Matches = glob.glob( Glob )
-				if len( Matches ) > 0:
-					LeafNodeMatches = []
-					for Match in Matches:
-						if self._directoryIsLeafNode( Match ):
-							LeafNodeMatches.append( Path + os.sep + Match )
-					AllDependencies.remove( Glob )
-					LeafNodeMatches.sort()
-					Environments.append( LeafNodeMatches )
-		os.chdir( OldCwd )
-		if len( AllDependencies ) == 0:
+		descriptions = list( dependencyDescriptions )
+		environments = []
+		folders = installationNode.split( os.sep )
+		root = environmentsRoot.split( os.sep )
+		if root != folders[:len( root )]:
+			raise MomError( 'The MOM dependency is supposed to be a subfolder of the MOM environments folder!' )
+		subTree = folders[len( root ):-1]
+		reversePaths = [ environmentsRoot ]
+		current = environmentsRoot
+		for folder in subTree:
+			current = os.path.join( current, folder )
+			reversePaths.append( current )
+		reversePaths.reverse()
+		mApp().debugN( self, 5, 'incremental paths: {0}'.format( ', '.join( reversePaths ) ) )
+		for path in reversePaths:
+			os.chdir( path )
+			originalDependencies = list( descriptions ) # cannot modify descriptions during iteration
+			for pattern in originalDependencies:
+				mApp().debugN( self, 3, 'getMatchingPathList: checking for matches to ' + str( pattern ) + ' in ' + str( os.getcwd() ) )
+				matches = glob.glob( pattern )
+				if len( matches ) > 0:
+					leafNodeMatches = []
+					for match in matches:
+						path = os.path.normpath( os.path.abspath( match ) )
+						if path in self._getInstalledDependencies().keys():
+							leafNodeMatches.append( path )
+					descriptions.remove( pattern )
+					leafNodeMatches.sort()
+					environments.append( leafNodeMatches )
+		if len( descriptions ) == 0:
 			# uniquify:
 			envs = []
-			for e in Environments:
+			for e in environments:
 				if e not in envs:
 					envs.append( e )
 			return envs
@@ -236,48 +169,58 @@ class Environments( ConfigurationBase ):
 				Name = Name + Parts[len( Parts ) - 1]
 		return Name
 
+	def detectMomDependencies( self ):
+		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )
+		detectedDependencies = self._findMomDependencies( momEnvironmentsRoot )
+		deps = {}
+		for dep in detectedDependencies:
+			deps[dep.getFolder()] = dep
+		self._setInstalledDependencies( deps )
+		# mApp().debugN( self, 3, 'found MOM dependencies: {0}'.format( ', '.join( str( detectedDependencies ) ) ) )
+
 	def findMatchingEnvironments( self ):
 		# find all leaf nodes:
-		dependencies = self.getDependencies()
+		dependencyDescriptions = self.getDependencies()
 		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )
 
-		if os.path.isdir( momEnvironmentsRoot ):
-			mApp().debugN( self, 3, 'MomEnvironments root found at "{0}"'.format( momEnvironmentsRoot ) )
-			# chdir, so that all resulting leaf nodes are below momEnvironmentsRoot:
-			oldCwd = os.getcwd()
-			os.chdir( momEnvironmentsRoot )
-			leafNodes = self._findLeafNodes( '.' )
-			mApp().debugN( self, 3, 'found leaf nodes: {0}'.format( ', '.join( str( leafNodes ) ) ) )
-			installedPackages = self._getInstallationNodes( leafNodes )
-			# we search an empty path as well, this makes the matcher check the host provided packages only, 
-			# those could possibly fulfill all requirements as well 
-			installedPackages.append( '' )
-			mApp().debugN( self, 3, 'found installation nodes: {0}'.format( ', '.join( str( installedPackages ) ) ) )
-			matchingEnvironments = []
-			for leafNode in installedPackages:
-				match = self._getMatchingPathList( momEnvironmentsRoot, leafNode, dependencies )
-				if match == None:
-					mApp().debugN( self, 3, '{0} has no matching build environment for {1}'
-						.format( leafNode, str( dependencies ) ) )
-				else:
-					mApp().debugN( self, 3, '{0} is a matching build environment for {1}'
-						.format( leafNode, str( dependencies ) ) )
-					matchingEnvironments.append( match )
-			pathLists = []
-			matchingEnvironments.sort()
-			for match in matchingEnvironments:
-				self._addElementsToPathList( match, pathLists )
-			environments = []
-			for pathList in pathLists:
-				Name = self._makeNameForPathList( pathList )
-				environments.append( [ Name, pathList ] )
-			mApp().debugN( self, 2, 'available build environments for {0}:'.format( str( dependencies ) ) )
-			for environment in environments:
-				mApp().debugN( self, 2, str( environment[0] ) + ':' )
-				for path in environment[1]:
-					mApp().debugN( self, 2, '--> ' + path )
-			os.chdir( oldCwd )
-			return environments
-		else:
+		if not os.path.isdir( momEnvironmentsRoot ):
 			mApp().debug( self, 'warning - MomEnvironments root not found at "{0}". Continuing.'.format( momEnvironmentsRoot ) )
 			return []
+
+		mApp().debugN( self, 3, 'MomEnvironments root found at "{0}"'.format( momEnvironmentsRoot ) )
+		self.detectMomDependencies()
+		# make set of installation nodes
+		uniqueDependencyFolders = self._getInstalledDependencies().keys()
+		matchingEnvironments = []
+		for dep in uniqueDependencyFolders:
+			match = self._findEnvironmentsForDependencies( momEnvironmentsRoot, dep, dependencyDescriptions )
+			if not match:
+				mApp().debugN( self, 3, '{0} has no matching build environment for {1}'
+					.format( dep, str( dependencyDescriptions ) ) )
+			else:
+				mApp().debugN( self, 3, '{0} is a matching build environment for {1}'
+					.format( dep, str( dependencyDescriptions ) ) )
+				matchingEnvironments.append( match )
+		# pathLists = []
+		matchingEnvironments.sort()
+# 			for match in matchingEnvironments:
+# 				self._addElementsToPathList( match, pathLists )
+		environments = []
+		for environment in matchingEnvironments:
+			env = Environment( 'NoName yet', self )
+			for paths in environment:
+				for path in paths:
+					dep = self._getInstalledDependencies()[path]
+					env.addDependency( dep )
+			environments.append( env )
+		return environments
+
+#		for pathList in pathLists:
+#			Name = self._makeNameForPathList( pathList )
+#			environments.append( [ Name, pathList ] )
+#		mApp().debugN( self, 2, 'available build environments for {0}:'.format( str( dependencyDescriptions ) ) )
+#		for environment in environments:
+#			mApp().debugN( self, 2, str( environment[0] ) + ':' )
+#			for path in environment[1]:
+#				mApp().debugN( self, 2, '--> ' + path )
+#		return environments
