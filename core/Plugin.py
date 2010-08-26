@@ -56,3 +56,8 @@ class Plugin( MObject ):
 		ShutDown is called from the finally block of the build method, so in all normal cases, it will be called 
 		before the build script ends."""
 		pass
+
+#	def describe( self, prefix ):
+#		me = '{0}Plugin: {1}'.format( prefix, self.getName() )
+#		print( me )
+

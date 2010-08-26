@@ -164,3 +164,7 @@ class Action( MObject ):
 			if oldPwd:
 				executomat.log( '# changing back to "{0}"'.format( oldPwd ) )
 				os.chdir( oldPwd )
+
+	def describe( self, prefix ):
+		me = '{0} {1}'.format( prefix, self.getLogDescription() )
+		print( me )

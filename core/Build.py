@@ -82,9 +82,17 @@ class Build( MApplication ):
 				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
 			raise ConfigurationError( text )
 
+	def run( self ):
+		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
+			self.describeRecursively()
+		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
+			MApplication.run( self )
+		else:
+			raise MomError( 'run can only be called in describe and build run modes' )
+
 	def _buildAndReturn( self ):
 		'''Overloaded method that implements the run modes.'''
-		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
+		if self.getSettings().get( Settings.ScriptRunMode ) in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
 			MApplication._buildAndReturn( self ) # use base class implementation
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
 			self.runPreFlightChecks()

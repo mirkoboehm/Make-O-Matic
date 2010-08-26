@@ -107,7 +107,6 @@ class MApplication( Instructions ):
 		self.runPreFlightChecks()
 		try:
 			self.runSetups()
-			self.describe()
 			self.run()
 		finally:
 			self.runShutDowns()

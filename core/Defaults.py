@@ -29,7 +29,8 @@ class Defaults( MObject ):
 	RunMode_Build = 'build'
 	RunMode_Query = 'query'
 	RunMode_Print = 'print'
-	RunModes = [ RunMode_Build, RunMode_Query, RunMode_Print ]
+	RunMode_Describe = 'describe'
+	RunModes = [ RunMode_Build, RunMode_Query, RunMode_Print, RunMode_Describe ]
 
 	# Constants (setting variable names)
 	# ----- script settings:

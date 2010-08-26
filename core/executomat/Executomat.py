@@ -138,3 +138,7 @@ class Executomat( MObject ):
 			Report.append( Step[1].report() )
 		return Report
 
+	def describe( self, prefix ):
+		MObject.describe( self, prefix )
+		for step in self._getSteps():
+			step.describe( prefix + '    ' )

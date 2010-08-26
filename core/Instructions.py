@@ -121,18 +121,26 @@ class Instructions( MObject ):
 		To implement specific operations between setup and wrap-up, re-implement execute.'''
 		pass
 
-	def describe( self, prefix = '' ):
-		'''Describe this instruction object in human readable form.'''
-		basedir = '<no base directory set>'
+	def describe( self, prefix ):
+		MObject.describe( self, prefix )
+		basedir = '(not set)'
 		try:
 			basedir = self.getBaseDir()
 		except ConfigurationError:
 			pass
-		me = '{0}[{1}] {2}'.format( prefix, self.getName(), basedir )
+		me = '{0}- base dir: {1}'.format( prefix, basedir )
 		print( me )
+		subPrefix = prefix + '    '
+		for plugin in self.getPlugins():
+			plugin.describe( subPrefix )
+		self.getExecutomat().describe( subPrefix )
+
+	def describeRecursively( self, prefix = '' ):
+		'''Describe this instruction object in human readable form.'''
+		self.describe( prefix )
 		prefix = '    {0}'.format( prefix )
 		for child in self.getChildren():
-			child.describe( prefix )
+			child.describeRecursively( prefix )
 
 	def runPreFlightChecks( self ):
 		mApp().debugN( self, 2, 'performing pre-flight checks' )

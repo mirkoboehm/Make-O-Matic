@@ -139,3 +139,17 @@ class Step( MObject ):
 					resultText = 'skipped'
 		return not self.__failed
 
+	def describe( self, prefix ):
+		MObject.describe( self, prefix )
+		if self.getPreActions():
+			print( '{0} - pre actions: '.format( prefix ) )
+			for action in self.getPreActions():
+				action.describe( prefix + '    ' )
+		if self.getMainActions():
+			print( '{0} - main actions: '.format( prefix ) )
+			for action in self.getMainActions():
+				action.describe( prefix + '    ' )
+		if self.getPostActions():
+			print( '{0} - post actions: '.format( prefix ) )
+			for action in self.getPostActions():
+				action.describe( prefix + '    ' )

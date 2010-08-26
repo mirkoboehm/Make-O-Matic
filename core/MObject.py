@@ -32,3 +32,12 @@ class MObject( object ):
 
 	def getName( self ):
 		return self.__name
+
+	def describe( self, prefix ):
+		name = self.getName()
+		clazz = self.__class__.__name__
+		if name != clazz:
+			print( '{0}{1}: {2}'.format( prefix, clazz, name ) )
+		else:
+			print( '{0}{1}'.format( prefix, clazz ) )
+
