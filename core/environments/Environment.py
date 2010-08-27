@@ -65,3 +65,10 @@ class Environment( ConfigurationBase ):
 			return 1
 		else:
 			return 0
+
+	def makeDescription( self ):
+		names = []
+		for dep in self.getDependencies():
+			names.append( dep.getDescription() )
+		return ' - '.join( names )
+

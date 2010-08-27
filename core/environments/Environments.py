@@ -68,7 +68,6 @@ class Environments( ConfigurationBase ):
 		# discover matching environments:
 		configs = self.getChildren()[:]
 		environments = self.findMatchingEnvironments()
-		# [ Environment( 'Qt-4.6.2-Shared-Release', self ) ] # FIXME
 		if environments:
 			for config in configs:
 				self.removeChild( config )
@@ -102,17 +101,17 @@ class Environments( ConfigurationBase ):
 					leafNodes.extend( self._findMomDependencies( path ) )
 		return leafNodes
 
-	def _findEnvironmentsForDependencies( self, environmentsRoot, installationNode, dependencyDescriptions ):
+	def _findEnvironmentsForDependencies( self, environmentsRoot, installationNode ):
 		"""Returns a path list, looks like that: ( ( EnvPathA1, EnvPathA2, ...), (EnvPathB1, EnvPathB2, ...), ... )
 		with one group (list) per dependency
 		Returns None if this is no match"""
-		descriptions = list( dependencyDescriptions )
+		descriptions = list( self.getDependencies() ) # make a copy, to avoid modifying the member
 		environments = []
 		folders = installationNode.split( os.sep )
 		root = environmentsRoot.split( os.sep )
 		if root != folders[:len( root )]:
 			raise MomError( 'The MOM dependency is supposed to be a subfolder of the MOM environments folder!' )
-		subTree = folders[len( root ):-1]
+		subTree = folders[len( root ):]
 		reversePaths = [ environmentsRoot ]
 		current = environmentsRoot
 		for folder in subTree:
@@ -129,12 +128,14 @@ class Environments( ConfigurationBase ):
 				if len( matches ) > 0:
 					leafNodeMatches = []
 					for match in matches:
-						path = os.path.normpath( os.path.abspath( match ) )
-						if path in self._getInstalledDependencies().keys():
+						path = os.path.join( path, match )
+						path = os.path.normpath( os.path.abspath( path ) )
+						if path in self._getInstalledDependencies():
 							leafNodeMatches.append( path )
-					descriptions.remove( pattern )
-					leafNodeMatches.sort()
-					environments.append( leafNodeMatches )
+					if leafNodeMatches:
+						leafNodeMatches.sort()
+						descriptions.remove( pattern )
+						environments.append( leafNodeMatches )
 		if len( descriptions ) == 0:
 			# uniquify:
 			envs = []
@@ -174,13 +175,13 @@ class Environments( ConfigurationBase ):
 		detectedDependencies = self._findMomDependencies( momEnvironmentsRoot )
 		deps = {}
 		for dep in detectedDependencies:
-			deps[dep.getFolder()] = dep
+			folder = os.path.normpath( os.path.abspath( dep.getFolder() ) )
+			deps[ folder ] = dep
 		self._setInstalledDependencies( deps )
 		# mApp().debugN( self, 3, 'found MOM dependencies: {0}'.format( ', '.join( str( detectedDependencies ) ) ) )
 
 	def findMatchingEnvironments( self ):
 		# find all leaf nodes:
-		dependencyDescriptions = self.getDependencies()
 		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )
 
 		if not os.path.isdir( momEnvironmentsRoot ):
@@ -190,16 +191,20 @@ class Environments( ConfigurationBase ):
 		mApp().debugN( self, 3, 'MomEnvironments root found at "{0}"'.format( momEnvironmentsRoot ) )
 		self.detectMomDependencies()
 		# make set of installation nodes
-		uniqueDependencyFolders = self._getInstalledDependencies().keys()
+		# FIXME this should be the folders that contain dependencies:
+		uniqueDependencyFolders = []
+		for dep in self._getInstalledDependencies():
+			uniqueDependencyFolders.append( self._getInstalledDependencies()[dep].getContainingFolder() )
+		uniqueDependencyFolders = frozenset( uniqueDependencyFolders )
 		matchingEnvironments = []
 		for dep in uniqueDependencyFolders:
-			match = self._findEnvironmentsForDependencies( momEnvironmentsRoot, dep, dependencyDescriptions )
+			match = self._findEnvironmentsForDependencies( momEnvironmentsRoot, dep )
 			if not match:
 				mApp().debugN( self, 3, '{0} has no matching build environment for {1}'
-					.format( dep, str( dependencyDescriptions ) ) )
+					.format( dep, str( self.getDependencies() ) ) )
 			else:
 				mApp().debugN( self, 3, '{0} is a matching build environment for {1}'
-					.format( dep, str( dependencyDescriptions ) ) )
+					.format( dep, str( self.getDependencies() ) ) )
 				matchingEnvironments.append( match )
 		# pathLists = []
 		matchingEnvironments.sort()
@@ -210,8 +215,10 @@ class Environments( ConfigurationBase ):
 			env = Environment( 'NoName yet', self )
 			for paths in environment:
 				for path in paths:
+					# FIXME error handling
 					dep = self._getInstalledDependencies()[path]
 					env.addDependency( dep )
+			env.setName( env.makeDescription() )
 			environments.append( env )
 		return environments
 
@@ -224,3 +231,8 @@ class Environments( ConfigurationBase ):
 #			for path in environment[1]:
 #				mApp().debugN( self, 2, '--> ' + path )
 #		return environments
+
+	def describe( self, prefix ):
+		ConfigurationBase.describe( self, prefix )
+		deps = '{0}- dependencies: {1}'.format( prefix, ', '.join( self.getDependencies() ) )
+		print( deps )

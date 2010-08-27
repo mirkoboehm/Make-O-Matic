@@ -53,6 +53,7 @@ class BuildEnvironmentTests( MomTestCase ):
 		dep = [ 'dep-a-1.?.0' ]
 		environments = Environments( dep )
 		matches = environments.findMatchingEnvironments()
+		environments.describe( '' )
 		# check if every environment contains every dependency only once
 		for environment in matches:
 			paths = []

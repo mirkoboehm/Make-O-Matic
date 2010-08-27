@@ -22,7 +22,7 @@ from core.executomat.Executomat import Executomat
 from core.Settings import Settings
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
-from core.Exceptions import ConfigurationError, MomError
+from core.Exceptions import ConfigurationError, MomError, MomException
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
 
 class Instructions( MObject ):
@@ -56,7 +56,7 @@ class Instructions( MObject ):
 	def getBaseDir( self ):
 		try:
 			check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
-		except Exception:
+		except MomException:
 			mApp().debugN( self, 4, 'getBaseDir() was called before the base directory was set!' )
 			raise
 		return self.__baseDir

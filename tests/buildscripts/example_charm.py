@@ -34,7 +34,7 @@ build, project = setupStandardBuildAndProject( buildName = 'Charm Build Script',
 enableCharmTools = CMakeVariable( 'CHARM_ENABLE_TOOLS_BUILD', 'TRUE', 'BOOL' )
 
 # find different Shared Debug build environments
-environments = Environments( [ 'Qt-Shared-Debug-4.[67].?' ], 'Qt 4', project )
+environments = Environments( [ 'Qt-4.[67].?-Shared-*' ], 'Qt 4', project )
 
 # add a debug and a release configuration that build using CMake
 debug = Configuration( 'Debug', environments, )

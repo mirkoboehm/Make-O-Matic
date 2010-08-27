@@ -39,9 +39,9 @@ class Dependency( MObject ):
 
 	def _readControlFile( self, controlFile ):
 		prefix = 'MOM_'
-		mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
 		try:
 			with open ( controlFile, 'r' ) as input:
+				mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
 				self._setValid( True )
 				for line in input.readlines():
 					if re.match( '^\s*#', line ): continue # ignore comments
@@ -112,3 +112,7 @@ class Dependency( MObject ):
 			else:
 				mApp().debugN( self, 5, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
 				return False
+
+	def getDescription( self ):
+		name = os.path.split( self.getFolder() )[1]
+		return name
