@@ -24,6 +24,7 @@ from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
 from core.Exceptions import ConfigurationError, MomError, MomException
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
+from core.Defaults import Defaults
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -90,31 +91,6 @@ class Instructions( MObject ):
 			raise MomError( 'Cannot remove child {0}, I am not it\'s parent {1}!'
 				.format( instructions.getName(), self.getName() ) )
 
-	def configureRelativeBaseDir( self ):
-		parentBaseDir = self.getParent().getBaseDir()
-		if parentBaseDir:
-			assert os.path.isdir( parentBaseDir )
-			foldername = make_foldername_from_string( self.getName() )
-			abspath = os.path.abspath( os.path.join( parentBaseDir, foldername ) )
-			try:
-				os.makedirs( abspath )
-				self._setBaseDir( abspath )
-			except ( OSError, IOError )as e:
-				raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
-					.format( abspath, self.getName(), e ) )
-
-	def configureRelativeLogDir( self ):
-		parentLogDir = self.getParent().getExecutomat().getLogDir()
-		assert os.path.isdir( parentLogDir )
-		foldername = make_foldername_from_string( self.getName() )
-		abspath = os.path.abspath( os.path.join( parentLogDir, foldername ) )
-		try:
-			os.makedirs( abspath )
-			self.getExecutomat().setLogDir( abspath )
-		except ( OSError, IOError )as e:
-			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
-				.format( abspath, self.getName(), e ) )
-
 	def execute( self ):
 		'''If execute is implemented, it is supposed to execute the pay load of the instructions. 
 		Execute is not required, many modules only need to act during the different phases.
@@ -142,6 +118,62 @@ class Instructions( MObject ):
 		for child in self.getChildren():
 			child.describeRecursively( prefix )
 
+	def _getIndex( self, instructions ):
+		index = 0
+		for child in self.getChildren():
+			if child == instructions:
+				return index
+			index = index + 1
+		raise MomError( 'Unknown child {0}'.format( instructions ) )
+
+	def _getBaseDirName( self ):
+		myIndex = None
+		if self.getParent():
+			myIndex = self.getParent()._getIndex( self ) + 1
+		if self.getName() == self.__class__.__name__:
+			baseDirName = '{0}'.format( myIndex )
+		else:
+			index = myIndex or ''
+			spacer = '_' if myIndex else ''
+			baseDirName = '{0}{1}{2}'.format( index, spacer, make_foldername_from_string( self.getName() ) )
+		return baseDirName
+
+	def _configureBaseDir( self ):
+		parentBaseDir = os.getcwd()
+		if self.getParent():
+			parentBaseDir = self.getParent().getBaseDir()
+		assert os.path.isdir( parentBaseDir )
+		baseDirName = self._getBaseDirName()
+		baseDir = os.path.join( parentBaseDir, baseDirName )
+		try:
+			os.makedirs( baseDir )
+			self._setBaseDir( baseDir )
+		except ( OSError, IOError ) as e:
+			raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
+				.format( baseDir, self.getName(), e ) )
+		if not self.getParent():
+			os.chdir( baseDir )
+
+	def _configureLogDir( self ):
+		# FIXME it is not "ProjectLogDir" anymore
+		logDirName = self._getBaseDirName()
+		parentLogDir = self.getBaseDir()
+			# bootstrap if this is the root object
+		if self.getParent():
+			parentLogDir = self.getParent().getExecutomat().getLogDir()
+		else:
+			parentLogDir = self.getBaseDir()
+			logDirName = self.getSettings().get( Defaults.ProjectLogDir )
+		assert os.path.isdir( parentLogDir )
+		logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
+		try:
+			os.makedirs( logDir )
+			self.getExecutomat().setLogDir( logDir )
+		except ( OSError, IOError )as e:
+			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
+				.format( logDir, self.getName(), e ) )
+
+
 	def runPreFlightChecks( self ):
 		mApp().debugN( self, 2, 'performing pre-flight checks' )
 		[ plugin.preFlightCheck() for plugin in self.getPlugins() ]
@@ -149,12 +181,11 @@ class Instructions( MObject ):
 
 	def runSetups( self ):
 		mApp().debugN( self, 2, 'setting up' )
+		self._configureBaseDir()
+		self._configureLogDir()
 		self.__executomat.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
 		[ plugin.setup() for plugin in self.getPlugins() ]
 		for child in self.getChildren():
-			if self.getExecutomat().getLogDir():
-				child.configureRelativeLogDir()
-				child.configureRelativeBaseDir()
 			child.runSetups()
 
 	def runWrapups( self ):

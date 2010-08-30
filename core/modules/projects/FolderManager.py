@@ -65,37 +65,38 @@ class FolderManager( Plugin ):
 		return self.__getNormPath( Settings.ProjectLogDir )
 
 	def preFlightCheck( self ):
-		project = self.getInstructions()
-		assert isinstance( project, core.Project.Project )
-		directory = os.path.normpath( os.path.join( os.getcwd(), make_foldername_from_string( project.getName() ) ) )
-		project._setBaseDir( directory )
-		mApp().debugN( self, 3, 'build folder is "{0}"'.format( project.getBaseDir() ) )
+		pass
+#		project = self.getInstructions()
+#		assert isinstance( project, core.Project.Project )
+#		directory = os.path.normpath( os.path.join( os.getcwd(), make_foldername_from_string( project.getName() ) ) )
+#		project._setBaseDir( directory )
 
 	def setup( self ):
+		mApp().debugN( self, 3, 'build folder is "{0}"'.format( self.getInstructions().getBaseDir() ) )
 		project = self.getInstructions()
 		assert isinstance( project, core.Project.Project )
-		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( make_foldername_from_string( project.getName() ) ), 'mom_' ) )
-		mApp().debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir() ) )
-		project.getExecutomat().setLogDir( self.getTmpLogDir() )
-		if os.path.isdir( project.getBaseDir() ):
-			stats = os.stat( project.getBaseDir() )
-			mtime = time.localtime( stats[8] )
-			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
-			newFolder = '{0}-{1}'.format( project.getBaseDir(), extension )
-			try:
-				shutil.move( project.getBaseDir(), newFolder )
-			except ( OSError, shutil.Error ) as o:
-				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
-										.format( project.getBaseDir(), newFolder, str( o ) ) )
-			mApp().debug( self, 'stale build folder exists, moving it.' )
-			mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
-		try:
-			os.mkdir( project.getBaseDir() )
-		except OSError as o:
-			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( project.getBaseDir(), str( o ) ) )
-		os.chdir( project.getBaseDir() )
-		mApp().debug( self, 'build folder created' )
-		mApp().debugN( self, 2, 'CWD: "{0}"'.format( os.getcwd() ) )
+#		self._setTmpLogDir( tempfile.mkdtemp( '_{0}'.format( make_foldername_from_string( project.getName() ) ), 'mom_' ) )
+#		mApp().debugN( self, 2, 'temporary log directory is at "{0}".'.format( self.getTmpLogDir() ) )
+#		project.getExecutomat().setLogDir( self.getTmpLogDir() )
+#		if os.path.isdir( project.getBaseDir() ):
+#			stats = os.stat( project.getBaseDir() )
+#			mtime = time.localtime( stats[8] )
+#			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
+#			newFolder = '{0}-{1}'.format( project.getBaseDir(), extension )
+#			try:
+#				shutil.move( project.getBaseDir(), newFolder )
+#			except ( OSError, shutil.Error ) as o:
+#				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
+#										.format( project.getBaseDir(), newFolder, str( o ) ) )
+#			mApp().debug( self, 'stale build folder exists, moving it.' )
+#			mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
+#		try:
+#			os.mkdir( project.getBaseDir() )
+#		except OSError as o:
+#			raise ConfigurationError( 'Cannot create project build folder at "{0}": {1}'.format( project.getBaseDir(), str( o ) ) )
+#		os.chdir( project.getBaseDir() )
+#		mApp().debug( self, 'build folder created' )
+#		mApp().debugN( self, 2, 'CWD: "{0}"'.format( os.getcwd() ) )
 		# now create actions:
 		create = project.getExecutomat().getStep( 'project-create-folders' )
 		delete = project.getExecutomat().getStep( 'project-cleanup' )
@@ -105,18 +106,19 @@ class FolderManager( Plugin ):
 
 	def shutDown( self ):
 		'''Move the temporary log dir into the base folder.'''
-		try:
-			# first, move a possibly existing log directory out of the way:
-			if os.path.isdir( self.getLogDir() ):
-				gmt = time.gmtime( os.path.getatime( self.getLogDir() ) )
-				atime = time.strftime( '%Y%m%d-%H-%M-%S', gmt )
-				shutil.move( self.getLogDir(), self.getLogDir() + '-' + atime )
-			if self.getTmpLogDir():
-				shutil.copytree( self.getTmpLogDir(), self.getLogDir() )
-				shutil.rmtree( self.getTmpLogDir(), True )
-				mApp().debugN( self, 2, 'logs moved from temporary to final location at "{0}"'.format( self.getLogDir() ) )
-			self._setTmpLogDir( None )
-		except ( IOError, os.error ) as why:
-			mApp().message( 'Cannot move build logs to log directory "{0}", log data remains at "{1}": {2}'
-				.format( self.getLogDir(), self.getTmpLogDir(), str( why ).strip() ) )
+		pass
+#		try:
+#			# first, move a possibly existing log directory out of the way:
+#			if os.path.isdir( self.getLogDir() ):
+#				gmt = time.gmtime( os.path.getatime( self.getLogDir() ) )
+#				atime = time.strftime( '%Y%m%d-%H-%M-%S', gmt )
+#				shutil.move( self.getLogDir(), self.getLogDir() + '-' + atime )
+#			if self.getTmpLogDir():
+#				shutil.copytree( self.getTmpLogDir(), self.getLogDir() )
+#				shutil.rmtree( self.getTmpLogDir(), True )
+#				mApp().debugN( self, 2, 'logs moved from temporary to final location at "{0}"'.format( self.getLogDir() ) )
+#			self._setTmpLogDir( None )
+#		except ( IOError, os.error ) as why:
+#			mApp().message( 'Cannot move build logs to log directory "{0}", log data remains at "{1}": {2}'
+#				.format( self.getLogDir(), self.getTmpLogDir(), str( why ).strip() ) )
 

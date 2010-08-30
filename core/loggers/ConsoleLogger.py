@@ -16,11 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import sys
+import sys, re
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
+from core.Exceptions import MomException
 
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
@@ -36,6 +37,12 @@ class ConsoleLogger( Logger ):
 
 	def message( self, mapp, mobject, msg ):
 		text = str( msg )
+		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
+		try:
+			basedir = mApp().getBaseDir()
+			text = re.sub( basedir, '$BASE', text )
+		except MomException:
+			pass # no base directory set yet		
 		if not text.endswith( '\n' ): text = text + '\n'
 		fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
 		sys.stderr.write( fulltext )

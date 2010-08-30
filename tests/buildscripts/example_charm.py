@@ -26,8 +26,8 @@ from core.modules.packagers.CPack import CPack
 from core.modules.testers.CTest import CTest
 from core.environments.Environments import Environments
 
-build, project = setupStandardBuildAndProject( buildName = 'Charm Build Script', minimumMomVersion = "0.5.0",
-	projectName = "Charm", projectVersionNumber = '1.4.0',
+build, project = setupStandardBuildAndProject( buildName = 'Charm', minimumMomVersion = "0.5.0",
+	projectVersionNumber = '1.4.0',
 	scmUrl = 'git:git@gitorious.org:charm/charm.git' )
 
 # helper variable to set a CMake parameter
