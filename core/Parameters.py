@@ -50,8 +50,6 @@ class Parameters( MObject ):
 			help = 'repository revision to be built' )
 		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
 			help = 'Full SCM URL' )
-		parser.add_option( '-e', '--email-recipients', action = 'store', dest = 'mailTo',
-			help = 'comma separated list of email recipients for emailed build reports' )
 		parser.add_option( '-t', '--type', action = 'store', dest = 'buildType',
 			help = 'selects the build type (for example manual, continuous, daily, snapshot, full)' )
 		parser.add_option( '-m', '--ignore-commit-message', action = 'store_true', dest = 'ignoreCommitMessage',
@@ -82,9 +80,6 @@ class Parameters( MObject ):
 	def getBuildSteps( self ):
 		return self._getOptions().buildSteps
 
-	def getRecipients( self ):
-		return self._getOptions().mailTo
-
 	def getIgnoreCommitMessage( self ):
 		return self._getOptions().ignoreCommitMessage
 
@@ -101,8 +96,6 @@ class Parameters( MObject ):
 			settings.set( Settings.ProjectBuildType, self.getBuildType() )
 		if self.getBuildSteps():
 			settings.set( Settings.ProjectBuildSequenceSwitches, self.getBuildSteps() )
-		if self.getRecipients():
-			settings.set( Settings.EmailReporterRecipients, self.getRecipients() )
 		if self.getIgnoreCommitMessage():
 			settings.set( Settings.ScriptIgnoreCommitMessageCommands, self.getIgnoreCommitMessage() )
 		if self.getDebugLevel():
