@@ -33,14 +33,14 @@ class ExecutomatReport( object ):
 	def getStepReports( self ):
 		return self.__stepReports
 
-	def getExecutomat( self ):
+	def _getExecutomat( self ):
 		return self.__executomat
 
 	def prepare( self ):
 		self.__summary = '{0} ({1})'\
-			.format( self.getExecutomat().getName(),
-					 self.getExecutomat().getTimeKeeper().deltaString() )
-		for step in self.getExecutomat()._getSteps():
+			.format( self._getExecutomat().getName(),
+					 self._getExecutomat().getTimeKeeper().deltaString() )
+		for step in self._getExecutomat()._getSteps():
 			report = StepReport( step )
 			report.prepare()
 			self.__stepReports.append( report )

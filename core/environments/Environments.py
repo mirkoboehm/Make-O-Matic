@@ -78,7 +78,7 @@ class Environments( ConfigurationBase ):
 		try:
 			action = ExecuteConfigurationBaseAction( self )
 			action.setIgnorePreviousFailure( True ) # there may be multiple configurations
-			step = self.getParent().getExecutomat().getStep( 'project-build-configurations' )
+			step = self.getParent().getStep( 'project-build-configurations' )
 			step.addMainAction( action )
 		except Exception as e:
 			print( e )

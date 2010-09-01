@@ -92,7 +92,7 @@ class SCMSubversion( SourceCodeProvider ):
 	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
 		assert self.getInstructions()
-		step = self.getInstructions().getExecutomat().getStep( 'project-checkout' )
+		step = self.getInstructions().getStep( 'project-checkout' )
 		cmd = 'svn --non-interactive checkout -r"{0}" {1} .'.format( 
 			self.getRevision() or 'HEAD',
 			self.getUrl() )

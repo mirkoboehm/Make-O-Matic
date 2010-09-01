@@ -42,7 +42,7 @@ class MakePackager( PackageProvider ):
 
     def makePackageStep( self ):
         """Create package for the project."""
-        step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
+        step = self.getInstructions().getStep( 'conf-package' )
         makePackage = ShellCommandAction( 'make package' )
         makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
         step.addMainAction( makePackage )

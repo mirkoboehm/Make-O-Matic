@@ -73,6 +73,14 @@ class Defaults( MObject ):
 	# ----- reporter settings:
 	EmailReporterSender = 'reporter.email.sender'
 	EmailReporterRecipients = 'reporter.email.recipient'
+	# ----- email sender settings:
+	EmailerSmtpServer = 'emailer.smtpserver'
+	EmailerServerPort = 'emailer.serverport'
+	EmailerTimeout = 'emailer.timeout'
+	EmailerUseTls = 'emailer.usetls'
+	EmailerDoLogin = 'emailer.dologin'
+	EmailerUsername = 'emailer.username'
+	EmailerPassword = 'emailer.password'
 	# ----- simple_ci settings: 
 	SimpleCIBuildJobCap = 'simple_ci.build.cap'
 

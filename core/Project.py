@@ -90,10 +90,10 @@ class Project( Instructions ):
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence( self ):
-			self.getExecutomat().addStep( step )
+			self._getExecutomat().addStep( step )
 		Instructions.runSetups( self )
-		create = self.getExecutomat().getStep( 'project-create-folders' )
-		delete = self.getExecutomat().getStep( 'project-cleanup' )
+		create = self.getStep( 'project-create-folders' )
+		delete = self.getStep( 'project-cleanup' )
 		for folder in ( self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
@@ -122,6 +122,6 @@ class Project( Instructions ):
 	def execute( self ):
 		self.getTimeKeeper().start()
 		try:
-			self.getExecutomat().run( self )
+			self._getExecutomat().run( self )
 		finally:
 			self.getTimeKeeper().stop()

@@ -65,7 +65,7 @@ class CPack( PackageProvider ):
 
     def makePackageStep( self ):
         """Create packages for the project using CPack."""
-        step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
+        step = self.getInstructions().getStep( 'conf-package' )
         buildDirectory = self.getInstructions().getBuildDir()
 
         makePackage = ShellCommandAction( 'cpack' )

@@ -72,7 +72,7 @@ class MakeBasedBuilder( Builder ):
 		cmd = ' '.join( [ self.getMakeToolName(), options ] )
 		action = ShellCommandAction( cmd )
 		action.setWorkingDirectory( self._getBuildDir() )
-		step = self.getInstructions().getExecutomat().getStep( 'conf-make' )
+		step = self.getInstructions().getStep( 'conf-make' )
 		step.addMainAction( action )
 
 	def createConfMakeInstallActions( self ):
@@ -82,6 +82,6 @@ class MakeBasedBuilder( Builder ):
 			mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) ] )
 		action = ShellCommandAction( cmd )
 		action.setWorkingDirectory( self._getBuildDir() )
-		step = self.getInstructions().getExecutomat().getStep( 'conf-make-install' )
+		step = self.getInstructions().getStep( 'conf-make-install' )
 		step.addMainAction( action )
 

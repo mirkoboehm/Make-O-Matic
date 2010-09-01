@@ -24,7 +24,7 @@ class ProjectReport( object ):
 		from core.Project import Project
 		assert isinstance( project, Project )
 		self.__project = project
-		self.__executomatReport = ExecutomatReport( project.getExecutomat() )
+		self.__executomatReport = ExecutomatReport( project._getExecutomat() )
 		self.__summary = None
 
 	def getProject( self ):

@@ -119,7 +119,7 @@ class SCMGit( SourceCodeProvider ):
 	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
 		assert self.getInstructions()
-		step = self.getInstructions().getExecutomat().getStep( 'project-checkout' )
+		step = self.getInstructions().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
 		updateClone = ShellCommandAction( 'git clone --local --depth 1 {0} .'.format ( self._getHiddenClonePath() ) )

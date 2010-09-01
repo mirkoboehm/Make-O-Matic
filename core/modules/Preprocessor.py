@@ -204,6 +204,6 @@ class Preprocessor( Plugin ):
 		return self.__project
 
 	def setup( self ):
-		step = self.getInstructions().getExecutomat().getStep( self.getStep() )
+		step = self.getInstructions().getStep( self.getStep() )
 		action = _PreprocessorAction( self )
 		step.addPostAction( action )

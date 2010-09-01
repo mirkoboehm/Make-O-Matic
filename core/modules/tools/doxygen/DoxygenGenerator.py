@@ -57,7 +57,7 @@ class DoxygenGenerator( Plugin ):
 
 	def setup( self ):
 		check_for_path( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
-		step = self.getInstructions().getExecutomat().getStep( 'project-create-docs' )
+		step = self.getInstructions().getStep( 'project-create-docs' )
 		doxygenCall = ShellCommandAction( '{0} {1}'
 			.format ( self.getDoxygenPath(), self.getDoxygenFile() ) )
 		doxygenCall.setWorkingDirectory( self.getInstructions().getScm().getSrcDir() )

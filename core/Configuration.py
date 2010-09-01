@@ -58,8 +58,8 @@ class Configuration( ConfigurationBase ):
 		with EnvironmentSaver():
 			self.getTimeKeeper().start()
 			try:
-				self.getExecutomat().run( self )
-				if self.getExecutomat().hasFailed():
+				self._getExecutomat().run( self )
+				if self._getExecutomat().hasFailed():
 					return 1
 				else:
 					return 0
@@ -73,18 +73,18 @@ class Configuration( ConfigurationBase ):
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():
-			self.getExecutomat().addStep( step )
+			self._getExecutomat().addStep( step )
 		action = ExecuteConfigurationBaseAction( self )
 		action.setIgnorePreviousFailure( True )
 		try:
-			step = self.getParent().getExecutomat().getStep( 'project-build-configurations' )
+			step = self.getParent().getStep( 'project-build-configurations' )
 			step.addMainAction( action )
 		except MomError:
 			mApp().debugN( self, 5, 'parent is not a Project, not generating actions' )
 		settings = mApp().getSettings()
 		folders = [ settings.get( Settings.ConfigurationBuildDir ), settings.get( Settings.ConfigurationTargetDir ) ]
-		create = self.getExecutomat().getStep( 'conf-create-folders' )
-		cleanup = self.getExecutomat().getStep( 'conf-cleanup' )
+		create = self.getStep( 'conf-create-folders' )
+		cleanup = self.getStep( 'conf-cleanup' )
 		for folder in folders:
 			create.addMainAction( MkDirAction( PathResolver( self.getBaseDir, folder ) ) )
 		folders.reverse()

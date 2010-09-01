@@ -65,8 +65,11 @@ class Instructions( MObject ):
 			raise
 		return self.__baseDir
 
-	def getExecutomat( self ):
+	def _getExecutomat( self ):
 		return self.__executomat
+
+	def getStep( self, step ):
+		return self._getExecutomat().getStep( step )
 
 	def getPlugins( self ):
 		return self.__plugins
@@ -112,7 +115,7 @@ class Instructions( MObject ):
 		subPrefix = prefix + '    '
 		for plugin in self.getPlugins():
 			plugin.describe( subPrefix )
-		self.getExecutomat().describe( subPrefix )
+		self._getExecutomat().describe( subPrefix )
 
 	def describeRecursively( self, prefix = '' ):
 		'''Describe this instruction object in human readable form.'''
@@ -175,7 +178,7 @@ class Instructions( MObject ):
 		parentLogDir = self.getBaseDir()
 			# bootstrap if this is the root object
 		if self.getParent():
-			parentLogDir = self.getParent().getExecutomat().getLogDir()
+			parentLogDir = self.getParent()._getExecutomat().getLogDir()
 		else:
 			parentLogDir = self.getBaseDir()
 			logDirName = self.getSettings().get( Defaults.ProjectLogDir )
@@ -183,7 +186,7 @@ class Instructions( MObject ):
 		logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
 		try:
 			os.makedirs( logDir )
-			self.getExecutomat().setLogDir( logDir )
+			self._getExecutomat().setLogDir( logDir )
 		except ( OSError, IOError )as e:
 			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
 				.format( logDir, self.getName(), e ) )
