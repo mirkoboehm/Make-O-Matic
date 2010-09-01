@@ -91,12 +91,12 @@ class CMakeBuilder( MakeBasedBuilder ):
 		configuration = self.getInstructions()
 		project = configuration.getProject()
 		srcDir = project.getSourceDir()
-		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getFolderManager().getTargetDir() ) )
+		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getTargetDir() ) )
 		variables = []
 		for variable in self.getCMakeVariables():
 			variables.append( '-D{0}'.format( variable ) )
 		cmd = '{0} {1} {2}'.format( self.getCMakeToolName(), ' '.join( variables ), srcDir )
 		action = ShellCommandAction( cmd )
-		action.setWorkingDirectory( configuration.getFolderManager().getBuildDir() )
+		action.setWorkingDirectory( configuration.getBuildDir() )
 		step = self.getInstructions().getExecutomat().getStep( 'conf-configure' )
 		step.addMainAction( action )

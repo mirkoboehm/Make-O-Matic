@@ -28,7 +28,7 @@ class CTest( TestProvider ):
     def __init__( self, name = None ):
         """Constructor"""
         TestProvider.__init__( self, name )
-        
+
     def _checkInstallation( self ):
         """Check if the tester's prerequisite are installed."""
         runner = RunCommand( 'ctest --version' )
@@ -39,11 +39,10 @@ class CTest( TestProvider ):
             lines = runner.getStdOut().decode().split( '\n' )
             self._setDescription( lines[0].rstrip() )
             mApp().debugN( self, 4, 'ctest found: "{0}"'.format( self.getDescription() ) )
-        
+
     def makeTestStep( self ):
         """Run tests for the project."""
         step = self.getInstructions().getExecutomat().getStep( 'conf-make-test' )
         makeTest = ShellCommandAction( 'ctest --verbose' )
-        makeTest.setWorkingDirectory( self.getInstructions().getFolderManager().getBuildDir() )
+        makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
         step.addMainAction( makeTest )
-        

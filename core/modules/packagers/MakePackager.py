@@ -28,7 +28,7 @@ class MakePackager( PackageProvider ):
     def __init__( self, name = None ):
         """Constructor"""
         PackageProvider.__init__( self, name )
-        
+
     def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
         runner = RunCommand( 'make --version' )
@@ -39,10 +39,10 @@ class MakePackager( PackageProvider ):
             lines = runner.getStdOut().decode().splitlines()
             self._setDescription( lines[0].rstrip() )
             mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
-        
+
     def makePackageStep( self ):
         """Create package for the project."""
         step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
         makePackage = ShellCommandAction( 'make package' )
-        makePackage.setWorkingDirectory( self.getInstructions().getFolderManager().getBuildDir() )
+        makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
         step.addMainAction( makePackage )

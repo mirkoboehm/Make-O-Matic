@@ -19,13 +19,16 @@
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.executomat.Step import Step
-from core.modules.configurations.FolderManager import FolderManager
 from core.Build import Build
 from core.actions.ExecuteConfigurationBaseAction import ExecuteConfigurationBaseAction
 from core.Exceptions import MomError
 import core
 from core.modules.ConfigurationBase import ConfigurationBase
 from core.helpers.EnvironmentSaver import EnvironmentSaver
+import os
+from core.actions.filesystem.MkDirAction import MkDirAction
+from core.helpers.PathResolver import PathResolver
+from core.actions.filesystem.RmDirAction import RmDirAction
 
 class Configuration( ConfigurationBase ):
 	'''Configuration represents a variant of how a project is built.
@@ -33,15 +36,20 @@ class Configuration( ConfigurationBase ):
 
 	def __init__( self, configName, parent = None ):
 		ConfigurationBase.__init__( self, configName, parent )
-		self.__folderManager = FolderManager()
-		self.addPlugin( self.__folderManager )
-
-	def getFolderManager( self ):
-		return self.__folderManager
 
 	def _setProject( self, project ):
 		assert isinstance( project, core.Project.Project )
 		self.__project = project
+
+	def _getNormPath( self, name ):
+		path = os.path.join( self.getBaseDir(), mApp().getSettings().get( name ) )
+		return os.path.normpath( os.path.abspath( path ) )
+
+	def getBuildDir( self ):
+		return self._getNormPath( Settings.ConfigurationBuildDir )
+
+	def getTargetDir( self ):
+		return self._getNormPath( Settings.ConfigurationTargetDir )
 
 	def buildConfiguration( self ):
 		'''Helper method used by configuration-like objects that executes the whole instructions as part of a step of a superior 
@@ -73,7 +81,17 @@ class Configuration( ConfigurationBase ):
 			step.addMainAction( action )
 		except MomError:
 			mApp().debugN( self, 5, 'parent is not a Project, not generating actions' )
+		settings = mApp().getSettings()
+		folders = [ settings.get( Settings.ConfigurationBuildDir ), settings.get( Settings.ConfigurationTargetDir ) ]
+		create = self.getExecutomat().getStep( 'conf-create-folders' )
+		cleanup = self.getExecutomat().getStep( 'conf-cleanup' )
+		for folder in folders:
+			create.addMainAction( MkDirAction( PathResolver( self.getBaseDir, folder ) ) )
+		folders.reverse()
+		for folder in folders:
+			cleanup.addMainAction( RmDirAction( PathResolver( self.getBaseDir, folder ) ) )
 		ConfigurationBase.runSetups( self )
+
 
 	def calculateBuildSequence( self ):
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()

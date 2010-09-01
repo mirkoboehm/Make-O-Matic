@@ -65,7 +65,7 @@ class MakeBasedBuilder( Builder ):
 
 	def _getBuildDir( self ):
 		configuration = self.getInstructions()
-		return configuration.getFolderManager().getBuildDir()
+		return configuration.getBuildDir()
 
 	def createConfMakeActions( self ):
 		options = self.getMakeOptions() or ''
