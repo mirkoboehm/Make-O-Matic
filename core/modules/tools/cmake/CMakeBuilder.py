@@ -90,7 +90,7 @@ class CMakeBuilder( MakeBasedBuilder ):
 	def createConfigureActions( self ):
 		configuration = self.getInstructions()
 		project = configuration.getProject()
-		srcDir = project.getFolderManager().getSourceDir()
+		srcDir = project.getSourceDir()
 		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getFolderManager().getTargetDir() ) )
 		variables = []
 		for variable in self.getCMakeVariables():

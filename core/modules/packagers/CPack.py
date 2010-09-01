@@ -33,7 +33,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 
     def run( self ):
         """Finds the names of the CPack generated packages and moves them."""
-        if (self.__action.getResult() != 0):
+        if ( self.__action.getResult() != 0 ):
             return 1
         lines = self.__action.getStdOut().decode().splitlines()
         packageLinePrefix = 'CPack: Package '
@@ -45,14 +45,14 @@ class _CPackMovePackageAction( FilesMoveAction ):
                 packageFile = line.replace( packageLineSuffix, '' )
                 packageFiles.append( packageFile )
         self.setFiles( packageFiles )
-        return FilesMoveAction.run(self)
+        return FilesMoveAction.run( self )
 
 class CPack( PackageProvider ):
 
     def __init__( self, name = None ):
         """Constructor"""
         PackageProvider.__init__( self, name )
-        
+
     def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
         runner = RunCommand( 'cpack --version' )
@@ -62,7 +62,7 @@ class CPack( PackageProvider ):
         else:
             self._setDescription( runner.getStdOut().decode().rstrip() )
             mApp().debugN( self, 4, 'cpack found: "{0}"'.format( self.getDescription() ) )
-        
+
     def makePackageStep( self ):
         """Create packages for the project using CPack."""
         step = self.getInstructions().getExecutomat().getStep( 'conf-package' )
@@ -72,6 +72,6 @@ class CPack( PackageProvider ):
         makePackage.setWorkingDirectory( buildDirectory )
         step.addMainAction( makePackage )
 
-        movePackageDestination = self.getInstructions().getProject().getFolderManager().getPackagesDir()
+        movePackageDestination = self.getInstructions().getProject().getPackagesDir()
         movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
         step.addMainAction( movePackage )

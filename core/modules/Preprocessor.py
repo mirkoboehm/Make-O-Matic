@@ -149,13 +149,13 @@ class _PreprocessorAction( Action ):
 		if not p:
 			return '[MOM PP: project not initialized]'
 		if folder == 'src':
-			return p.getFolderManager().getSourceDir()
+			return p.getSourceDir()
 		elif folder == 'tmp':
-			return p.getFolderManager().getTempDir()
+			return p.getTempDir()
 		elif folder == 'docs':
-			return p.getFolderManager().getDocsDir()
+			return p.getDocsDir()
 		elif folder == 'packages':
-			return p.getFolderManager().getPackagesDir()
+			return p.getPackagesDir()
 		else:
 			mApp().debugN( self, 2, 'Unknown folder id "{0}"'.format( folder ) )
 			return ''

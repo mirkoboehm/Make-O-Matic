@@ -54,6 +54,6 @@ release.addPlugin( CTest() )
 release.addPlugin( CPack() )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
-project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getPackagesDir ) ) )
+project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getPackagesDir ) ) )
 
 build.build()

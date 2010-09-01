@@ -30,8 +30,8 @@ build, project = setupStandardBuildAndProject( minimumMomVersion = "0.5.0",
 	scmUrl = 'git:git@gitorious.org:make-o-matic/mom.git' )
 
 # add a preprocessor that generates the Doxygen input file
-prep = Preprocessor( project, inputFilename = PathResolver( project.getFolderManager().getSourceDir, 'doxygen.cfg.in' ),
-					 outputFilename = PathResolver( project.getFolderManager().getTempDir, 'doxygen.cfg' ) )
+prep = Preprocessor( project, inputFilename = PathResolver( project.getSourceDir, 'doxygen.cfg.in' ),
+					 outputFilename = PathResolver( project.getTempDir, 'doxygen.cfg' ) )
 project.addPlugin( prep )
 
 # add a doxygen generator
@@ -44,7 +44,7 @@ python3 = Configuration( 'test with Python 3', project )
 python2 = Configuration( 'test with Python 2.6', project )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
-project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getFolderManager().getDocsDir ) ) )
+project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getDocsDir ) ) )
 
 # run:
 build.build()

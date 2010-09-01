@@ -19,7 +19,6 @@
 
 from __future__ import print_function
 
-from core.modules.projects.FolderManager import FolderManager
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Settings import Settings
@@ -29,6 +28,9 @@ from core.helpers.PathResolver import PathResolver
 from core.Instructions import Instructions
 from core.helpers.GlobalMApp import mApp
 from core.executomat.Step import Step
+import os
+from core.actions.filesystem.MkDirAction import MkDirAction
+from core.actions.filesystem.RmDirAction import RmDirAction
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -41,8 +43,6 @@ class Project( Instructions ):
 		mApp().getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
-		self.__folderManager = FolderManager()
-		self.addPlugin( self.getFolderManager() )
 
 	def getBuild( self ):
 		from core.Build import Build
@@ -52,7 +52,7 @@ class Project( Instructions ):
 	def createScm( self, description ):
 		factory = SourceCodeProviderFactory()
 		scm = factory.makeScmImplementation( description )
-		scm.setSrcDir( PathResolver( self.getFolderManager().getSourceDir ) )
+		scm.setSrcDir( PathResolver( self.getSourceDir ) )
 		self.setScm( scm )
 
 	def setScm( self, scm ):
@@ -66,8 +66,24 @@ class Project( Instructions ):
 	def getScm( self ):
 		return self.__scm
 
-	def getFolderManager( self ):
-		return self.__folderManager
+	def __getNormPath( self, name ):
+		path = os.path.join( self.getBaseDir(), mApp().getSettings().get( name ) )
+		return os.path.normpath( path )
+
+	def getSourceDir( self ):
+		return self.__getNormPath( Settings.ProjectSourceDir )
+
+	def getPackagesDir( self ):
+		return self.__getNormPath( Settings.ProjectPackagesDir )
+
+	def getTempDir( self ):
+		return self.__getNormPath( Settings.ProjectTempDir )
+
+	def getDocsDir( self ):
+		return self.__getNormPath( Settings.ProjectDocsDir )
+
+	def getLogDir( self ):
+		return self.__getNormPath( Settings.ProjectLogDir )
 
 	def getTimeKeeper( self ):
 		return self.__timeKeeper
@@ -76,6 +92,11 @@ class Project( Instructions ):
 		for step in self.calculateBuildSequence( self ):
 			self.getExecutomat().addStep( step )
 		Instructions.runSetups( self )
+		create = self.getExecutomat().getStep( 'project-create-folders' )
+		delete = self.getExecutomat().getStep( 'project-cleanup' )
+		for folder in ( self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
+			create.addMainAction( MkDirAction( folder ) )
+			delete.addMainAction( RmDirAction( folder ) )
 
 	def calculateBuildSequence( self, project ):
 		assert self.getBuild()
