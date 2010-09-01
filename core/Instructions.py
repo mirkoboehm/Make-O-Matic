@@ -25,6 +25,7 @@ import os
 from core.Exceptions import ConfigurationError, MomError, MomException
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
 from core.Defaults import Defaults
+from core.helpers.EnvironmentSaver import EnvironmentSaver
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -175,36 +176,40 @@ class Instructions( MObject ):
 
 
 	def runPreFlightChecks( self ):
-		mApp().debugN( self, 2, 'performing pre-flight checks' )
-		[ plugin.preFlightCheck() for plugin in self.getPlugins() ]
-		[ child.runPreFlightChecks() for child in self.getChildren() ]
+		with EnvironmentSaver():
+			mApp().debugN( self, 2, 'performing pre-flight checks' )
+			[ plugin.preFlightCheck() for plugin in self.getPlugins() ]
+			[ child.runPreFlightChecks() for child in self.getChildren() ]
 
 	def runSetups( self ):
-		mApp().debugN( self, 2, 'setting up' )
-		self._configureBaseDir()
-		self._configureLogDir()
-		self.__executomat.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
-		[ plugin.setup() for plugin in self.getPlugins() ]
-		for child in self.getChildren():
-			child.runSetups()
+		with EnvironmentSaver():
+			mApp().debugN( self, 2, 'setting up' )
+			self._configureBaseDir()
+			self._configureLogDir()
+			self.__executomat.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
+			[ plugin.setup() for plugin in self.getPlugins() ]
+			for child in self.getChildren():
+				child.runSetups()
 
 	def runWrapups( self ):
-		mApp().debugN( self, 2, 'wrapping up' )
-		[ plugin.wrapUp() for plugin in self.getPlugins() ]
-		for child in self.getChildren():
-			child.runWrapups()
+		with EnvironmentSaver():
+			mApp().debugN( self, 2, 'wrapping up' )
+			[ plugin.wrapUp() for plugin in self.getPlugins() ]
+			for child in self.getChildren():
+				child.runWrapups()
 
 	def runShutDowns( self ):
-		for child in self.getChildren():
-			child.runShutDowns()
-		mApp().debugN( self, 2, 'shutting down' )
-		for plugin in self.getPlugins():
-			try:
-				plugin.shutDown()
-			except Exception as e:
-				text = '''\
-An error occurred during shutdown: "{0}"
-Offending module: "{1}" 
-This error will not change the return code of the script!'''.format( str( e ), plugin.getName() )
-				mApp().message( self, text )
+		with EnvironmentSaver():
+			for child in self.getChildren():
+				child.runShutDowns()
+			mApp().debugN( self, 2, 'shutting down' )
+			for plugin in self.getPlugins():
+				try:
+					plugin.shutDown()
+				except Exception as e:
+					text = '''\
+	An error occurred during shutdown: "{0}"
+	Offending module: "{1}" 
+	This error will not change the return code of the script!'''.format( str( e ), plugin.getName() )
+					mApp().message( self, text )
 

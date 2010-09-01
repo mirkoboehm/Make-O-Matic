@@ -25,7 +25,7 @@ from core.actions.ExecuteConfigurationBaseAction import ExecuteConfigurationBase
 from core.Exceptions import MomError
 import core
 from core.modules.ConfigurationBase import ConfigurationBase
-import os
+from core.helpers.EnvironmentSaver import EnvironmentSaver
 
 class Configuration( ConfigurationBase ):
 	'''Configuration represents a variant of how a project is built.
@@ -47,26 +47,21 @@ class Configuration( ConfigurationBase ):
 		'''Helper method used by configuration-like objects that executes the whole instructions as part of a step of a superior 
 		instructions object.'''
 		mApp().debug( self, 'building configuration "{0}"'.format( self.getName() ) )
-		self.getTimeKeeper().start()
-		mApp().debugN( self, 3, 'saving working directory and environment variables' )
-		oldenv = os.environ.copy()
-		oldcwd = os.getcwd()
-		try:
-			self.getExecutomat().run( self )
-			if self.getExecutomat().hasFailed():
-				return 1
-			else:
-				return 0
-		except MomError as e:
-			mApp().message( self, 'error while building configuration "{0}"'.format( e ) )
-			# mApp().registerReturnCode( e.getReturnCode() )
-			return e.getReturnCode()
-		finally:
-			os.environ = oldenv
-			os.chdir( oldcwd )
-			mApp().debugN( self, 3, 'working directory and environment variables restored' )
-			self.getTimeKeeper().stop()
-			mApp().debug( self, 'finished building configuration "{0}"'.format( self.getName() ) )
+		with EnvironmentSaver():
+			self.getTimeKeeper().start()
+			try:
+				self.getExecutomat().run( self )
+				if self.getExecutomat().hasFailed():
+					return 1
+				else:
+					return 0
+			except MomError as e:
+				mApp().message( self, 'error while building configuration "{0}"'.format( e ) )
+				# mApp().registerReturnCode( e.getReturnCode() )
+				return e.getReturnCode()
+			finally:
+				self.getTimeKeeper().stop()
+				mApp().debug( self, 'finished building configuration "{0}"'.format( self.getName() ) )
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():
