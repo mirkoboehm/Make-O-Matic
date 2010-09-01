@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Defaults import Defaults
-import os
+import os, sys
 from socket import gethostname
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
@@ -29,15 +29,38 @@ class Settings( Defaults ):
 		'''Constructor'''
 		# this applies the defaults:
 		Defaults.__init__( self )
+		if sys.platform == 'darwin' or sys.platform == 'win32':
+			self.__momFolder = "MakeOMatic"
+		else:
+			self.__momFolder = "mom"
 
-	def evalConfigurationFiles( self, toolName = None ):
-		momFolder = 'mom'
-		globalFolder = os.path.join( os.sep, 'etc', momFolder )
-		userFolder = os.path.join( os.environ['HOME'], '.{0}'.format( momFolder ) )
+	def globalFolder( self, toolName = None ):
+		if sys.platform == 'darwin':
+			globalFolder = os.path.join( "/Library/Application Support", self.__momFolder )
+		elif sys.platform == 'win32':
+			globalFolder = os.path.join( os.getenv( 'ALLUSERSPROFILE' ), self.__momFolder )
+		else:
+			globalFolder = os.path.join( "/etc", self.__momFolder )
+
 		if toolName:
 			globalFolder = os.path.join( globalFolder, toolName )
+		return globalFolder
+
+	def userFolder( self, toolName = None ):
+		if sys.platform == 'darwin':
+			userFolder = os.path.join( "~/Library/Application Support", self.__momFolder )
+			userFolder = os.path.expanduser( userFolder )
+		elif sys.platform == 'win32':
+			userFolder = os.path.join( os.getenv( 'APPDATA' ), self.__momFolder )
+		else:
+			userFolder = os.path.expanduser( "~/." + self.__momFolder )
+
+		if toolName:
 			userFolder = os.path.join( userFolder, toolName )
-		folders = [ globalFolder, userFolder ]
+		return userFolder
+
+	def evalConfigurationFiles( self, toolName = None ):
+		folders = [ self.globalFolder( toolName ), self.userFolder( toolName ) ]
 		hostConfigFile = '{0}.py'.format( gethostname() )
 		files = [ 'config.py', hostConfigFile ]
 		for folder in folders:

@@ -23,6 +23,7 @@ from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
+import sys
 
 # FIXME add variants of make? That provide make tool name, version check command, ...? 
 class MakeBasedBuilder( Builder ):
@@ -47,7 +48,14 @@ class MakeBasedBuilder( Builder ):
 		return self.__makeInstallOptions
 
 	def preFlightCheck( self ):
-		runner = RunCommand( '{0} {1}'.format( self.getMakeToolName(), '--version' ) )
+		if sys.platform == 'win32':
+			#FIXME get a version string that actually works
+			runner = RunCommand( '{0} {1}'.format( self.getMakeToolName(), '/?' ) )\
+			#FIXME create NMake subclass
+			self.setMakeOptions( '' )
+			self.setMakeInstallOptions( '' )
+		else:
+			runner = RunCommand( '{0} {1}'.format( self.getMakeToolName(), '--version' ) )
 		runner.run()
 		if runner.getReturnCode() != 0:
 			raise ConfigurationError( 'MakeBasedBuilder: make tool "{0}" not found.'.format( self.getMakeToolName() ) )
@@ -69,17 +77,14 @@ class MakeBasedBuilder( Builder ):
 
 	def createConfMakeActions( self ):
 		options = self.getMakeOptions() or ''
-		cmd = ' '.join( [ self.getMakeToolName(), options ] )
-		action = ShellCommandAction( cmd )
+		action = ShellCommandAction( [ self.getMakeToolName(), options ] )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-make' )
 		step.addMainAction( action )
 
 	def createConfMakeInstallActions( self ):
-		cmd = ' '.join( [
-			self.getMakeToolName(),
-			self.getMakeInstallOptions() or '',
-			mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) ] )
+		options = self.getMakeInstallOptions() or ''
+		cmd = [ self.getMakeToolName(), options, mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) ]
 		action = ShellCommandAction( cmd )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-make-install' )

@@ -21,7 +21,7 @@ from core.Exceptions import AbstractMethodCalledError, ConfigurationError, MomEr
 from core.helpers.RunCommand import RunCommand
 from core.executomat.ShellCommandAction import ShellCommandAction
 from core.executomat.Action import Action
-import os
+import os, sys
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import re
 from core.helpers.GlobalMApp import mApp
@@ -45,8 +45,13 @@ class SCMGit( SourceCodeProvider ):
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
-		# FIXME platformdefs for home
-		self.__cloneArmy = os.environ['HOME'] + os.sep + '.cloneArmy'
+		if sys.platform == 'darwin':
+			self.__cloneArmy = os.path.expanduser( "~/Library/Caches/MakeOMatic/CloneArmy" )
+		elif sys.platform == 'win32':
+			self.__cloneArmy = os.getenv( 'LOCALAPPDATA' ) or os.getenv( 'APPDATA' )
+			self.__cloneArmy = os.path.join( self.__cloneArmy, "MakeOMatic" )
+		else:
+			self.__cloneArmy = os.path.expanduser( "~/.cloneArmy" )
 
 	def getIdentifier( self ):
 		return 'git'
@@ -122,7 +127,7 @@ class SCMGit( SourceCodeProvider ):
 		step = self.getInstructions().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
-		updateClone = ShellCommandAction( 'git clone --local --depth 1 {0} .'.format ( self._getHiddenClonePath() ) )
+		updateClone = ShellCommandAction( 'git clone --local --depth 1 "{0}" .'.format ( self._getHiddenClonePath() ) )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
 		revision = self.getRevision() or 'HEAD'
@@ -151,7 +156,7 @@ class SCMGit( SourceCodeProvider ):
 			else:
 				raise MomError( 'cannot update the clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 		else:
-			runner = RunCommand( 'git clone {0} {1}'.format( self.getUrl(), hiddenClone ), 1200, True )
+			runner = RunCommand( 'git clone {0} "{1}"'.format( self.getUrl(), hiddenClone ), 1200, True )
 			runner.run()
 			if runner.getReturnCode() == 0:
 				mApp().debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )

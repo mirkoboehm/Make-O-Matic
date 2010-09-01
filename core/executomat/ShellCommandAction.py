@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_nonnegative_int
+from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.Exceptions import MomError
 from core.helpers.RunCommand import RunCommand
 from core.executomat.Action import Action
@@ -36,7 +36,6 @@ class ShellCommandAction( Action ):
 
 	def setCommand( self, command, TimeOutPeriod = None ):
 		"""Set the shell command"""
-		check_for_nonempty_string( command, 'trying to set a command that is not a string' )
 		if TimeOutPeriod != None:
 			check_for_nonnegative_int( TimeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
 		self.__command = command
@@ -53,7 +52,6 @@ class ShellCommandAction( Action ):
 
 	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
-		check_for_nonempty_string( self.getCommand(), 'trying to run a command without a command' )
 		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, True )
 		self._getRunner().run()
 		self._setStdOut( self._getRunner().getStdOut() )
