@@ -171,7 +171,6 @@ class Instructions( MObject ):
 			os.chdir( baseDir )
 
 	def _configureLogDir( self ):
-		# FIXME it is not "ProjectLogDir" anymore
 		logDirName = self._getBaseDirName()
 		parentLogDir = self.getBaseDir()
 			# bootstrap if this is the root object

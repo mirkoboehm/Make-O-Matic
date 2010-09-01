@@ -24,7 +24,6 @@ from core.modules.publishers.RSyncPublisher import RSyncPublisher
 from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder, CMakeVariable
 from core.modules.packagers.CPack import CPack
 from core.modules.testers.CTest import CTest
-from core.environments.Environments import Environments
 
 build, project = setupStandardBuildAndProject( buildName = 'Charm', minimumMomVersion = "0.5.0",
 	projectVersionNumber = '1.4.0',
@@ -34,17 +33,17 @@ build, project = setupStandardBuildAndProject( buildName = 'Charm', minimumMomVe
 enableCharmTools = CMakeVariable( 'CHARM_ENABLE_TOOLS_BUILD', 'TRUE', 'BOOL' )
 
 # find different Shared Debug build environments
-environments = Environments( [ 'Qt-4.[67].?-Shared-*' ], 'Qt 4', project )
+# environments = Environments( [ 'Qt-4.[67].?-Shared-*' ], 'Qt 4', project )
 
 # add a debug and a release configuration that build using CMake
-debug = Configuration( 'Debug', environments, )
+debug = Configuration( 'Debug', project, )
 cmakeDebug = CMakeBuilder()
 cmakeDebug.setMakeOptions( '-j2' )
 cmakeDebug.setMakeInstallOptions( '-j1' )
 cmakeDebug.addCMakeVariable( enableCharmTools )
 debug.addPlugin( cmakeDebug )
 
-release = Configuration( 'Release', environments )
+release = Configuration( 'Release', project )
 cmakeRelease = CMakeBuilder()
 cmakeRelease.setMakeOptions( '-j2' )
 cmakeDebug.setMakeInstallOptions( '-j1' )
