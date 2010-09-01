@@ -25,7 +25,6 @@ import os
 from core.Exceptions import MomError
 import glob
 from core.environments.Dependency import Dependency
-from test.test_iterlen import len
 from core.environments.Environment import Environment
 
 class Environments( ConfigurationBase ):
