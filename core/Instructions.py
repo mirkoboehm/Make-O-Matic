@@ -26,6 +26,8 @@ from core.Exceptions import ConfigurationError, MomError, MomException
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
 from core.Defaults import Defaults
 from core.helpers.EnvironmentSaver import EnvironmentSaver
+import time
+import shutil
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -146,6 +148,19 @@ class Instructions( MObject ):
 		assert os.path.isdir( parentBaseDir )
 		baseDirName = self._getBaseDirName()
 		baseDir = os.path.join( parentBaseDir, baseDirName )
+		if os.path.isdir( baseDir ):
+			mApp().debug( self, 'stale base directory exists, moving it.' )
+			stats = os.stat( baseDir )
+			mtime = time.localtime( stats[8] )
+			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
+			newFolder = '{0}-{1}'.format( baseDir, extension )
+			try:
+				shutil.move( baseDir, newFolder )
+			except ( OSError, shutil.Error ) as o:
+				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
+					.format( baseDir, newFolder, str( o ) ) )
+			mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
+
 		try:
 			os.makedirs( baseDir )
 			self._setBaseDir( baseDir )
