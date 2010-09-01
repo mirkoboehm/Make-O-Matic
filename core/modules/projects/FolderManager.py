@@ -16,24 +16,19 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os, time
 from core.Plugin import Plugin
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.Exceptions import ConfigurationError
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
 from core.Settings import Settings
-import tempfile
-import shutil
 from core.helpers.GlobalMApp import mApp
 import core
+import os
 
 class FolderManager( Plugin ):
 	"""FolderManager creates and deletes the project folders. It is specific to Project objects."""
 
 	def __init__( self ):
 		Plugin.__init__( self )
-		self._tmpLogDir = None
 
 	def getProject( self ):
 		assert isinstance( self.getInstructions(), core.Project.Project )
@@ -63,13 +58,6 @@ class FolderManager( Plugin ):
 
 	def getLogDir( self ):
 		return self.__getNormPath( Settings.ProjectLogDir )
-
-	def preFlightCheck( self ):
-		pass
-#		project = self.getInstructions()
-#		assert isinstance( project, core.Project.Project )
-#		directory = os.path.normpath( os.path.join( os.getcwd(), make_foldername_from_string( project.getName() ) ) )
-#		project._setBaseDir( directory )
 
 	def setup( self ):
 		mApp().debugN( self, 3, 'build folder is "{0}"'.format( self.getInstructions().getBaseDir() ) )

@@ -17,9 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import unittest
+from tests.cases.preprocessor_tests import PreprocessorTest
+from tests.cases.environment_saver_tests import EnvironmentSaverTest
 from tests.cases.buildstatus_persistence_tests import BuildStatusPersistenceTests
 from tests.cases.path_resolver_tests import PathResolverTest
-from tests.cases.preprocessor_tests import PreprocessorTest
 from tests.cases.run_mode_print_tests import RunModePrintTests
 from tests.cases.run_timeout_tests import RunWithTimeoutTest
 from tests.cases.scm_factory_tests import ScmFactoryTests
@@ -28,8 +29,9 @@ from tests.selftest.simple_project_tests import SimpleProjectTests
 from tests.selftest.simple_ci_tests import SimpleCITests
 from tests.selftest.charm_build_tests import CharmBuildTests
 
-classes = [ BuildStatusPersistenceTests,
-	PathResolverTest,
+classes = [ PathResolverTest,
+	EnvironmentSaverTest,
+	BuildStatusPersistenceTests,
 	PreprocessorTest,
 	RunModePrintTests,
 	RunWithTimeoutTest,
