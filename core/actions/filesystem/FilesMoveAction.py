@@ -23,42 +23,42 @@ from core.helpers.GlobalMApp import mApp
 from os.path import isdir
 
 class FilesMoveAction( Action ):
-    """FilesMoveAction encapsulates the moving of files to a directory.
-    It is mostly used internally, but can be of general use as well."""
-    def __init__( self, files = None, destination = None ):
-        Action.__init__( self )
-        self.setFiles( files )
-        self.setDestination( destination )
-        
-    def setFiles( self, sourceFiles ):
-        """Set the list of files to move"""
-        self.__sourceFiles = sourceFiles
-        
-    def getFiles( self ):
-        """Get the list of files to move"""
-        return self.__sourceFiles
-    
-    def setDestination( self, destination ):
-        """Set the destination directory to move to"""
-        self.__destination = destination
-        
-    def getDestination( self ):
-        """Get the destination directory to move to"""
-        return self.__destination
+	"""FilesMoveAction encapsulates the moving of files to a directory.
+	It is mostly used internally, but can be of general use as well."""
+	def __init__( self, files = None, destination = None ):
+		Action.__init__( self )
+		self.setFiles( files )
+		self.setDestination( destination )
 
-    def getLogDescription( self ):
-        """Provide a textual description for the Action that can be added to the execution log file."""
-        return self.getName()
+	def setFiles( self, sourceFiles ):
+		"""Set the list of files to move"""
+		self.__sourceFiles = sourceFiles
 
-    def run( self ):
-        """Executes the shell command. Needs a command to be set."""
-        if not isdir( str( self.__destination ) ):
-            return 1
+	def getFiles( self ):
+		"""Get the list of files to move"""
+		return self.__sourceFiles
 
-        for file in self.__sourceFiles:
-            try:
-                mApp().debugN( self, 4, 'moving file from "{0}" to "{1}'.format( file, self.__destination ) )
-                move( file, self.__destination )
-            except:
-                return 1
-        return 0
+	def setDestination( self, destination ):
+		"""Set the destination directory to move to"""
+		self.__destination = destination
+
+	def getDestination( self ):
+		"""Get the destination directory to move to"""
+		return self.__destination
+
+	def getLogDescription( self ):
+		"""Provide a textual description for the Action that can be added to the execution log file."""
+		return self.getName()
+
+	def run( self ):
+		"""Executes the shell command. Needs a command to be set."""
+		if not isdir( str( self.__destination ) ):
+			return 1
+
+		for file in self.__sourceFiles:
+			try:
+				mApp().debugN( self, 4, 'moving file from "{0}" to "{1}'.format( file, self.__destination ) )
+				move( file, self.__destination )
+			except:
+				return 1
+		return 0
