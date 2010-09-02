@@ -23,7 +23,7 @@ class Environment( ConfigurationBase ):
 	'''Environment is a single match of the required build environment for a single 
 	configuration.'''
 
-	def __init__( self, name, parent ):
+	def __init__( self, name = None, parent = None ):
 		ConfigurationBase.__init__( self, name, parent )
 		from core.environments.Environments import Environments
 		assert isinstance( parent, Environments )

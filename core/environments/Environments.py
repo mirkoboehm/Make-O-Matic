@@ -22,9 +22,10 @@ from core.modules.ConfigurationBase import ConfigurationBase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 import os
-from core.Exceptions import MomError
+from core.Exceptions import MomError, AbstractMethodCalledError
 import glob
 from core.environments.Dependency import Dependency
+from fnmatch import fnmatch
 from core.environments.Environment import Environment
 
 class Environments( ConfigurationBase ):
@@ -104,6 +105,7 @@ class Environments( ConfigurationBase ):
 		"""Returns a path list, looks like that: ( ( EnvPathA1, EnvPathA2, ...), (EnvPathB1, EnvPathB2, ...), ... )
 		with one group (list) per dependency
 		Returns None if this is no match"""
+		raise AbstractMethodCalledError
 		descriptions = list( self.getDependencies() ) # make a copy, to avoid modifying the member
 		environments = []
 		folders = installationNode.split( os.sep )
@@ -148,6 +150,7 @@ class Environments( ConfigurationBase ):
 	def _addElementsToPathList( self, Environment, PathListCollection, PathList = None ):
 		"""perform a depth-first traversal of the tree spanned by the combination of the possible 
 		installation paths and create a list of flat lists of directories in PathListCollection"""
+		raise AbstractMethodCalledError
 		if len( Environment ) > 0:
 			Environment[0].sort()
 			for Path in Environment[0]:
@@ -160,6 +163,7 @@ class Environments( ConfigurationBase ):
 
 	def _makeNameForPathList( self, PathList ):
 		"""take the paths basenames and use them to create a name. easy"""
+		raise AbstractMethodCalledError
 		Name = ''
 		for Path in PathList:
 			Parts = Path.split( os.sep )
@@ -179,6 +183,30 @@ class Environments( ConfigurationBase ):
 		self._setInstalledDependencies( deps )
 		# mApp().debugN( self, 3, 'found MOM dependencies: {0}'.format( ', '.join( str( detectedDependencies ) ) ) )
 
+	def calculateMatches( self, packages, remainingDependencies, folders ):
+		matches = []
+		if not folders:
+			return None
+		folder = folders[0]
+		for dep in remainingDependencies:
+			for item in os.listdir( folder ):
+				path = os.path.join( folder, item )
+				if os.path.isdir( path ):
+					if fnmatch( item, dep ):
+						newPackages = list( packages )
+						newPackages.append( path )
+						newDeps = list( self.getDependencies() )
+						newDeps.remove( dep )
+						if newDeps:
+							# there are still dependencies to find further up the path
+							theseMatches = self.calculateMatches( newPackages, newDeps, folders[1:] )
+							if theseMatches:
+								matches.append( theseMatches )
+						else:
+							# yay, all dependencies have been found
+							matches.append( newPackages )
+		return matches
+
 	def findMatchingEnvironments( self ):
 		# find all leaf nodes:
 		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )
@@ -190,46 +218,40 @@ class Environments( ConfigurationBase ):
 		mApp().debugN( self, 3, 'MomEnvironments root found at "{0}"'.format( momEnvironmentsRoot ) )
 		self.detectMomDependencies()
 		# make set of installation nodes
-		# FIXME this should be the folders that contain dependencies:
 		uniqueDependencyFolders = []
 		for dep in self._getInstalledDependencies():
 			uniqueDependencyFolders.append( self._getInstalledDependencies()[dep].getContainingFolder() )
 		uniqueDependencyFolders = frozenset( uniqueDependencyFolders )
-		matchingEnvironments = []
-		for dep in uniqueDependencyFolders:
-			match = self._findEnvironmentsForDependencies( momEnvironmentsRoot, dep )
-			if not match:
-				mApp().debugN( self, 3, '{0} has no matching build environment for {1}'
-					.format( dep, str( self.getDependencies() ) ) )
-			else:
-				mApp().debugN( self, 3, '{0} is a matching build environment for {1}'
-					.format( dep, str( self.getDependencies() ) ) )
-				matchingEnvironments.append( match )
-		# pathLists = []
-		matchingEnvironments.sort()
-# 			for match in matchingEnvironments:
-# 				self._addElementsToPathList( match, pathLists )
+		allRawEnvironments = [] # these are the folders, that will be converted to Environment objects later
+		for folder in uniqueDependencyFolders:
+			# calculate the paths to look at
+			folders = folder.split( os.sep )
+			root = momEnvironmentsRoot.split( os.sep )
+			if root != folders[:len( root )]:
+				raise MomError( 'The MOM dependency is supposed to be a sub directory of the MOM environments folder!' )
+			subTree = folders[len( root ):]
+			reversePaths = [ momEnvironmentsRoot ]
+			current = momEnvironmentsRoot
+			for folder in subTree:
+				current = os.path.join( current, folder )
+				reversePaths.append( current )
+			reversePaths.reverse()
+			mApp().debugN( self, 5, 'incremental paths: {0}'.format( ', '.join( reversePaths ) ) )
+			matches = self.calculateMatches( [], list( self.getDependencies() ), reversePaths )
+			if matches:
+				allRawEnvironments.extend( matches )
+		# convert to Environment objects, make them unique, because the matching algorithm potentially finds duplicates:
 		environments = []
-		for environment in matchingEnvironments:
-			env = Environment( 'NoName yet', self )
-			for paths in environment:
-				for path in paths:
-					# FIXME error handling
-					dep = self._getInstalledDependencies()[path]
-					env.addDependency( dep )
-			env.setName( env.makeDescription() )
-			environments.append( env )
+		for env in allRawEnvironments:
+			envs = []
+			for path in env:
+				envs.append( self._getInstalledDependencies()[ path ] )
+			envs = frozenset( envs )
+			match = Environment( parent = self )
+			match.setDependencies( envs )
+			environments.append( match )
+		environments = frozenset( environments )
 		return environments
-
-#		for pathList in pathLists:
-#			Name = self._makeNameForPathList( pathList )
-#			environments.append( [ Name, pathList ] )
-#		mApp().debugN( self, 2, 'available build environments for {0}:'.format( str( dependencyDescriptions ) ) )
-#		for environment in environments:
-#			mApp().debugN( self, 2, str( environment[0] ) + ':' )
-#			for path in environment[1]:
-#				mApp().debugN( self, 2, '--> ' + path )
-#		return environments
 
 	def createXmlNode( self, document ):
 		node = document.createElement( "environment" )

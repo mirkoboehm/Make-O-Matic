@@ -20,7 +20,7 @@ from core.MObject import MObject
 from socket import gethostname
 from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.Exceptions import ConfigurationError
-import os
+import os, sys
 
 class Defaults( MObject ):
 	"""Defaults stores all hard-coded default values of make-o-matic."""
@@ -88,7 +88,7 @@ class Defaults( MObject ):
 		'''Constructor'''
 		MObject.__init__( self )
 		self.__settings = {}
-		home = os.getenv( 'USERPROFILE' ) or os.getenv( 'HOME' ) or ''
+		home = os.path.expanduser( "~" )
 		# store defaults:
 		# ----- store the make-o-matic version these scripts use:
 		self.getSettings()[ Defaults.MomVersionNumber ] = '0.5.0'
@@ -141,8 +141,10 @@ class Defaults( MObject ):
 		]
 		self.getSettings()[ Defaults.ConfigurationBuildDir ] = 'build'
 		self.getSettings()[ Defaults.ConfigurationTargetDir ] = 'install'
-		# FIXME nmake on Windows
-		self.getSettings()[ Defaults.MakeBuilderMakeTool ] = 'make'
+		if sys.platform == 'win32':
+			self.getSettings()[ Defaults.MakeBuilderMakeTool ] = 'nmake'
+		else:
+			self.getSettings()[ Defaults.MakeBuilderMakeTool ] = 'make'
 		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
 		self.getSettings()[ Defaults.CMakeBuilderTool ] = 'cmake'
 		self.getSettings()[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )

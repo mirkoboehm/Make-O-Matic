@@ -33,7 +33,7 @@ class BuildEnvironmentTests( MomTestCase ):
 
 	def setUp( self ):
 		MomTestCase.setUp( self )
-		mApp().getSettings().set( Settings.ScriptLogLevel, 5 )
+		mApp().getSettings().set( Settings.ScriptLogLevel, 1 )
 		mApp().getSettings().set( Settings.EnvironmentsBaseDir, BuildEnvironmentTests.TestMomEnvironments )
 		mApp().addLogger( ConsoleLogger() )
 
@@ -53,15 +53,19 @@ class BuildEnvironmentTests( MomTestCase ):
 		dep = [ 'dep-a-1.?.0' ]
 		environments = Environments( dep )
 		matches = environments.findMatchingEnvironments()
-		environments.describe( '' )
+		# there should be 3 matches
+		self.assertEquals( len( matches ), 3 )
 		# check if every environment contains every dependency only once
+		allPaths = []
 		for environment in matches:
 			paths = []
 			for dependency in environment.getDependencies():
 				self.assertTrue( dependency.getFolder() not in paths )
+				# this must be true because there is only one dependency we are looking for, so every path should appear only once
+				self.assertTrue( dependency.getFolder() not in allPaths )
 				self.assertTrue( os.path.isdir( dependency.getFolder() ) )
 				paths.append( dependency.getFolder() )
-		self.assertEquals( len( matches ), 1 )
+				allPaths.append( dependency.getFolder() )
 
 if __name__ == "__main__":
 	unittest.main()

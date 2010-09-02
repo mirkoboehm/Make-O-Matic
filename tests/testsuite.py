@@ -25,6 +25,7 @@ from tests.cases.run_mode_print_tests import RunModePrintTests
 from tests.cases.run_timeout_tests import RunWithTimeoutTest
 from tests.cases.scm_factory_tests import ScmFactoryTests
 from tests.cases.buildscript_interface_tests import BuildScriptInterfaceTests
+from tests.cases.build_environment_tests import BuildEnvironmentTests
 from tests.selftest.simple_project_tests import SimpleProjectTests
 from tests.selftest.simple_ci_tests import SimpleCITests
 from tests.selftest.charm_build_tests import CharmBuildTests
@@ -39,7 +40,8 @@ classes = [ PathResolverTest,
 	SimpleProjectTests,
 	BuildScriptInterfaceTests,
 	CharmBuildTests,
-	SimpleCITests
+	SimpleCITests,
+	BuildEnvironmentTests
 ]
 
 s = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, classes ) )

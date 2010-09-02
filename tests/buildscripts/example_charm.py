@@ -27,7 +27,7 @@ from core.modules.testers.CTest import CTest
 
 build, project = setupStandardBuildAndProject( buildName = 'Charm', minimumMomVersion = "0.5.0",
 	projectVersionNumber = '1.4.0',
-	scmUrl = 'git:git@gitorious.org:charm/charm.git' )
+	scmUrl = 'git:git://gitorious.org/charm/charm.git' )
 
 # helper variable to set a CMake parameter
 enableCharmTools = CMakeVariable( 'CHARM_ENABLE_TOOLS_BUILD', 'TRUE', 'BOOL' )
