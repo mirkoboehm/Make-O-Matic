@@ -28,6 +28,7 @@ class Build( MApplication ):
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		MApplication.__init__( self, minimumMomVersion, name, parent )
+		self.setType( "build" )
 		self.__project = None
 		self.__parameters = Parameters()
 

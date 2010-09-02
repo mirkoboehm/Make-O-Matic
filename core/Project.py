@@ -40,6 +40,7 @@ class Project( Instructions ):
 	def __init__( self, projectName, parent = None ):
 		"""Set up the build steps, parse the command line arguments."""
 		Instructions.__init__( self, projectName, parent )
+		self.setType( "project" )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
