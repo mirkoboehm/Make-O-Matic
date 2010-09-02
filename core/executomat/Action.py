@@ -170,17 +170,25 @@ class Action( MObject ):
 		node.attributes["finished"] = str( self.didFinish() )
 
 		stderrElement = document.createElement( "stderr" )
-		data = ""
 		try:
-			data = ( self.getStdErr() if self.getStdErr() != None else "" )
+			data = self.getStdErr() or ""
 		except:
-			pass
+			data = ""
 		textNode = document.createTextNode( data )
 		stderrElement.appendChild( textNode )
 		node.appendChild( stderrElement )
 
+		stdoutElement = document.createElement( "stdout" )
+		try:
+			data = self.getStdOut() or ""
+		except:
+			data = ""
+		textNode = document.createTextNode( data )
+		stdoutElement.appendChild( textNode )
+		node.appendChild( stdoutElement )
+
 		logElement = document.createElement( "logdescription" )
-		textNode = document.createTextNode( self.getLogDescription() + data + str( self.getAborted() ) )
+		textNode = document.createTextNode( self.getLogDescription() )
 		logElement.appendChild( textNode )
 		node.appendChild( logElement )
 
