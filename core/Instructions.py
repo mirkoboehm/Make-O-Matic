@@ -58,11 +58,7 @@ class Instructions( MObject ):
 		self.__baseDir = folder
 
 	def getBaseDir( self ):
-		try:
-			check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
-		except MomException:
-			mApp().debugN( self, 4, 'getBaseDir() was called before the base directory was set!' )
-			raise
+		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		return self.__baseDir
 
 	def _getExecutomat( self ):
