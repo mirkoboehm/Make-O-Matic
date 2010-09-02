@@ -116,7 +116,7 @@ class Project( Instructions ):
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		# apply customizations passed as command line parameters:
-		self.getBuild().getParameters().applyBuildSequenceSwitches( buildSteps, 'project' )
+		#self.getBuild().getParameters().applyBuildSequenceSwitches( buildSteps, 'project' )
 		return buildSteps
 
 	def execute( self ):

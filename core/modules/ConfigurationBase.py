@@ -20,12 +20,14 @@ from core.Instructions import Instructions
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Project import Project
 from core.Exceptions import AbstractMethodCalledError
+from core.MObject import MObject
 
 class ConfigurationBase( Instructions ):
 	'''Configurationbase encapsulates common logic of configuration-like objects.'''
 
 	def __init__( self, name, parent = None ):
 		Instructions.__init__( self, name, parent )
+		self.setType( "configuration" )
 		self.__timeKeeper = TimeKeeper()
 
 	def getTimeKeeper( self ):

@@ -43,8 +43,9 @@ class RmDirAction( Action ):
 			shutil.rmtree( str( self.getPath() ), False )
 			return 0
 		except ( OSError, IOError ) as e:
-			mApp().debug( self, 'error deleting directory "{0}": {1}'
-						.format( self.getPath(), str( e ) ) )
+			error = 'error deleting directory "{0}": {1}'.format( self.getPath(), str( e ) )
+			self._setStdErr( error )
+			mApp().debug( self, error )
 			return 1
 
 	def getLogDescription( self ):

@@ -22,7 +22,7 @@ class Plugin( MObject ):
 
 	def __init__( self, name = None ):
 		"""Constructor"""
-		MObject.__init__( self, name )
+		MObject.__init__( self, name, "plugin" )
 		self._setInstructions( None )
 
 	def _setInstructions( self, instructions ):
@@ -60,4 +60,14 @@ class Plugin( MObject ):
 #	def describe( self, prefix ):
 #		me = '{0}Plugin: {1}'.format( prefix, self.getName() )
 #		print( me )
+
+	def createXmlNode( self, document ):
+		node = MObject.createXmlNode( self, document )
+
+		steps = self.getInstructions()._getExecutomat()._getSteps()
+		for step in steps:
+			element = step.createXmlNode( document )
+			node.appendChild( element )
+
+		return node
 

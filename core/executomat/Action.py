@@ -42,7 +42,7 @@ class Action( MObject ):
 
 	def __init__( self, name = None ):
 		"""Constructor"""
-		MObject.__init__( self, name )
+		MObject.__init__( self, name, "action" )
 		self.__timeKeeper = TimeKeeper()
 		self.__workingDir = None
 		self.__started = False
@@ -164,3 +164,29 @@ class Action( MObject ):
 			if oldPwd:
 				executomat.log( '# changing back to "{0}"'.format( oldPwd ) )
 				os.chdir( oldPwd )
+
+	def createXmlNode( self, document ):
+		node = MObject.createXmlNode( self, document )
+		node.attributes["finished"] = str( self.didFinish() )
+
+		stderrElement = document.createElement( "stderr" )
+		data = ""
+		try:
+			data = ( self.getStdErr() if self.getStdErr() != None else "" )
+		except:
+			pass
+		textNode = document.createTextNode( data )
+		stderrElement.appendChild( textNode )
+		node.appendChild( stderrElement )
+
+		logElement = document.createElement( "logdescription" )
+		textNode = document.createTextNode( self.getLogDescription() + data + str( self.getAborted() ) )
+		logElement.appendChild( textNode )
+		node.appendChild( logElement )
+
+		returncodeElement = document.createElement( "returncode" )
+		textNode = document.createTextNode( "{0}".format( self.getResult() ) )
+		returncodeElement.appendChild( textNode )
+		node.appendChild( returncodeElement )
+
+		return node

@@ -28,7 +28,7 @@ from core.helpers.GlobalMApp import mApp
 class Step( MObject ):
 	"""An individual step of an Executomat run."""
 	def __init__( self, stepName = None ):
-		MObject.__init__( self, stepName )
+		MObject.__init__( self, stepName, "step" )
 		self.__timeKeeper = TimeKeeper()
 		self.__enabled = True
 		self.__ignorePreviousFailure = False
@@ -153,3 +153,21 @@ class Step( MObject ):
 			print( '{0} - post actions: '.format( prefix ) )
 			for action in self.getPostActions():
 				action.describe( prefix + '    ' )
+
+	def createXmlNode( self, document ):
+		node = MObject.createXmlNode( self, document )
+
+		if self.getPreActions():
+			for action in self.getPreActions():
+				element = action.createXmlNode( document )
+				node.appendChild( element )
+		if self.getMainActions():
+			for action in self.getMainActions():
+				element = action.createXmlNode( document )
+				node.appendChild( element )
+		if self.getPostActions():
+			for action in self.getPostActions():
+				element = action.createXmlNode( document )
+				node.appendChild( element )
+
+		return node
