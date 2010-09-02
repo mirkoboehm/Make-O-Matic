@@ -57,6 +57,9 @@ class _CommandRunner( Thread ):
 		self._getRunner()._setStdErr( error )
 		self._getRunner()._setReturnCode( p.returncode )
 		self.__finished = True
+		mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( output.decode() ) )
+		if not self.__combineOutput:
+			mApp().debugN( self._getRunner(), 5, "STDERR:\n{0}".format( error.decode() ) )
 		mApp().debugN( self._getRunner(), 4, 'finished, return code {0}'.format( p.returncode ) )
 
 	def wasStarted( self ):
