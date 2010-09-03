@@ -171,7 +171,7 @@ class Action( MObject ):
 
 		stderrElement = document.createElement( "stderr" )
 		try:
-			data = self.getStdErr() or ""
+			data = "{0}".format( self.getStdErr() ) or ""
 		except:
 			data = ""
 		textNode = document.createTextNode( data )
@@ -180,7 +180,7 @@ class Action( MObject ):
 
 		stdoutElement = document.createElement( "stdout" )
 		try:
-			data = self.getStdOut() or ""
+			data = "{0}".format( self.getStdOut() ) or ""
 		except:
 			data = ""
 		textNode = document.createTextNode( data )
