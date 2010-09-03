@@ -85,7 +85,10 @@ class Emailer( MObject ):
 			self.__server.ehlo()
 
 	def send( self, email ):
-		self.__server.sendmail( email.getFromAddress(), email.getToAddresses(), email.getMessageText() )
+		if ( email.getFromAddress() and email.getToAddresses() ):
+			self.__server.sendmail( email.getFromAddress(), email.getToAddresses(), email.getMessageText() )
+		else:
+			raise ConfigurationError( 'Sender/recipient address missing, cannot send mail!' )
 
 	def quit( self ):
 		self.__server.quit()
