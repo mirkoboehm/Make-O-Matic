@@ -25,7 +25,9 @@ class EnvironmentSaver( object ):
 		self.__oldCwd = os.getcwd()
 
 	def __exit__( self, type, value, traceback ):
-		os.environ = self.__environment
+		os.environ.clear()
+		for key in self.__environment:
+			os.environ[ key ] = self.__environment[ key ]
 		if not os.path.isdir( self.__oldCwd ):
 			raise MomError( 'The old working directory got deleted and cannot be restored!' )
 		if os.getcwd() != self.__oldCwd:

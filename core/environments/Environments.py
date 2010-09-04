@@ -22,8 +22,7 @@ from core.modules.ConfigurationBase import ConfigurationBase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 import os
-from core.Exceptions import MomError, AbstractMethodCalledError
-import glob
+from core.Exceptions import MomError
 from core.environments.Dependency import Dependency
 from fnmatch import fnmatch
 from core.environments.Environment import Environment
@@ -82,6 +81,7 @@ class Environments( ConfigurationBase ):
 			step = self.getParent().getStep( 'project-build-configurations' )
 			step.addMainAction( action )
 		except Exception as e:
+			# FIXME what?
 			print( e )
 		ConfigurationBase.runSetups( self )
 
@@ -100,78 +100,6 @@ class Environments( ConfigurationBase ):
 				elif os.path.isdir( path ):
 					leafNodes.extend( self._findMomDependencies( path ) )
 		return leafNodes
-
-	def _findEnvironmentsForDependencies( self, environmentsRoot, installationNode ):
-		"""Returns a path list, looks like that: ( ( EnvPathA1, EnvPathA2, ...), (EnvPathB1, EnvPathB2, ...), ... )
-		with one group (list) per dependency
-		Returns None if this is no match"""
-		raise AbstractMethodCalledError
-		descriptions = list( self.getDependencies() ) # make a copy, to avoid modifying the member
-		environments = []
-		folders = installationNode.split( os.sep )
-		root = environmentsRoot.split( os.sep )
-		if root != folders[:len( root )]:
-			raise MomError( 'The MOM dependency is supposed to be a subfolder of the MOM environments folder!' )
-		subTree = folders[len( root ):]
-		reversePaths = [ environmentsRoot ]
-		current = environmentsRoot
-		for folder in subTree:
-			current = os.path.join( current, folder )
-			reversePaths.append( current )
-		reversePaths.reverse()
-		mApp().debugN( self, 5, 'incremental paths: {0}'.format( ', '.join( reversePaths ) ) )
-		for path in reversePaths:
-			os.chdir( path )
-			originalDependencies = list( descriptions ) # cannot modify descriptions during iteration
-			for pattern in originalDependencies:
-				mApp().debugN( self, 3, 'getMatchingPathList: checking for matches to ' + str( pattern ) + ' in ' + str( os.getcwd() ) )
-				matches = glob.glob( pattern )
-				if len( matches ) > 0:
-					leafNodeMatches = []
-					for match in matches:
-						path = os.path.join( path, match )
-						path = os.path.normpath( os.path.abspath( path ) )
-						if path in self._getInstalledDependencies():
-							leafNodeMatches.append( path )
-					if leafNodeMatches:
-						leafNodeMatches.sort()
-						descriptions.remove( pattern )
-						environments.append( leafNodeMatches )
-		if len( descriptions ) == 0:
-			# uniquify:
-			envs = []
-			for e in environments:
-				if e not in envs:
-					envs.append( e )
-			return envs
-		else:
-			return None
-
-	def _addElementsToPathList( self, Environment, PathListCollection, PathList = None ):
-		"""perform a depth-first traversal of the tree spanned by the combination of the possible 
-		installation paths and create a list of flat lists of directories in PathListCollection"""
-		raise AbstractMethodCalledError
-		if len( Environment ) > 0:
-			Environment[0].sort()
-			for Path in Environment[0]:
-				NewPathList = [ Path ]
-				if PathList != None:
-					NewPathList = PathList + NewPathList
-				self._addElementsToPathList( Environment[1:], PathListCollection, NewPathList )
-		else:
-			PathListCollection.append( PathList )
-
-	def _makeNameForPathList( self, PathList ):
-		"""take the paths basenames and use them to create a name. easy"""
-		raise AbstractMethodCalledError
-		Name = ''
-		for Path in PathList:
-			Parts = Path.split( os.sep )
-			if len( Parts ) > 0:
-				if len( Name ) != 0:
-					Name = Name + ' - '
-				Name = Name + Parts[len( Parts ) - 1]
-		return Name
 
 	def detectMomDependencies( self ):
 		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )

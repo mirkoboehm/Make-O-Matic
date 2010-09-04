@@ -119,11 +119,10 @@ class Step( MObject ):
 		logfileName = os.path.join( executomat.getLogDir(), logfileName )
 		self.setLogfileName( logfileName )
 
-		phases = { 'preparatory actions' : self.__preActions,
-				   'main actions' : self.__mainActions,
-				   'post actions' : self.__postActions }
-		for phase in phases:
-			actions = phases[ phase ]
+		phases = [ [ 'preparatory actions', self.__preActions ],
+				[ 'main actions', self.__mainActions ],
+				[ 'post actions', self.__postActions ] ]
+		for phase, actions in phases:
 			if not actions:
 				executomat.log( '# Phase "{0}" is empty (no actions registered)'.format( phase ) )
 			for action in actions:
