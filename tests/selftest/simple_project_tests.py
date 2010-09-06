@@ -24,6 +24,7 @@ from core.Settings import Settings
 from core.helpers.RunCommand import RunCommand
 from core.helpers.GlobalMApp import mApp
 from tests.helpers.MomTestCase import MomTestCase
+import time
 
 class SimpleProjectTests( MomTestCase ):
 	'''SimpleProjectTests runs the example_mom_builscript in the three major run modes.
@@ -46,7 +47,7 @@ class SimpleProjectTests( MomTestCase ):
 		runner = self._querySetting( Settings.ProjectName )
 		self.assertEquals( runner.getReturnCode(), 0 )
 		line = runner.getStdOut().decode().strip()
-		self.assertEquals( line, 'project.name: Simple Project Run Test' )
+		self.assertEquals( line, 'project.name: MakeOMatic' )
 
 	def testQueryMomVersion( self ):
 		runner = self._querySetting( Settings.MomVersionNumber )
@@ -74,6 +75,8 @@ class SimpleProjectTests( MomTestCase ):
 			print( runner.getStdOut().decode() )
 			print( 'error output:' )
 			print( runner.getStdErr().decode() )
+		# Sleep for 1 second to stop build directories with the same second causing failures
+		time.sleep( 1 )
 		return runner
 
 	def testEBuild( self ):
