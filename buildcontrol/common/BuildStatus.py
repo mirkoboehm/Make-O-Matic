@@ -26,8 +26,6 @@ from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 from core.helpers.GlobalMApp import mApp
-from cmd import Cmd
-from ctypes.util import cmd
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
