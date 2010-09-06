@@ -96,7 +96,7 @@ class CMakeBuilder( MakeBasedBuilder ):
 		for variable in self.getCMakeVariables():
 			variables.append( '-D{0}'.format( variable ) )
 		cmd = [ self.getCMakeToolName(), ' '.join( variables ), srcDir ]
-		action = ShellCommandAction( cmd )
+		action = ShellCommandAction( ' '.join( cmd ) )
 		action.setWorkingDirectory( configuration.getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-configure' )
 		step.addMainAction( action )
