@@ -75,14 +75,10 @@ class Environments( ConfigurationBase ):
 		ConfigurationBase.runPreFlightChecks( self )
 
 	def runSetups( self ):
-		try:
-			action = ExecuteConfigurationBaseAction( self )
-			action.setIgnorePreviousFailure( True ) # there may be multiple configurations
-			step = self.getParent().getStep( 'project-build-configurations' )
-			step.addMainAction( action )
-		except Exception as e:
-			# FIXME what?
-			print( e )
+		action = ExecuteConfigurationBaseAction( self )
+		action.setIgnorePreviousFailure( True ) # there may be multiple configurations
+		step = self.getParent().getStep( 'project-build-configurations' )
+		step.addMainAction( action )
 		ConfigurationBase.runSetups( self )
 
 	def _findMomDependencies( self, folder ):
@@ -119,20 +115,24 @@ class Environments( ConfigurationBase ):
 		for dep in remainingDependencies:
 			for item in os.listdir( folder ):
 				path = os.path.join( folder, item )
-				if os.path.isdir( path ):
-					if fnmatch( item, dep ):
-						newPackages = list( packages )
-						newPackages.append( path )
-						newDeps = list( self.getDependencies() )
-						newDeps.remove( dep )
-						if newDeps:
-							# there are still dependencies to find further up the path
-							theseMatches = self.calculateMatches( newPackages, newDeps, folders[1:] )
-							if theseMatches:
-								matches.append( theseMatches )
-						else:
-							# yay, all dependencies have been found
-							matches.append( newPackages )
+				if not os.path.isdir( path ):
+					continue
+				if fnmatch( item, dep ):
+					if path not in self._getInstalledDependencies():
+						mApp().debugN( self, 4, 'dependency {0} matches, but is not enabled'.format( item ) )
+						continue
+					newPackages = list( packages )
+					newPackages.append( path )
+					newDeps = list( self.getDependencies() )
+					newDeps.remove( dep )
+					if newDeps:
+						# there are still dependencies to find further up the path
+						theseMatches = self.calculateMatches( newPackages, newDeps, folders[1:] )
+						if theseMatches:
+							matches.append( theseMatches )
+					else:
+						# yay, all dependencies have been found
+						matches.append( newPackages )
 		return matches
 
 	def findMatchingEnvironments( self ):

@@ -23,6 +23,8 @@ from core.helpers.GlobalMApp import mApp
 from core.environments.Environments import Environments
 from test.test_iterlen import len
 from core.loggers.ConsoleLogger import ConsoleLogger
+from core.environments.Dependency import Dependency
+from core.helpers.EnvironmentSaver import EnvironmentSaver
 
 class BuildEnvironmentTests( MomTestCase ):
 
@@ -49,7 +51,7 @@ class BuildEnvironmentTests( MomTestCase ):
 		matches = environments.findMatchingEnvironments()
 		self.assertEquals( len( matches ), 1 )
 
-	def testTryFindTwoMatches( self ):
+	def testTryFindThreeMatches( self ):
 		dep = [ 'dep-a-1.?.0' ]
 		environments = Environments( dep )
 		matches = environments.findMatchingEnvironments()
@@ -66,6 +68,29 @@ class BuildEnvironmentTests( MomTestCase ):
 				self.assertTrue( os.path.isdir( dependency.getFolder() ) )
 				paths.append( dependency.getFolder() )
 				allPaths.append( dependency.getFolder() )
+
+	def testApplyPackageConfiguration( self ):
+		packageFolder = os.path.join( BuildEnvironmentTests.TestMomEnvironments, 'dep-a-1.1.0' )
+		packageFile = os.path.join( packageFolder, Dependency._ControlFileName )
+		self.assertTrue( os.path.exists( packageFile ) )
+		dep = Dependency()
+		dep.setFolder( packageFolder )
+		self.assertTrue( dep._readControlFile( packageFile ) )
+		self.assertTrue( dep.isEnabled() )
+		self.assertEquals( dep.getDescription(), 'Test MOM Package' )
+		with EnvironmentSaver():
+			dep.apply()
+			self.assertEquals( os.environ[ 'EXAMPLE_VARIABLE'], 'example_variable' )
+
+	def testApplyDisabledPackageConfiguration( self ):
+		packageFolder = os.path.join( BuildEnvironmentTests.TestMomEnvironments, 'dep-a-1.2.0' )
+		packageFile = os.path.join( packageFolder, Dependency._ControlFileName )
+		self.assertTrue( os.path.exists( packageFile ) )
+		dep = Dependency()
+		dep.setFolder( packageFolder )
+		self.assertTrue( dep._readControlFile( packageFile ) )
+		self.assertTrue( not dep.isEnabled() )
+		self.assertEquals( dep.getDescription(), 'Test Disabled MOM Package' )
 
 if __name__ == "__main__":
 	unittest.main()

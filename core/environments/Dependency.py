@@ -22,6 +22,7 @@ from core.helpers.GlobalMApp import mApp
 import re
 from core.Exceptions import ConfigurationError
 from core.helpers.EnvironmentVariables import addToPathCollection
+from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class Dependency( MObject ):
 	'''Dependency represents a single installed dependency, and the adaptations to the environment variables needed to use it.'''
@@ -40,7 +41,10 @@ class Dependency( MObject ):
 		return os.path.join( path, Dependency._ControlFileName )
 
 	def setFolder( self, folder ):
-		self.__folder = os.path.abspath( os.path.normpath( folder ) )
+		if folder:
+			self.__folder = os.path.abspath( os.path.normpath( folder ) )
+		else:
+			self.__folder = None
 
 	def getFolder( self ):
 		return self.__folder
@@ -84,11 +88,14 @@ class Dependency( MObject ):
 					if re.match( '^{0}'.format( Dependency._CommandPrefix ), line ):
 						if not self.applyProperty( controlFile, line ):
 							self._addCommand( line )
+				return True
 		except IOError:
 			mApp().debugN( self, 3, 'no control file found at "{0}"'.format( controlFile ) )
+			return False
 
 	def applyProperty( self, controlFile, line ):
 		enabledLine = re.match( '^({0}PACKAGE_ENABLED)\s+(\w+)$'.format( Dependency._CommandPrefix ), line )
+		descriptionLine = re.match( '^({0}PACKAGE_DESCRIPTION)\s+(.+)$'.format( Dependency._CommandPrefix ), line )
 		# parse for "enabled" commands:
 		try:
 			if enabledLine:
@@ -101,6 +108,11 @@ class Dependency( MObject ):
 					raise ConfigurationError( 'enable must be true or false' )
 				mApp().debugN( self, 3, '>enabled< {0}'.format( str( self.isEnabled() ) ) )
 				return True
+			elif descriptionLine:
+				description = str( descriptionLine.group( 2 ) )
+				self._setDescription( description )
+				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getDescription() ) )
+				return True
 			return False
 		except ConfigurationError as value:
 			mApp().message( 'error ({0}) in control file {1}\n--> {2}'.
@@ -112,6 +124,7 @@ class Dependency( MObject ):
 		pass
 
 	def apply( self ):
+		assert self.getFolder()
 		controlFile = self._getControlFileName( self.getFolder() )
 		for line in self.getCommands():
 			assert( not re.match( '^\s*#', line ) and not re.match( '^\s*$', line ) )
@@ -146,7 +159,7 @@ class Dependency( MObject ):
 					else:
 						raise ConfigurationError( 'enable must be true or false' )
 					mApp().debugN( self, 2, 'setBuildEnvironment: >enabled< ' + str( enabled ) )
-				elif re.match( '^AUTOBUILD_', line ):
+				elif re.match( '^{0}'.format( Dependency._CommandPrefix ), line ):
 					mApp().message( self, 'unknown command in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
 				else:
 					mApp().message( self, 'parse error in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
@@ -171,6 +184,14 @@ class Dependency( MObject ):
 				mApp().debugN( self, 5, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
 				return False
 
+	def _setDescription( self, description ):
+		check_for_nonempty_string( description, 'A MOM Package Configuration description cannot be empty!' )
+		self.__description = description
+
 	def getDescription( self ):
-		name = os.path.split( self.getFolder() )[1]
-		return name
+		if not self.__description:
+			name = os.path.split( self.getFolder() )[1]
+			return name
+		else:
+			return self.__description
+
