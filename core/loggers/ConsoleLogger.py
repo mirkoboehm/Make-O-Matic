@@ -63,3 +63,15 @@ class ConsoleLogger( Logger ):
 		check_for_nonnegative_int( level, 'The debug level must be a non-negative integer!' )
 		if level > 0:
 			mApp().debug( self, 'debug level is {0}'.format( level ) )
+
+	def getXsltTemplate( self ):
+		return """Base directory: <xsl:value-of select="@basedir"/><br/>
+Debug level: <xsl:value-of select="@debuglevel"/>"""
+
+	def createXmlNode( self, document ):
+		node = Logger.createXmlNode( self, document )
+		node.attributes["basedir"] = mApp().getBaseDir()
+		node.attributes["debuglevel"] = str( mApp().getSettings().get( Settings.ScriptLogLevel, True ) )
+		return node
+
+

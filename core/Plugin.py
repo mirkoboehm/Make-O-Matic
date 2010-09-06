@@ -64,6 +64,9 @@ class Plugin( MObject ):
 #		me = '{0}Plugin: {1}'.format( prefix, self.getName() )
 #		print( me )
 
+	def getXsltTemplate( self ):
+		return None
+
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
 

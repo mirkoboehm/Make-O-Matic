@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <xsl:stylesheet
   version="1.0"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -10,11 +10,16 @@
     <html>
       <head>
         <style type="text/css">
-body {
+body,table {
+  font-size: 9pt;
   width: 1000px;
 }
 pre {
+  font-size: 8pt;
+  margin-top: 10px;
+  margin-bottom: 10px;
   width: 1000px;
+  background-color: #EEEEEE;
 
   /* line wrap hack */
   white-space: pre-wrap;       /* css-3 */
@@ -27,9 +32,7 @@ pre {
 th {
   text-align: left;
 }
-pre {
-  background-color: #EEEEEE;
-}
+
 .success {
   color: green;
 }
@@ -68,39 +71,43 @@ pre {
 
   <xsl:template match="plugin">
     <h4>Plugin: <xsl:value-of select="@name"/></h4>
-    <xsl:if test="count(./*) > 0">
-      <table>
-        <thead>
-          <tr>
-            <th width="700px">Instruction</th>
-            <th width="200px">Timing</th>
-            <th width="300px">Status</th>
-          </tr>
-        </thead>
-        <tbody>
-          <xsl:apply-templates/>
-        </tbody>
-      </table>
-    </xsl:if>
+    <xsl:choose>
+      <!-- Plugin templates are inserted here -->
+      <xsl:otherwise>
+        <xsl:if test="count(./step) > 0">
+          <table>
+            <thead>
+              <tr>
+                <th width="700px">Instruction</th>
+                <th width="200px">Timing</th>
+                <th width="300px">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <xsl:apply-templates/>
+            </tbody>
+          </table>
+        </xsl:if>
+      </xsl:otherwise>
+    </xsl:choose>
   </xsl:template>
 
   <xsl:template match="plugin/step">
-        <tr>
-          <td><xsl:value-of select="@name"/></td>
-          <td><xsl:value-of select="@timing"/></td>
-          <td>
-            <xsl:choose>
-              <xsl:when test="@failed = 'False'">
-                <span class="success">SUCCESS</span>
-              </xsl:when>
-              <xsl:otherwise>
-                <span class="fail">FAILED</span>
-              </xsl:otherwise>
-            </xsl:choose>
-          </td>
-        </tr>
-        <xsl:apply-templates/>
-        <br/>
+    <tr>
+      <td><xsl:value-of select="@name"/></td>
+      <td><xsl:value-of select="@timing"/></td>
+      <td>
+        <xsl:choose>
+          <xsl:when test="@failed = 'False'">
+            -<!--<span class="success">SUCCESS</span>-->
+          </xsl:when>
+          <xsl:otherwise>
+            <span class="fail">FAILED</span>
+          </xsl:otherwise>
+        </xsl:choose>
+      </td>
+    </tr>
+    <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template match="plugin/step/action">
@@ -122,7 +129,7 @@ pre {
           </xsl:when>
           <xsl:otherwise>
             <span class="neutral">
-              DID NOT FINISHED
+              DID NOT FINISH
             </span>
           </xsl:otherwise>
         </xsl:choose>

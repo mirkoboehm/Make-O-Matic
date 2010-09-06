@@ -30,7 +30,7 @@ class XmlReport( object ):
 		self.__doc = xml.dom.minidom.Document()
 
 	def getProject( self ):
-		return self.__project
+		return self.__build.getProject()
 
 	def getSummary( self ):
 		return self.__summary
