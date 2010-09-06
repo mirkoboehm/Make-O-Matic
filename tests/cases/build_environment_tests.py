@@ -21,7 +21,6 @@ import os, inspect, unittest
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.environments.Environments import Environments
-from test.test_iterlen import len
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.environments.Dependency import Dependency
 from core.helpers.EnvironmentSaver import EnvironmentSaver
