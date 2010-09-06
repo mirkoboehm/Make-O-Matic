@@ -31,6 +31,7 @@ from core.executomat.Step import Step
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
+from core.MObject import MObject
 
 """A Project represents an entity to build. 
 FIXME documentation
@@ -40,7 +41,6 @@ class Project( Instructions ):
 	def __init__( self, projectName, parent = None ):
 		"""Set up the build steps, parse the command line arguments."""
 		Instructions.__init__( self, projectName, parent )
-		self.setType( "project" )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
@@ -126,3 +126,10 @@ class Project( Instructions ):
 			self._getExecutomat().run( self )
 		finally:
 			self.getTimeKeeper().stop()
+
+	def createXmlNode( self, document ):
+		node = MObject.createXmlNode( self, document )
+
+		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().delta() )
+
+		return node

@@ -165,25 +165,30 @@ class Action( MObject ):
 				executomat.log( '# changing back to "{0}"'.format( oldPwd ) )
 				os.chdir( oldPwd )
 
+	def getTagName( self ):
+		return "action"
+
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
 		node.attributes["finished"] = str( self.didFinish() )
+		node.attributes["timing"] = str( self.__timeKeeper.delta() )
+		node.attributes["returncode"] = str( self.getResult() )
 
 		stderrElement = document.createElement( "stderr" )
 		try:
-			data = "{0}".format( self.getStdErr() ) or ""
+			data = self.getStdErr().decode()
 		except:
 			data = ""
-		textNode = document.createTextNode( data )
+		textNode = document.createTextNode( str( data ) )
 		stderrElement.appendChild( textNode )
 		node.appendChild( stderrElement )
 
 		stdoutElement = document.createElement( "stdout" )
 		try:
-			data = "{0}".format( self.getStdOut() ) or ""
+			data = self.getStdOut().decode()
 		except:
 			data = ""
-		textNode = document.createTextNode( data )
+		textNode = document.createTextNode( str( data ) ) # TODO: FIXME
 		stdoutElement.appendChild( textNode )
 		node.appendChild( stdoutElement )
 
@@ -191,10 +196,5 @@ class Action( MObject ):
 		textNode = document.createTextNode( self.getLogDescription() )
 		logElement.appendChild( textNode )
 		node.appendChild( logElement )
-
-		returncodeElement = document.createElement( "returncode" )
-		textNode = document.createTextNode( "{0}".format( self.getResult() ) )
-		returncodeElement.appendChild( textNode )
-		node.appendChild( returncodeElement )
 
 		return node

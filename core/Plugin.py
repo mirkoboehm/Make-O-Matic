@@ -22,7 +22,7 @@ class Plugin( MObject ):
 
 	def __init__( self, name = None ):
 		"""Constructor"""
-		MObject.__init__( self, name, "plugin" )
+		MObject.__init__( self, name )
 		self._setInstructions( None )
 
 	def _setInstructions( self, instructions ):
@@ -32,6 +32,9 @@ class Plugin( MObject ):
 
 	def getInstructions( self ):
 		return self.__instructions
+
+	def getTagName( self ):
+		return "plugin"
 
 	def preFlightCheck( self ):
 		"""PreFlightCheck is called after the command line arguments have been passed, 

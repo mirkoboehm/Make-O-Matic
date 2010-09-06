@@ -36,7 +36,7 @@ class XmlReport( object ):
 		return self.__summary
 
 	def getReport( self ):
-		return self.__doc.toprettyxml( "  " )
+		return self.__doc.toxml()
 
 	def prepare( self ):
 		#element = self.__doc.createElement( "root" )

@@ -22,7 +22,7 @@ from core.executomat.Executomat import Executomat
 from core.Settings import Settings
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
-from core.Exceptions import ConfigurationError, MomError, MomException
+from core.Exceptions import ConfigurationError, MomError
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
 from core.Defaults import Defaults
 from core.helpers.EnvironmentSaver import EnvironmentSaver
@@ -37,7 +37,7 @@ class Instructions( MObject ):
 	idea of plug-ins that implement certain functionality.'''
 
 	def __init__( self, name = None, parent = None ):
-		MObject.__init__( self, name, "instruction" )
+		MObject.__init__( self, name )
 		self.__executomat = Executomat( 'Exec-o-Matic' )
 		self._setBaseDir( None )
 		self._setParent( None )
@@ -129,7 +129,6 @@ class Instructions( MObject ):
 
 		for child in self.getChildren():
 			child.describeXmlRecursively( document, node ) # enter recursion
-
 
 	def describeRecursively( self, prefix = '' ):
 		'''Describe this instruction object in human readable form.'''
