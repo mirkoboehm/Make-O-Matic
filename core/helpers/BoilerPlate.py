@@ -35,7 +35,7 @@ def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 		build._initialize()
 		return build
 	except MomException as e:
-		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), file = sys.stderr )
+		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), sys.stderr )
 		sys.exit( e.getReturnCode() )
 
 def setupStandardProject( build, projectName = None,
