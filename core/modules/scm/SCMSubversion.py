@@ -37,7 +37,7 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def _checkInstallation( self ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-		runner = RunCommand( 'svn --version' )
+		runner = RunCommand( ['svn', '--version'] )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
 			raise ConfigurationError( "SCMSubversion::checkInstallation: svn not found." )
@@ -75,7 +75,7 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def _getCurrentRevision( self, project ):
 		'''Return the identifier of the current revisions.'''
-		cmd = 'svn --non-interactive log --xml --limit 1 ' + self.getUrl()
+		cmd = [ 'svn', '--non-interactive', 'log', '--xml', '--limit 1', self.getUrl() ]
 		runner = RunCommand( project, cmd )
 		runner.run()
 

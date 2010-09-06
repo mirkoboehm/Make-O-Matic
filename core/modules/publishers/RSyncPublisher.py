@@ -49,7 +49,7 @@ class RSyncPublisher( Plugin ):
 		return self.__localDir
 
 	def preFlightCheck( self ):
-		runner = RunCommand( 'rsync --version' )
+		runner = RunCommand( [ 'rsync', '--version' ] )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
 			raise ConfigurationError( "RSyncPublisher: rsync not found." )
@@ -67,9 +67,9 @@ class RSyncPublisher( Plugin ):
 			if not uploadLocation:
 				mApp().message( self, 'Upload location is empty. Not generating any actions.' )
 				return
-		step = self.getInstructions().getStep( 'project-upload-docs' )
+		step = self.getInstructions().getStep( 'project - upload - docs' )
 		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-		action = ShellCommandAction( 'rsync -avz -e \'ssh -o "BatchMode yes"\' {0} {1}'.format( fromDir, uploadLocation ), 7200 )
+		action = ShellCommandAction( 'rsync - avz - e \'ssh -o "BatchMode yes"\' {0} {1}'.format( fromDir, uploadLocation ), 7200 )
 		action.setWorkingDirectory( self.getInstructions().getBaseDir() )
 		step.addMainAction( action )
 

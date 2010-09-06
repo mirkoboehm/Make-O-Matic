@@ -20,7 +20,9 @@ import os, platform, subprocess, signal, time
 from threading import Thread
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string, \
+	check_for_path
+from core.helpers.PathResolver import PathResolver
 
 class _CommandRunner( Thread ):
 	def __init__ ( self , runner ):
@@ -31,6 +33,7 @@ class _CommandRunner( Thread ):
 		self._runner = runner
 		self._pid = None
 		self.__combineOutput = False
+		self.__workingDir = None
 
 	def setCombineOutput( self, combine ):
 		if combine: # make sure combine is usable as a boolean
@@ -46,11 +49,12 @@ class _CommandRunner( Thread ):
 
 	def run( self ):
 		self.__started = True
-		mApp().debugN( self._getRunner(), 4, 'executing "{0}"'.format( self._getRunner().getCommand() ) )
+		mApp().debugN( self._getRunner(), 4, 'executing "{0}" in directory {1}'.format( self._getRunner().getCommand(), self._getRunner().getWorkingDir() ) )
+		print( self._getRunner().getWorkingDir() )
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
-		p = subprocess.Popen ( self._getRunner().getCommand(), shell = True, stdout = subprocess.PIPE, stderr = stderrValue )
+		p = subprocess.Popen ( self._getRunner().getCommand(), shell = False, cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
 		self._pid = p.pid
 		output, error = p.communicate()
 		self._getRunner()._setStdOut( output )
@@ -114,8 +118,8 @@ class RunCommand( MObject ):
 		return self.__timedOut
 
 	def setWorkingDir( self, dir ):
-		check_for_nonempty_string( dir, 'The working directory must be a non-empty string!' )
-		self.__workingDir = dir
+		check_for_path( dir, 'The working directory must be a non-empty string!' )
+		self.__workingDir = str( dir )
 
 	def getWorkingDir( self ):
 		return self.__workingDir
@@ -145,36 +149,28 @@ class RunCommand( MObject ):
 		return self.__cmd
 
 	def run( self ):
-		oldCwd = None
-		try:
-			if self.getWorkingDir():
-				oldCwd = os.getcwd()
-				os.chdir( self.getWorkingDir() )
-			timeoutString = 'without a timeout'
-			if self.getTimeoutSeconds() != None:
-				timeoutString = 'with timeout of {0} seconds'.format( self.getTimeoutSeconds() )
-			combinedOutputString = 'and separate output for stdout and stderr'
-			if self.getCombineOutput():
-				combinedOutputString = 'and combined stdout and stderr output'
-			mApp().debugN( self, 4, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
-			runner = _CommandRunner ( self )
-			runner.setCombineOutput( self.getCombineOutput() )
-			runner.start()
-			# this sucks, but seems to be needed on Windows at least
-			while not runner.wasStarted():
-				time.sleep( 0.1 )
-			if not self.getTimeoutSeconds():
-				runner.join()
-			else:
-				runner.join( self.getTimeoutSeconds() )
-			if runner.isAlive():
-				runner.terminate()
-				runner.join( 5 )
-				self.__timedOut = True
-			timeoutString = "timed out" if self.getTimedOut() else "completed"
-			mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( self.getCommand(), timeoutString, str( self.getReturnCode() ) ) )
-			return self.getReturnCode()
-		finally:
-			if oldCwd:
-				os.chdir( oldCwd )
+		timeoutString = 'without a timeout'
+		if self.getTimeoutSeconds() != None:
+			timeoutString = 'with timeout of {0} seconds'.format( self.getTimeoutSeconds() )
+		combinedOutputString = 'and separate output for stdout and stderr'
+		if self.getCombineOutput():
+			combinedOutputString = 'and combined stdout and stderr output'
+		mApp().debugN( self, 4, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
+		runner = _CommandRunner ( self )
+		runner.setCombineOutput( self.getCombineOutput() )
+		runner.start()
+		# this sucks, but seems to be needed on Windows at least
+		while not runner.wasStarted():
+			time.sleep( 0.1 )
+		if not self.getTimeoutSeconds():
+			runner.join()
+		else:
+			runner.join( self.getTimeoutSeconds() )
+		if runner.isAlive():
+			runner.terminate()
+			runner.join( 5 )
+			self.__timedOut = True
+		timeoutString = "timed out" if self.getTimedOut() else "completed"
+		mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( self.getCommand(), timeoutString, str( self.getReturnCode() ) ) )
+		return self.getReturnCode()
 

@@ -36,7 +36,7 @@ class BuildScriptInterface( MObject ):
 		return self.__buildScript
 
 	def querySetting( self, setting ):
-		cmd = '{0} {1} query {2}'.format( sys.executable, self.getBuildScript(), setting )
+		cmd = [ sys.executable, self.getBuildScript(), 'query', setting ]
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
@@ -56,7 +56,7 @@ class BuildScriptInterface( MObject ):
 
 	def queryRevisionsSince( self, revision ):
 		'''Execute the build script, and return the lines it outputs for "query revisions-since"'''
-		cmd = '{0} {1} print revisions-since {2}'.format( sys.executable, self.getBuildScript(), revision )
+		cmd = [ sys.executable, self.getBuildScript(), 'print', 'revisions-since', revision ]
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
@@ -70,7 +70,7 @@ class BuildScriptInterface( MObject ):
 		return lines
 
 	def queryCurrentRevision( self ):
-		cmd = '{0} {1} print current-revision'.format( sys.executable, self.getBuildScript() )
+		cmd = [ sys.executable, self.getBuildScript(), 'print', 'current-revision' ]
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:

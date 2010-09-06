@@ -55,7 +55,7 @@ class CPack( PackageProvider ):
 
     def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
-        runner = RunCommand( 'cpack --version' )
+        runner = RunCommand( [ 'cpack', '--version' ] )
         runner.run()
         if runner.getReturnCode() != 0:
             raise ConfigurationError( "CPack::checkInstallation: cpack not found." )

@@ -54,6 +54,8 @@ class ShellCommandAction( Action ):
 	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
 		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, True )
+		if self.getWorkingDirectory() != None:
+			self.__runner.setWorkingDir( self.getWorkingDirectory() )
 		self._getRunner().run()
 		self._setStdOut( self._getRunner().getStdOut() )
 		self._setStdErr( self._getRunner().getStdErr() )

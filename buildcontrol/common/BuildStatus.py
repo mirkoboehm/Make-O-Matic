@@ -26,6 +26,8 @@ from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 from core.helpers.GlobalMApp import mApp
+from cmd import Cmd
+from ctypes.util import cmd
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -209,11 +211,11 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		except ( OSError, IOError )as e:
 			raise ConfigurationError( 'Cannot create required build directory "{0}"!'.format( directory ) )
 		# now run the build script:
-		cmd = '{0} {1} -t {2}'.format( sys.executable, os.path.abspath( buildInfo.getBuildScript() ), buildType )
+		cmd = [ sys.executable, os.path.abspath( buildInfo.getBuildScript() ), '-t', buildType ]
 		if buildInfo.getUrl():
-			cmd += ' -u {0}'.format( buildInfo.getUrl() )
+			cmd.extend( '-u', buildInfo.getUrl() )
 		if rev:
-			cmd += ' -r "{0}"'.format( str( rev ) )
+			cmd.extend( '-r', str( rev ) )
 			rev = 'revision ' + str( rev )
 		else:
 			rev = 'latest revision'

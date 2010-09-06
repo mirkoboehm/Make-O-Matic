@@ -46,7 +46,7 @@ class DoxygenGenerator( Plugin ):
 		return self.__doxygenFile
 
 	def preFlightCheck( self ):
-		runner = RunCommand( '"{0}" --version'.format( self.getDoxygenPath() ) )
+		runner = RunCommand( [ self.getDoxygenPath(), '--version'.format() ] )
 		runner.run()
 		if( runner.getReturnCode() != 0 ):
 			raise ConfigurationError( "DoxygenGenerator: doxygen not found." )
