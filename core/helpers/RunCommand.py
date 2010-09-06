@@ -20,9 +20,7 @@ import os, platform, subprocess, signal, time
 from threading import Thread
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string, \
-	check_for_path
-from core.helpers.PathResolver import PathResolver
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_path
 
 class _CommandRunner( Thread ):
 	def __init__ ( self , runner ):
@@ -50,7 +48,6 @@ class _CommandRunner( Thread ):
 	def run( self ):
 		self.__started = True
 		mApp().debugN( self._getRunner(), 4, 'executing "{0}" in directory {1}'.format( self._getRunner().getCommand(), self._getRunner().getWorkingDir() ) )
-		print( self._getRunner().getWorkingDir() )
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
