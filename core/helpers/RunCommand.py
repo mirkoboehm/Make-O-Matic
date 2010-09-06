@@ -47,7 +47,7 @@ class _CommandRunner( Thread ):
 
 	def run( self ):
 		self.__started = True
-		mApp().debugN( self._getRunner(), 4, 'executing "{0}" in directory {1}'.format( self._getRunner().getCommand(), self._getRunner().getWorkingDir() ) )
+		mApp().debugN( self._getRunner(), 4, 'executing "{0}"'.format( self._getRunner().getCommand() ) )
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
