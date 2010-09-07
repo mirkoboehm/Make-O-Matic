@@ -60,6 +60,11 @@ def setupStandardBuildAndProject( buildName = None, minimumMomVersion = None,
 		projectName = None,
 		projectVersionNumber = None, projectVersionName = None,
 		scmUrl = None ):
+	# If the only one of the project/build names is set, initialise both with the same value
+	if buildName and not projectName:
+		projectName = buildName
+	if projectName and not buildName:
+		buildName = projectName
 	build = setupStandardBuild( buildName, minimumMomVersion )
 	project = setupStandardProject( build, projectName, projectVersionNumber, projectVersionName, scmUrl )
 	return build, project
