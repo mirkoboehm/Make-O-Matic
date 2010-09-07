@@ -68,7 +68,7 @@ class CPack( PackageProvider ):
         step = self.getInstructions().getStep( 'conf-package' )
         buildDirectory = self.getInstructions().getBuildDir()
 
-        makePackage = ShellCommandAction( 'cpack' )
+        makePackage = ShellCommandAction( [ 'cpack' ] )
         makePackage.setWorkingDirectory( buildDirectory )
         step.addMainAction( makePackage )
 

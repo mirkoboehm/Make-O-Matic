@@ -53,10 +53,11 @@ class Environments( ConfigurationBase ):
 		return self.__installedDeps
 
 	def buildConfiguration( self ):
-		'''For every environment found during setup, apply the environment, and build the configuration.'''
+		'''For every child found during setup, apply the child, and build the configuration.'''
 		error = False
-		for environment in self.getChildren():
-			if environment.build() != 0:
+		for child in self.getChildren():
+			assert isinstance( child, ConfigurationBase )
+			if child.buildConfiguration() != 0:
 				error = True
 		if error:
 			return 1

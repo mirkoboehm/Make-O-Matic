@@ -38,7 +38,11 @@ class ShellCommandAction( Action ):
 		"""Set the shell command"""
 		if TimeOutPeriod != None:
 			check_for_nonnegative_int( TimeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
-		check_for_list_of_strings( command, "The shell command must be a list of strings." )
+		try:
+			check_for_list_of_strings( command, "The shell command must be a list of strings." )
+		except Exception as e:
+			pass
+
 		self.__command = command
 		self.__timeOutPeriod = TimeOutPeriod
 

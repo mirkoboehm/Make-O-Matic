@@ -50,7 +50,7 @@ class Environment( ConfigurationBase ):
 		assert dep not in self.__deps
 		self.__deps.append( dep )
 
-	def build( self ):
+	def buildConfiguration( self ):
 		'''Apply the environment, build the configuration, restore the environment.'''
 		error = False
 		for configuration in self.getChildren():
