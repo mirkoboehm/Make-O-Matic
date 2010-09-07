@@ -211,9 +211,9 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		# now run the build script:
 		cmd = [ sys.executable, os.path.abspath( buildInfo.getBuildScript() ), '-t', buildType ]
 		if buildInfo.getUrl():
-			cmd.extend( '-u', buildInfo.getUrl() )
+			cmd.extend( [ '-u', buildInfo.getUrl() ] )
 		if rev:
-			cmd.extend( '-r', str( rev ) )
+			cmd.extend( [ '-r', str( rev ) ] )
 			rev = 'revision ' + str( rev )
 		else:
 			rev = 'latest revision'
