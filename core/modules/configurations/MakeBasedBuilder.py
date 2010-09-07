@@ -62,7 +62,9 @@ class MakeBasedBuilder( Builder ):
 		return configuration.getBuildDir()
 
 	def createConfMakeActions( self ):
-		if sys.platform != 'win32':
+		if sys.platform == 'win32':
+			jobs = ''
+		else:
 			jobs = '-j{0}'.format( multiprocessing.cpu_count() )
 		action = ShellCommandAction( [ self.getMakeToolName(), jobs ] )
 		action.setWorkingDirectory( self._getBuildDir() )
