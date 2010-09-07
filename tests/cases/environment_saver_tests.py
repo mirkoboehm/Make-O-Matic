@@ -32,10 +32,10 @@ class EnvironmentSaverTest( unittest.TestCase ):
 
 	def testChangeDirectory( self ):
 		oldCwd = os.getcwd()
-		tmpDir = '/' #FIXME does this work on Windows?
+		homeDir = os.path.expanduser( '~' )
 		with EnvironmentSaver():
-			os.chdir( tmpDir )
-			self.assertEqual( os.getcwd(), tmpDir )
+			os.chdir( homeDir )
+			self.assertEqual( os.getcwd(), homeDir )
 		self.assertEqual( os.getcwd(), oldCwd )
 
 if __name__ == "__main__":
