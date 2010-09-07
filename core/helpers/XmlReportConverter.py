@@ -29,7 +29,10 @@ except ImportError:
 
 class XmlReportConverter( MObject ):
 
-	TO_HTML = "xmlreport2html.xsl"
+	TEMPLATES = {
+		"html" : "xmlreport2html.xsl",
+		"text" : "xmlreport2text.xsl"
+	}
 
 	def __init__( self, xmlReport ):
 		MObject.__init__( self )
@@ -40,8 +43,9 @@ class XmlReportConverter( MObject ):
 		self.__registeredPlugins = []
 
 		# init HTML converter
-		f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( self.TO_HTML ) )
-		self.__xslTransformations[self.TO_HTML] = etree.XML( f.read() )
+		for k, v in self.TEMPLATES.items():
+			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( v ) )
+			self.__xslTransformations[k] = etree.XML( f.read() )
 
 		self._fetchXsltTemplates( mApp() )
 
@@ -66,7 +70,7 @@ class XmlReportConverter( MObject ):
 			return
 
 		# search for place to register new plugin templates
-		pluginTemplate = self.__xslTransformations[self.TO_HTML].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
+		pluginTemplate = self.__xslTransformations["html"].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
 		placeholder = pluginTemplate.find( "{http://www.w3.org/1999/XSL/Transform}choose" )
 
 		# validate XML
@@ -81,4 +85,7 @@ class XmlReportConverter( MObject ):
 		placeholder.insert( 0, element )
 
 	def convertToHtml( self ):
-		return self._convertTo( self.TO_HTML )
+		return self._convertTo( "html" )
+
+	def convertToText( self ):
+		return self._convertTo( "text" )

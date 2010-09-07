@@ -68,5 +68,19 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ) )
 		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ) )
 
+	def testConvertXmlReportToText( self ):
+		report = XmlReport( self.build )
+		report.prepare()
+		converter = XmlReportConverter( report )
+
+		text = converter.convertToText()
+
+		# TODO: Add more _useful_ tests 
+		self.assertGreater( len( text ), 1000 )
+
+		# debug
+		#f = open( "/tmp/workfile", 'w' )
+		#f.write( converter.convertToText() )
+
 if __name__ == "__main__":
 	unittest.main()
