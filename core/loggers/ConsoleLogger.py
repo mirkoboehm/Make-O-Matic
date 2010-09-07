@@ -65,8 +65,7 @@ class ConsoleLogger( Logger ):
 			mApp().debug( self, 'debug level is {0}'.format( level ) )
 
 	def getXsltTemplate( self ):
-		return """Base directory: <xsl:value-of select="@basedir"/><br/>
-Debug level: <xsl:value-of select="@debuglevel"/>"""
+		return """Debug level: <xsl:value-of select="@debuglevel"/>"""
 
 	def createXmlNode( self, document ):
 		node = Logger.createXmlNode( self, document )

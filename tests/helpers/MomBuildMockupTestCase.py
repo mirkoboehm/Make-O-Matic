@@ -30,6 +30,8 @@ from core.modules.testers.CTest import CTest
 from core.modules.packagers.CPack import CPack
 from core.helpers.BoilerPlate import setupStandardBuild
 import sys
+from core.Build import Build
+from core.helpers.GlobalMApp import mApp
 
 class MomBuildMockupTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
@@ -48,9 +50,14 @@ class MomBuildMockupTestCase( unittest.TestCase ):
 		testMomEnvironments = os.path.join( myDir, 'test-mom-environments' )
 		sys.argv = [] # reset command line arguments
 
-		self.build = setupStandardBuild( 'XmlReportTestBuild' )
+		build = Build( None, 'XmlReportTestBuild' )
+		build.getParameters().parse()
+		mApp().getSettings().set( Settings.ScriptLogLevel, build.getParameters().getDebugLevel() )
+		build._initialize()
+		build = build
+
 		project = Project( 'XmlReportTestProject' )
-		self.build.setProject( project )
+		build.setProject( project )
 		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
 		environments = Environments( [ 'Qt-4.[67].?-Shared-*' ], 'Qt 4', project )
 
@@ -64,8 +71,10 @@ class MomBuildMockupTestCase( unittest.TestCase ):
 		release.addPlugin( CTest() )
 		release.addPlugin( CPack() )
 
-		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.build.getSettings().set( Settings.EnvironmentsBaseDir, testMomEnvironments )
+		build.getSettings().set( Settings.ScriptLogLevel, 3 )
+		build.getSettings().set( Settings.EnvironmentsBaseDir, testMomEnvironments )
+
+		self.build = build
 
 	def tearDown( self ):
 		MApplication._instance = None

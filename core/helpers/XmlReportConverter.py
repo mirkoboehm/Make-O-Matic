@@ -34,7 +34,6 @@ class XmlReportConverter( MObject ):
 	def __init__( self, xmlReport ):
 		MObject.__init__( self )
 
-		self.__project = xmlReport.getProject()
 		self.__xml = etree.fromstring( xmlReport.getReport() )
 
 		self.__xslTransformations = {}
@@ -44,25 +43,23 @@ class XmlReportConverter( MObject ):
 		f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( self.TO_HTML ) )
 		self.__xslTransformations[self.TO_HTML] = etree.XML( f.read() )
 
-		self._fetchXsltTemplates( self.__project )
+		self._fetchXsltTemplates( mApp() )
 
 	def _convertTo( self, destinationFormat ):
 		transform = etree.XSLT( self.__xslTransformations[destinationFormat] )
 		return str( transform( self.__xml ) )
 
-	def _fetchXsltTemplates( self, instruction ):
-		for plugin in self.__project.getPlugins():
+	def _fetchXsltTemplates( self, instructions ):
+		for plugin in instructions.getPlugins():
 			# prevent infinite loop on circular plugin dependencies
 			if plugin in self.__registeredPlugins:
 				mApp().debug( self, "XSLT template already added for plugin {0}".format( plugin.getName() ) )
 				continue
 
 			self.__registeredPlugins.append( plugin )
+			self._addXsltTemplate( plugin, plugin.getXsltTemplate() )
 
-			if plugin.getInstructions().getPlugins():
-				self._fetchXsltTemplates( plugin ) # enter recursion
-
-			self._addXsltTemplate( plugin.getName(), plugin.getXsltTemplate() )
+			self._fetchXsltTemplates( plugin.getInstructions() ) # enter recursion
 
 	def _addXsltTemplate( self, plugin, xslString ):
 		if xslString is None :

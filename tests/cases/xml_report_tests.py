@@ -20,20 +20,53 @@
 import unittest
 from core.modules.reporters.XmlReport import XmlReport
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
+from core.helpers.XmlReportConverter import XmlReportConverter
+from core.Exceptions import MomError
+
+try:
+	from lxml import etree
+except ImportError:
+	raise MomError( "Fatal: lxml package missing, required for Xml transformations" )
 
 class XmlReportTests( MomBuildMockupTestCase ):
 
-	def testCreateXmlReport( self ):
-		# start run
-		#self.build.buildAndReturn()
+	def setUp( self ):
+		MomBuildMockupTestCase.setUp( self )
+
+		# start build
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 		self.build.buildAndReturn()
 
-		# generate report
+	def testCreateXmlReport( self ):
 		report = XmlReport( self.build )
 		report.prepare()
-		print( report.getReport() )
+
+		xmlString = report.getReport()
+		doc = etree.XML( xmlString )
+
+		self.assertEqual( doc.tag, "build" ) # root
+		self.assertIsNotNone( doc.find( './/project' ) )
+		self.assertIsNotNone( doc.find( './/environment' ) )
+
+		self.assertIsNotNone( doc.find( './/plugin' ) )
+		self.assertIsNotNone( doc.find( './/step' ) )
+		self.assertIsNotNone( doc.find( './/action' ) )
+
+		self.assertIsNotNone( doc.find( './/plugin[@name="CMakeBuilder"]' ) )
+
+	def testConvertXmlReportToHtml( self ):
+		report = XmlReport( self.build )
+		report.prepare()
+		converter = XmlReportConverter( report )
+
+		xmlString = converter.convertToHtml()
+		doc = etree.XML( xmlString )
+
+		# TODO: Add more _useful_ tests 
+		self.assertEqual( doc.tag, "{http://www.w3.org/1999/xhtml}html" ) # root
+		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ) )
+		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ) )
 
 if __name__ == "__main__":
 	unittest.main()
