@@ -73,6 +73,8 @@ th {
     <h4>Plugin: <xsl:value-of select="@name"/></h4>
     <xsl:choose>
       <!-- Plugin templates are inserted here -->
+      <xsl:when test="@name = 'placeholder'">
+      </xsl:when>
       <xsl:otherwise>
         <xsl:if test="count(./step) > 0">
           <table>

@@ -20,17 +20,20 @@
 import os.path
 from core.Exceptions import ConfigurationError, MomError
 from core.helpers.GlobalMApp import mApp
+from core.MObject import MObject
 
 try:
 	from lxml import etree
 except ImportError:
 	raise MomError( "Fatal: lxml package missing, required for Xml transformations" )
 
-class XmlReportConverter( object ):
+class XmlReportConverter( MObject ):
 
 	TO_HTML = "xmlreport2html.xsl"
 
 	def __init__( self, xmlReport ):
+		MObject.__init__( self )
+
 		self.__project = xmlReport.getProject()
 		self.__xml = etree.fromstring( xmlReport.getReport() )
 
@@ -41,26 +44,29 @@ class XmlReportConverter( object ):
 		f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( self.TO_HTML ) )
 		self.__xslTransformations[self.TO_HTML] = etree.XML( f.read() )
 
-		# fetch XSL templates from external plugins/loggers
-		for logger in self.__project.getBuild().getLoggers():
-			self._addXsltTemplate( logger.getName(), logger.getXsltTemplate() )
-
-		for plugin in self.__project.getPlugins():
-			self._addXsltTemplate( plugin.getName(), plugin.getXsltTemplate() )
+		self._fetchXsltTemplates( self.__project )
 
 	def _convertTo( self, destinationFormat ):
 		transform = etree.XSLT( self.__xslTransformations[destinationFormat] )
 		return str( transform( self.__xml ) )
 
-	def _addXsltTemplate( self, pluginName, xslString ):
+	def _fetchXsltTemplates( self, instruction ):
+		for plugin in self.__project.getPlugins():
+			# prevent infinite loop on circular plugin dependencies
+			if plugin in self.__registeredPlugins:
+				mApp().debug( self, "XSLT template already added for plugin {0}".format( plugin.getName() ) )
+				continue
+
+			self.__registeredPlugins.append( plugin )
+
+			if plugin.getInstructions().getPlugins():
+				self._fetchXsltTemplates( plugin ) # enter recursion
+
+			self._addXsltTemplate( plugin.getName(), plugin.getXsltTemplate() )
+
+	def _addXsltTemplate( self, plugin, xslString ):
 		if xslString is None :
 			return
-
-		if pluginName in self.__registeredPlugins:
-			mApp().debug( self, "XSLT template already added for plugin {0}".format( pluginName ) )
-			return
-
-		self.__registeredPlugins.append( pluginName )
 
 		# search for place to register new plugin templates
 		pluginTemplate = self.__xslTransformations[self.TO_HTML].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
@@ -70,9 +76,9 @@ class XmlReportConverter( object ):
 		try:
 			element = etree.XML( """<xsl:when xmlns:xsl="http://www.w3.org/1999/XSL/Transform"	
 				 xmlns="http://www.w3.org/1999/xhtml"
-				 test="@name = '{0}'">{1}</xsl:when>""".format( pluginName, xslString ) )
+				 test="@name = '{0}'">{1}</xsl:when>""".format( plugin.getName(), xslString ) )
 		except etree.XMLSyntaxError:
-			raise ConfigurationError( "XSL template of {0} plugin malformed.".format( pluginName ) )
+			raise ConfigurationError( "XSL template of {0} plugin malformed.".format( plugin.getName() ) )
 
 		# insert new switch case
 		placeholder.insert( 0, element )
