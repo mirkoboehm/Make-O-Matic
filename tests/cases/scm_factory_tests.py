@@ -37,7 +37,7 @@ class ScmFactoryTests( unittest.TestCase ):
 		self.build.setProject( self.project )
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
 		# self.build.addLogger( ConsoleLogger() )
-		self.project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
+		self.project.createScm( 'git:git://gitorious.org/make-o-matic/mom.git' )
 
 	def tearDown( self ):
 		MApplication._instance = None
@@ -47,7 +47,7 @@ class ScmFactoryTests( unittest.TestCase ):
 		return factory.makeScmImplementation( description )
 
 	def testCreateGitScm( self ):
-		description = 'git:git@gitorious.org:make-o-matic/mom.git'
+		description = 'git:git://gitorious.org/make-o-matic/mom.git'
 		scm = self.__createAndReturnScm( description )
 		self.assertTrue( isinstance( scm, SCMGit ), 'The descriptor {0} should result in a ScmGit object!'.format( description ) )
 

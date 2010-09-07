@@ -63,6 +63,7 @@ class Defaults( MObject ):
 	ConfigurationTargetDir = 'configuration.targetdir'
 	# ----- auto-detected environment settings:
 	EnvironmentsBaseDir = 'environments.basedir'
+	EnvironmentsApplicableBuildTypes = 'environments.applicablebuildtypes'
 	# ----- Builder settings
 	MakeBuilderMakeTool = 'configuration.builder.make.toolname'
 	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
@@ -148,6 +149,7 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
 		self.getSettings()[ Defaults.CMakeBuilderTool ] = 'cmake'
 		self.getSettings()[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
+		self.getSettings()[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
 		# ----- simple_ci settings:
 		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
 

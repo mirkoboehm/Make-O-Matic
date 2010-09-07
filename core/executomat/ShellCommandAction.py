@@ -32,17 +32,13 @@ class ShellCommandAction( Action ):
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
-		return '{0}: {1}'.format( self.getName(), self.getCommand() )
+		return '{0}: {1}'.format( self.getName(), ' '.join( self.getCommand() ) )
 
 	def setCommand( self, command, TimeOutPeriod = None ):
 		"""Set the shell command"""
 		if TimeOutPeriod != None:
 			check_for_nonnegative_int( TimeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
-		try:
-			check_for_list_of_strings( command, "The shell command must be a list of strings." )
-		except Exception as e:
-			pass
-
+		check_for_list_of_strings( command, "The shell command must be a list of strings." )
 		self.__command = command
 		self.__timeOutPeriod = TimeOutPeriod
 

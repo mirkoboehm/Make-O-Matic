@@ -35,6 +35,7 @@ project.addPlugin( prep )
 
 # add a doxygen generator
 dox = DoxygenGenerator()
+dox.setOptional( True )
 dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 

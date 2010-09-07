@@ -48,7 +48,6 @@ class _CommandRunner( Thread ):
 
 	def run( self ):
 		self.__started = True
-		mApp().debugN( self._getRunner(), 4, 'executing "{0}"'.format( self._getRunner().getCommand() ) )
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
@@ -62,7 +61,6 @@ class _CommandRunner( Thread ):
 		mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( output.decode() ) )
 		if not self.__combineOutput:
 			mApp().debugN( self._getRunner(), 5, "STDERR:\n{0}".format( error.decode() ) )
-		mApp().debugN( self._getRunner(), 4, 'finished, return code {0}'.format( p.returncode ) )
 
 	def wasStarted( self ):
 		return self.__started
@@ -154,7 +152,7 @@ class RunCommand( MObject ):
 		combinedOutputString = 'and separate output for stdout and stderr'
 		if self.getCombineOutput():
 			combinedOutputString = 'and combined stdout and stderr output'
-		mApp().debugN( self, 4, 'executing "{0}" {1} {2}'.format( self.getCommand(), timeoutString, combinedOutputString ) )
+		mApp().debugN( self, 4, 'executing "{0}" {1} {2}'.format( ' '.join( self.getCommand() ), timeoutString, combinedOutputString ) )
 		runner = _CommandRunner ( self )
 		runner.setCombineOutput( self.getCombineOutput() )
 		runner.start()
@@ -170,6 +168,6 @@ class RunCommand( MObject ):
 			runner.join( 5 )
 			self.__timedOut = True
 		timeoutString = "timed out" if self.getTimedOut() else "completed"
-		mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( self.getCommand(), timeoutString, str( self.getReturnCode() ) ) )
+		mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( ' '.join( self.getCommand() ), timeoutString, str( self.getReturnCode() ) ) )
 		return self.getReturnCode()
 

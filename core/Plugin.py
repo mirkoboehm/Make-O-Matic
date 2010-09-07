@@ -17,12 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
+from core.Exceptions import MomException
+from core.helpers.GlobalMApp import mApp
 
 class Plugin( MObject ):
 
 	def __init__( self, name = None ):
 		"""Constructor"""
 		MObject.__init__( self, name )
+		self.setEnabled( True )
+		self.setOptional( False )
 		self._setInstructions( None )
 
 	def _setInstructions( self, instructions ):
@@ -36,11 +40,36 @@ class Plugin( MObject ):
 	def getTagName( self ):
 		return "plugin"
 
+	def performPreFlightCheck( self ):
+		'''This method handles the execution of the pre flight check. Do not overload this method to adapt it, overload 
+		preFlightCheck instead!'''
+		if not self.getEnabled():
+			mApp().debugN( self, 2, 'this plugin is disabled, skipping pre flight check.' )
+			return
+		try:
+			self.preFlightCheck()
+		except MomException as e:
+			if self.getOptional():
+				mApp().message( self, 'pre flight check failed, disabling the plugin because it is marked as optional.' )
+				self.setEnabled( False )
+			else:
+				raise e
+
 	def preFlightCheck( self ):
 		"""PreFlightCheck is called after the command line arguments have been passed, 
 		but before the build steps are generated.
-		Modules should check the setup of the tools they use in this phase."""
+		Modules should check the setup of the tools they use in this phase.
+		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError 
+		exception."""
 		pass
+
+	def performSetup( self ):
+		'''This method handles the execution of the setup phase. Do not overload this method to adapt it, overload 
+		setup instead!'''
+		if self.getEnabled():
+			self.setup()
+		else:
+			mApp().debugN( self, 2, 'this plugin is disabled, not generating any actions.' )
 
 	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 
@@ -60,9 +89,17 @@ class Plugin( MObject ):
 		before the build script ends."""
 		pass
 
-#	def describe( self, prefix ):
-#		me = '{0}Plugin: {1}'.format( prefix, self.getName() )
-#		print( me )
+	def setEnabled( self, onOff ):
+		self.__enabled = onOff
+
+	def getEnabled( self ):
+		return self.__enabled
+
+	def setOptional( self, onOff ):
+		self.__optional = onOff
+
+	def getOptional( self ):
+		return self.__optional
 
 	def getXsltTemplate( self ):
 		return None

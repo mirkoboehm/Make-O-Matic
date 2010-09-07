@@ -66,6 +66,10 @@ class Environments( ConfigurationBase ):
 
 	def runPreFlightChecks( self ):
 		# discover matching environments:
+		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
+		if buildType not in mApp().getSettings().get( Settings.EnvironmentsApplicableBuildTypes ).lower():
+			mApp().debugN( self, 2, 'environments will not be applied in build type {0}'.format( buildType ) )
+			return
 		configs = self.getChildren()[:]
 		environments = self.findMatchingEnvironments()
 		if environments:

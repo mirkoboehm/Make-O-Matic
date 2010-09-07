@@ -33,7 +33,7 @@ class RunModePrintTests( unittest.TestCase ):
 		self.build.setProject( self.project )
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
 		# self.build.addLogger( ConsoleLogger() )
-		self.project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
+		self.project.createScm( 'git:git://gitorious.org/make-o-matic/mom.git' )
 
 	def tearDown( self ):
 		MApplication._instance = None

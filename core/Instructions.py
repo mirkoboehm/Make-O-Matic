@@ -222,7 +222,7 @@ class Instructions( MObject ):
 	def runPreFlightChecks( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'performing pre-flight checks' )
-			[ plugin.preFlightCheck() for plugin in self.getPlugins() ]
+			[ plugin.performPreFlightCheck() for plugin in self.getPlugins() ]
 			[ child.runPreFlightChecks() for child in self.getChildren() ]
 
 	def runSetups( self ):
@@ -231,7 +231,7 @@ class Instructions( MObject ):
 			self._configureBaseDir()
 			self._configureLogDir()
 			self.__executomat.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
-			[ plugin.setup() for plugin in self.getPlugins() ]
+			[ plugin.performSetup() for plugin in self.getPlugins() ]
 			for child in self.getChildren():
 				child.runSetups()
 
