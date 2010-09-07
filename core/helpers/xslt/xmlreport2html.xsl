@@ -55,7 +55,16 @@ th {
 
   <xsl:template match="project">
     <h2>Project: <xsl:value-of select="@name"/></h2>
-    <span>Build time: <xsl:value-of select="@timing"/></span>
+    <p>
+      Base directory: <xsl:value-of select="@basedir"/>
+    </p>
+    <p>
+      Start time (UTC): <xsl:value-of select="@starttime"/><br/>
+      End time (UTC): <xsl:value-of select="@stoptime"/>
+    </p>
+    <p>
+      Build time: <xsl:value-of select="@timing"/>
+    </p>
     <xsl:apply-templates/>
   </xsl:template>
 

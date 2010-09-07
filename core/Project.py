@@ -126,10 +126,3 @@ class Project( Instructions ):
 			self._getExecutomat().run( self )
 		finally:
 			self.getTimeKeeper().stop()
-
-	def createXmlNode( self, document ):
-		node = MObject.createXmlNode( self, document )
-
-		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().delta() )
-
-		return node

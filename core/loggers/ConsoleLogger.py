@@ -70,7 +70,6 @@ Debug level: <xsl:value-of select="@debuglevel"/>"""
 
 	def createXmlNode( self, document ):
 		node = Logger.createXmlNode( self, document )
-		node.attributes["basedir"] = mApp().getBaseDir()
 		node.attributes["debuglevel"] = str( mApp().getSettings().get( Settings.ScriptLogLevel, True ) )
 		return node
 

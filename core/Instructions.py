@@ -116,6 +116,11 @@ class Instructions( MObject ):
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
 
+		node.attributes["basedir"] = str ( self.getBaseDir() )
+		node.attributes["starttime"] = str ( self._getExecutomat().getTimeKeeper().getStartTime() )
+		node.attributes["stoptime"] = str ( self._getExecutomat().getTimeKeeper().getStopTime() )
+		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().delta() )
+
 		for plugin in self.getPlugins():
 			#print( "describe plugin " + plugin.getName() )
 			element = plugin.createXmlNode( document )
