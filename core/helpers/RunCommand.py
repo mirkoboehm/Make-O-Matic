@@ -30,7 +30,7 @@ class _CommandRunner( Thread ):
 		self.__finished = None
 		assert runner
 		self._runner = runner
-		self._pid = None
+		self._process = None
 		self.__combineOutput = False
 		self.__workingDir = None
 
@@ -51,12 +51,11 @@ class _CommandRunner( Thread ):
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
-		p = subprocess.Popen ( self._getRunner().getCommand(), shell = False, cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
-		self._pid = p.pid
-		output, error = p.communicate()
+		self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False, cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
+		output, error = self._process.communicate()
 		self._getRunner()._setStdOut( output )
 		self._getRunner()._setStdErr( error )
-		self._getRunner()._setReturnCode( p.returncode )
+		self._getRunner()._setReturnCode( self._process.returncode )
 		self.__finished = True
 		mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( output.decode() ) )
 		if not self.__combineOutput:
@@ -70,28 +69,15 @@ class _CommandRunner( Thread ):
 
 	def terminate( self ):
 		# FIXME logic?
-		if self._pid:
-			self.kill( self._pid, signal.SIGTERM )
+		if self._process:
+			self._process.terminate()
 		if not self.hasFinished():
 			self.join( 5 )
 			try:
-				self.kill( self._pid, signal.SIGKILL )
+				self._process.kill()
 			except OSError:
 				pass # process finished in the meantime (the error is "[Errno 3] No such process")
 			self.join( 5 )
-		self._pid = -1
-
-	def windowskill( self, pid ):
-		""" replace os.kill on Windows, where it is not available"""
-		cmd = 'taskkill /PID ' + str( int( pid ) ) + ' /T /F'
-		if os.system( cmd ) == 0:
-			mApp().debugN( self, 4, 'windows-kill killed process {0}'.format( pid ) )
-
-	def kill( self, pid, signal ):
-		if 'Windows' in platform.platform():
-			self.windowskill( pid )
-		else:
-			os.kill( pid, signal )
 
 class RunCommand( MObject ):
 	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False ):
