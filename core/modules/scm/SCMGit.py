@@ -157,6 +157,8 @@ class SCMGit( SourceCodeProvider ):
 			else:
 				raise MomError( 'cannot update the clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 		else:
+			if not os.path.exists( self.getCloneArmyDir() ):
+				os.mkdir( self.getCloneArmyDir() )
 			runner = RunCommand( [ 'git', 'clone', self.getUrl(), hiddenClone ], 1200, True )
 			runner.run()
 			if runner.getReturnCode() == 0:
