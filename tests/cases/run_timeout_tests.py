@@ -40,7 +40,7 @@ class RunWithTimeoutTest( unittest.TestCase ):
 		runner = RunCommand( command, timeout, True )
 		runner.run()
 		self.assertTrue( runner.getTimedOut() )
-		self.assertTrue( runner.getReturnCode() != 0 )
+		self.assertNotEquals( runner.getReturnCode(), 0 )
 
 	def testRunWithoutTimeout( self ):
 		timeout = 10
@@ -48,7 +48,7 @@ class RunWithTimeoutTest( unittest.TestCase ):
 		runner = RunCommand( command, timeout, True )
 		runner.run()
 		self.assertFalse( runner.getTimedOut() )
-		self.assertTrue( runner.getReturnCode() == 0 )
+		self.assertEqual( runner.getReturnCode(), 0 )
 
 if __name__ == "__main__":
 	#import sys;sys.argv = ['', 'Test.testName']
