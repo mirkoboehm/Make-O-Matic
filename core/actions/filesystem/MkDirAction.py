@@ -45,7 +45,7 @@ class MkDirAction( Action ):
 			return 0
 		except ( OSError, IOError ) as e:
 			error = 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) )
-			self._setStdErr( error )
+			self._setStdErr( error.encode() )
 			mApp().debug( self, error )
 			return 1
 
