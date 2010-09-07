@@ -158,7 +158,8 @@ class SCMGit( SourceCodeProvider ):
 		else:
 			if not os.path.exists( self.getCloneArmyDir() ):
 				os.mkdir( self.getCloneArmyDir() )
-			runner = RunCommand( [ 'git', 'clone', '--bare', self.getUrl(), hiddenClone ], 1200, True )
+			runner = RunCommand( [ 'git', 'clone', '--bare', self.getUrl(), make_foldername_from_string( self.getUrl() ) ], 1200, True )
+			runner.setWorkingDir( self.getCloneArmyDir() )
 			runner.run()
 			if runner.getReturnCode() == 0:
 				mApp().debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )
