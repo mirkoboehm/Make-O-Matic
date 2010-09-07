@@ -18,60 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Project import Project
-from core.Settings import Settings
-from core.MApplication import MApplication
-import os.path
-import inspect
-from core.environments.Environments import Environments
-from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder
-from core.Configuration import Configuration
 from core.modules.reporters.XmlReport import XmlReport
-from core.modules.testers.CTest import CTest
-from core.modules.packagers.CPack import CPack
-from core.helpers.BoilerPlate import setupStandardBuild
-import sys
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
-class XmlReportTests( unittest.TestCase ):
-
-	def setUp( self ):
-		if MApplication._instance:
-			# do not try this at home!
-			MApplication._instance = None
-
-		self._initializeBuildMockup()
-
-	def _initializeBuildMockup( self ):
-		myFile = inspect.getfile( inspect.currentframe() )
-		myFilePath = os.path.split( myFile )
-		myDir = myFilePath[0]
-		testMomEnvironments = os.path.join( myDir, 'test-mom-environments' )
-		#args = sys.argv.copy()
-		sys.argv = []
-		self.build = setupStandardBuild( 'XmlReportTestBuild' )
-		project = Project( 'XmlReportTestProject', self.build )
-		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
-		environments = Environments( [ 'Qt-4.[67].?-Shared-*' ], 'Qt 4', project )
-
-		debug = Configuration( 'Debug', environments, )
-		cmakeDebug = CMakeBuilder()
-		cmakeDebug.setMakeOptions( '-j2' )
-		cmakeDebug.setMakeInstallOptions( '-j1' )
-		debug.addPlugin( cmakeDebug )
-
-		release = Configuration( 'Release', environments )
-		cmakeRelease = CMakeBuilder()
-		cmakeRelease.setMakeOptions( '-j2' )
-		cmakeDebug.setMakeInstallOptions( '-j1' )
-		release.addPlugin( cmakeRelease )
-		release.addPlugin( CTest() )
-		release.addPlugin( CPack() )
-
-		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.build.getSettings().set( Settings.EnvironmentsBaseDir, testMomEnvironments )
-
-	def tearDown( self ):
-		MApplication._instance = None
+class XmlReportTests( MomBuildMockupTestCase ):
 
 	def testCreateXmlReport( self ):
 		# start run
@@ -79,6 +29,7 @@ class XmlReportTests( unittest.TestCase ):
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 		self.build.buildAndReturn()
+
 		# generate report
 		report = XmlReport( self.build )
 		report.prepare()

@@ -31,9 +31,8 @@ class EmailReporter( Reporter ):
 	def wrapUp( self ):
 		report = XmlReport( mApp() )
 		report.prepare()
-		xml = report.getReport()
 
-		conv = XmlReportConverter( xml )
+		conv = XmlReportConverter( report )
 		html = conv.convertToHtml()
 
 		email = Email()
