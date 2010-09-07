@@ -31,7 +31,7 @@ class MakePackager( PackageProvider ):
 
     def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
-        runner = RunCommand( 'make --version' )
+        runner = RunCommand( [ 'make', '--version' ] )
         runner.run()
         if runner.getReturnCode() != 0:
             raise ConfigurationError( "MakePackager::checkInstallation: make not found." )

@@ -36,7 +36,7 @@ class RunWithTimeoutTest( unittest.TestCase ):
 
 	def testRunWithTimeout( self ):
 		timeout = 5
-		command = 'sleep 20'
+		command = [ 'sleep', '20' ]
 		runner = RunCommand( command, timeout, True )
 		runner.run()
 		self.assertTrue( runner.getTimedOut() )
@@ -44,7 +44,7 @@ class RunWithTimeoutTest( unittest.TestCase ):
 
 	def testRunWithoutTimeout( self ):
 		timeout = 10
-		command = 'sleep 5'
+		command = [ 'sleep', ' 5' ]
 		runner = RunCommand( command, timeout, True )
 		runner.run()
 		self.assertFalse( runner.getTimedOut() )

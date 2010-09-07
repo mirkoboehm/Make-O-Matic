@@ -24,6 +24,7 @@ from core.Settings import Settings
 from core.helpers.RunCommand import RunCommand
 from core.helpers.GlobalMApp import mApp
 from tests.helpers.MomTestCase import MomTestCase
+import time
 
 class SimpleProjectTests( MomTestCase ):
 	'''SimpleProjectTests runs the example_mom_builscript in the three major run modes.
@@ -32,13 +33,13 @@ class SimpleProjectTests( MomTestCase ):
 	BuildScriptName = os.path.join( 'buildscripts', 'example_mom_buildscript.py' )
 
 	def _querySetting( self, name ):
-		cmd = '{0} {1} query {2}'.format( sys.executable, SimpleProjectTests.BuildScriptName, name )
+		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, 'query', name ]
 		runner = RunCommand( cmd )
 		runner.run()
 		return runner
 
 	def testUsageHelp( self ):
-		cmd = '{0} {1} -h'.format( sys.executable, SimpleProjectTests.BuildScriptName )
+		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, '-h' ]
 		runner = self.runCommand( cmd, 'build script usage help' )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
@@ -46,7 +47,7 @@ class SimpleProjectTests( MomTestCase ):
 		runner = self._querySetting( Settings.ProjectName )
 		self.assertEquals( runner.getReturnCode(), 0 )
 		line = runner.getStdOut().decode().strip()
-		self.assertEquals( line, 'project.name: Simple Project Run Test' )
+		self.assertEquals( line, 'project.name: MakeOMatic' )
 
 	def testQueryMomVersion( self ):
 		runner = self._querySetting( Settings.MomVersionNumber )
@@ -56,7 +57,7 @@ class SimpleProjectTests( MomTestCase ):
 		self.assertEquals( line, '{0}: {1}'.format( Settings.MomVersionNumber, expectedVersion ) )
 
 	def testPrintCurrentRevision( self ):
-		cmd = '{0} {1} print current-revision'.format( sys.executable, SimpleProjectTests.BuildScriptName )
+		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, 'print', 'current-revision' ]
 		runner = RunCommand( cmd )
 		runner.run()
 		self.assertEquals( runner.getReturnCode(), 0 )
@@ -65,7 +66,7 @@ class SimpleProjectTests( MomTestCase ):
 		self.assertTrue( line )
 
 	def _testBuild( self, buildType ):
-		cmd = '{0} {1} -v -t {2}'.format( sys.executable, SimpleProjectTests.BuildScriptName, buildType )
+		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, '-v', '-t', buildType ]
 		runner = RunCommand( cmd )
 		runner.run()
 		if runner.getReturnCode() != 0:
@@ -74,6 +75,8 @@ class SimpleProjectTests( MomTestCase ):
 			print( runner.getStdOut().decode() )
 			print( 'error output:' )
 			print( runner.getStdErr().decode() )
+		# Sleep for 1 second to stop build directories with the same second causing failures
+		time.sleep( 1 )
 		return runner
 
 	def testEBuild( self ):

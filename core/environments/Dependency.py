@@ -21,11 +21,14 @@ import os
 from core.helpers.GlobalMApp import mApp
 import re
 from core.Exceptions import ConfigurationError
+from core.helpers.EnvironmentVariables import addToPathCollection
+from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class Dependency( MObject ):
 	'''Dependency represents a single installed dependency, and the adaptations to the environment variables needed to use it.'''
 
 	_ControlFileName = 'MOM_PACKAGE_CONFIGURATION'
+	_CommandPrefix = 'MOM_'
 
 	def __init__( self, folder = None, name = None ):
 		MObject.__init__( self, name )
@@ -37,41 +40,11 @@ class Dependency( MObject ):
 	def _getControlFileName( self, path ):
 		return os.path.join( path, Dependency._ControlFileName )
 
-	def _readControlFile( self, controlFile ):
-		prefix = 'MOM_'
-		try:
-			with open ( controlFile, 'r' ) as input:
-				mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
-				self._setValid( True )
-				for line in input.readlines():
-					if re.match( '^\s*#', line ): continue # ignore comments
-					if re.match( '^\s*$', line ): continue # ignore empty lines
-					line = line.strip()
-					enabledLine = re.match( '^({0}PACKAGE_ENABLED)\s+(\w+)$'.format( prefix ), line )
-					# parse for "enabled" commands:
-					try:
-						if enabledLine:
-							yesNo = str( enabledLine.group( 2 ) )
-							if yesNo.lower() == 'false':
-								self.setEnabled( False )
-							elif yesNo.lower() == 'true':
-								self.setEnabled( True )
-							else:
-								raise ConfigurationError( 'enable must be true or false' )
-							mApp().debugN( self, 3, 'build environments: >enabled< {0}'.format( str( self.isEnabled() ) ) )
-						else:
-							if re.match( '^{0}'.format( prefix ), line ):
-								self._addCommand( line )
-					except ConfigurationError as value:
-						mApp().message( 'error ({0}) in control file {1}\n--> {2}'.
-							format( str( value ), controlFile, str( line ).strip() ) )
-					except IndexError:
-						mApp().message( 'syntax error in control file {0}\n--> {1}'.format( controlFile, str( line ).strip() ) )
-		except IOError:
-			mApp().debugN( self, 3, 'no control file found at "{0}"'.format( controlFile ) )
-
 	def setFolder( self, folder ):
-		self.__folder = os.path.abspath( os.path.normpath( folder ) )
+		if folder:
+			self.__folder = os.path.abspath( os.path.normpath( folder ) )
+		else:
+			self.__folder = None
 
 	def getFolder( self ):
 		return self.__folder
@@ -98,6 +71,104 @@ class Dependency( MObject ):
 		pieces = os.path.split( self.getFolder() )
 		return pieces[0]
 
+	def _expandVariables( self, text ):
+		# FIXME If there are no other supported variables, maybe remove the function. Or maybe not.
+		result = text.replace( '$PWD', self.getFolder() )
+		return result
+
+	def _readControlFile( self, controlFile ):
+		try:
+			with open ( controlFile, 'r' ) as input:
+				mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
+				self._setValid( True )
+				for line in input.readlines():
+					if re.match( '^\s*#', line ): continue # ignore comments
+					if re.match( '^\s*$', line ): continue # ignore empty lines
+					line = line.strip()
+					if re.match( '^{0}'.format( Dependency._CommandPrefix ), line ):
+						if not self.applyProperty( controlFile, line ):
+							self._addCommand( line )
+				return True
+		except IOError:
+			mApp().debugN( self, 3, 'no control file found at "{0}"'.format( controlFile ) )
+			return False
+
+	def applyProperty( self, controlFile, line ):
+		enabledLine = re.match( '^({0}PACKAGE_ENABLED)\s+(\w+)$'.format( Dependency._CommandPrefix ), line )
+		descriptionLine = re.match( '^({0}PACKAGE_DESCRIPTION)\s+(.+)$'.format( Dependency._CommandPrefix ), line )
+		# parse for "enabled" commands:
+		try:
+			if enabledLine:
+				yesNo = str( enabledLine.group( 2 ) )
+				if yesNo.lower() == 'false':
+					self.setEnabled( False )
+				elif yesNo.lower() == 'true':
+					self.setEnabled( True )
+				else:
+					raise ConfigurationError( 'enable must be true or false' )
+				mApp().debugN( self, 3, '>enabled< {0}'.format( str( self.isEnabled() ) ) )
+				return True
+			elif descriptionLine:
+				description = str( descriptionLine.group( 2 ) )
+				self._setDescription( description )
+				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getDescription() ) )
+				return True
+			return False
+		except ConfigurationError as value:
+			mApp().message( 'error ({0}) in control file {1}\n--> {2}'.
+				format( str( value ), controlFile, str( line ).strip() ) )
+		except IndexError:
+			mApp().message( 'syntax error in control file {0}\n--> {1}'.format( controlFile, str( line ).strip() ) )
+
+	def applyCommand( self, line ):
+		pass
+
+	def apply( self ):
+		assert self.getFolder()
+		controlFile = self._getControlFileName( self.getFolder() )
+		for line in self.getCommands():
+			assert( not re.match( '^\s*#', line ) and not re.match( '^\s*$', line ) )
+			export = re.match( '^({0}EXPORT)\s+(\w+)\s+(.+)$'.format( Dependency._CommandPrefix ), line )
+			addTo = re.match( '^({0}ADD_PATH)\s+(\w+)\s+(\w+)\s+(.+)$'.format( Dependency._CommandPrefix ), line )
+			enabled = re.match( '^({0}PACKAGE_ENABLED)\s+(\w+)$'.format( Dependency._CommandPrefix ), line )
+			# parse commands:
+			try:
+				if export:
+					variable = str( export.group( 2 ) )
+					value = self._expandVariables( export.group( 3 ) )
+					mApp().debugN( self, 2, 'setBuildEnvironment: >export< ' + variable + '="' + value + '"' )
+					os.environ[variable] = value
+				elif addTo:
+					variable = str( addTo.group( 2 ) )
+					mode = self._expandVariables( addTo.group( 3 ) )
+					value = self._expandVariables( addTo.group( 4 ) )
+					if mode == 'APPEND':
+						mApp().debugN( self, 2, 'setBuildEnvironment: >append< ' + variable + ': "' + value + '"' )
+						addToPathCollection( variable, value, 'append' )
+					elif mode == 'PREPEND':
+						mApp().debugN( self, 2, 'setBuildEnvironment: >prepend< ' + variable + ': "' + value + '"' )
+						addToPathCollection( variable, value, 'prepend' )
+					else:
+						raise ConfigurationError( 'mode missing' )
+				elif enabled:
+					yesNo = str( enabled.group( 2 ) )
+					if yesNo.lower() == 'false':
+						enabled = False
+					elif yesNo.lower() == 'true':
+						enabled = True
+					else:
+						raise ConfigurationError( 'enable must be true or false' )
+					mApp().debugN( self, 2, 'setBuildEnvironment: >enabled< ' + str( enabled ) )
+				elif re.match( '^{0}'.format( Dependency._CommandPrefix ), line ):
+					mApp().message( self, 'unknown command in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
+				else:
+					mApp().message( self, 'parse error in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
+			except ConfigurationError as value:
+				mApp().message( self, 'error (' + str( value ) + ') in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
+			except IndexError:
+				mApp().message( self, 'syntax error in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
+
+
 	def verify( self ):
 		'''Verify that the folder contains a MOM package control file. If so, evaluate it.'''
 		if os.path.isdir( self.getFolder() ):
@@ -113,6 +184,14 @@ class Dependency( MObject ):
 				mApp().debugN( self, 5, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
 				return False
 
+	def _setDescription( self, description ):
+		check_for_nonempty_string( description, 'A MOM Package Configuration description cannot be empty!' )
+		self.__description = description
+
 	def getDescription( self ):
-		name = os.path.split( self.getFolder() )[1]
-		return name
+		if not self.__description:
+			name = os.path.split( self.getFolder() )[1]
+			return name
+		else:
+			return self.__description
+

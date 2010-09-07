@@ -170,7 +170,15 @@ class Instructions( MObject ):
 			stats = os.stat( baseDir )
 			mtime = time.localtime( stats[8] )
 			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
-			newFolder = '{0}-{1}'.format( baseDir, extension )
+			newFolderBaseName = '{0}-{1}'.format( baseDir, extension )
+			newFolder = newFolderBaseName
+			max = 1000
+			for index in range( max ):
+				if not os.path.isdir( newFolder ):
+					break
+				newFolder = newFolderBaseName + '__{0}'.format( index + 1 )
+			if os.path.isdir( newFolder ):
+				raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( max ) )
 			try:
 				shutil.move( baseDir, newFolder )
 			except ( OSError, shutil.Error ) as o:

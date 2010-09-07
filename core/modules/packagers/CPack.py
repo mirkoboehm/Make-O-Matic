@@ -55,7 +55,7 @@ class CPack( PackageProvider ):
 
     def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
-        runner = RunCommand( 'cpack --version' )
+        runner = RunCommand( [ 'cpack', '--version' ] )
         runner.run()
         if runner.getReturnCode() != 0:
             raise ConfigurationError( "CPack::checkInstallation: cpack not found." )
@@ -68,7 +68,7 @@ class CPack( PackageProvider ):
         step = self.getInstructions().getStep( 'conf-package' )
         buildDirectory = self.getInstructions().getBuildDir()
 
-        makePackage = ShellCommandAction( 'cpack' )
+        makePackage = ShellCommandAction( [ 'cpack' ] )
         makePackage.setWorkingDirectory( buildDirectory )
         step.addMainAction( makePackage )
 

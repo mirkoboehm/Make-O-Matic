@@ -20,6 +20,7 @@ from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.executomat.ShellCommandAction import ShellCommandAction
+from cmd import Cmd
 
 class CMakeVariable( object ):
 	def __init__( self, name, value, type = None ):
@@ -92,11 +93,11 @@ class CMakeBuilder( MakeBasedBuilder ):
 		project = configuration.getProject()
 		srcDir = project.getSourceDir()
 		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getTargetDir() ) )
-		variables = []
+		cmd = [ self.getCMakeToolName() ]
 		for variable in self.getCMakeVariables():
-			variables.append( '-D{0}'.format( variable ) )
-		cmd = [ self.getCMakeToolName(), ' '.join( variables ), srcDir ]
-		action = ShellCommandAction( ' '.join( cmd ) )
+			cmd.append( '-D{0}'.format( variable ) )
+		cmd.append( srcDir )
+		action = ShellCommandAction( cmd )
 		action.setWorkingDirectory( configuration.getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-configure' )
 		step.addMainAction( action )

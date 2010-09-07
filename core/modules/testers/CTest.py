@@ -31,7 +31,7 @@ class CTest( TestProvider ):
 
     def _checkInstallation( self ):
         """Check if the tester's prerequisite are installed."""
-        runner = RunCommand( 'ctest --version' )
+        runner = RunCommand( [ 'ctest', '--version' ] )
         runner.run()
         if runner.getReturnCode() != 0:
             raise ConfigurationError( "CTest::checkInstallation: ctest not found." )
@@ -43,6 +43,6 @@ class CTest( TestProvider ):
     def makeTestStep( self ):
         """Run tests for the project."""
         step = self.getInstructions().getStep( 'conf-make-test' )
-        makeTest = ShellCommandAction( 'ctest --verbose' )
+        makeTest = ShellCommandAction( [ 'ctest', '--verbose' ] )
         makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
         step.addMainAction( makeTest )

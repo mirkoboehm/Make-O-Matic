@@ -28,23 +28,19 @@ class SimpleCITests( MomTestCase ):
 	ToolName = os.path.join( '..', 'tools', 'simple_ci.py' )
 
 	def testUsageHelp( self ):
-		cmd = '{0} {1} -h'.format( sys.executable, SimpleCITests.ToolName )
+		cmd = [ sys.executable, SimpleCITests.ToolName, '-h' ]
 		runner = self.runCommand( cmd, 'simple_ci usage help' )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunFindRevisions( self ):
-		cmd = '{0} {1} --slave --pause 1 -b {2}'.format( 
-			sys.executable,
-			SimpleCITests.ToolName,
-			SimpleCITests.BuildScriptName )
+		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
+			'--pause', '1', '-b', SimpleCITests.BuildScriptName ]
 		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunPerformBuilds( self ):
-		cmd = '{0} {1} --slave --pause 1 -f {2}'.format( 
-			sys.executable,
-			SimpleCITests.ToolName,
-			SimpleCITests.BuildScriptName )
+		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
+			'--pause', '1', '-f', SimpleCITests.BuildScriptName ]
 		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
 		self.assertEquals( runner.getReturnCode(), 0 )
 

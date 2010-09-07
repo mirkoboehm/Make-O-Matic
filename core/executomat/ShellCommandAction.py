@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_list_of_strings
 from core.Exceptions import MomError
 from core.helpers.RunCommand import RunCommand
 from core.executomat.Action import Action
@@ -38,7 +38,11 @@ class ShellCommandAction( Action ):
 		"""Set the shell command"""
 		if TimeOutPeriod != None:
 			check_for_nonnegative_int( TimeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
-		check_for_nonempty_string( command, "The shell command must be an non-empty string." )
+		try:
+			check_for_list_of_strings( command, "The shell command must be a list of strings." )
+		except Exception as e:
+			pass
+
 		self.__command = command
 		self.__timeOutPeriod = TimeOutPeriod
 
@@ -54,6 +58,8 @@ class ShellCommandAction( Action ):
 	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
 		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, True )
+		if self.getWorkingDirectory() != None:
+			self.__runner.setWorkingDir( self.getWorkingDirectory() )
 		self._getRunner().run()
 		self._setStdOut( self._getRunner().getStdOut() )
 		self._setStdErr( self._getRunner().getStdErr() )

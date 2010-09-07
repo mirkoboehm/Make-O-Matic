@@ -23,7 +23,7 @@ from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
-import sys
+import sys, multiprocessing
 
 # FIXME add variants of make? That provide make tool name, version check command, ...? 
 class MakeBasedBuilder( Builder ):
@@ -31,31 +31,17 @@ class MakeBasedBuilder( Builder ):
 
 	def __init__( self, name ):
 		Builder.__init__( self, name )
-		self.setMakeOptions( None )
-		self.setMakeInstallOptions( None )
 		self.setMakeToolName( mApp().getSettings().get( Settings.MakeBuilderMakeTool ) )
 
-	def setMakeOptions( self, options ):
-		self.__makeOptions = options
-
-	def getMakeOptions( self ):
-		return self.__makeOptions
-
-	def setMakeInstallOptions( self, options ):
-		self.__makeInstallOptions = options
-
-	def getMakeInstallOptions( self ):
-		return self.__makeInstallOptions
-
 	def preFlightCheck( self ):
+		cmd = [ self.getMakeToolName() ]
 		if sys.platform == 'win32':
 			#FIXME get a version string that actually works
-			runner = RunCommand( '{0} {1}'.format( self.getMakeToolName(), '/?' ) )\
+			cmd.append( '/?' )
 			#FIXME create NMake subclass
-			self.setMakeOptions( '' )
-			self.setMakeInstallOptions( '' )
 		else:
-			runner = RunCommand( '{0} {1}'.format( self.getMakeToolName(), '--version' ) )
+			cmd.append( '--version' )
+		runner = RunCommand( cmd )
 		runner.run()
 		if runner.getReturnCode() != 0:
 			raise ConfigurationError( 'MakeBasedBuilder: make tool "{0}" not found.'.format( self.getMakeToolName() ) )
@@ -76,18 +62,15 @@ class MakeBasedBuilder( Builder ):
 		return configuration.getBuildDir()
 
 	def createConfMakeActions( self ):
-		options = self.getMakeOptions() or ''
-		cmd = [ self.getMakeToolName(), options ]
-		action = ShellCommandAction( ' '.join( cmd ) )
+		jobs = '-j{0}'.format( multiprocessing.cpu_count() )
+		action = ShellCommandAction( [ self.getMakeToolName(), jobs ] )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-make' )
 		step.addMainAction( action )
 
 	def createConfMakeInstallActions( self ):
-		options = self.getMakeInstallOptions() or ''
-		cmd = [ self.getMakeToolName(), options, mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) ]
-		action = ShellCommandAction( ' '.join( cmd ) )
+		cmd = [ self.getMakeToolName(), mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) ]
+		action = ShellCommandAction( cmd )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-make-install' )
 		step.addMainAction( action )
-

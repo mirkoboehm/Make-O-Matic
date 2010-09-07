@@ -65,7 +65,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def _checkInstallation( self ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-		runner = RunCommand( 'git --version' )
+		runner = RunCommand( [ 'git', '--version'] )
 		runner.run()
 		if runner.getReturnCode() != 0:
 			raise ConfigurationError( "SCMGit::checkInstallation: git not found." )
@@ -77,7 +77,8 @@ class SCMGit( SourceCodeProvider ):
 	def _getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
 		self._updateHiddenClone()
-		runner = RunCommand( 'git log {1}..'.format( cap or '', revision ), 3600 )
+		cmd = [ 'git', 'log', '{1}..'.format( cap or '', revision ) ]
+		runner = RunCommand( cmd, 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -106,7 +107,7 @@ class SCMGit( SourceCodeProvider ):
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
 		self._updateHiddenClone()
-		runner = RunCommand( 'git log -n1' )
+		runner = RunCommand( [ 'git', 'log', '-n1' ] )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -127,11 +128,11 @@ class SCMGit( SourceCodeProvider ):
 		step = self.getInstructions().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
-		updateClone = ShellCommandAction( 'git clone --local --depth 1 "{0}" .'.format ( self._getHiddenClonePath() ) )
+		updateClone = ShellCommandAction( [ 'git', 'clone', '--local', '--depth', '1', self._getHiddenClonePath(), "." ] )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
 		revision = self.getRevision() or 'HEAD'
-		checkout = ShellCommandAction( 'git checkout {0}'.format( revision ) )
+		checkout = ShellCommandAction( [ 'git', 'checkout', revision ] )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 
@@ -148,7 +149,7 @@ class SCMGit( SourceCodeProvider ):
 			if not os.path.isdir( hiddenClone ):
 				raise MomError( 'hidden clone exists at "{0}", but is not a directory. Help!'.format( hiddenClone ) )
 			# FIXME get timeout value from settings
-			runner = RunCommand( 'git pull --all', 1200, True )
+			runner = RunCommand( [ 'git', 'pull', '--all' ], 1200, True )
 			runner.setWorkingDir( hiddenClone )
 			runner.run()
 			if runner.getReturnCode() == 0:
@@ -156,7 +157,7 @@ class SCMGit( SourceCodeProvider ):
 			else:
 				raise MomError( 'cannot update the clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 		else:
-			runner = RunCommand( 'git clone {0} "{1}"'.format( self.getUrl(), hiddenClone ), 1200, True )
+			runner = RunCommand( [ 'git', 'clone', self.getUrl(), hiddenClone ], 1200, True )
 			runner.run()
 			if runner.getReturnCode() == 0:
 				mApp().debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )

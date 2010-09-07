@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from copy import copy
 from core.modules.ConfigurationBase import ConfigurationBase
+from core.helpers.EnvironmentSaver import EnvironmentSaver
 
 class Environment( ConfigurationBase ):
 	'''Environment is a single match of the required build environment for a single 
@@ -49,17 +50,17 @@ class Environment( ConfigurationBase ):
 		assert dep not in self.__deps
 		self.__deps.append( dep )
 
-	def build( self ):
+	def buildConfiguration( self ):
 		'''Apply the environment, build the configuration, restore the environment.'''
-		# apply environment:
-		# ...
-		# build configuration:
 		error = False
 		for configuration in self.getChildren():
-			if configuration.buildConfiguration() != 0:
-				error = True
-		# restore original environment
-		# ...
+			with EnvironmentSaver():
+				# apply environment:
+				for dep in self.getDependencies():
+					dep.apply()
+				# build configuration:
+				if configuration.buildConfiguration() != 0:
+					error = True
 		# return result
 		if error:
 			return 1

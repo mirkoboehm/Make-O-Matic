@@ -209,11 +209,11 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		except ( OSError, IOError )as e:
 			raise ConfigurationError( 'Cannot create required build directory "{0}"!'.format( directory ) )
 		# now run the build script:
-		cmd = '{0} {1} -t {2}'.format( sys.executable, os.path.abspath( buildInfo.getBuildScript() ), buildType )
+		cmd = [ sys.executable, os.path.abspath( buildInfo.getBuildScript() ), '-t', buildType ]
 		if buildInfo.getUrl():
-			cmd += ' -u {0}'.format( buildInfo.getUrl() )
+			cmd.extend( '-u', buildInfo.getUrl() )
 		if rev:
-			cmd += ' -r "{0}"'.format( str( rev ) )
+			cmd.extend( '-r', str( rev ) )
 			rev = 'revision ' + str( rev )
 		else:
 			rev = 'latest revision'
