@@ -21,6 +21,7 @@ from core.helpers.RunCommand import RunCommand
 import unittest
 from core.MApplication import MApplication
 from core.Build import Build
+import sys
 
 # FIXME the test will need a Build object now! setup/tearDown?
 class RunWithTimeoutTest( unittest.TestCase ):
@@ -30,22 +31,24 @@ class RunWithTimeoutTest( unittest.TestCase ):
 			# do not try this at home!
 			MApplication._instance = None
 		self.build = Build()
+		if sys.platform == 'win32':
+			self.sleepCommand = [ 'ping', '127.0.0.1', '-n', '10' ]
+		else:
+			self.sleepCommand = [ 'sleep', '5']
 
 	def tearDown( self ):
 		MApplication._instance = None
 
 	def testRunWithTimeout( self ):
-		timeout = 5
-		command = [ 'sleep', '20' ]
-		runner = RunCommand( command, timeout, True )
+		timeout = 1
+		runner = RunCommand( self.sleepCommand, timeout, True )
 		runner.run()
 		self.assertTrue( runner.getTimedOut() )
 		self.assertNotEquals( runner.getReturnCode(), 0 )
 
 	def testRunWithoutTimeout( self ):
 		timeout = 10
-		command = [ 'sleep', ' 5' ]
-		runner = RunCommand( command, timeout, True )
+		runner = RunCommand( self.sleepCommand, timeout, True )
 		runner.run()
 		self.assertFalse( runner.getTimedOut() )
 		self.assertEqual( runner.getReturnCode(), 0 )
