@@ -25,8 +25,6 @@ from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder, CMakeVariable
 from core.modules.packagers.CPack import CPack
 from core.modules.testers.CTest import CTest
 from core.environments.Environments import Environments
-from core.helpers.XmlReportConverter import XmlReportConverter
-from core.modules.reporters.XmlReport import XmlReport
 
 build, project = setupStandardBuildAndProject( projectName = 'Charm', minimumMomVersion = "0.5.0",
 	projectVersionNumber = '1.4.0',
@@ -52,10 +50,4 @@ release.addPlugin( CPack() )
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getPackagesDir ) ) )
 
-build.buildAndReturn()
-
-report = XmlReport( build )
-report.prepare()
-conv = XmlReportConverter( report )
-f = open( '/tmp/workfile', 'w' )
-f.write( conv.convertToHtml() )
+build.build()
