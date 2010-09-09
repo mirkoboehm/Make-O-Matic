@@ -24,7 +24,7 @@ import os
 
 class BuildStatusPersistenceTests( unittest.TestCase ):
 	def getTemporaryDatabaseFilename( self ):
-		return tempfile.TemporaryFile().name
+		return tempfile.NamedTemporaryFile( suffix = '.sqlite' ).name
 
 	def testPersistBuildInfo( self ):
 		bs = BuildStatus()
