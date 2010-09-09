@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # This file is part of make-o-matic.
 # -*- coding: utf-8 -*-
 # 
