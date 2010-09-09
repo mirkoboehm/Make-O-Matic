@@ -16,7 +16,15 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import datetime
+
+from datetime import datetime
+
+def formattedTime( datetime ):
+	try:
+		text = datetime.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
+	except:
+		text = datetime
+	return text
 
 def formattedTimeDelta( t ):
 	return formattedDuration( t.seconds + 60 * 60 * 24 * t.days )
@@ -33,6 +41,7 @@ def formattedDuration( noOfSeconds ):
 	Hours = int( noOfSeconds / Hour ) % 24
 	Minutes = int( noOfSeconds / Minute ) % 60
 	Seconds = noOfSeconds % 60
+
 	text = ''
 	if Days > 0:
 		text += str( Days ) + 'd '
@@ -58,13 +67,13 @@ class TimeKeeper( object ):
 		self.__stopTime = None
 
 	def start( self ):
-		self.__startTime = datetime.datetime.utcnow()
+		self.__startTime = datetime.utcnow()
 
 	def getStartTime( self ):
 		return self.__startTime
 
 	def stop( self ):
-		self.__stopTime = datetime.datetime.utcnow()
+		self.__stopTime = datetime.utcnow()
 
 	def getStopTime( self ):
 		return self.__stopTime
@@ -76,6 +85,6 @@ class TimeKeeper( object ):
 
 	def deltaString( self ):
 		if not self.getStartTime() or not self.getStopTime():
-			return '[--:--.---]'
+			return '---'
 		return formattedTimeDelta( self.delta() )
 
