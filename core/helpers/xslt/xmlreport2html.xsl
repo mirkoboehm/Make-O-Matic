@@ -55,6 +55,11 @@ th {
       </head>
       <body>
         <h1>Build Report for: <xsl:value-of select="@name"/></h1>
+        <p>
+          Platform:     <xsl:value-of select="@sys-platform"/> (<xsl:value-of select="@sys-version"/>)<br/>
+          Architecture: <xsl:value-of select="@sys-architecture"/><br/>
+          Node name:    <xsl:value-of select="@sys-nodename"/>
+        </p>
         <xsl:apply-templates/>
       </body>
     </html>
@@ -67,7 +72,7 @@ th {
     </p>
     <p>
       Start time (UTC): <xsl:value-of select="@starttime"/><br/>
-      End time (UTC): <xsl:value-of select="@stoptime"/>
+      End time (UTC):    <xsl:value-of select="@stoptime"/>
     </p>
     <p>
       Build time: <xsl:value-of select="@timing"/>

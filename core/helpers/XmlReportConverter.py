@@ -99,11 +99,12 @@ class XmlReportConverter( MObject ):
 		indent = "  "
 		recurse = True
 
-		wrapper.initial_indent = wrapper.initial_indent + indent
-		wrapper.subsequent_indent = wrapper.initial_indent
-
 		if element.tag == "build":
-			out += wrapper.wrap( "BUILD: {0}".format( element.attrib["name"] ) )
+			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
+			out += " " # new line
+			out += wrapper.wrap( "Platform:     {0} ({1})".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
+			out += wrapper.wrap( "Architecture: {0}".format( element.attrib["sys-architecture"] ) )
+			out += wrapper.wrap( "Node name:    {0}".format( element.attrib["sys-nodename"] ) )
 
 		if element.tag == "project":
 			out += " "
@@ -170,6 +171,9 @@ class XmlReportConverter( MObject ):
 #				out += wrapper.wrap( element.text )
 #				out += wrapper.wrap( "--- end of stderr output ---" )
 #				wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
+
+		wrapper.initial_indent = wrapper.initial_indent + indent
+		wrapper.subsequent_indent = wrapper.initial_indent
 
 		if recurse != False:
 			for el in element.getchildren():
