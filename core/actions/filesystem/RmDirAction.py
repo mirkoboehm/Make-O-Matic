@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.executomat.Action import Action
 from core.helpers.TypeCheckers import check_for_path
-import shutil
+import shutil, os
 from core.helpers.GlobalMApp import mApp
 
 class RmDirAction( Action ):
@@ -40,7 +40,10 @@ class RmDirAction( Action ):
 		check_for_path( self.getPath(), "No directory specified!" )
 		mApp().debugN( self, 2, 'deleting directory "{0}"'.format( self.getPath() ) )
 		try:
-			shutil.rmtree( str( self.getPath() ), False )
+			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
+			shutil.rmtree( str( self.getPath() ), True )
+			if os.path.exists( str( self.getPath() ) ):
+				shutil.rmtree( str( self.getPath() ), False )
 			return 0
 		except ( OSError, IOError ) as e:
 			error = 'error deleting directory "{0}": {1}'.format( self.getPath(), str( e ) )

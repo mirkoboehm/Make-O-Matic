@@ -24,11 +24,11 @@ import os
 
 class BuildStatusPersistenceTests( unittest.TestCase ):
 	def getTemporaryDatabaseFilename( self ):
-		return tempfile.mkstemp( '.sqlite', '_{0}'.format( self.__class__.__name__ ) )
+		return tempfile.NamedTemporaryFile( suffix = '.sqlite' ).name
 
 	def testPersistBuildInfo( self ):
 		bs = BuildStatus()
-		filename = self.getTemporaryDatabaseFilename()[1]
+		filename = self.getTemporaryDatabaseFilename()
 		bs.setDatabaseFilename( filename )
 		bi = BuildInfo()
 		bi.setProjectName( bs.getName() )

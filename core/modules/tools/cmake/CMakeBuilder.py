@@ -20,7 +20,6 @@ from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.executomat.ShellCommandAction import ShellCommandAction
-from cmd import Cmd
 
 class CMakeVariable( object ):
 	def __init__( self, name, value, type = None ):

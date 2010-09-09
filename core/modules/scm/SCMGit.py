@@ -142,14 +142,13 @@ class SCMGit( SourceCodeProvider ):
 		return hiddenClone
 
 	def _updateHiddenClone( self ):
-		# FIXME should this be a bare repository clone?
 		hiddenClone = self._getHiddenClonePath()
 		# check if the clone directory exists, create if necessary: 
 		if os.path.exists( hiddenClone ):
 			if not os.path.isdir( hiddenClone ):
 				raise MomError( 'hidden clone exists at "{0}", but is not a directory. Help!'.format( hiddenClone ) )
 			# FIXME get timeout value from settings
-			runner = RunCommand( [ 'git', 'pull', '--all' ], 1200, True )
+			runner = RunCommand( [ 'git', 'fetch', '--all' ], 1200, True )
 			runner.setWorkingDir( hiddenClone )
 			runner.run()
 			if runner.getReturnCode() == 0:
@@ -157,7 +156,10 @@ class SCMGit( SourceCodeProvider ):
 			else:
 				raise MomError( 'cannot update the clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 		else:
-			runner = RunCommand( [ 'git', 'clone', self.getUrl(), hiddenClone ], 1200, True )
+			if not os.path.exists( self.getCloneArmyDir() ):
+				os.makedirs( self.getCloneArmyDir() )
+			runner = RunCommand( [ 'git', 'clone', '--bare', self.getUrl(), make_foldername_from_string( self.getUrl() ) ], 1200, True )
+			runner.setWorkingDir( self.getCloneArmyDir() )
 			runner.run()
 			if runner.getReturnCode() == 0:
 				mApp().debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )
