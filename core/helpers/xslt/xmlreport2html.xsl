@@ -11,6 +11,7 @@
       <head>
         <style type="text/css">
 body,table {
+  font-family: monospace;
   font-size: 9pt;
   width: 1000px;
 }
@@ -71,8 +72,8 @@ th {
       Base directory: <xsl:value-of select="@basedir"/>
     </p>
     <p>
-      Start time (UTC): <xsl:value-of select="@starttime"/><br/>
-      End time (UTC):    <xsl:value-of select="@stoptime"/>
+      Start time: <xsl:value-of select="@starttime"/><br/>
+      Stop time : <xsl:value-of select="@stoptime"/>
     </p>
     <p>
       Build time: <xsl:value-of select="@timing"/>

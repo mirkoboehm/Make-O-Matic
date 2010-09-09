@@ -28,6 +28,7 @@ from core.Defaults import Defaults
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import time
 import shutil
+from core.helpers.TimeKeeper import formattedTime
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -117,9 +118,9 @@ class Instructions( MObject ):
 		node = MObject.createXmlNode( self, document )
 
 		node.attributes["basedir"] = str ( self.getBaseDir() )
-		node.attributes["starttime"] = str ( self._getExecutomat().getTimeKeeper().getStartTime() )
-		node.attributes["stoptime"] = str ( self._getExecutomat().getTimeKeeper().getStopTime() )
-		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().delta() )
+		node.attributes["starttime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStartTime() ) )
+		node.attributes["stoptime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStopTime() ) )
+		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().deltaString() )
 
 		pluginsElement = document.createElement( "plugins" )
 		for plugin in self.getPlugins():

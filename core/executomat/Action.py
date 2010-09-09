@@ -171,7 +171,7 @@ class Action( MObject ):
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
 		node.attributes["finished"] = str( self.didFinish() )
-		node.attributes["timing"] = str( self.__timeKeeper.delta() )
+		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
 		node.attributes["returncode"] = str( self.getResult() )
 
 		stderrElement = document.createElement( "stderr" )

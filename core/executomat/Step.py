@@ -22,7 +22,7 @@ from core.Exceptions import MomError
 from core.MObject import MObject
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.TypeCheckers import check_for_string
-from core.helpers.TimeKeeper import TimeKeeper
+from core.helpers.TimeKeeper import TimeKeeper, formattedTimeDelta
 from core.helpers.GlobalMApp import mApp
 
 class Step( MObject ):
@@ -156,7 +156,7 @@ class Step( MObject ):
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
 		node.attributes["enabled"] = str( self.getEnabled() )
-		node.attributes["timing"] = str( self.__timeKeeper.delta() )
+		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
 		node.attributes["failed"] = str( self.failed() )
 
 		if self.getPreActions():

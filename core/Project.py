@@ -31,7 +31,6 @@ from core.executomat.Step import Step
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
-from core.MObject import MObject
 
 """A Project represents an entity to build. 
 FIXME documentation
