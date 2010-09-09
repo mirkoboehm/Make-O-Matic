@@ -37,12 +37,19 @@ th {
   color: green;
 }
 .fail {
-  font-weight: bold;
   color: red;
 }
 .neutral {
   color: #BBBBBB;
 }
+
+.log {
+ padding-left: 10px;
+}
+.step-status {
+  font-weight: bold;
+}
+
         </style>
         <title>Build Report</title>
       </head>
@@ -72,10 +79,28 @@ th {
     <h2>Environment: <xsl:value-of select="@name"/></h2>
     <xsl:apply-templates/>
   </xsl:template>
-
+  
   <xsl:template match="configuration">
     <h3>Configuration: <xsl:value-of select="@name"/></h3>
     <xsl:apply-templates/>
+  </xsl:template>
+
+  <xsl:template match="steps">
+    <h4>Steps: <xsl:value-of select="@name"/></h4>
+    <xsl:if test="count(./step) > 0">
+      <table>
+        <thead>
+          <tr>
+            <th width="700px">Instruction</th>
+            <th width="200px">Timing</th>
+            <th width="300px">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <xsl:apply-templates/>
+        </tbody>
+      </table>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="plugin">
@@ -85,45 +110,42 @@ th {
       <xsl:when test="@name = 'placeholder'">
       </xsl:when>
       <xsl:otherwise>
-        <xsl:if test="count(./step) > 0">
-          <table>
-            <thead>
-              <tr>
-                <th width="700px">Instruction</th>
-                <th width="200px">Timing</th>
-                <th width="300px">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <xsl:apply-templates/>
-            </tbody>
-          </table>
-        </xsl:if>
+        No information about this plugin
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match="plugin/step">
+  <xsl:template match="step">
     <tr>
       <td><xsl:value-of select="@name"/></td>
       <td><xsl:value-of select="@timing"/></td>
-      <td>
+      <td class="step-status">
         <xsl:choose>
-          <xsl:when test="@failed = 'False'">
-            -<!--<span class="success">SUCCESS</span>-->
+          <xsl:when test="@enabled = 'False'">
+            <span class="neutral">DISABLED</span>
+          </xsl:when>
+          <xsl:when test="count(./action) = 0">
+            <span class="neutral">NO ACTIONS REGISTERED</span>
+          </xsl:when>
+          <xsl:when test="@failed = 'True'">
+            <span class="fail">FAILED</span>
           </xsl:when>
           <xsl:otherwise>
-            <span class="fail">FAILED</span>
+            <span class="success">SUCCESS</span>
           </xsl:otherwise>
         </xsl:choose>
       </td>
     </tr>
-    <xsl:apply-templates/>
+    
+    <!--  only show actions if step has failed -->
+    <xsl:if test="@failed = 'True'">
+      <xsl:apply-templates/>
+    </xsl:if>
   </xsl:template>
 
-  <xsl:template match="plugin/step/action">
+  <xsl:template match="step/action">
     <tr>
-      <td><code><xsl:value-of select="logdescription"/></code></td>
+      <td><div class="log"><code><xsl:value-of select="logdescription"/></code></div></td>
       <td><xsl:value-of select="@timing"/></td>
 
       <td>

@@ -121,10 +121,17 @@ class Instructions( MObject ):
 		node.attributes["stoptime"] = str ( self._getExecutomat().getTimeKeeper().getStopTime() )
 		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().delta() )
 
+		pluginsElement = document.createElement( "plugins" )
 		for plugin in self.getPlugins():
-			#print( "describe plugin " + plugin.getName() )
 			element = plugin.createXmlNode( document )
-			node.appendChild( element )
+			pluginsElement.appendChild( element )
+		node.appendChild( pluginsElement )
+
+		stepsElement = document.createElement( "steps" )
+		for step in self._getExecutomat()._getSteps():
+			element = step.createXmlNode( document )
+			stepsElement.appendChild( element )
+		node.appendChild( stepsElement )
 
 		return node
 

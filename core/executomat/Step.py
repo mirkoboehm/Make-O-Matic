@@ -155,6 +155,7 @@ class Step( MObject ):
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
+		node.attributes["enabled"] = str( self.getEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.delta() )
 		node.attributes["failed"] = str( self.failed() )
 

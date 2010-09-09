@@ -104,13 +104,3 @@ class Plugin( MObject ):
 	def getXsltTemplate( self ):
 		return None
 
-	def createXmlNode( self, document ):
-		node = MObject.createXmlNode( self, document )
-
-		steps = self.getInstructions()._getExecutomat()._getSteps()
-		for step in steps:
-			element = step.createXmlNode( document )
-			node.appendChild( element )
-
-		return node
-

@@ -21,6 +21,7 @@ import os.path
 from core.Exceptions import ConfigurationError, MomError
 from core.helpers.GlobalMApp import mApp
 from core.MObject import MObject
+from textwrap import TextWrapper
 
 try:
 	from lxml import etree
@@ -88,4 +89,93 @@ class XmlReportConverter( MObject ):
 		return self._convertTo( "html" )
 
 	def convertToText( self ):
-		return self._convertTo( "text" )
+		wrapper = TextWrapper( drop_whitespace = False, width = 80 )
+
+		return "\n".join( self._toText( self.__xml, wrapper ) )
+
+	def _toText( self, element, wrapper ):
+		out = []
+
+		indent = "  "
+		recurse = True
+
+		wrapper.initial_indent = wrapper.initial_indent + indent
+		wrapper.subsequent_indent = wrapper.initial_indent
+
+		if element.tag == "build":
+			out += wrapper.wrap( "BUILD: {0}".format( element.attrib["name"] ) )
+
+		if element.tag == "project":
+			out += " "
+			out += wrapper.wrap( "Project: {0}".format( element.attrib["name"] ) )
+			out += " "
+			out += wrapper.wrap( "Base directory: {0}".format( element.attrib["basedir"] ) )
+			out += " "
+			out += wrapper.wrap( "Start time (UTC): {0}".format( element.attrib["starttime"] ) )
+			out += wrapper.wrap( "Stop time (UTC):  {0}".format( element.attrib["stoptime"] ) )
+			out += " "
+			out += wrapper.wrap( "Build time: {0}".format( element.attrib["timing"] ) )
+
+		elif element.tag == "plugins": # container element
+			if len( element.getchildren() ) > 0:
+				out += " "
+				out += wrapper.wrap( "Plugin list:" )
+
+		elif element.tag == "plugin":
+			out += wrapper.wrap( "Plugin: {0}".format( element.attrib["name"] ) )
+#
+		elif element.tag == "configuration":
+			out += " "
+			out += wrapper.wrap( "Configuration: {0}".format( element.attrib["name"] ) )
+
+		elif element.tag == "environment":
+			out += " "
+			out += wrapper.wrap( "Environment: {0}".format( element.attrib["name"] ) )
+
+		elif element.tag == "steps": # container element
+			if len( element.getchildren() ) > 0:
+				out += " "
+				out += wrapper.wrap( "Steps:" )
+
+		elif element.tag == "step":
+
+			if element.attrib["enabled"] == "False":
+				status = "disabled"
+			elif len( element.getchildren() ) == 0:
+				status = "noaction"
+			elif element.attrib["failed"] == "True":
+				status = "!failed!"
+			else:
+				status = "success "
+
+			out += wrapper.wrap( '{0}: Step "{1}" (took {2})'.format( 
+				status,
+				element.attrib["name"] ,
+				element.attrib["timing"]
+			) )
+
+			if element.attrib["failed"] == "False":
+				recurse = False
+
+#		elif element.tag == "action":
+#			wrapper.subsequent_indent += " " * 10
+#			out += wrapper.wrap( "Action: {0}".format( element.find( "logdescription" ).text ) )
+#			out += wrapper.wrap( "  Code: {0}".format( element.attrib["returncode"] ) )
+
+#		elif element.tag == "stderr":
+#			if element.text:
+#				originalIndent = wrapper.initial_indent
+#				wrapper.initial_indent = wrapper.subsequent_indent = "> "
+#				out += wrapper.wrap( "--- stderr output ---" )
+#				out += wrapper.wrap( element.text )
+#				out += wrapper.wrap( "--- end of stderr output ---" )
+#				wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
+
+		if recurse != False:
+			for el in element.getchildren():
+				out += self._toText( el, wrapper )
+
+		wrapper.initial_indent = wrapper.initial_indent[:-len( indent )]
+
+		return out
+
