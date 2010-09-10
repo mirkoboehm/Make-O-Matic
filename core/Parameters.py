@@ -29,8 +29,9 @@ class Parameters( MObject ):
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
-		self.__options = None
-		self.__args = None
+
+		self.__parser = self._getOptionParser()
+		( self.__options, self.__args ) = self.__parser.parse_args() # populate options and args 
 
 	def _getOptions( self ):
 		return self.__options
@@ -38,13 +39,7 @@ class Parameters( MObject ):
 	def _getArgs( self ):
 		return self.__args
 
-	def parse( self ):
-		""" read program execution options, setting up variables and proceed the dependent steps 
-		The options --configure-options, -b, -l, -z have been removed.
-		-b and -l are now a run mode (query).
-		-z is also a run mode (print).
-		-i is now an argument to the build run mode."""
-		# set up the parser:
+	def _getOptionParser( self ):
 		parser = optparse.OptionParser()
 		parser.add_option( '-r', '--revision', action = 'store', dest = 'revision',
 			help = 'repository revision to be built' )
@@ -58,8 +53,17 @@ class Parameters( MObject ):
 			help = 'enable or disable individual builds steps on top of the defaults for the build type' )
 		parser.add_option( '-v', '--verbose', action = 'count', dest = 'verbosity', default = 0,
 			help = 'level of debug output' )
+		return parser
+
+	def parse( self ):
+		""" read program execution options, setting up variables and proceed the dependent steps 
+		The options --configure-options, -b, -l, -z have been removed.
+		-b and -l are now a run mode (query).
+		-z is also a run mode (print).
+		-i is now an argument to the build run mode."""
+
 		# parse options:
-		( self.__options, self.__args ) = parser.parse_args( sys.argv )
+		( self.__options, self.__args ) = self.__parser.parse_args( sys.argv )
 		# except BadOptionError, OptionValueError as e:
 
 	def getRevision( self ):

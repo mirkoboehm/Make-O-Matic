@@ -30,7 +30,6 @@ from core.modules.testers.CTest import CTest
 from core.modules.packagers.CPack import CPack
 import sys
 from core.Build import Build
-from core.helpers.GlobalMApp import mApp
 
 class MomBuildMockupTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
@@ -50,11 +49,6 @@ class MomBuildMockupTestCase( unittest.TestCase ):
 		sys.argv = [] # reset command line arguments
 
 		build = Build( None, 'XmlReportTestBuild' )
-		build.getParameters().parse()
-		mApp().getSettings().set( Settings.ScriptLogLevel, build.getParameters().getDebugLevel() )
-		build._initialize()
-		build = build
-
 		project = Project( 'XmlReportTestProject' )
 		build.setProject( project )
 		project.createScm( 'git:git@gitorious.org:make-o-matic/mom.git' )
