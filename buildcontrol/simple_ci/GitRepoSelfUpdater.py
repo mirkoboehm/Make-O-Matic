@@ -16,30 +16,32 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Plugin import Plugin
-from core.Exceptions import AbstractMethodCalledError
+from buildcontrol.simple_ci.SelfUpdater import SelfUpdater
+from core.helpers.RunCommand import RunCommand
 from core.helpers.GlobalMApp import mApp
 
-class SelfUpdater( Plugin ):
-
+class GitRepoSelfUpdater( SelfUpdater ):
 	def __init__( self, name = None ):
-		Plugin.__init__( self, name )
-		self.setFolder( [] )
+		SelfUpdater.__init__( self, name )
+		self.setUseRebase( False )
 
-	def setFolder( self, folders ):
-		self.__folders = folders
+	def getUseRebase( self ):
+		return self.__useRebase
 
-	def getFolders( self ):
-		return self.__folders
+	def setUseRebase( self, onOff ):
+		self.__useRebase = onOff
 
 	def update( self, folder ):
-		'''Overload this method to implement specific self-updaters.'''
-		raise AbstractMethodCalledError()
-
-	def setup( self ):
-		folders = self.getFolders()
-		if not folders:
-			mApp().debug( self, 'No folders specified for self-update, continuing.' )
-		for folder in folders:
-			mApp().debug( self, 'Self-updating directory "{0}"'.format( folder ) )
-			self.update( folder )
+		cmd = [ 'git', 'pull' ]
+		if self.getUseRebase():
+			cmd.append( '--rebase' )
+		runner = RunCommand( cmd )
+		runner.setWorkingDir( folder )
+		runner.run()
+		if runner.getReturnCode() == 0:
+			mApp().debugN( self, 2, 'Updated the git repository at "{0}"'.format( folder ) )
+		else:
+			# we are not raising an exception, because we do not want the master to die because of, for example, a temporary 
+			# network outage
+			message = runner.getStdErr() or b''
+			mApp().message( self, 'Updating the git repository at "{0}" failed: "{1}"'.format( folder, message.decode() ) )
