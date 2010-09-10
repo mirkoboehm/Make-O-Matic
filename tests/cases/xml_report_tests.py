@@ -40,8 +40,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.build.buildAndReturn()
 
 	def testCreateXmlReport( self ):
-		self._runBuild( 
-				)
+		self._runBuild()
 		report = XmlReport( self.build )
 		report.prepare()
 

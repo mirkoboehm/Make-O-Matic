@@ -31,19 +31,22 @@ from tests.cases.build_environment_tests import BuildEnvironmentTests
 from tests.selftest.simple_project_tests import SimpleProjectTests
 from tests.selftest.simple_ci_tests import SimpleCITests
 from tests.selftest.charm_build_tests import CharmBuildTests
+from tests.cases.xml_report_tests import XmlReportTests
 
-classes = [ PathResolverTest,
-	EnvironmentSaverTest,
+classes = [
+	BuildEnvironmentTests,
+	BuildScriptInterfaceTests,
 	BuildStatusPersistenceTests,
+	CharmBuildTests,
+	EnvironmentSaverTest,
+	PathResolverTest,
 	PreprocessorTest,
 	RunModePrintTests,
 	RunWithTimeoutTest,
 	ScmFactoryTests,
 	SimpleProjectTests,
-	BuildScriptInterfaceTests,
-	CharmBuildTests,
 	SimpleCITests,
-	BuildEnvironmentTests
+	XmlReportTests
 ]
 
 s = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, classes ) )
