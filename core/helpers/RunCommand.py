@@ -16,7 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-import os, platform, subprocess, signal, time
+import subprocess, time
 from threading import Thread
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp

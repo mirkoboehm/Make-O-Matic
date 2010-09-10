@@ -1,4 +1,3 @@
-#!/usr/bin/env python3.1
 # This file is part of make-o-matic.
 # -*- coding: utf-8 -*-
 # 
@@ -17,13 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from buildcontrol.simple_ci import Master, Slave, Parameters
+from core.Plugin import Plugin
 
-if __name__ == "__main__":
-	params = Parameters.Parameters()
-	params.parse()
-	if params.getSlaveMode():
-		ci = Slave.Slave( params )
-	else:
-		ci = Master.Master( params )
-	ci.build()
+class SelfUpdater( Plugin ):
+	pass
