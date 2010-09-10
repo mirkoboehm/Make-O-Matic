@@ -101,6 +101,9 @@ class Plugin( MObject ):
 	def getOptional( self ):
 		return self.__optional
 
+	def getXmlTemplate( self, element, wrapper ):
+		return None
+
 	def getXsltTemplate( self ):
 		return None
 

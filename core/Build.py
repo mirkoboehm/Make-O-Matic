@@ -21,8 +21,6 @@ from core.Project import Project
 from core.Exceptions import ConfigurationError, MomError
 from core.Settings import Settings
 from core.Parameters import Parameters
-from core.MObject import MObject
-from core.helpers import MachineInfo
 from core.helpers.MachineInfo import machineInfo
 
 class Build( MApplication ):
@@ -111,7 +109,7 @@ class Build( MApplication ):
 					', '.join( Settings.RunModes ) ) )
 
 	def createXmlNode( self, document ):
-		node = MObject.createXmlNode( self, document )
+		node = MApplication.createXmlNode( self, document )
 
 		for k, v in machineInfo().items():
 			node.attributes[k] = v

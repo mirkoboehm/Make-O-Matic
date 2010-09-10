@@ -75,3 +75,6 @@ class CPack( PackageProvider ):
         movePackageDestination = self.getInstructions().getProject().getPackagesDir()
         movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
         step.addMainAction( movePackage )
+
+    def getXmlTemplate( self, element, wrapper ):
+        return wrapper.wrap( "Name: {0}".format( element.attrib["name"] ) )

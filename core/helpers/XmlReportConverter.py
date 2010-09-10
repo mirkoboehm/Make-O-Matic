@@ -40,21 +40,22 @@ class XmlReportConverter( MObject ):
 
 		self.__xml = etree.fromstring( xmlReport.getReport() )
 
-		self.__xslTransformations = {}
+		self.__xslTemplateSnippets = {}
+		self.__xmlTemplateFunctions = {}
 		self.__registeredPlugins = []
 
 		# init HTML converter
 		for k, v in self.TEMPLATES.items():
 			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( v ) )
-			self.__xslTransformations[k] = etree.XML( f.read() )
+			self.__xslTemplateSnippets[k] = etree.XML( f.read() )
 
-		self._fetchXsltTemplates( mApp() )
+		self._fetchTemplates( mApp() )
 
 	def _convertTo( self, destinationFormat ):
-		transform = etree.XSLT( self.__xslTransformations[destinationFormat] )
+		transform = etree.XSLT( self.__xslTemplateSnippets[destinationFormat] )
 		return str( transform( self.__xml ) )
 
-	def _fetchXsltTemplates( self, instructions ):
+	def _fetchTemplates( self, instructions ):
 		for plugin in instructions.getPlugins():
 			# prevent infinite loop on circular plugin dependencies
 			if plugin in self.__registeredPlugins:
@@ -62,16 +63,21 @@ class XmlReportConverter( MObject ):
 				continue
 
 			self.__registeredPlugins.append( plugin )
-			self._addXsltTemplate( plugin, plugin.getXsltTemplate() )
 
-			self._fetchXsltTemplates( plugin.getInstructions() ) # enter recursion
+			self._addXsltTemplate( plugin )
+			self._addXmlTemplate( plugin )
 
-	def _addXsltTemplate( self, plugin, xslString ):
+		for child in instructions.getChildren():
+			self._fetchTemplates( child ) # enter recursion
+
+	def _addXsltTemplate( self, plugin ):
+		xslString = plugin.getXsltTemplate()
+
 		if xslString is None :
 			return
 
 		# search for place to register new plugin templates
-		pluginTemplate = self.__xslTransformations["html"].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
+		pluginTemplate = self.__xslTemplateSnippets["html"].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
 		placeholder = pluginTemplate.find( "{http://www.w3.org/1999/XSL/Transform}choose" )
 
 		# validate XML
@@ -85,6 +91,15 @@ class XmlReportConverter( MObject ):
 		# insert new switch case
 		placeholder.insert( 0, element )
 
+	def _addXmlTemplate( self, plugin ):
+		functionPointer = plugin.getXmlTemplate
+
+		classMembers = plugin.__class__.__dict__.keys()
+		if 'getXmlTemplate' not in classMembers:
+			return # getXmlTemplate has not been overwritten, do not add template
+
+		self.__xmlTemplateFunctions[plugin.getName()] = functionPointer
+
 	def convertToHtml( self ):
 		return self._convertTo( "html" )
 
@@ -97,7 +112,7 @@ class XmlReportConverter( MObject ):
 		out = []
 
 		indent = "  "
-		recurse = True
+		recursionEnabled = True
 
 		if element.tag == "build":
 			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
@@ -120,11 +135,23 @@ class XmlReportConverter( MObject ):
 		elif element.tag == "plugins": # container element
 			if len( element.getchildren() ) > 0:
 				out += " "
-				out += wrapper.wrap( "Plugin list:" )
+				out += wrapper.wrap( "Plugins:" )
 
 		elif element.tag == "plugin":
+			name = element.attrib["name"]
+
 			out += wrapper.wrap( "Plugin: {0}".format( element.attrib["name"] ) )
-#
+
+			if name in self.__xmlTemplateFunctions:
+				originalIndent = wrapper.initial_indent
+				wrapper.initial_indent = wrapper.subsequent_indent = wrapper.initial_indent + indent
+				try:
+					out += self.__xmlTemplateFunctions[name]( element, wrapper )
+				except:
+					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
+				finally:
+					wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
+
 		elif element.tag == "configuration":
 			out += " "
 			out += wrapper.wrap( "Configuration: {0}".format( element.attrib["name"] ) )
@@ -156,7 +183,7 @@ class XmlReportConverter( MObject ):
 			) )
 
 			if element.attrib["failed"] == "False":
-				recurse = False
+				recursionEnabled = False # do not show children
 
 #		elif element.tag == "action":
 #			wrapper.subsequent_indent += " " * 10
@@ -172,14 +199,13 @@ class XmlReportConverter( MObject ):
 #				out += wrapper.wrap( "--- end of stderr output ---" )
 #				wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
 
-		wrapper.initial_indent = wrapper.initial_indent + indent
-		wrapper.subsequent_indent = wrapper.initial_indent
+		if recursionEnabled != False:
+			wrapper.initial_indent = wrapper.subsequent_indent = wrapper.initial_indent + indent
 
-		if recurse != False:
-			for el in element.getchildren():
-				out += self._toText( el, wrapper )
+			for childElement in element.getchildren():
+				out += self._toText( childElement, wrapper ) # enter recursion
 
-		wrapper.initial_indent = wrapper.initial_indent[:-len( indent )]
+			wrapper.initial_indent = wrapper.subsequent_indent = wrapper.initial_indent[:-len( indent )]
 
 		return out
 

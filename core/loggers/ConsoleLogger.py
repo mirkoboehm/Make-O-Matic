@@ -67,6 +67,9 @@ class ConsoleLogger( Logger ):
 	def getXsltTemplate( self ):
 		return """Debug level: <xsl:value-of select="@debuglevel"/>"""
 
+	def getXmlTemplate( self, element, wrapper ):
+		return wrapper.wrap( "Debug level: {0}".format( element.attrib["debuglevel"] ) )
+
 	def createXmlNode( self, document ):
 		node = Logger.createXmlNode( self, document )
 		node.attributes["debuglevel"] = str( mApp().getSettings().get( Settings.ScriptLogLevel, True ) )

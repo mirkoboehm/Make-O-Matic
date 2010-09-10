@@ -22,7 +22,7 @@ from core.Exceptions import MomError
 from core.MObject import MObject
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.TypeCheckers import check_for_string
-from core.helpers.TimeKeeper import TimeKeeper, formattedTimeDelta
+from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 
 class Step( MObject ):
