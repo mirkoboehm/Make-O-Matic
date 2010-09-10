@@ -28,7 +28,6 @@ from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder
 from core.Configuration import Configuration
 from core.modules.testers.CTest import CTest
 from core.modules.packagers.CPack import CPack
-from core.helpers.BoilerPlate import setupStandardBuild
 import sys
 from core.Build import Build
 from core.helpers.GlobalMApp import mApp
