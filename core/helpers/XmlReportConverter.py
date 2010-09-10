@@ -28,11 +28,21 @@ try:
 except ImportError:
 	raise MomError( "Fatal: lxml package missing, required for Xml transformations" )
 
+class MyTextWrapper( TextWrapper ):
+
+	MY_INDENT = " "
+
+	def indent( self ):
+		self.initial_indent = self.subsequent_indent = self.initial_indent + self.MY_INDENT
+
+	def dedent( self ):
+		self.initial_indent = self.subsequent_indent = self.initial_indent[:-len( self.MY_INDENT )]
+
+
 class XmlReportConverter( MObject ):
 
-	TEMPLATES = {
+	XSL_STYLESHEETS = {
 		"html" : "xmlreport2html.xsl",
-		"text" : "xmlreport2text.xsl"
 	}
 
 	def __init__( self, xmlReport ):
@@ -45,7 +55,7 @@ class XmlReportConverter( MObject ):
 		self.__registeredPlugins = []
 
 		# init HTML converter
-		for k, v in self.TEMPLATES.items():
+		for k, v in self.XSL_STYLESHEETS.items():
 			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( v ) )
 			self.__xslTemplateSnippets[k] = etree.XML( f.read() )
 
@@ -64,14 +74,18 @@ class XmlReportConverter( MObject ):
 
 			self.__registeredPlugins.append( plugin )
 
-			self._addXsltTemplate( plugin )
+			self._addXslTemplate( plugin )
 			self._addXmlTemplate( plugin )
 
 		for child in instructions.getChildren():
 			self._fetchTemplates( child ) # enter recursion
 
-	def _addXsltTemplate( self, plugin ):
-		xslString = plugin.getXsltTemplate()
+	def _addXslTemplate( self, plugin ):
+		"""Add XSL template to stylesheet if plugin provides one
+		
+		Warning: This only works for HTML conversions right now. For other types logic must be altered."""
+
+		xslString = plugin.getXslTemplate()
 
 		if xslString is None :
 			return
@@ -104,33 +118,36 @@ class XmlReportConverter( MObject ):
 		return self._convertTo( "html" )
 
 	def convertToText( self ):
-		wrapper = TextWrapper( drop_whitespace = False, width = 80 )
+		wrapper = MyTextWrapper( drop_whitespace = False, width = 80 )
 
 		return "\n".join( self._toText( self.__xml, wrapper ) )
 
 	def _toText( self, element, wrapper ):
 		out = []
 
-		indent = "  "
 		recursionEnabled = True
 
 		if element.tag == "build":
 			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
 			out += " " # new line
+			wrapper.indent()
 			out += wrapper.wrap( "Platform:     {0} ({1})".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
 			out += wrapper.wrap( "Architecture: {0}".format( element.attrib["sys-architecture"] ) )
 			out += wrapper.wrap( "Node name:    {0}".format( element.attrib["sys-nodename"] ) )
+			wrapper.dedent()
 
-		if element.tag == "project":
+		elif element.tag == "project":
 			out += " "
 			out += wrapper.wrap( "Project: {0}".format( element.attrib["name"] ) )
 			out += " "
+			wrapper.indent()
 			out += wrapper.wrap( "Base directory: {0}".format( element.attrib["basedir"] ) )
 			out += " "
 			out += wrapper.wrap( "Start time (UTC): {0}".format( element.attrib["starttime"] ) )
 			out += wrapper.wrap( "Stop time (UTC):  {0}".format( element.attrib["stoptime"] ) )
 			out += " "
 			out += wrapper.wrap( "Build time: {0}".format( element.attrib["timing"] ) )
+			wrapper.dedent()
 
 		elif element.tag == "plugins": # container element
 			if len( element.getchildren() ) > 0:
@@ -143,14 +160,12 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrap( "Plugin: {0}".format( element.attrib["name"] ) )
 
 			if name in self.__xmlTemplateFunctions:
-				originalIndent = wrapper.initial_indent
-				wrapper.initial_indent = wrapper.subsequent_indent = wrapper.initial_indent + indent
+				wrapper.indent()
 				try:
 					out += self.__xmlTemplateFunctions[name]( element, wrapper )
 				except:
 					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
-				finally:
-					wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
+				wrapper.dedent()
 
 		elif element.tag == "configuration":
 			out += " "
@@ -200,12 +215,12 @@ class XmlReportConverter( MObject ):
 #				wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
 
 		if recursionEnabled != False:
-			wrapper.initial_indent = wrapper.subsequent_indent = wrapper.initial_indent + indent
+			wrapper.indent()
 
 			for childElement in element.getchildren():
 				out += self._toText( childElement, wrapper ) # enter recursion
 
-			wrapper.initial_indent = wrapper.subsequent_indent = wrapper.initial_indent[:-len( indent )]
+			wrapper.dedent()
 
 		return out
 
