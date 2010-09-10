@@ -22,6 +22,7 @@ from core.modules.reporters.XmlReport import XmlReport
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Exceptions import MomError
+from core.modules.XmlReportGenerator import XmlReportGenerator
 
 try:
 	from lxml import etree
@@ -33,12 +34,14 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self )
 
-		# start build
+	def _runBuild( self ):
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 		self.build.buildAndReturn()
 
 	def testCreateXmlReport( self ):
+		self._runBuild( 
+				)
 		report = XmlReport( self.build )
 		report.prepare()
 
@@ -56,6 +59,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertIsNotNone( doc.find( './/plugin[@name="CMakeBuilder"]' ) )
 
 	def testConvertXmlReportToHtml( self ):
+		self._runBuild()
+
 		report = XmlReport( self.build )
 		report.prepare()
 		converter = XmlReportConverter( report )
@@ -68,7 +73,10 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ) )
 		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ) )
 
+
 	def testConvertXmlReportToText( self ):
+		self._runBuild()
+
 		report = XmlReport( self.build )
 		report.prepare()
 		converter = XmlReportConverter( report )
@@ -78,9 +86,24 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		# TODO: Add more _useful_ tests 
 		self.assertGreater( len( text ), 1000 )
 
-		# debug
-		#f = open( "/tmp/workfile", 'w' )
-		#f.write( converter.convertToText() )
+	def testXmlReportGenerator( self ):
+		generator = XmlReportGenerator()
+		self.build.addPlugin( generator )
+		self._runBuild()
+
+		report = XmlReport( self.build )
+		report.prepare()
+		reportContent = report.getReport()
+
+		file = generator.getReportFile()
+		self.assertIsNotNone( file, "Log file does not exist" )
+
+		f = open( file )
+		fileContent = f.read()
+		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
+
+		self.assertEqual( fileContent, reportContent, "Report file content not written correctly" )
+
 
 if __name__ == "__main__":
 	unittest.main()
