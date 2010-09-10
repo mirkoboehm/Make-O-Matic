@@ -71,6 +71,7 @@ class SimpleCiBase( MApplication ):
 		return path
 
 	def build( self ):
+		self.setUseCwdAsBaseDir( True )
 		settings = self.getSettings()
 		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevelParameter() )
 		self.addLogger( ConsoleLogger() )

@@ -39,6 +39,7 @@ class Instructions( MObject ):
 	def __init__( self, name = None, parent = None ):
 		MObject.__init__( self, name )
 		self.__executomat = Executomat( 'Exec-o-Matic' )
+		self.setUseCwdAsBaseDir( False )
 		self._setBaseDir( None )
 		self._setParent( None )
 		if parent: # the parent instructions object
@@ -60,6 +61,12 @@ class Instructions( MObject ):
 	def getBaseDir( self ):
 		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		return self.__baseDir
+
+	def setUseCwdAsBaseDir( self, onOff ):
+		self.__cwdIsBaseDir = onOff
+
+	def getUseCwdAsBaseDir( self ):
+		return self.__cwdIsBaseDir
 
 	def _getExecutomat( self ):
 		return self.__executomat
@@ -141,6 +148,9 @@ class Instructions( MObject ):
 		return baseDirName
 
 	def _configureBaseDir( self ):
+		if self.getUseCwdAsBaseDir():
+			self._setBaseDir( os.getcwd() )
+			return
 		parentBaseDir = os.getcwd()
 		if self.getParent():
 			parentBaseDir = self.getParent().getBaseDir()
@@ -178,6 +188,8 @@ class Instructions( MObject ):
 			os.chdir( baseDir )
 
 	def _configureLogDir( self ):
+		if self.getUseCwdAsBaseDir():
+			return
 		logDirName = self._getBaseDirName()
 		parentLogDir = self.getBaseDir()
 			# bootstrap if this is the root object
