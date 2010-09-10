@@ -20,10 +20,11 @@
 class MObject( object ):
 	"""MObject is the base class for objects used during a MoM script run."""
 
-	def __init__( self, name = None ):
+	def __init__( self, name = None, command = None ):
 		"""Constructor"""
 		if name == None:
 			name = self.__class__.__name__
+
 		self.setName( name )
 
 	def setName( self, name ):
@@ -33,6 +34,9 @@ class MObject( object ):
 	def getName( self ):
 		return self.__name
 
+	def getTagName( self ):
+		return self.__class__.__name__.lower()
+
 	def describe( self, prefix ):
 		name = self.getName()
 		clazz = self.__class__.__name__
@@ -41,3 +45,8 @@ class MObject( object ):
 		else:
 			print( '{0}{1}'.format( prefix, clazz ) )
 
+	def createXmlNode( self, document ):
+		node = document.createElement( self.getTagName() )
+		node.attributes["name"] = self.getName()
+
+		return node

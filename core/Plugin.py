@@ -37,6 +37,9 @@ class Plugin( MObject ):
 	def getInstructions( self ):
 		return self.__instructions
 
+	def getTagName( self ):
+		return "plugin"
+
 	def performPreFlightCheck( self ):
 		'''This method handles the execution of the pre flight check. Do not overload this method to adapt it, overload 
 		preFlightCheck instead!'''
@@ -97,4 +100,10 @@ class Plugin( MObject ):
 
 	def getOptional( self ):
 		return self.__optional
+
+	def getXmlTemplate( self, element, wrapper ):
+		return None
+
+	def getXslTemplate( self ):
+		return None
 

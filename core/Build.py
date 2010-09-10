@@ -21,6 +21,7 @@ from core.Project import Project
 from core.Exceptions import ConfigurationError, MomError
 from core.Settings import Settings
 from core.Parameters import Parameters
+from core.helpers.MachineInfo import machineInfo
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -106,3 +107,11 @@ class Build( MApplication ):
 			raise MomError( 'Unknown run mode "{0}". Known run modes are: {1}'.format( 
 					self.getSettings().get( Settings.ScriptRunMode ),
 					', '.join( Settings.RunModes ) ) )
+
+	def createXmlNode( self, document ):
+		node = MApplication.createXmlNode( self, document )
+
+		for k, v in machineInfo().items():
+			node.attributes[k] = v
+
+		return node

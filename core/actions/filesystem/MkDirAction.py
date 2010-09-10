@@ -44,7 +44,9 @@ class MkDirAction( Action ):
 			os.makedirs( str( self.getPath() ) )
 			return 0
 		except ( OSError, IOError ) as e:
-			mApp().debug( self, 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) ) )
+			error = 'error creating directory "{0}": {1}'.format( self.getPath(), str( e ) )
+			self._setStdErr( error.encode() )
+			mApp().debug( self, error )
 			return 1
 
 	def getLogDescription( self ):

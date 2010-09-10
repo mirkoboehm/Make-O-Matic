@@ -28,6 +28,7 @@ from core.Defaults import Defaults
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import time
 import shutil
+from core.helpers.TimeKeeper import formattedTime
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -120,10 +121,40 @@ class Instructions( MObject ):
 			plugin.describe( subPrefix )
 		self._getExecutomat().describe( subPrefix )
 
+	def createXmlNode( self, document ):
+		node = MObject.createXmlNode( self, document )
+
+		node.attributes["basedir"] = str ( self.getBaseDir() )
+		node.attributes["starttime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStartTime() ) )
+		node.attributes["stoptime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStopTime() ) )
+		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().deltaString() )
+
+		pluginsElement = document.createElement( "plugins" )
+		for plugin in self.getPlugins():
+			element = plugin.createXmlNode( document )
+			pluginsElement.appendChild( element )
+		node.appendChild( pluginsElement )
+
+		stepsElement = document.createElement( "steps" )
+		for step in self._getExecutomat()._getSteps():
+			element = step.createXmlNode( document )
+			stepsElement.appendChild( element )
+		node.appendChild( stepsElement )
+
+		return node
+
+	def describeXmlRecursively ( self, document, currentNode ):
+		node = self.createXmlNode( document )
+		currentNode.appendChild( node )
+
+		for child in self.getChildren():
+			child.describeXmlRecursively( document, node ) # enter recursion
+
 	def describeRecursively( self, prefix = '' ):
 		'''Describe this instruction object in human readable form.'''
 		self.describe( prefix )
 		prefix = '    {0}'.format( prefix )
+		#print( "LENGTH: {0}".format( len( self.getChildren() ) ) )
 		for child in self.getChildren():
 			child.describeRecursively( prefix )
 
