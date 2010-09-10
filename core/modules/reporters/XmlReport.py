@@ -17,20 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Build import Build
-
 import xml.dom.minidom
+from core.Instructions import Instructions
 
 class XmlReport( object ):
 
-	def __init__( self, build ):
-		assert isinstance( build, Build )
-		self.__build = build
+	def __init__( self, instructions ):
+		assert isinstance( instructions, Instructions )
+		self.__instructions = instructions
 		self.__summary = None
 		self.__doc = xml.dom.minidom.Document()
-
-	def getProject( self ):
-		return self.__build.getProject()
 
 	def getSummary( self ):
 		return self.__summary
@@ -41,4 +37,4 @@ class XmlReport( object ):
 	def prepare( self ):
 		#element = self.__doc.createElement( "root" )
 		#self.__doc.appendChild( element )
-		self.__build.describeXmlRecursively( self.__doc, self.__doc )
+		self.__instructions.describeXmlRecursively( self.__doc, self.__doc )

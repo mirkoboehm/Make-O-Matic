@@ -21,11 +21,8 @@ from core.Plugin import Plugin
 from core.modules.reporters.XmlReport import XmlReport
 import os.path
 from core.Exceptions import ConfigurationError
-from core.helpers.GlobalMApp import mApp
 
 class XmlReportGenerator( Plugin ):
-
-	REPORTFILENAME = "build-report.xml"
 
 	def __init__( self ):
 		Plugin.__init__( self, self.__class__.__name__ )
@@ -34,7 +31,7 @@ class XmlReportGenerator( Plugin ):
 		self.__reportFile = None
 
 	def wrapUp( self ):
-		report = XmlReport( mApp() )
+		report = XmlReport( self.getInstructions() )
 		report.prepare()
 
 		self._openReportFile()
@@ -46,7 +43,7 @@ class XmlReportGenerator( Plugin ):
 
 	def _openReportFile( self ):
 		baseDirectory = self.getInstructions().getBaseDir()
-		reportFileName = self.REPORTFILENAME
+		reportFileName = "{0}-report.xml".format( self.getInstructions().getTagName() )
 
 		if not os.path.isdir( baseDirectory ):
 			raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( baseDirectory ) ) )
