@@ -26,7 +26,7 @@ class SelfUpdater( Plugin ):
 		Plugin.__init__( self, name )
 		self.setFolder( [] )
 
-	def setFolder( self, folders ):
+	def setFolders( self, folders ):
 		self.__folders = folders
 
 	def getFolders( self ):
