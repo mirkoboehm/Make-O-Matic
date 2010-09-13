@@ -104,6 +104,6 @@ class Plugin( MObject ):
 	def getXmlTemplate( self, element, wrapper ):
 		return None
 
-	def getXslTemplate( self ):
-		return None
+	def getXslTemplates( self ):
+		return {}
 

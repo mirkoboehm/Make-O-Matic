@@ -55,9 +55,9 @@ class XmlReportConverter( MObject ):
 		self.__registeredPlugins = []
 
 		# init HTML converter
-		for k, v in self.XSL_STYLESHEETS.items():
-			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( v ) )
-			self.__xslTemplateSnippets[k] = etree.XML( f.read() )
+		for key, value in self.XSL_STYLESHEETS.items():
+			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
+			self.__xslTemplateSnippets[key] = etree.XML( f.read() )
 
 		self._fetchTemplates( mApp() )
 
@@ -83,35 +83,35 @@ class XmlReportConverter( MObject ):
 	def _addXslTemplate( self, plugin ):
 		"""Add XSL template to stylesheet if plugin provides one
 		
-		Warning: This only works for HTML conversions right now. For other types logic must be altered."""
+		Merges templates from plugins into the stylesheets provided in XSL_STYLESHEETS."""
 
-		xslString = plugin.getXslTemplate()
 
-		if xslString is None :
-			return
+		# iterate trough the dict from getXslTemplates(), add each template to the corresponding stylesheet
+		for type, markup in plugin.getXslTemplates().items():
+			if not type in self.__xslTemplateSnippets.keys():
+				continue # invalid key, no stylesheet registered for that type of XSL
 
-		# search for place to register new plugin templates
-		pluginTemplate = self.__xslTemplateSnippets["html"].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
-		placeholder = pluginTemplate.find( "{http://www.w3.org/1999/XSL/Transform}choose" )
+			# search for place to register new plugin templates
+			pluginTemplate = self.__xslTemplateSnippets[type].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
+			placeholder = pluginTemplate.find( "{http://www.w3.org/1999/XSL/Transform}choose" )
 
-		# validate XML
-		try:
-			element = etree.XML( """<xsl:when xmlns:xsl="http://www.w3.org/1999/XSL/Transform"	
-				 xmlns="http://www.w3.org/1999/xhtml"
-				 test="@name = '{0}'">{1}</xsl:when>""".format( plugin.getName(), xslString ) )
-		except etree.XMLSyntaxError:
-			raise ConfigurationError( "XSL template of {0} plugin malformed.".format( plugin.getName() ) )
+			# create new element with markup provided from plugin
+			try:
+				element = etree.XML( """<xsl:when xmlns:xsl="http://www.w3.org/1999/XSL/Transform"	
+					 xmlns="http://www.w3.org/1999/xhtml"
+					 test="@name = '{0}'">{1}</xsl:when>""".format( plugin.getName(), markup ) )
+			except etree.XMLSyntaxError:
+				raise ConfigurationError( "XSL template of {0} plugin malformed.".format( plugin.getName() ) )
 
-		# insert new switch case
-		placeholder.insert( 0, element )
+			# insert new element in the placeholder from the stylesheet
+			placeholder.insert( 0, element )
 
 	def _addXmlTemplate( self, plugin ):
-		functionPointer = plugin.getXmlTemplate
-
 		classMembers = plugin.__class__.__dict__.keys()
 		if 'getXmlTemplate' not in classMembers:
 			return # getXmlTemplate has not been overwritten, do not add template
 
+		functionPointer = plugin.getXmlTemplate
 		self.__xmlTemplateFunctions[plugin.getName()] = functionPointer
 
 	def convertToHtml( self ):
@@ -162,8 +162,8 @@ class XmlReportConverter( MObject ):
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()
 				try:
-					out += self.__xmlTemplateFunctions[name]( element, wrapper )
-				except:
+					out += self.__xmlTemplateFunctions[name]( None, wrapper )
+				except AttributeError:
 					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
 				wrapper.dedent()
 

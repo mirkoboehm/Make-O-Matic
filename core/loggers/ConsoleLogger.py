@@ -64,8 +64,8 @@ class ConsoleLogger( Logger ):
 		if level > 0:
 			mApp().debug( self, 'debug level is {0}'.format( level ) )
 
-	def getXslTemplate( self ):
-		return """Debug level: <xsl:value-of select="@debuglevel"/>"""
+	def getXslTemplates( self ):
+		return { "html": """Debug level: <xsl:value-of select="@debuglevel"/>""" }
 
 	def getXmlTemplate( self, element, wrapper ):
 		return wrapper.wrap( "Debug level: {0}".format( element.attrib["debuglevel"] ) )
