@@ -102,8 +102,19 @@ class Plugin( MObject ):
 		return self.__optional
 
 	def getXmlTemplate( self, element, wrapper ):
+		"""Returns a string representing the information about this plugin
+		
+		Parameter element is an instance of Element,
+		parameter wrapper an instance of textwrap.TextWrapper
+		
+		Overwrite if necessary, returns None by default"""
+
 		return None
 
 	def getXslTemplates( self ):
+		"""Returns a dict of XML templates for this plugin. See ConsoleLogger method overwrite for example.
+		
+		Overwrite if necessary, returns an empty dict by default"""
+
 		return {}
 

@@ -181,7 +181,7 @@ class XmlReportConverter( MObject ):
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()
 				try:
-					out += self.__xmlTemplateFunctions[name]( None, wrapper )
+					out += self.__xmlTemplateFunctions[name]( element, wrapper )
 				except AttributeError:
 					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
 				wrapper.dedent()
