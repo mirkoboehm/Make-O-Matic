@@ -37,4 +37,18 @@ class XmlReport( object ):
 	def prepare( self ):
 		#element = self.__doc.createElement( "root" )
 		#self.__doc.appendChild( element )
-		self.__instructions.describeXmlRecursively( self.__doc, self.__doc )
+
+		self.__doc.appendChild( self._createNode( self.__instructions ) )
+
+	def _createNode( self, instructions ):
+		"""Create XML node from Instructions object
+		
+		Also create nodes from children recursively"""
+
+		node = instructions.createXmlNode( self.__doc )
+
+		for child in instructions.getChildren():
+			childNode = self._createNode( child ) # enter recursion
+			node.appendChild( childNode )
+
+		return node

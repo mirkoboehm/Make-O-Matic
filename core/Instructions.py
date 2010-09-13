@@ -143,13 +143,6 @@ class Instructions( MObject ):
 
 		return node
 
-	def describeXmlRecursively ( self, document, currentNode ):
-		node = self.createXmlNode( document )
-		currentNode.appendChild( node )
-
-		for child in self.getChildren():
-			child.describeXmlRecursively( document, node ) # enter recursion
-
 	def describeRecursively( self, prefix = '' ):
 		'''Describe this instruction object in human readable form.'''
 		self.describe( prefix )
