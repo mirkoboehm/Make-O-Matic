@@ -20,7 +20,7 @@ from core.MApplication import MApplication
 from buildcontrol.common.BuildStatus import BuildStatus
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import os
-from core.Exceptions import ConfigurationError, MomError, AbstractMethodCalledError
+from core.Exceptions import ConfigurationError, MomError
 from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.helpers.GlobalMApp import mApp
@@ -42,7 +42,7 @@ class SimpleCiBase( MApplication ):
 		return self.__buildStatus
 
 	def getToolName( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def getInstanceName( self ):
 		name = make_foldername_from_string( self.getName() )
@@ -150,4 +150,4 @@ class SimpleCiBase( MApplication ):
 			pass
 
 	def execute( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()

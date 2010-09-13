@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-from core.Exceptions import AbstractMethodCalledError
 from core.Plugin import Plugin
 from buildcontrol.SubprocessHelpers import get_debug_prefix
 
@@ -30,13 +29,13 @@ class Logger( Plugin ):
 		Plugin.__init__( self, name )
 
 	def message( self, mapp, mobject, msg ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def debug( self, mapp, mobject, msg ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def debugN( self, mapp, mobject, level , msg ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def timeStampPrefix( self ):
 		return datetime.now().strftime( '%y%m%d-%H:%M:%S' )

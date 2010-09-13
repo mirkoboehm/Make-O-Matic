@@ -52,12 +52,6 @@ class MomError( MomException ):
 	def getReturnCode( self ):
 		return 3
 
-class AbstractMethodCalledError( MomError ):
-	"""This message is raised when a method is called that needs to be implemented in a derived class.
-	It is a MomError, for that reason."""
-	def __init__( self ):
-		MomError.__init__( self, "(Abstract) base class method called!" )
-
 class InterruptedException( MomError ):
 	"""This class is not used directly by MOM, it only defines the correct return code."""
 	def getReturnCode( self ):

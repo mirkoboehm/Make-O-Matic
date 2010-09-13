@@ -19,7 +19,6 @@
 from core.Instructions import Instructions
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Project import Project
-from core.Exceptions import AbstractMethodCalledError
 
 class ConfigurationBase( Instructions ):
 	'''Configurationbase encapsulates common logic of configuration-like objects.'''
@@ -32,7 +31,7 @@ class ConfigurationBase( Instructions ):
 		return self.__timeKeeper
 
 	def buildConfiguration( self ):
-		raise AbstractMethodCalledError
+		raise NotImplementedError
 
 	def getProject( self ):
 		project = self.getParent()

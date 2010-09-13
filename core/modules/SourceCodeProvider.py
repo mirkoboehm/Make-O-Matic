@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import AbstractMethodCalledError, MomError
+from core.Exceptions import MomError
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_path
 from core.Plugin import Plugin
 from core.helpers.GlobalMApp import mApp
@@ -36,7 +36,7 @@ class SourceCodeProvider( Plugin ):
 		self.__description = None
 
 	def getIdentifier( self ):
-		raise AbstractMethodCalledError
+		raise NotImplementedError
 
 	def setUrl( self, url ):
 		self.__url = url
@@ -81,11 +81,11 @@ class SourceCodeProvider( Plugin ):
 
 	def _getRevisionInfo( self ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
-		raise AbstractMethodCalledError
+		raise NotImplementedError
 
 	def _checkInstallation( self ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-		raise AbstractMethodCalledError
+		raise NotImplementedError
 
 	def printRevisionsSince( self, options ):
 		"""Print revisions committed since the specified revision."""
@@ -107,7 +107,7 @@ class SourceCodeProvider( Plugin ):
 
 	def _getRevisionsSince( self, revision, cap = None ):
 		"""Return revisions committed since the specified revision."""
-		raise AbstractMethodCalledError
+		raise NotImplementedError
 
 	def printCurrentRevision( self, options ):
 		"""Print current (most recent) revision."""
@@ -118,15 +118,15 @@ class SourceCodeProvider( Plugin ):
 
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
-		raise AbstractMethodCalledError
+		raise NotImplementedError
 
 	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def makeExportStep( self, targetDir ):
 		"""Create a Step that will export the source code to the target directory."""
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def preFlightCheck( self ):
 		"""Overload"""

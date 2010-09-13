@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, \
 	check_for_positive_int
-from core.Exceptions import AbstractMethodCalledError
 
 class MakeTool():
 	'''MakeTool implements an abstract base class for a makefile-parsing build command.'''
@@ -28,7 +27,7 @@ class MakeTool():
 		self.__jobs = 1
 
 	def getVersion( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def setCommand( self, command ):
 		check_for_nonempty_string_or_none( command, 'The make tool command must be a non-empty string, or None.' )
@@ -45,4 +44,4 @@ class MakeTool():
 		return self.__jobs
 
 	def getArguments( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
-from core.Exceptions import AbstractMethodCalledError
 
 class Builder( Plugin ):
 	'''A Builder creates the actions to build a configuration for a project. 
@@ -27,16 +26,16 @@ class Builder( Plugin ):
 		Plugin.__init__( self, name )
 
 	def createPrepareSourceDirActions( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def createConfigureActions( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def createConfMakeActions( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def createConfMakeInstallActions( self ):
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def setup( self ):
 		self.createPrepareSourceDirActions()

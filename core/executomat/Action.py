@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
 from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_path
-from core.Exceptions import AbstractMethodCalledError, MomError, MomException, BuildError
+from core.Exceptions import MomError, MomException, BuildError
 import os
 from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
@@ -34,11 +34,11 @@ class Action( MObject ):
 		'''run() executes the workload of the action. 
 		Run must return a non-negative integer number. 
 		A return value or zero indicates success. Any value different from zero is considered an error.'''
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def __init__( self, name = None ):
 		"""Constructor"""

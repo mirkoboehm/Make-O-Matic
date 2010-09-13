@@ -20,7 +20,6 @@
 from core.Plugin import Plugin
 from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_nonempty_string
-from core.Exceptions import AbstractMethodCalledError
 
 class PackageProvider( Plugin ):
 
@@ -30,7 +29,7 @@ class PackageProvider( Plugin ):
 
     def _checkInstallation( self ):
         """Check if the package generator's prerequisite are installed."""
-        raise AbstractMethodCalledError
+        raise NotImplementedError
 
     def getDescription( self ):
         return self.__description
@@ -41,7 +40,7 @@ class PackageProvider( Plugin ):
 
     def makePackageStep( self ):
         """Create package for the project."""
-        raise AbstractMethodCalledError()
+        raise NotImplementedError()
 
     def preFlightCheck( self ):
         """Overload"""

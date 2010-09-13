@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.modules.SourceCodeProvider import SourceCodeProvider
-from core.Exceptions import AbstractMethodCalledError, ConfigurationError
+from core.Exceptions import ConfigurationError
 from core.helpers.RunCommand import RunCommand
 from core.executomat.ShellCommandAction import ShellCommandAction
 import time
@@ -33,7 +33,7 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def _getRevisionInfo( self ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
-		raise AbstractMethodCalledError
+		raise NotImplementedError
 
 	def _checkInstallation( self ):
 		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""

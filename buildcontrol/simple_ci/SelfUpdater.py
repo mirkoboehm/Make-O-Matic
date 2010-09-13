@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
-from core.Exceptions import AbstractMethodCalledError
 from core.helpers.GlobalMApp import mApp
 
 class SelfUpdater( Plugin ):
@@ -34,7 +33,7 @@ class SelfUpdater( Plugin ):
 
 	def update( self, folder ):
 		'''Overload this method to implement specific self-updaters.'''
-		raise AbstractMethodCalledError()
+		raise NotImplementedError()
 
 	def setup( self ):
 		folders = self.getFolders()
