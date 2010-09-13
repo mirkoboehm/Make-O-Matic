@@ -22,22 +22,20 @@ class BuildInfo( MObject ):
 	'''BuildInfo represents a single build script run.'''
 
 	class Status( object ):
-		NoStatus = 0
-		NewRevision = 1
-		Pending = 3
-		Completed = 4
-		InitialRevision = 5
+		# pylint: disable=r0903
+		# Ignore this as we're just simulating an enum so don't need public members
+		NoStatus, NewRevision, Pending, Completed, InitialRevision = range( 4 )
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
-		self.setBuildId( None )
-		self.setProjectName( None )
-		self.setPriority( None )
-		self.setBuildStatus( BuildInfo.Status.NoStatus )
-		self.setBuildType( None )
-		self.setRevision( None )
-		self.setUrl( None )
-		self.setBuildScript( None )
+		self.__buildId = None
+		self.__projectName = None
+		self.__priority = None
+		self.__buildStatus = BuildInfo.Status.NoStatus
+		self.__buildType = None
+		self.__revision = None
+		self.__url = None
+		self.__buildScript = None
 
 	def getProjectName( self ):
 		return self.__projectName
@@ -48,8 +46,8 @@ class BuildInfo( MObject ):
 	def getBuildId( self ):
 		return self.__buildId
 
-	def setBuildId( self, id ):
-		self.__buildId = id
+	def setBuildId( self, buildId ):
+		self.__buildId = buildId
 
 	def setPriority( self, priority ):
 		self.__priority = priority
