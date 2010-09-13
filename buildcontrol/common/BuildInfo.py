@@ -24,7 +24,7 @@ class BuildInfo( MObject ):
 	class Status( object ):
 		# pylint: disable=r0903
 		# Ignore this as we're just simulating an enum so don't need public members
-		NoStatus, NewRevision, Pending, Completed, InitialRevision = range( 4 )
+		NoStatus, NewRevision, Pending, Completed, InitialRevision = range( 5 )
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
