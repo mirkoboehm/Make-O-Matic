@@ -25,24 +25,24 @@ from core.helpers.GlobalMApp import mApp
 
 class MakePackager( PackageProvider ):
 
-    def __init__( self, name = None ):
-        """Constructor"""
-        PackageProvider.__init__( self, name )
+	def __init__( self, name = None ):
+		"""Constructor"""
+		PackageProvider.__init__( self, name )
 
-    def _checkInstallation( self ):
-        """Check if the package generator's prerequisite are installed."""
-        runner = RunCommand( [ 'make', '--version' ] )
-        runner.run()
-        if runner.getReturnCode() != 0:
-            raise ConfigurationError( "MakePackager::checkInstallation: make not found." )
-        else:
-            lines = runner.getStdOut().decode().splitlines()
-            self._setDescription( lines[0].rstrip() )
-            mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
+	def _checkInstallation( self ):
+		"""Check if the package generator's prerequisite are installed."""
+		runner = RunCommand( [ 'make', '--version' ] )
+		runner.run()
+		if runner.getReturnCode() != 0:
+			raise ConfigurationError( "MakePackager::checkInstallation: make not found." )
+		else:
+			lines = runner.getStdOut().decode().splitlines()
+			self._setDescription( lines[0].rstrip() )
+			mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
 
-    def makePackageStep( self ):
-        """Create package for the project."""
-        step = self.getInstructions().getStep( 'conf-package' )
-        makePackage = ShellCommandAction( 'make package' )
-        makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
-        step.addMainAction( makePackage )
+	def makePackageStep( self ):
+		"""Create package for the project."""
+		step = self.getInstructions().getStep( 'conf-package' )
+		makePackage = ShellCommandAction( 'make package' )
+		makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
+		step.addMainAction( makePackage )

@@ -23,32 +23,32 @@ from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class TestProvider( Plugin ):
 
-    def __init__( self, name = None ):
-        """Constructor"""
-        Plugin.__init__( self, name )
+	def __init__( self, name = None ):
+		"""Constructor"""
+		Plugin.__init__( self, name )
 
-    def _checkInstallation( self ):
-        """Check if the tester's prerequisite are installed."""
-        raise NotImplementedError
+	def _checkInstallation( self ):
+		"""Check if the tester's prerequisite are installed."""
+		raise NotImplementedError
 
-    def getDescription( self ):
-        return self.__description
+	def getDescription( self ):
+		return self.__description
 
-    def _setDescription( self, description ):
-        check_for_nonempty_string( description, "The Tester description needs to be a non-empty string." )
-        self.__description = description
+	def _setDescription( self, description ):
+		check_for_nonempty_string( description, "The Tester description needs to be a non-empty string." )
+		self.__description = description
 
-    def makeTestStep( self ):
-        """Run tests for the project."""
-        raise NotImplementedError()
+	def makeTestStep( self ):
+		"""Run tests for the project."""
+		raise NotImplementedError()
 
-    def preFlightCheck( self ):
-        """Overload"""
-        self._checkInstallation()
-        mApp().debug( self, 'Testing module initialized: {0}'.format( self.getDescription() ) )
+	def preFlightCheck( self ):
+		"""Overload"""
+		self._checkInstallation()
+		mApp().debug( self, 'Testing module initialized: {0}'.format( self.getDescription() ) )
 
-    def setup( self ):
-        """Setup is called after the test steps have been generated, and the command line 
-        options have been applied to them. It can be used to insert actions into the build
-        steps, for example."""
-        self.makeTestStep()
+	def setup( self ):
+		"""Setup is called after the test steps have been generated, and the command line 
+		options have been applied to them. It can be used to insert actions into the build
+		steps, for example."""
+		self.makeTestStep()

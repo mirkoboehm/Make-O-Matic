@@ -23,32 +23,32 @@ from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class PackageProvider( Plugin ):
 
-    def __init__( self, name = None ):
-        """Constructor"""
-        Plugin.__init__( self, name )
+	def __init__( self, name = None ):
+		"""Constructor"""
+		Plugin.__init__( self, name )
 
-    def _checkInstallation( self ):
-        """Check if the package generator's prerequisite are installed."""
-        raise NotImplementedError
+	def _checkInstallation( self ):
+		"""Check if the package generator's prerequisite are installed."""
+		raise NotImplementedError
 
-    def getDescription( self ):
-        return self.__description
+	def getDescription( self ):
+		return self.__description
 
-    def _setDescription( self, description ):
-        check_for_nonempty_string( description, "The Packager description needs to be a non-empty string." )
-        self.__description = description
+	def _setDescription( self, description ):
+		check_for_nonempty_string( description, "The Packager description needs to be a non-empty string." )
+		self.__description = description
 
-    def makePackageStep( self ):
-        """Create package for the project."""
-        raise NotImplementedError()
+	def makePackageStep( self ):
+		"""Create package for the project."""
+		raise NotImplementedError()
 
-    def preFlightCheck( self ):
-        """Overload"""
-        self._checkInstallation()
-        mApp().debug( self, 'Packaging module initialized: {0}'.format( self.getDescription() ) )
+	def preFlightCheck( self ):
+		"""Overload"""
+		self._checkInstallation()
+		mApp().debug( self, 'Packaging module initialized: {0}'.format( self.getDescription() ) )
 
-    def setup( self ):
-        """Setup is called after the package steps have been generated, and the command line 
-        options have been applied to them. It can be used to insert actions into the build
-        steps, for example."""
-        self.makePackageStep()
+	def setup( self ):
+		"""Setup is called after the package steps have been generated, and the command line 
+		options have been applied to them. It can be used to insert actions into the build
+		steps, for example."""
+		self.makePackageStep()

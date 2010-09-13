@@ -25,24 +25,24 @@ from core.helpers.GlobalMApp import mApp
 
 class MakeTester( TestProvider ):
 
-    def __init__( self, name = None ):
-        """Constructor"""
-        TestProvider.__init__( self, name )
+	def __init__( self, name = None ):
+		"""Constructor"""
+		TestProvider.__init__( self, name )
 
-    def _checkInstallation( self ):
-        """Check if the tester's prerequisite are installed."""
-        runner = RunCommand( ['make', '--version'] )
-        runner.run()
-        if runner.getReturnCode() != 0:
-            raise ConfigurationError( "MakeTester::checkInstallation: make not found." )
-        else:
-            lines = runner.getStdOut().decode().split( '\n' )
-            self._setDescription( lines[0].rstrip() )
-            mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
+	def _checkInstallation( self ):
+		"""Check if the tester's prerequisite are installed."""
+		runner = RunCommand( ['make', '--version'] )
+		runner.run()
+		if runner.getReturnCode() != 0:
+			raise ConfigurationError( "MakeTester::checkInstallation: make not found." )
+		else:
+			lines = runner.getStdOut().decode().split( '\n' )
+			self._setDescription( lines[0].rstrip() )
+			mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
 
-    def makeTestStep( self ):
-        """Run tests for the project."""
-        step = self.getInstructions().getStep( 'conf-make-test' )
-        makeTest = ShellCommandAction( ['make', 'test'] )
-        makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
-        step.addMainAction( makeTest )
+	def makeTestStep( self ):
+		"""Run tests for the project."""
+		step = self.getInstructions().getStep( 'conf-make-test' )
+		makeTest = ShellCommandAction( ['make', 'test'] )
+		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
+		step.addMainAction( makeTest )

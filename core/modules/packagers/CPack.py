@@ -25,53 +25,53 @@ from core.helpers.GlobalMApp import mApp
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
 
 class _CPackMovePackageAction( FilesMoveAction ):
-    def __init__( self, cpackAction, destination ):
-        """Constructor"""
-        FilesMoveAction.__init__( self )
-        self.__action = cpackAction
-        self.setDestination( destination )
+	def __init__( self, cpackAction, destination ):
+		"""Constructor"""
+		FilesMoveAction.__init__( self )
+		self.__action = cpackAction
+		self.setDestination( destination )
 
-    def run( self ):
-        """Finds the names of the CPack generated packages and moves them."""
-        if ( self.__action.getResult() != 0 ):
-            return 1
-        lines = self.__action.getStdOut().decode().splitlines()
-        packageLinePrefix = 'CPack: Package '
-        packageLineSuffix = ' generated.'
-        packageFiles = []
-        for line in lines:
-            if line.startswith( packageLinePrefix ) and line.endswith( packageLineSuffix ):
-                line = line.replace( packageLinePrefix, '' )
-                packageFile = line.replace( packageLineSuffix, '' )
-                packageFiles.append( packageFile )
-        self.setFiles( packageFiles )
-        return FilesMoveAction.run( self )
+	def run( self ):
+		"""Finds the names of the CPack generated packages and moves them."""
+		if ( self.__action.getResult() != 0 ):
+			return 1
+		lines = self.__action.getStdOut().decode().splitlines()
+		packageLinePrefix = 'CPack: Package '
+		packageLineSuffix = ' generated.'
+		packageFiles = []
+		for line in lines:
+			if line.startswith( packageLinePrefix ) and line.endswith( packageLineSuffix ):
+				line = line.replace( packageLinePrefix, '' )
+				packageFile = line.replace( packageLineSuffix, '' )
+				packageFiles.append( packageFile )
+		self.setFiles( packageFiles )
+		return FilesMoveAction.run( self )
 
 class CPack( PackageProvider ):
 
-    def __init__( self, name = None ):
-        """Constructor"""
-        PackageProvider.__init__( self, name )
+	def __init__( self, name = None ):
+		"""Constructor"""
+		PackageProvider.__init__( self, name )
 
-    def _checkInstallation( self ):
-        """Check if the package generator's prerequisite are installed."""
-        runner = RunCommand( [ 'cpack', '--version' ] )
-        runner.run()
-        if runner.getReturnCode() != 0:
-            raise ConfigurationError( "CPack::checkInstallation: cpack not found." )
-        else:
-            self._setDescription( runner.getStdOut().decode().rstrip() )
-            mApp().debugN( self, 4, 'cpack found: "{0}"'.format( self.getDescription() ) )
+	def _checkInstallation( self ):
+		"""Check if the package generator's prerequisite are installed."""
+		runner = RunCommand( [ 'cpack', '--version' ] )
+		runner.run()
+		if runner.getReturnCode() != 0:
+			raise ConfigurationError( "CPack::checkInstallation: cpack not found." )
+		else:
+			self._setDescription( runner.getStdOut().decode().rstrip() )
+			mApp().debugN( self, 4, 'cpack found: "{0}"'.format( self.getDescription() ) )
 
-    def makePackageStep( self ):
-        """Create packages for the project using CPack."""
-        step = self.getInstructions().getStep( 'conf-package' )
-        buildDirectory = self.getInstructions().getBuildDir()
+	def makePackageStep( self ):
+		"""Create packages for the project using CPack."""
+		step = self.getInstructions().getStep( 'conf-package' )
+		buildDirectory = self.getInstructions().getBuildDir()
 
-        makePackage = ShellCommandAction( [ 'cpack' ] )
-        makePackage.setWorkingDirectory( buildDirectory )
-        step.addMainAction( makePackage )
+		makePackage = ShellCommandAction( [ 'cpack' ] )
+		makePackage.setWorkingDirectory( buildDirectory )
+		step.addMainAction( makePackage )
 
-        movePackageDestination = self.getInstructions().getProject().getPackagesDir()
-        movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
-        step.addMainAction( movePackage )
+		movePackageDestination = self.getInstructions().getProject().getPackagesDir()
+		movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
+		step.addMainAction( movePackage )
