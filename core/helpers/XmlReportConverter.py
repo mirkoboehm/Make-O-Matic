@@ -29,6 +29,9 @@ except ImportError:
 	raise MomError( "Fatal: lxml package missing, required for Xml transformations" )
 
 class MyTextWrapper( TextWrapper ):
+	"""TextWrapper Wrapper class ;)
+	
+	Provides easy access to indent and dedent methods"""
 
 	MY_INDENT = " "
 
@@ -38,8 +41,8 @@ class MyTextWrapper( TextWrapper ):
 	def dedent( self ):
 		self.initial_indent = self.subsequent_indent = self.initial_indent[:-len( self.MY_INDENT )]
 
-
 class XmlReportConverter( MObject ):
+	"""Converts a XmlReport instance to HTML, plain text and maybe others"""
 
 	XSL_STYLESHEETS = {
 		"html" : "xmlreport2html.xsl",
@@ -54,7 +57,7 @@ class XmlReportConverter( MObject ):
 		self.__xmlTemplateFunctions = {}
 		self.__registeredPlugins = []
 
-		# init HTML converter
+		# load stylesheets from XSL_STYLESHEETS into memory
 		for key, value in self.XSL_STYLESHEETS.items():
 			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
 			self.__xslTemplateSnippets[key] = etree.XML( f.read() )
@@ -62,10 +65,16 @@ class XmlReportConverter( MObject ):
 		self._fetchTemplates( mApp() )
 
 	def _convertTo( self, destinationFormat ):
+		"""Converts the report to destinationFormat, which is one of the keys in XSL_STYLESHEETS"""
+
 		transform = etree.XSLT( self.__xslTemplateSnippets[destinationFormat] )
 		return str( transform( self.__xml ) )
 
 	def _fetchTemplates( self, instructions ):
+		"""Fetches templates from all registered plugins in the Instruction object
+		
+		Loops through all plugins from this object and its children recursively."""
+
 		for plugin in instructions.getPlugins():
 			# prevent infinite loop on circular plugin dependencies
 			if plugin in self.__registeredPlugins:
@@ -81,10 +90,9 @@ class XmlReportConverter( MObject ):
 			self._fetchTemplates( child ) # enter recursion
 
 	def _addXslTemplate( self, plugin ):
-		"""Add XSL template to stylesheet if plugin provides one
+		"""Adds the XSL template to stylesheet if plugin provides one
 		
-		Merges templates from plugins into the stylesheets provided in XSL_STYLESHEETS."""
-
+		Merges templates from plugins into the stylesheets provided by XSL_STYLESHEETS."""
 
 		# iterate trough the dict from getXslTemplates(), add each template to the corresponding stylesheet
 		for type, markup in plugin.getXslTemplates().items():
@@ -107,24 +115,35 @@ class XmlReportConverter( MObject ):
 			placeholder.insert( 0, element )
 
 	def _addXmlTemplate( self, plugin ):
+		"""Adds lxml conversion code if plugin provides one
+		
+		Adds function pointers to the Plugin.getXmlTemplate() methods so that their parameter list can be evaluated when actually 
+		parsing the tree"""
+
+		# check if this plugin overwrites the getXmlTemplate method
 		classMembers = plugin.__class__.__dict__.keys()
 		if 'getXmlTemplate' not in classMembers:
-			return # getXmlTemplate has not been overwritten, do not add template
+			return # getXmlTemplate has not been overwritten, do not add function pointer
 
 		functionPointer = plugin.getXmlTemplate
 		self.__xmlTemplateFunctions[plugin.getName()] = functionPointer
 
 	def convertToHtml( self ):
+		"""Convenience method for converting the report to HTML using the protected _convertTo() method"""
+
 		return self._convertTo( "html" )
 
 	def convertToText( self ):
+		"""Convenience method for converting the report to plain text using the recursive _toText() method"""
+
 		wrapper = MyTextWrapper( drop_whitespace = False, width = 80 )
 
 		return "\n".join( self._toText( self.__xml, wrapper ) )
 
 	def _toText( self, element, wrapper ):
-		out = []
+		"""Recursive method for parsing an ElementTree and converting it to plain text"""
 
+		out = []
 		recursionEnabled = True
 
 		if element.tag == "build":
@@ -223,4 +242,3 @@ class XmlReportConverter( MObject ):
 			wrapper.dedent()
 
 		return out
-

@@ -22,6 +22,7 @@ class MObject( object ):
 
 	def __init__( self, name = None, command = None ):
 		"""Constructor"""
+
 		if name == None:
 			name = self.__class__.__name__
 
@@ -38,6 +39,10 @@ class MObject( object ):
 		return self.__class__.__name__.lower()
 
 	def describe( self, prefix ):
+		"""Describe this object
+		
+		Print out information like class name"""
+
 		name = self.getName()
 		clazz = self.__class__.__name__
 		if name != clazz:
@@ -46,6 +51,10 @@ class MObject( object ):
 			print( '{0}{1}'.format( prefix, clazz ) )
 
 	def createXmlNode( self, document ):
+		"""Create XML node for this object
+		
+		Feel free to overwrite in subclasses to add more details"""
+
 		node = document.createElement( self.getTagName() )
 		node.attributes["name"] = self.getName()
 
