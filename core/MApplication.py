@@ -19,10 +19,8 @@
 import sys
 from core.loggers.Logger import Logger
 from core.Exceptions import MomError, MomException, InterruptedException
-from core.helpers.GlobalMApp import mApp
-from core.helpers.VersionChecker import checkMinimumMomVersion
 from core.Settings import Settings
-from core.helpers.TypeCheckers import check_for_nonnegative_int
+from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
 from core.Instructions import Instructions
 
 class MApplication( Instructions ):
@@ -34,16 +32,46 @@ class MApplication( Instructions ):
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		Instructions.__init__( self, name, parent )
+
 		if MApplication._instance:
 			raise MomError( 'The script tried to create more than one MApplication object!' )
 		MApplication._instance = self
+
 		self.__loggers = []
 		self.__settings = Settings()
 		self.__returnCode = 0
-		checkMinimumMomVersion( minimumMomVersion )
+
+		self._checkMinimumMomVersion( minimumMomVersion )
 
 	def getMomVersion( self ):
 		return self.getSettings().get( Settings.MomVersionNumber )
+
+	def _checkMinimumMomVersion( self, minimumMomVersion ):
+		'''Check if this make-o-matic copy is recent enough for this build script.
+
+		If not, the function does not return, but instead exits the script with an error Message.'''
+
+		if not minimumMomVersion:
+			self.debug( self, 'No minimum make-o-matic version specified.' )
+			return
+		try:
+			check_for_nonempty_string( minimumMomVersion, 'minimumMomVersion needs to be a version string like "0.5.5"' )
+			minVersion = minimumMomVersion.split( '.' )
+			version = self.getMomVersion().split( '.' )
+			if len( version ) != 3 or len( minVersion ) != len( version ) :
+				raise MomError( 'Version descriptions must be strings of 3 integer numbers, like "0.5.5"' )
+			for position in range( len( version ) ):
+				try:
+					element = int( version[position] )
+					minElement = int( minVersion[position] )
+					if element < minElement:
+						raise MomError( 'This build script requires make-o-matic ' + minimumMomVersion
+											 + ', but this is only make-o-matic ' + self.getMomVersion() + ', aborting.' )
+				except ValueError:
+					raise MomError( 'Version descriptions must be strings of integer numbers, like "0.5.5"' )
+		except MomException as  e:
+			self.message( self, e.value )
+			sys.exit( 1 )
 
 	def addLogger( self, logger ):
 		if not isinstance( logger, Logger ):
@@ -79,7 +107,7 @@ class MApplication( Instructions ):
 		[ logger.debugN( self, mobject, level, text ) for logger in self.getLoggers() ]
 
 	def run( self ):
-		mApp().debugN( self, 2, 'executing' )
+		self.debugN( self, 2, 'executing' )
 		try:
 			self.execute()
 			[ child.execute() for child in self.getChildren() ]
