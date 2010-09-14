@@ -33,7 +33,7 @@ from tests.selftest.simple_ci_tests import SimpleCITests
 from tests.selftest.charm_build_tests import CharmBuildTests
 from tests.cases.xml_report_tests import XmlReportTests
 
-classes = [
+CLASSES = [
 	BuildEnvironmentTests,
 	BuildScriptInterfaceTests,
 	BuildStatusPersistenceTests,
@@ -49,5 +49,5 @@ classes = [
 	XmlReportTests
 ]
 
-s = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, classes ) )
-unittest.TextTestRunner( verbosity = 2 ).run( s )
+suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
+unittest.TextTestRunner( verbosity = 2 ).run( suite )

@@ -146,17 +146,17 @@ class _PreprocessorAction( Action ):
 		return str( value )
 
 	def _getFolderName( self, folder ):
-		p = self._getPreprocessor().getProject()
-		if not p:
+		project = self._getPreprocessor().getProject()
+		if not project:
 			return '[MOM PP: project not initialized]'
 		if folder == 'src':
-			return p.getSourceDir()
+			return project.getSourceDir()
 		elif folder == 'tmp':
-			return p.getTempDir()
+			return project.getTempDir()
 		elif folder == 'docs':
-			return p.getDocsDir()
+			return project.getDocsDir()
 		elif folder == 'packages':
-			return p.getPackagesDir()
+			return project.getPackagesDir()
 		else:
 			mApp().debugN( self, 2, 'Unknown folder id "{0}"'.format( folder ) )
 			return ''

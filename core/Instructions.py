@@ -28,7 +28,7 @@ from core.Defaults import Defaults
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import time
 import shutil
-from core.helpers.TimeKeeper import formattedTime
+from core.helpers.TimeKeeper import formatted_time
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -114,8 +114,8 @@ class Instructions( MObject ):
 			basedir = self.getBaseDir()
 		except ConfigurationError:
 			pass
-		me = '{0}- base dir: {1}'.format( prefix, basedir )
-		print( me )
+		text = '{0}- base dir: {1}'.format( prefix, basedir )
+		print( text )
 		subPrefix = prefix + '    '
 		for plugin in self.getPlugins():
 			plugin.describe( subPrefix )
@@ -125,8 +125,8 @@ class Instructions( MObject ):
 		node = MObject.createXmlNode( self, document )
 
 		node.attributes["basedir"] = str ( self.getBaseDir() )
-		node.attributes["starttime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStartTime() ) )
-		node.attributes["stoptime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStopTime() ) )
+		node.attributes["starttime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStartTime() ) )
+		node.attributes["stoptime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStopTime() ) )
 		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().deltaString() )
 
 		pluginsElement = document.createElement( "plugins" )
@@ -197,9 +197,9 @@ class Instructions( MObject ):
 				raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( maxIterations ) )
 			try:
 				shutil.move( baseDir, newFolder )
-			except ( OSError, shutil.Error ) as o:
+			except ( OSError, shutil.Error ) as e:
 				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
-					.format( baseDir, newFolder, str( o ) ) )
+					.format( baseDir, newFolder, str( e ) ) )
 			mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
 
 		try:

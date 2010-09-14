@@ -59,7 +59,7 @@ script text
 
 	def _saveBuildInfo( self, connection, buildInfos ):
 		try:
-			c = connection.cursor()
+			cursor = connection.cursor()
 			for buildInfo in buildInfos:
 				values = [
 					buildInfo.getProjectName(),
@@ -72,10 +72,10 @@ script text
 				query = '''insert into {0}
 ( id, project_name, status, priority, type, revision, url, script )
 values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
-				c.execute( query, values )
-				buildInfo.setBuildId( c.lastrowid )
+				cursor.execute( query, values )
+				buildInfo.setBuildId( cursor.lastrowid )
 		finally:
-			c.close()
+			cursor.close()
 
 	def saveBuildInfo( self, buildInfos ):
 		with self.getConnection() as connection:
@@ -117,16 +117,16 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 
 	def _loadBuildInfo( self, connection , status ):
 		try:
-			c = connection.cursor()
+			cursor = connection.cursor()
 			query = 'select * from {0} where status=? order by priority desc'.format( BuildStatus.TableName )
-			c.execute( query, [ status ] )
+			cursor.execute( query, [ status ] )
 			buildInfos = []
-			for row in c:
+			for row in cursor:
 				buildInfo = self.__makeBuildInfoFromRow( row )
 				buildInfos.append( buildInfo )
 			return buildInfos
 		finally:
-			c.close()
+			cursor.close()
 
 	def loadBuildInfo( self, status = BuildInfo.Status.NewRevision ):
 		'''Load all BuildInfo objects from the database that are in the specified status.'''
@@ -160,13 +160,13 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			self.saveBuildInfo( [ buildInfo ] )
 
 	def listNewBuildInfos( self ):
-		conn = self.getConnection()
+		connection = self.getConnection()
 		try:
-			c = conn.cursor()
+			cursor = connection.cursor()
 			query = 'select * from {0} where status=? order by priority desc'.format( BuildStatus.TableName )
-			c.execute( query, [ BuildInfo.Status.NewRevision ] )
+			cursor.execute( query, [ BuildInfo.Status.NewRevision ] )
 			buildInfos = []
-			for row in c:
+			for row in cursor:
 				buildInfo = self.__makeBuildInfoFromRow( row )
 				buildInfos.append( buildInfo )
 			if buildInfos:
@@ -181,7 +181,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				mApp().debug( self, 'build queue is empty.' )
 			return buildInfos
 		finally:
-			c.close()
+			cursor.close()
 
 	def performBuild( self, buildInfo ):
 		"""Start a build process for a new revision. baseDir is the directory where all builds go. To build 
@@ -266,16 +266,16 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		return True
 
 	def getNewestBuildInfo( self, buildScript ):
-		conn = self.getConnection()
+		connection = self.getConnection()
 		try:
-			c = conn.cursor()
+			cursor = connection.cursor()
 			query = 'select * from {0} where script=? order by id desc limit 1'.format( BuildStatus.TableName )
-			c.execute( query, [ buildScript ] )
-			for row in c:
+			cursor.execute( query, [ buildScript ] )
+			for row in cursor:
 				buildInfo = self.__makeBuildInfoFromRow( row )
 				return buildInfo # only the first (and only) result is interesting
 		finally:
-			c.close()
+			cursor.close()
 
 	def getBuildInfoForInitialRevision( self, buildScript, projectName ):
 		iface = BuildScriptInterface( buildScript )

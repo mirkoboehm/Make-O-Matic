@@ -19,17 +19,17 @@
 
 from datetime import datetime
 
-def formattedTime( datetimeObj ):
+def formatted_time( datetimeObj ):
 	try:
 		text = datetime.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
 	except Exception:
 		text = datetimeObj
 	return text
 
-def formattedTimeDelta( t ):
-	return formattedDuration( t.seconds + 60 * 60 * 24 * t.days )
+def formatted_time_delta( timeDelta ):
+	return formatted_duration( timeDelta.seconds + 60 * 60 * 24 * timeDelta.days )
 
-def formattedDuration( noOfSeconds ):
+def formatted_duration( noOfSeconds ):
 	"""Returns a printable string that contains the duration in readable format"""
 	# static definitions: 
 	second = 1
@@ -86,5 +86,5 @@ class TimeKeeper( object ):
 	def deltaString( self ):
 		if not self.getStartTime() or not self.getStopTime():
 			return '---'
-		return formattedTimeDelta( self.delta() )
+		return formatted_time_delta( self.delta() )
 

@@ -19,7 +19,7 @@
 
 import os
 
-def addToPathCollection( pathVariable, element, order = 'append' ):
+def add_to_path_collection( pathVariable, element, order = 'append' ):
 	# pathVariable is the name of the environment variable
 	# safely get the existing setting:
 	# try if the given path exists
@@ -40,10 +40,10 @@ def addToPathCollection( pathVariable, element, order = 'append' ):
 		else:
 			elements.append( element )
 
-	def whiteSpaceFilter( x ):
+	def white_space_filter( x ):
 		return x.strip() != ''
 
-	elements = filter( whiteSpaceFilter, elements )
+	elements = filter( white_space_filter, elements )
 
 	result = os.pathsep.join( elements )
 	os.environ[pathVariable] = result

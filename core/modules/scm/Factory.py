@@ -31,8 +31,8 @@ class SourceCodeProviderFactory( MObject ):
 	def parseDescription( self, description ):
 		# extract implementation identifier and SCM location part out of the description:
 		pattern = '^(.+?):(.*)$'
-		rx = re.compile( pattern )
-		groups = rx.search( description )
+		patternObj = re.compile( pattern )
+		groups = patternObj.search( description )
 		if not groups or len( groups.groups() ) != 2:
 			raise ConfigurationError( 'Cannot parse source code provider description "{0}" '.format( description ) )
 		implementation, location = groups.groups()

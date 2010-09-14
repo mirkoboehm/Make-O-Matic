@@ -21,7 +21,7 @@ import os
 from core.helpers.GlobalMApp import mApp
 import re
 from core.Exceptions import ConfigurationError
-from core.helpers.EnvironmentVariables import addToPathCollection
+from core.helpers.EnvironmentVariables import add_to_path_collection
 from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class Dependency( MObject ):
@@ -146,10 +146,10 @@ class Dependency( MObject ):
 					value = self._expandVariables( addTo.group( 4 ) )
 					if mode == 'APPEND':
 						mApp().debugN( self, 2, 'setBuildEnvironment: >append< ' + variable + ': "' + value + '"' )
-						addToPathCollection( variable, value, 'append' )
+						add_to_path_collection( variable, value, 'append' )
 					elif mode == 'PREPEND':
 						mApp().debugN( self, 2, 'setBuildEnvironment: >prepend< ' + variable + ': "' + value + '"' )
-						addToPathCollection( variable, value, 'prepend' )
+						add_to_path_collection( variable, value, 'prepend' )
 					else:
 						raise ConfigurationError( 'mode missing' )
 				elif enabled:

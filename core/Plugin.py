@@ -118,7 +118,9 @@ class Plugin( MObject ):
 		
 		Overwrite if necessary, returns None by default"""
 
-		assert element; assert wrapper # fix pylint warning W0613
+ 		# fix pylint warning W0613
+		assert element
+		assert wrapper
 
 		return None
 

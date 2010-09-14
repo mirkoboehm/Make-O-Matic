@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-def __checkPythonVersion():
+def check_python_version():
 	# in this case, hard coded values make sense, because we do not even want to initialize the Settings object before 
 	# verifying the Python version:
 	import sys
@@ -41,5 +41,5 @@ def __checkPythonVersion():
 	sys.exit( 1 )
 
 # this code will be executed during import:
-__checkPythonVersion()
+check_python_version()
 
