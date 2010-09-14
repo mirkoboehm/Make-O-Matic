@@ -66,6 +66,12 @@ class TimeKeeper( object ):
 		self.__startTime = None
 		self.__stopTime = None
 
+	def __enter__( self ):
+		self.start()
+
+	def __exit__( self, type, value, traceback ):
+		self.stop()
+
 	def start( self ):
 		self.__startTime = datetime.utcnow()
 

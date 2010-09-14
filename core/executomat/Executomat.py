@@ -96,12 +96,9 @@ class Executomat( MObject ):
 			self.__logfile.write( text.rstrip() + '\n' )
 
 	def run( self, instructions ):
-		try:
-			self.__timeKeeper.start()
+		with self.__timeKeeper:
 			return self._runTimed( instructions )
-		finally:
-			self.__timeKeeper.stop()
-			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
+		mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
 	def _runTimed( self, instructions ):
 		try:
