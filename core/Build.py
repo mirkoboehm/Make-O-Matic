@@ -35,7 +35,7 @@ class Build( MApplication ):
 	def getParameters( self ):
 		return self.__parameters
 
-	def _initialize( self ):
+	def initialize( self ):
 		'''Determine the script run settings. 
 		In the constructor, defaults will be applied. 
 		First, configuration files will be parsed.
@@ -43,6 +43,7 @@ class Build( MApplication ):
 		Third, commit message commands will be applied. This can be disabled by a parameter (step three).
 		On error, a subclass of MomException is thrown.
 		Logging and reporting is not available at this stage yet.'''
+
 		# first, parse configuration files:
 		self.getSettings().evalConfigurationFiles()
 		# second, apply parameters:
@@ -66,10 +67,10 @@ class Build( MApplication ):
 
 	def printAndExit( self ):
 		# program name, "print", argument, [options] 
-		if len( self.getParameters()._getArgs() ) < 3:
+		if len( self.getParameters().getArgs() ) < 3:
 			raise MomError( 'Please specify parameter to print!' )
-		command = self.getParameters()._getArgs()[2]
-		options = self.getParameters()._getArgs()[3:]
+		command = self.getParameters().getArgs()[2]
+		options = self.getParameters().getArgs()[3:]
 		commands = {
 			'revisions-since' : [ self.getProject().getScm().printRevisionsSince, 'print revisions committed since specified revision' ],
 			'current-revision': [ self.getProject().getScm().printCurrentRevision, 'print current revision' ]
@@ -98,7 +99,7 @@ class Build( MApplication ):
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
 			self.runPreFlightChecks()
 			# filter script name, 'query'
-			self.querySettings( self.getParameters()._getArgs()[2:] )
+			self.querySettings( self.getParameters().getArgs()[2:] )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:
 			self.runPreFlightChecks()
 			self.printAndExit()

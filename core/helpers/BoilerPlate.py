@@ -34,7 +34,7 @@ def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 		logger = ConsoleLogger()
 		build.addLogger( logger )
 		build.addPlugin( XmlReportGenerator() )
-		build._initialize()
+		build.initialize()
 		return build
 	except MomException as e:
 		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), sys.stderr )

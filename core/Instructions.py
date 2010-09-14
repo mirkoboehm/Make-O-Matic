@@ -43,13 +43,13 @@ class Instructions( MObject ):
 		self.__executomat = Executomat( 'Exec-o-Matic' )
 		self.setUseCwdAsBaseDir( False )
 		self._setBaseDir( None )
-		self._setParent( None )
+		self.setParent( None )
 		if parent: # the parent instructions object
 			parent.addChild( self )
 		self.__plugins = []
 		self.__instructions = []
 
-	def _setParent( self, parent ):
+	def setParent( self, parent ):
 		assert parent == None or isinstance( parent, Instructions )
 		self.__parent = parent
 
@@ -70,17 +70,17 @@ class Instructions( MObject ):
 	def getUseCwdAsBaseDir( self ):
 		return self.__cwdIsBaseDir
 
-	def _getExecutomat( self ):
+	def getExecutomat( self ):
 		return self.__executomat
 
 	def getStep( self, step ):
-		return self._getExecutomat().getStep( step )
+		return self.getExecutomat().getStep( step )
 
 	def getPlugins( self ):
 		return self.__plugins
 
 	def addPlugin( self, plugin ):
-		plugin._setInstructions( self )
+		plugin.setInstructions( self )
 		self.__plugins.append( plugin )
 
 	def getChildren( self ):
@@ -91,7 +91,7 @@ class Instructions( MObject ):
 		if instructions in self.getChildren():
 			raise MomError( 'A child can be added to the same instruction object only once (offending object: {0})!'
 				.format( instructions.getName() ) )
-		instructions._setParent( self )
+		instructions.setParent( self )
 		self.__instructions.append( instructions )
 
 	def removeChild( self, instructions ):
@@ -120,15 +120,15 @@ class Instructions( MObject ):
 		subPrefix = prefix + '    '
 		for plugin in self.getPlugins():
 			plugin.describe( subPrefix )
-		self._getExecutomat().describe( subPrefix )
+		self.getExecutomat().describe( subPrefix )
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
 
 		node.attributes["basedir"] = str ( self.getBaseDir() )
-		node.attributes["starttime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStartTime() ) )
-		node.attributes["stoptime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStopTime() ) )
-		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().deltaString() )
+		node.attributes["starttime"] = str ( formatted_time( self.getExecutomat().getTimeKeeper().getStartTime() ) )
+		node.attributes["stoptime"] = str ( formatted_time( self.getExecutomat().getTimeKeeper().getStopTime() ) )
+		node.attributes["timing"] = str( self.getExecutomat().getTimeKeeper().deltaString() )
 
 		pluginsElement = document.createElement( "plugins" )
 		for plugin in self.getPlugins():
@@ -137,7 +137,7 @@ class Instructions( MObject ):
 		node.appendChild( pluginsElement )
 
 		stepsElement = document.createElement( "steps" )
-		for step in self._getExecutomat()._getSteps():
+		for step in self.getExecutomat().getSteps():
 			element = step.createXmlNode( document )
 			stepsElement.appendChild( element )
 		node.appendChild( stepsElement )
@@ -167,7 +167,7 @@ class Instructions( MObject ):
 			buildSteps.append( stepName )
 		return buildSteps
 
-	def _getIndex( self, instructions ):
+	def getIndex( self, instructions ):
 		index = 0
 		for child in self.getChildren():
 			if child == instructions:
@@ -178,7 +178,7 @@ class Instructions( MObject ):
 	def _getBaseDirName( self ):
 		myIndex = None
 		if self.getParent():
-			myIndex = self.getParent()._getIndex( self ) + 1
+			myIndex = self.getParent().getIndex( self ) + 1
 		if self.getName() == self.__class__.__name__:
 			baseDirName = '{0}'.format( myIndex )
 		else:
@@ -234,7 +234,7 @@ class Instructions( MObject ):
 		parentLogDir = self.getBaseDir()
 			# bootstrap if this is the root object
 		if self.getParent():
-			parentLogDir = self.getParent()._getExecutomat().getLogDir()
+			parentLogDir = self.getParent().getExecutomat().getLogDir()
 		else:
 			parentLogDir = self.getBaseDir()
 			logDirName = mApp().getSettings().get( Defaults.ProjectLogDir )
@@ -242,7 +242,7 @@ class Instructions( MObject ):
 		logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
 		try:
 			os.makedirs( logDir )
-			self._getExecutomat().setLogDir( logDir )
+			self.getExecutomat().setLogDir( logDir )
 		except ( OSError, IOError )as e:
 			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
 				.format( logDir, self.getName(), e ) )

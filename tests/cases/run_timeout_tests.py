@@ -27,9 +27,9 @@ import sys
 class RunWithTimeoutTest( unittest.TestCase ):
 
 	def setUp( self ):
-		if MApplication._instance:
+		if MApplication.instance:
 			# do not try this at home!
-			MApplication._instance = None
+			MApplication.instance = None
 		self.build = Build()
 		if sys.platform == 'win32':
 			self.sleepCommand = [ 'ping', '127.0.0.1', '-n', '10' ]
@@ -37,7 +37,7 @@ class RunWithTimeoutTest( unittest.TestCase ):
 			self.sleepCommand = [ 'sleep', '5']
 
 	def tearDown( self ):
-		MApplication._instance = None
+		MApplication.instance = None
 
 	def testRunWithTimeout( self ):
 		timeout = 1

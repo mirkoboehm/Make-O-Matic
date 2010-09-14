@@ -26,13 +26,13 @@ class MomTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
 
 	def setUp( self ):
-		if MApplication._instance:
+		if MApplication.instance:
 			# do not try this at home!
-			MApplication._instance = None
+			MApplication.instance = None
 		self.build = Build()
 
 	def tearDown( self ):
-		MApplication._instance = None
+		MApplication.instance = None
 
 	def runCommand( self, cmd, description ):
 		'''Helper method to run shell commands in tests. It creates a RunCommand object, runs it, 

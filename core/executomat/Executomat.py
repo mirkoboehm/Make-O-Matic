@@ -77,12 +77,12 @@ class Executomat( MObject ):
 		check_for_nonempty_string( newStep.getName(), "Every Executomat step must have a name!" )
 		self.__steps.append( newStep )
 
-	def _getSteps( self ):
+	def getSteps( self ):
 		return self.__steps
 
 	def getStep( self, identifier ):
 		"""Find the step with this identifier and return it."""
-		for step in self._getSteps():
+		for step in self.getSteps():
 			if step.getName() == identifier:
 				return step
 		raise MomError( 'no such step "{0}"'.format( identifier ) )
@@ -113,7 +113,7 @@ class Executomat( MObject ):
 				except:
 					raise ConfigurationError( 'Cannot open log file at "{0}"'.format( self.getLogfileName() ) )
 			self.log( '# Starting execution of "{0}"'.format( self.getName() ) )
-			for step in self._getSteps():
+			for step in self.getSteps():
 				mApp().debugN( self, 1, 'now executing step "{0}"'.format( step.getName() ) )
 				if step.execute( self, instructions ):
 					mApp().debugN( self, 2, 'success: "{0}"'.format( step.getName() ) )
@@ -139,5 +139,5 @@ class Executomat( MObject ):
 
 	def describe( self, prefix ):
 		MObject.describe( self, prefix )
-		for step in self._getSteps():
+		for step in self.getSteps():
 			step.describe( prefix + '    ' )

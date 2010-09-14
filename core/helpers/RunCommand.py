@@ -27,6 +27,7 @@ import sys
 from core.Exceptions import ConfigurationError
 
 class _CommandRunner( Thread ):
+
 	def __init__ ( self , runner ):
 		Thread.__init__( self )
 		self.__started = None
@@ -56,9 +57,9 @@ class _CommandRunner( Thread ):
 			stderrValue = subprocess.STDOUT
 		self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False, cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
 		output, error = self._process.communicate()
-		self._getRunner()._setStdOut( output )
-		self._getRunner()._setStdErr( error )
-		self._getRunner()._setReturnCode( self._process.returncode )
+		self._getRunner().setStdOut( output )
+		self._getRunner().setStdErr( error )
+		self._getRunner().setReturnCode( self._process.returncode )
 		self.__finished = True
 		mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( output ) )
 		if not self.__combineOutput:
@@ -113,19 +114,19 @@ class RunCommand( MObject ):
 	def getCombineOutput( self ):
 		return self.__combineOutput
 
-	def _setReturnCode( self, code ):
+	def setReturnCode( self, code ):
 		self.__returnCode = code
 
 	def getReturnCode( self ):
 		return self.__returnCode
 
-	def _setStdOut( self, stdout ):
+	def setStdOut( self, stdout ):
 		self.__stdOut = stdout
 
 	def getStdOut( self ):
 		return self.__stdOut
 
-	def _setStdErr( self, stderr ):
+	def setStdErr( self, stderr ):
 		self.__stdErr = stderr
 
 	def getStdErr( self ):

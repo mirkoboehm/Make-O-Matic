@@ -36,7 +36,7 @@ class Parameters( MObject ):
 	def _getOptions( self ):
 		return self.__options
 
-	def _getArgs( self ):
+	def getArgs( self ):
 		return self.__args
 
 	def _getOptionParser( self ):
@@ -104,8 +104,8 @@ class Parameters( MObject ):
 			settings.set( Settings.ScriptIgnoreCommitMessageCommands, self.getIgnoreCommitMessage() )
 		if self.getDebugLevel():
 			settings.set( Settings.ScriptLogLevel, self.getDebugLevel() )
-		if len( self._getArgs() ) > 1:
-			runMode = self._getArgs()[1]
+		if len( self.getArgs() ) > 1:
+			runMode = self.getArgs()[1]
 			settings.set( settings.ScriptRunMode, runMode )
 
 	def __getBuildSequenceDescription( self, buildSteps ):

@@ -58,8 +58,8 @@ class Configuration( ConfigurationBase ):
 		with EnvironmentSaver():
 			self.getTimeKeeper().start()
 			try:
-				self._getExecutomat().run( self )
-				if self._getExecutomat().hasFailed():
+				self.getExecutomat().run( self )
+				if self.getExecutomat().hasFailed():
 					return 1
 				else:
 					return 0
@@ -73,7 +73,7 @@ class Configuration( ConfigurationBase ):
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():
-			self._getExecutomat().addStep( step )
+			self.getExecutomat().addStep( step )
 		action = ExecuteConfigurationBaseAction( self )
 		action.setIgnorePreviousFailure( True )
 		try:

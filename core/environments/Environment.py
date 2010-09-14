@@ -37,7 +37,7 @@ class Environment( ConfigurationBase ):
 		for configuration in configs:
 			clone = copy( configuration )
 			for plugin in clone.getPlugins():
-				plugin._setInstructions( clone )
+				plugin.setInstructions( clone )
 			self.addChild( clone )
 
 	def setDependencies( self, deps ):

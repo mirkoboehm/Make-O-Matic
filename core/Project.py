@@ -91,7 +91,7 @@ class Project( Instructions ):
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():
-			self._getExecutomat().addStep( step )
+			self.getExecutomat().addStep( step )
 		Instructions.runSetups( self )
 		create = self.getStep( 'project-create-folders' )
 		delete = self.getStep( 'project-cleanup' )
@@ -113,6 +113,6 @@ class Project( Instructions ):
 	def execute( self ):
 		self.getTimeKeeper().start()
 		try:
-			self._getExecutomat().run( self )
+			self.getExecutomat().run( self )
 		finally:
 			self.getTimeKeeper().stop()

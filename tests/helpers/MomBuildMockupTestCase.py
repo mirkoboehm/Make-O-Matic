@@ -35,9 +35,9 @@ class MomBuildMockupTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
 
 	def setUp( self ):
-		if MApplication._instance:
+		if MApplication.instance:
 			# do not try this at home!
-			MApplication._instance = None
+			MApplication.instance = None
 
 		self._initializeBuildMockup()
 
@@ -70,5 +70,5 @@ class MomBuildMockupTestCase( unittest.TestCase ):
 		self.build = build
 
 	def tearDown( self ):
-		MApplication._instance = None
+		MApplication.instance = None
 

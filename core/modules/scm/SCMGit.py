@@ -33,7 +33,7 @@ class _UpdateHiddenCloneAction( Action ):
 		self.__scmgit = scmgit
 
 	def run( self ):
-		self.__scmgit._updateHiddenClone()
+		self.__scmgit.updateHiddenClone()
 		return 0
 
 	def getLogDescription( self ):
@@ -66,7 +66,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def _getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
-		self._updateHiddenClone()
+		self.updateHiddenClone()
 		cmd = [ self.getCommand(), 'log', '{0}..'.format( revision ) ]
 		runner = RunCommand( cmd, 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
@@ -95,7 +95,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
-		self._updateHiddenClone()
+		self.updateHiddenClone()
 		runner = RunCommand( [ self.getCommand(), 'log', '-n1' ] )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
@@ -127,7 +127,7 @@ class SCMGit( SourceCodeProvider ):
 		hiddenClone = os.path.join( self.getCloneArmyDir(), clonename )
 		return hiddenClone
 
-	def _updateHiddenClone( self ):
+	def updateHiddenClone( self ):
 		hiddenClone = self._getHiddenClonePath()
 		# check if the clone directory exists, create if necessary: 
 		if os.path.exists( hiddenClone ):

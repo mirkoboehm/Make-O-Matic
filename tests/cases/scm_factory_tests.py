@@ -29,9 +29,9 @@ from core.MApplication import MApplication
 class ScmFactoryTests( unittest.TestCase ):
 
 	def setUp( self ):
-		if MApplication._instance:
+		if MApplication.instance:
 			# do not try this at home!
-			MApplication._instance = None
+			MApplication.instance = None
 		self.build = Build()
 		self.project = Project( 'ScmFactoryTest' )
 		self.build.setProject( self.project )
@@ -40,7 +40,7 @@ class ScmFactoryTests( unittest.TestCase ):
 		self.project.createScm( 'git:git://gitorious.org/make-o-matic/mom.git' )
 
 	def tearDown( self ):
-		MApplication._instance = None
+		MApplication.instance = None
 
 	def __createAndReturnScm( self, description ):
 		factory = SourceCodeProviderFactory()

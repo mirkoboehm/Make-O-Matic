@@ -28,14 +28,14 @@ class MApplication( Instructions ):
 	It contains the loggers and reporters, for example. It also maintains the settings,
 	and defines the exit code of the program.'''
 
-	_instance = None
+	instance = None
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		Instructions.__init__( self, name, parent )
 
-		if MApplication._instance:
+		if MApplication.instance:
 			raise MomError( 'The script tried to create more than one MApplication object!' )
-		MApplication._instance = self
+		MApplication.instance = self
 
 		self.__loggers = []
 		self.__settings = Settings()

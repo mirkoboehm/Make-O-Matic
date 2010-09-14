@@ -18,6 +18,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import unittest
 from tests.cases.preprocessor_tests import PreprocessorTest
 from tests.cases.environment_saver_tests import EnvironmentSaverTest
@@ -49,5 +50,9 @@ CLASSES = [
 	XmlReportTests
 ]
 
-suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
-unittest.TextTestRunner( verbosity = 2 ).run( suite )
+def main():
+	suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
+	unittest.TextTestRunner( verbosity = 2 ).run( suite )
+
+if __name__ == "__main__":
+	main()

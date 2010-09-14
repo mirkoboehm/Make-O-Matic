@@ -28,12 +28,13 @@ class Plugin( MObject ):
 		MObject.__init__( self, name )
 		self.setEnabled( True )
 		self.setOptional( False )
-		self._setInstructions( None )
+		self.setInstructions( None )
 		self.__command = None
 
-	def _setInstructions( self, instructions ):
+	def setInstructions( self, instructions ):
 		'''Assign this plugin to it's instruction object. 
 		This method is called automatically during addPlugin.'''
+
 		self.__instructions = instructions
 
 	def getInstructions( self ):
