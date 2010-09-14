@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.modules.testers.TestProvider import TestProvider
-from core.executomat.ShellCommandAction import ShellCommandAction
 
 class CTest( TestProvider ):
 
@@ -26,10 +25,4 @@ class CTest( TestProvider ):
 		"""Constructor"""
 		TestProvider.__init__( self, name )
 		self._setCommand( "ctest" )
-
-	def makeTestStep( self ):
-		"""Run tests for the project."""
-		step = self.getInstructions().getStep( 'conf-make-test' )
-		makeTest = ShellCommandAction( [ self.getCommand(), '--verbose' ] )
-		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
-		step.addMainAction( makeTest )
+		self._setTestArgument( "--verbose" )

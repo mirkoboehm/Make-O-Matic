@@ -18,19 +18,19 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.modules.testers.TestProvider import TestProvider
-from core.executomat.ShellCommandAction import ShellCommandAction
+from core.modules.configurations import maketools
 
 class MakeTester( TestProvider ):
 
 	def __init__( self, name = None ):
-		# FIXME Port to use Maketools
 		"""Constructor"""
 		TestProvider.__init__( self, name )
-		self._setCommand( "make" )
+		self.__makeTool = maketools.getMakeTool()
+		self._setCommand( self.__makeTool.getCommand() )
+		self._setTestArgument( "test" )
 
-	def makeTestStep( self ):
-		"""Run tests for the project."""
-		step = self.getInstructions().getStep( 'conf-make-test' )
-		makeTest = ShellCommandAction( [self.getCommand(), 'test'] )
-		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
-		step.addMainAction( makeTest )
+	def preFlightCheck( self ):
+		self.getMakeTool().checkVersion()
+
+	def getMakeTool( self ):
+		return self.__makeTool

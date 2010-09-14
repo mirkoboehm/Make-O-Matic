@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string
+from core.helpers.RunCommand import RunCommand
 
 class MakeTool():
 	'''MakeTool implements an abstract base class for a makefile-parsing build command.'''
@@ -26,6 +27,9 @@ class MakeTool():
 		self.__versionParameter = "--version"
 		self.__versionOutputLine = 0
 		self.__jobs = 1
+
+	def checkVersion( self ):
+		RunCommand( [ self.getCommand() ] ).checkVersion( self.getVersionParameter(), self.getVersionOutputLine() )
 
 	def _setCommand( self, command ):
 		check_for_nonempty_string( command, 'The make tool command must be a non-empty string' )

@@ -21,23 +21,24 @@ from core.executomat.ShellCommandAction import ShellCommandAction
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 import multiprocessing
-from core.modules.configurations.maketools import getMakeTool
-from core.helpers.RunCommand import RunCommand
+from core.modules.configurations import maketools
 
 class MakeBasedBuilder( Builder ):
 	'''MakeBasedBuilder implements a base class for builders that implement variants of a build process that uses the make tools.'''
 
 	def __init__( self, name = None ):
 		Builder.__init__( self, name )
-		self.__makeTool = getMakeTool()
+		self.__makeTool = maketools.getMakeTool()
 		self._setCommand( self.__makeTool.getCommand() )
 
 	def preFlightCheck( self ):
-		parameter = self.__makeTool.getVersionParameter()
-		RunCommand( [ self.getCommand() ] ).checkVersion( parameter )
+		self.getMakeTool().checkVersion()
 
 	def _getBuildDir( self ):
 		return self.getInstructions().getBuildDir()
+
+	def getMakeTool( self ):
+		return self.__makeTool
 
 	def createConfMakeActions( self ):
 		tool = self.__makeTool

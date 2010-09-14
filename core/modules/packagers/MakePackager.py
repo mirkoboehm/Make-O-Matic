@@ -19,14 +19,16 @@
 
 from core.modules.packagers.PackageProvider import PackageProvider
 from core.executomat.ShellCommandAction import ShellCommandAction
+from core.modules.configurations import maketools
 
 class MakePackager( PackageProvider ):
 
 	def __init__( self, name = None ):
-		# FIXME Port to use Maketools
 		"""Constructor"""
 		PackageProvider.__init__( self, name )
-		self._setCommand( "make" )
+		self.__makeTool = maketools.getMakeTool()
+		self._setCommand( self.__makeTool.getCommand() )
+		self._setPackageArgument( "package" )
 
 	def makePackageStep( self ):
 		"""Create package for the project."""
@@ -34,3 +36,9 @@ class MakePackager( PackageProvider ):
 		makePackage = ShellCommandAction( self.getCommand(), 'package' )
 		makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makePackage )
+
+	def preFlightCheck( self ):
+		self.getMakeTool().checkVersion()
+
+	def getMakeTool( self ):
+		return self.__makeTool

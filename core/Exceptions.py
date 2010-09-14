@@ -29,7 +29,7 @@ class MomException( Exception ):
 		return repr( self.value ).rstrip()
 
 	def getReturnCode( self ):
-		raise Exception( "(Abstract) base class method called!" )
+		raise NotImplementedError( "Abstract base class method called!" )
 
 	def getDescription( self ):
 		return self.__doc__

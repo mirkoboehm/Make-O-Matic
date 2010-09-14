@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.modules.packagers.PackageProvider import PackageProvider
-from core.executomat.ShellCommandAction import ShellCommandAction
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
 
 class _CPackMovePackageAction( FilesMoveAction ):
@@ -50,16 +49,12 @@ class CPack( PackageProvider ):
 		"""Constructor"""
 		PackageProvider.__init__( self, name )
 		self._setCommand( "cpack" )
+		self._setPackageArgument( "--verbose" )
 
 	def makePackageStep( self ):
 		"""Create packages for the project using CPack."""
+		makePackage = PackageProvider.makePackageStep( self )
 		step = self.getInstructions().getStep( 'conf-package' )
-		buildDirectory = self.getInstructions().getBuildDir()
-
-		makePackage = ShellCommandAction( [ self.getCommand()] )
-		makePackage.setWorkingDirectory( buildDirectory )
-		step.addMainAction( makePackage )
-
 		movePackageDestination = self.getInstructions().getProject().getPackagesDir()
 		movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
 		step.addMainAction( movePackage )

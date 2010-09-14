@@ -122,15 +122,3 @@ class SourceCodeProvider( Plugin ):
 		self.makeCheckoutStep()
 		# FIXME it needs to be decided by the builder if this gets called!
 		# self.makeExportStep( project )
-
-	def wrapUp( self ):
-		"""WrapUp is called when the last step has finished. It could be used to publish 
-		the reports, for example."""
-		pass
-
-	def shutDown( self ):
-		"""Shutdown is called right before the build ends. It could be used to close
-		files or network connections.
-		ShutDown is called from the finally block of the build method, so in all normal cases, it will be called 
-		before the build script ends."""
-		pass

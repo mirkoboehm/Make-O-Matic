@@ -18,16 +18,31 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
+from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.executomat.ShellCommandAction import ShellCommandAction
 
 class TestProvider( Plugin ):
 
 	def __init__( self, name = None ):
 		"""Constructor"""
 		Plugin.__init__( self, name )
+		self.__testArgument = None
+
+	def _setTestArgument( self, testArgument ):
+		check_for_nonempty_string( testArgument, "The test argument needs to be a non-empty string" )
+		self.__testArgument = testArgument
+
+	def _getTestArgument( self ):
+		return self.__testArgument
 
 	def makeTestStep( self ):
 		"""Run tests for the project."""
-		raise NotImplementedError()
+		if self._getTestArgument() == None:
+			raise NotImplementedError()
+		step = self.getInstructions().getStep( 'conf-make-test' )
+		makeTest = ShellCommandAction( [ self.getCommand(), self._getTestArgument() ] )
+		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
+		step.addMainAction( makeTest )
 
 	def setup( self ):
 		"""Setup is called after the test steps have been generated, and the command line 

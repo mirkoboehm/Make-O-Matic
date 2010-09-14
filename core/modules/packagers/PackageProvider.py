@@ -18,16 +18,32 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
+from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.executomat.ShellCommandAction import ShellCommandAction
 
 class PackageProvider( Plugin ):
 
 	def __init__( self, name = None ):
 		"""Constructor"""
 		Plugin.__init__( self, name )
+		self.__packageArgument = None
+
+	def _setPackageArgument( self, packageArgument ):
+		check_for_nonempty_string( packageArgument, "The package argument needs to be a non-empty string" )
+		self.__packageArgument = packageArgument
+
+	def _getPackageArgument( self ):
+		return self.__packageArgument
 
 	def makePackageStep( self ):
 		"""Create package for the project."""
-		raise NotImplementedError()
+		if self._getPackageArgument() == None:
+			raise NotImplementedError()
+		step = self.getInstructions().getStep( 'conf-package' )
+		makePackage = ShellCommandAction( [ self.getCommand(), self._getPackageArgument() ] )
+		makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
+		step.addMainAction( makePackage )
+		return makePackage
 
 	def setup( self ):
 		"""Setup is called after the package steps have been generated, and the command line 
