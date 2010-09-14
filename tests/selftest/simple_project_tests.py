@@ -24,7 +24,7 @@ from core.Settings import Settings
 from core.helpers.RunCommand import RunCommand
 from core.helpers.GlobalMApp import mApp
 from tests.helpers.MomTestCase import MomTestCase
-import time
+import shutil
 
 class SimpleProjectTests( MomTestCase ):
 	'''SimpleProjectTests runs the example_mom_builscript in the three major run modes.
@@ -75,41 +75,32 @@ class SimpleProjectTests( MomTestCase ):
 			print( runner.getStdOut().decode() )
 			print( 'error output:' )
 			print( runner.getStdErr().decode() )
-		# Sleep for 1 second to stop build directories with the same second causing failures
-		time.sleep( 1 )
-		return runner
+			self.assert_( runner.getReturnCode(), 0 )
+		shutil.rmtree( 'makeomatic', True )
 
 	def testEBuild( self ):
-		runner = self._testBuild( 'E' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'E' )
 
 	def testMBuild( self ):
-		runner = self._testBuild( 'M' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'M' )
 
 	def testCBuild( self ):
-		runner = self._testBuild( 'C' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'C' )
 
 	def testDBuild( self ):
-		runner = self._testBuild( 'D' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'D' )
 
 	def testSBuild( self ):
-		runner = self._testBuild( 'S' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'S' )
 
 	def testHBuild( self ):
-		runner = self._testBuild( 'H' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'H' )
 
 	def testPBuild( self ):
-		runner = self._testBuild( 'P' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'P' )
 
 	def testFBuild( self ):
-		runner = self._testBuild( 'F' )
-		self.assertEquals( runner.getReturnCode(), 0 )
+		self._testBuild( 'F' )
 
 if __name__ == "__main__":
 	unittest.main()
