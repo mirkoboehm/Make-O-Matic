@@ -144,13 +144,13 @@ class Action( MObject ):
 				mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
 				self._setResult( e.getReturnCode() )
 			if step.getLogfileName():
-				file = open( step.getLogfileName(), 'a' )
-				if file:
+				f = open( step.getLogfileName(), 'a' )
+				if f:
 					if self.getStdOut():
-						file.writelines( self.getStdOut().decode() )
+						f.writelines( self.getStdOut().decode() )
 					else:
-						file.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
-					file.close()
+						f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
+					f.close()
 				else:
 					raise MomError( 'cannot write to log file "{0}"'.format( step.getLogfileName() ) )
 			return self.getResult()

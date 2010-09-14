@@ -60,18 +60,19 @@ class _PreprocessorAction( Action ):
 		return 0
 
 	def _process( self ):
-		# open input file for reading
+		# open inputText file for reading
 		inputPath = os.path.join( str( self._getPreprocessor().getInputFilename() ) )
 		if not os.path.isfile( inputPath ):
 			raise BuildError( 'Input file "{0}" does not exist.'.format( inputPath ) )
-		with open( inputPath ) as input:
-			with open( str( self._getPreprocessor().getOutputFilename() ), 'w' ) as output:
+		with open( inputPath ) as inputText:
+			with open( str( self._getPreprocessor().getOutputFilename() ), 'w' ) as outputText:
 				# read line by line, replace contents, write line by line
 				while True:
-					line = input.readline()
-					if not line: break
+					line = inputText.readline()
+					if not line:
+						break
 					result = self.processLine( line )
-					output.write( result )
+					outputText.write( result )
 
 	def processLine( self, line ):
 		'''Process a line of text, and return the result.'''

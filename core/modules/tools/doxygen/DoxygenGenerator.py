@@ -29,8 +29,8 @@ class DoxygenGenerator( Plugin ):
 		self.__doxygenFile = None
 		self.__docsDir = 'docs'
 
-	def setDoxygenFile( self, file ):
-		self.__doxygenFile = file
+	def setDoxygenFile( self, doxygenFile ):
+		self.__doxygenFile = doxygenFile
 
 	def getDoxygenFile( self ):
 		return self.__doxygenFile

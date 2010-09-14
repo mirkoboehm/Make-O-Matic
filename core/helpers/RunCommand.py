@@ -134,24 +134,29 @@ class RunCommand( MObject ):
 	def getCommand( self ):
 		return self.__cmd
 
-	def findExecutable( self, program, search_paths = [] ):
-		def is_exe( fpath ):
+	def findExecutable( self, program, searchPaths = None ):
+		"""Returns path to program found in system's PATH, returns None if nothing found"""
+
+		def isExecutable( fpath ):
 			return os.path.exists( fpath ) and os.access( fpath, os.X_OK )
+
+		if searchPaths is None:
+			searchPaths = []
 
 		fpath, fname = os.path.split( program )
 		if fpath:
-			if is_exe( program ):
+			if isExecutable( program ):
 				return program
 		else:
-			paths = search_paths
+			paths = searchPaths
 			paths += os.environ["PATH"].split( os.pathsep )
 
 			for path in paths:
-				exe_file = os.path.join( path, fname )
-				if is_exe( exe_file ):
-					return exe_file
-				elif sys.platform == "win32" and is_exe( exe_file + ".exe" ):
-					return exe_file + ".exe"
+				executableFile = os.path.join( path, fname )
+				if isExecutable( executableFile ):
+					return executableFile
+				elif sys.platform == "win32" and isExecutable( executableFile + ".exe" ):
+					return executableFile + ".exe"
 
 		return None
 
@@ -169,7 +174,7 @@ class RunCommand( MObject ):
 		runner.join()
 		returnCode = self.getReturnCode()
 		if returnCode == 0:
-			version = runner.getStdOut().splitlines().lines[ lineNumber ].strip()
+			version = self.getStdOut().splitlines().lines[ lineNumber ].strip()
 			mApp().debugN( self, 4, 'RunCommand found: "{0}"'.format( version ) )
 
 		self.__cmd = oldCmd

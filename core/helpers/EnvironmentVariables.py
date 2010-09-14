@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 
 def addToPathCollection( pathVariable, element, order = 'append' ):
@@ -27,7 +28,7 @@ def addToPathCollection( pathVariable, element, order = 'append' ):
 	variable = ''
 	try:
 		variable = os.environ[pathVariable]
-	except:
+	except KeyError:
 		pass
 	# prune it and split it up (not too aggressively): 
 	if variable[-1:] == os.pathsep:
@@ -39,8 +40,10 @@ def addToPathCollection( pathVariable, element, order = 'append' ):
 		else:
 			elements.append( element )
 
-	def WhiteSpaceFilter( x ): return x.strip() != ''
-	elements = filter( WhiteSpaceFilter, elements )
+	def whiteSpaceFilter( x ):
+		return x.strip() != ''
+
+	elements = filter( whiteSpaceFilter, elements )
 
 	result = os.pathsep.join( elements )
 	os.environ[pathVariable] = result

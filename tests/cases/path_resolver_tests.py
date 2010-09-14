@@ -28,10 +28,10 @@ class FolderTester( object ):
 class PathResolverTest( unittest.TestCase ):
 
 	def testPathResolver( self ):
-		t = FolderTester()
+		tester = FolderTester()
 		filename = 'test.txt'
-		sr = PathResolver( t.pathMethod, filename )
-		path = str( sr )
+		resolver = PathResolver( tester.pathMethod, filename )
+		path = str( resolver )
 		filepath = os.path.join( os.getcwd(), filename )
 		self.assertEqual( path, filepath )
 		tmpdir = 'test_folder'
@@ -41,10 +41,10 @@ class PathResolverTest( unittest.TestCase ):
 		oldpwd = os.getcwd()
 		os.chdir( tmpdir )
 		newfilepath = os.path.join( os.getcwd(), filename )
-		self.assertEqual( str( sr ), newfilepath )
+		self.assertEqual( str( resolver ), newfilepath )
 		os.chdir( oldpwd )
 		os.rmdir( tmpdir )
-		self.assertEqual( str( sr ), filepath )
+		self.assertEqual( str( resolver ), filepath )
 
 if __name__ == "__main__":
 	unittest.main()

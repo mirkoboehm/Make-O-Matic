@@ -94,10 +94,10 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		report.prepare()
 		reportContent = report.getReport()
 
-		file = generator.getReportFile()
-		self.assertNotEquals( file, None, "Log file does not exist" )
+		filePath = generator.getReportFile()
+		self.assertNotEquals( filePath, None, "Log file does not exist" )
 
-		f = open( file )
+		f = open( filePath )
 		fileContent = f.read()
 		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
 

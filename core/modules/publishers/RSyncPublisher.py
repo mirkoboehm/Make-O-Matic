@@ -40,9 +40,9 @@ class RSyncPublisher( Plugin ):
 	def getUploadLocation( self ):
 		return self.__uploadLocation
 
-	def setLocalDir( self, dir ):
-		check_for_path_or_none( dir, 'The local directory must be a nonempty string!' )
-		self.__localDir = dir
+	def setLocalDir( self, localDir ):
+		check_for_path_or_none( localDir, 'The local directory must be a nonempty string!' )
+		self.__localDir = localDir
 
 	def getLocalDir( self ):
 		return self.__localDir
@@ -63,26 +63,26 @@ class RSyncPublisher( Plugin ):
 		step.addMainAction( action )
 
 
-	def __makeCygwinPathForRsync( self, dir ):
+	def __makeCygwinPathForRsync( self, directory ):
 		"""This function generates a path understood by Cygwin from a Windows  
 		path that contains a drive letter. Rsync otherwise interprets the letter 
 		before the colon as a target hostname. On all other platforms, this function does nothing."""
 		# be transparent on non-Windows platforms: 
-		if not dir or not 'Windows' in platform.platform():
-			return dir
+		if not directory or not 'Windows' in platform.platform():
+			return directory
 		# normalize the path 
-		hasEndingSlash = dir.strip()[-1] == '\\'
-		dir = os.path.normpath( dir )
+		hasEndingSlash = directory.strip()[-1] == '\\'
+		directory = os.path.normpath( directory )
 		if hasEndingSlash: # normpath strips trailing slashes  
-			dir += '/' # *now* we ar on Unix, sigh :-)  
+			directory += '/' # *now* we ar on Unix, sigh :-)  
 		# remove leading whitespace, to be sure 
-		dir = re.sub( '^\s+', '', dir )
-		assert dir
+		directory = re.sub( '^\s+', '', directory )
+		assert directory
 		# if we are on Windows and the path starts with a drive letter: 
-		if re.match( '^\s*[a-zA-Z]\:', dir ):
-			driveLetter = dir[0]
-			dir = dir[2:]
+		if re.match( '^\s*[a-zA-Z]\:', directory ):
+			driveLetter = directory[0]
+			directory = directory[2:]
 		# we *do* *require* cygwin rsync on Windows!
-		dir = '/cygdrive/' + driveLetter + dir
-		dir = re.sub( '\\\\+', '/', dir )
-		return dir
+		directory = '/cygdrive/' + driveLetter + directory
+		directory = re.sub( '\\\\+', '/', directory )
+		return directory

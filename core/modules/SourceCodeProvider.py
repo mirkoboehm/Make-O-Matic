@@ -42,9 +42,9 @@ class SourceCodeProvider( Plugin ):
 	def getUrl( self ):
 		return self.__url
 
-	def setSrcDir( self, dir ):
-		check_for_path( dir, 'The course folder needs to be a non-empty string!' )
-		self.__srcDir = dir
+	def setSrcDir( self, srcDir ):
+		check_for_path( srcDir, 'The course folder needs to be a non-empty string!' )
+		self.__srcDir = srcDir
 
 	def getSrcDir( self ):
 		return self.__srcDir

@@ -19,11 +19,11 @@
 
 from datetime import datetime
 
-def formattedTime( datetime ):
+def formattedTime( datetimeObj ):
 	try:
 		text = datetime.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
-	except:
-		text = datetime
+	except Exception:
+		text = datetimeObj
 	return text
 
 def formattedTimeDelta( t ):
@@ -32,25 +32,25 @@ def formattedTimeDelta( t ):
 def formattedDuration( noOfSeconds ):
 	"""Returns a printable string that contains the duration in readable format"""
 	# static definitions: 
-	Second = 1
-	Minute = 60 * Second
-	Hour = 60 * Minute
-	Day = 24 * Hour
+	second = 1
+	minute = 60 * second
+	hour = 60 * minute
+	day = 24 * hour
 	# make the string: 
-	Days = int( noOfSeconds / Day )
-	Hours = int( noOfSeconds / Hour ) % 24
-	Minutes = int( noOfSeconds / Minute ) % 60
-	Seconds = noOfSeconds % 60
+	days = int( noOfSeconds / day )
+	hours = int( noOfSeconds / hour ) % 24
+	minutes = int( noOfSeconds / minute ) % 60
+	seconds = noOfSeconds % 60
 
 	text = ''
-	if Days > 0:
-		text += str( Days ) + 'd '
-	if Hours > 0:
-		text += str( Hours ) + 'h '
-	if Minutes > 0:
-		text += str( Minutes ) + 'min '
-	text += str( Seconds )
-	if Seconds == 1:
+	if days > 0:
+		text += str( days ) + 'd '
+	if hours > 0:
+		text += str( hours ) + 'h '
+	if minutes > 0:
+		text += str( minutes ) + 'min '
+	text += str( seconds )
+	if seconds == 1:
 		text += 'sec'
 	else:
 		text += 'secs'
