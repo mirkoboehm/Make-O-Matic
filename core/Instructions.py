@@ -29,6 +29,7 @@ from core.helpers.EnvironmentSaver import EnvironmentSaver
 import time
 import shutil
 from core.helpers.TimeKeeper import formatted_time
+from core.executomat.Step import Step
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -150,6 +151,21 @@ class Instructions( MObject ):
 		#print( "LENGTH: {0}".format( len( self.getChildren() ) ) )
 		for child in self.getChildren():
 			child.describeRecursively( prefix )
+
+	def _setupBuildSteps( self, buildStepsSetting ):
+		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
+		allBuildSteps = mApp().getSettings().get( buildStepsSetting, True )
+		buildSteps = []
+		for buildStep in allBuildSteps:
+			# FIXME maybe this could be a unit test?
+			assert len( buildStep ) == 3
+			name, types, ignorePreviousFailure = buildStep
+			assert types.lower() == types
+			stepName = Step( name )
+			stepName.setEnabled( buildType in types )
+			stepName.setIgnorePreviousFailure( ignorePreviousFailure )
+			buildSteps.append( stepName )
+		return buildSteps
 
 	def _getIndex( self, instructions ):
 		index = 0

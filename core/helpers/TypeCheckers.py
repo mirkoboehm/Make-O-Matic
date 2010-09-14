@@ -48,25 +48,17 @@ def check_for_path_or_none( expression, description ):
 	if expression:
 		check_for_path( expression, description )
 
-def check_for_int( expression, description ):
+def check_for_int( expression, description, lessThan = None ):
 	try:
-		int( expression )
+		value = int( expression )
+		if lessThan != None and value < lessThan:
+			raise ConfigurationError( description )
 	except ValueError:
 		raise ConfigurationError( description )
 
 def check_for_nonnegative_int( expression, description ):
-	try:
-		value = int( expression )
-		if( value < 0 ):
-			raise ConfigurationError( description )
-	except ( ValueError, TypeError ):
-		raise ConfigurationError( description )
+	check_for_int( expression, description, 0 )
 
 def check_for_positive_int( expression, description ):
-	try:
-		value = int( expression )
-		if( value < 1 ):
-			raise ConfigurationError( description )
-	except ( ValueError, TypeError ):
-		raise ConfigurationError( description )
+	check_for_int( expression, description, 1 )
 

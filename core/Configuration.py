@@ -92,22 +92,8 @@ class Configuration( ConfigurationBase ):
 			cleanup.addMainAction( RmDirAction( PathResolver( self.getBaseDir, folder ) ) )
 		ConfigurationBase.runSetups( self )
 
-
 	def calculateBuildSequence( self ):
-		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
-		allBuildSteps = mApp().getSettings().get( Settings.ConfigurationBuildSteps, True )
-		buildSteps = []
-		for buildStep in allBuildSteps:
-			# FIXME maybe this could be a unit test?
-			assert len( buildStep ) == 3
-			name, types, ignorePreviousFailure = buildStep
-			assert types.lower() == types
-			stepName = Step( name )
-			stepName.setEnabled( buildType in types )
-			stepName.setIgnorePreviousFailure( ignorePreviousFailure )
-			buildSteps.append( stepName )
+		buildSteps = self._setupBuildSteps( Settings.ConfigurationBuildSteps )
 		assert isinstance( mApp(), Build )
-		params = mApp().getParameters()
-		params.applyBuildSequenceSwitches( buildSteps, 'conf' )
+		mApp().getParameters().applyBuildSequenceSwitches( buildSteps, 'conf' )
 		return buildSteps
-

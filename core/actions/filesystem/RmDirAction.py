@@ -16,24 +16,16 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.executomat.Action import Action
+from core.actions.filesystem.MkDirAction import MkDirAction
 from core.helpers.TypeCheckers import check_for_path
 import shutil, os
 from core.helpers.GlobalMApp import mApp
 
-class RmDirAction( Action ):
+class RmDirAction( MkDirAction ):
 	"""RmDirAction deletes a directory."""
 
 	def __init__( self, path, name = None ):
-		Action.__init__( self, name )
-		self.setPath( path )
-
-	def setPath( self, path ):
-		check_for_path( path, "The directory to create must be a non-empty name of a directory!" )
-		self.__path = path
-
-	def getPath( self ):
-		return self.__path
+		MkDirAction.__init__( self, path, name )
 
 	# FIXME Are result and the return value redundant? How to enforce setting result?
 	def run( self ):

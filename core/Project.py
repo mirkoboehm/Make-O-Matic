@@ -103,17 +103,7 @@ class Project( Instructions ):
 		assert self.getBuild()
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
 		assert len( buildType ) == 1
-		allBuildSteps = mApp().getSettings().get( Settings.ProjectBuildSteps, True )
-		buildSteps = []
-		for buildStep in allBuildSteps:
-			# FIXME maybe this could be a unit test?
-			assert len( buildStep ) == 3
-			name, types, ignorePreviousFailure = buildStep
-			assert types.lower() == types
-			stepName = Step( name )
-			stepName.setEnabled( buildType in types )
-			stepName.setIgnorePreviousFailure( ignorePreviousFailure )
-			buildSteps.append( stepName )
+		buildSteps = self._setupBuildSteps( Settings.ProjectBuildSteps )
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		# apply customizations passed as command line parameters:
