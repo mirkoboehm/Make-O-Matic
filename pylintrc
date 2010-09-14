@@ -79,14 +79,14 @@ attr-rgx=[a-z_][a-zA-Z_]{2,30}$
 argument-rgx=[a-z][a-zA-Z]{2,30}$
 
 # Regular expression which should only match correct variable names
-variable-rgx=(e|f|k|v|[a-z][a-zA-Z]{2,30})$
+variable-rgx=[a-z][a-zA-Z]{2,30}$
 
 # Regular expression which should only match correct list comprehension /
 # generator expression variable names
 inlinevar-rgx=[A-Za-z_][A-Za-z0-9_]*$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=_
+good-names=_,e
 
 # Bad variable names which should always be refused, separated by a comma
 bad-names=foo,bar
