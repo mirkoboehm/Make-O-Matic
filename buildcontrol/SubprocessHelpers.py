@@ -16,11 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Settings import Settings
 import os
 from core.helpers.GlobalMApp import mApp
 
-def extend_debug_prefix( token ):
+def extendDebugPrefix( token ):
 	indentVar = mApp().getSettings().get( Settings.MomDebugIndentVariable )
 	oldIndent = None
 	if indentVar in os.environ:
@@ -28,11 +29,11 @@ def extend_debug_prefix( token ):
 	os.environ[ indentVar ] = '{0}{1}slave> '.format( oldIndent or '', ' ' if oldIndent else '' )
 	return oldIndent
 
-def restore_debug_prefix( content ):
+def restoreDebugPrefix( content ):
 	indentVar = mApp().getSettings().get( Settings.MomDebugIndentVariable )
 	os.environ[ indentVar ] = content or ''
 
-def get_debug_prefix():
+def getDebugPrefix():
 	indentVar = mApp().getSettings().get( Settings.MomDebugIndentVariable )
 	if indentVar in os.environ:
 		return os.environ[ indentVar ]

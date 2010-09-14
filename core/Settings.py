@@ -64,17 +64,17 @@ class Settings( Defaults ):
 		hostConfigFile = '{0}.py'.format( gethostname() )
 		files = [ 'config.py', hostConfigFile ]
 		for folder in folders:
-			for file in files:
-				configFile = os.path.join( folder, file )
+			for fileName in files:
+				configFile = os.path.join( folder, fileName )
 				if not os.path.isfile( configFile ):
 					mApp().debugN( self, 3, 'Configuration file "{0}" does not exist, continuing.'.format( configFile ) )
 					continue
 				mApp().debugN( self, 2, 'Loading configuration file "{0}"'.format( configFile ) )
 				try:
-					globals = { 'application' : mApp() }
+					currentGlobals = { 'application' : mApp() }
 					with open( configFile ) as f:
 						code = f.read()
-						exec( code, globals )
+						exec( code, currentGlobals )
 					mApp().debug( self, 'Configuration file "{0}" loaded successfully'.format( configFile ) )
 				except SyntaxError as e:
 					raise ConfigurationError( 'The configuration file "{0}" contains a syntax error: "{1}"'.format( configFile, str( e ) ) )
@@ -83,9 +83,9 @@ class Settings( Defaults ):
 				except: # we need to catch all exceptions, since we are calling user code 
 					raise ConfigurationError( 'The configuration file "{0}" contains an unknown error!'.format( configFile ) )
 
-	def getBuildTypeDescription( self, type ):
+	def getBuildTypeDescription( self, buildType ):
 		descriptions = self.get( Settings.ProjectBuildTypeDescriptions )
-		if type in descriptions:
-			return descriptions[type]
+		if buildType in descriptions:
+			return descriptions[buildType]
 		else:
 			return None

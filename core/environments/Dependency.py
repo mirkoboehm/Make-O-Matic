@@ -78,12 +78,14 @@ class Dependency( MObject ):
 
 	def _readControlFile( self, controlFile ):
 		try:
-			with open ( controlFile, 'r' ) as input:
+			with open( controlFile, 'r' ) as inputFile:
 				mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
 				self._setValid( True )
-				for line in input.readlines():
-					if re.match( '^\s*#', line ): continue # ignore comments
-					if re.match( '^\s*$', line ): continue # ignore empty lines
+				for line in inputFile.readlines():
+					if re.match( '^\s*#', line ):
+						continue # ignore comments
+					if re.match( '^\s*$', line ):
+						continue # ignore empty lines
 					line = line.strip()
 					if re.match( '^{0}'.format( Dependency._CommandPrefix ), line ):
 						if not self.applyProperty( controlFile, line ):
@@ -115,10 +117,10 @@ class Dependency( MObject ):
 				return True
 			return False
 		except ConfigurationError as value:
-			mApp().message( 'error ({0}) in control file {1}\n--> {2}'.
+			mApp().message( self, 'error ({0}) in control file {1}\n--> {2}'.
 				format( str( value ), controlFile, str( line ).strip() ) )
 		except IndexError:
-			mApp().message( 'syntax error in control file {0}\n--> {1}'.format( controlFile, str( line ).strip() ) )
+			mApp().message( self, 'syntax error in control file {0}\n--> {1}'.format( controlFile, str( line ).strip() ) )
 
 	def applyCommand( self, line ):
 		pass

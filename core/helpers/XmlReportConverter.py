@@ -95,12 +95,13 @@ class XmlReportConverter( MObject ):
 		Merges templates from plugins into the stylesheets provided by XSL_STYLESHEETS."""
 
 		# iterate trough the dict from getXslTemplates(), add each template to the corresponding stylesheet
-		for type, markup in plugin.getXslTemplates().items():
-			if not type in self.__xslTemplateSnippets.keys():
+		for conversionType, markup in plugin.getXslTemplates().items():
+			if not conversionType in self.__xslTemplateSnippets.keys():
 				continue # invalid key, no stylesheet registered for that type of XSL
 
 			# search for place to register new plugin templates
-			pluginTemplate = self.__xslTemplateSnippets[type].find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
+			stylesheet = self.__xslTemplateSnippets[conversionType]
+			pluginTemplate = stylesheet.find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
 			placeholder = pluginTemplate.find( "{http://www.w3.org/1999/XSL/Transform}choose" )
 
 			# create new element with markup provided from plugin

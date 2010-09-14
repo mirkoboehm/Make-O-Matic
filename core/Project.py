@@ -32,10 +32,11 @@ import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
 
-"""A Project represents an entity to build. 
-FIXME documentation
-"""
 class Project( Instructions ):
+	"""A Project represents an entity to build. 
+	
+	FIXME: documentation
+	"""
 
 	def __init__( self, projectName, parent = None ):
 		"""Set up the build steps, parse the command line arguments."""
@@ -89,7 +90,7 @@ class Project( Instructions ):
 		return self.__timeKeeper
 
 	def runSetups( self ):
-		for step in self.calculateBuildSequence( self ):
+		for step in self.calculateBuildSequence():
 			self._getExecutomat().addStep( step )
 		Instructions.runSetups( self )
 		create = self.getStep( 'project-create-folders' )
@@ -98,7 +99,7 @@ class Project( Instructions ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
 
-	def calculateBuildSequence( self, project ):
+	def calculateBuildSequence( self ):
 		assert self.getBuild()
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
 		assert len( buildType ) == 1

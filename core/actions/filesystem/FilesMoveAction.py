@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.executomat.Action import Action
-from shutil import move
+from shutil import move, Error
 from core.helpers.GlobalMApp import mApp
 from os.path import isdir
 
@@ -55,10 +55,10 @@ class FilesMoveAction( Action ):
 		if not isdir( str( self.__destination ) ):
 			return 1
 
-		for file in self.__sourceFiles:
+		for sourceFile in self.__sourceFiles:
 			try:
-				mApp().debugN( self, 4, 'moving file from "{0}" to "{1}'.format( file, self.__destination ) )
-				move( file, self.__destination )
-			except:
+				mApp().debugN( self, 4, 'moving file from "{0}" to "{1}'.format( sourceFile, self.__destination ) )
+				move( sourceFile, self.__destination )
+			except Error:
 				return 1
 		return 0

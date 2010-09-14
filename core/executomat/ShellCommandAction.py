@@ -25,6 +25,7 @@ from core.executomat.Action import Action
 class ShellCommandAction( Action ):
 	"""ShellCommandAction encapsulates the execution of one command in the Step class. 
 	It is mostly used internally, but can be of general use as well."""
+
 	def __init__( self, command = None, timeout = None ):
 		Action.__init__( self )
 		self.setCommand( command, timeout )
@@ -34,13 +35,13 @@ class ShellCommandAction( Action ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
 		return '{0}: {1}'.format( self.getName(), ' '.join( self.getCommand() ) )
 
-	def setCommand( self, command, TimeOutPeriod = None ):
+	def setCommand( self, command, timeOutPeriod = None ):
 		"""Set the shell command"""
-		if TimeOutPeriod != None:
-			check_for_nonnegative_int( TimeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
+		if timeOutPeriod != None:
+			check_for_nonnegative_int( timeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
 		check_for_list_of_strings( command, "The shell command must be a list of strings." )
 		self.__command = command
-		self.__timeOutPeriod = TimeOutPeriod
+		self.__timeOutPeriod = timeOutPeriod
 
 	def getCommand( self ):
 		"""Returns the command"""
@@ -66,5 +67,5 @@ class ShellCommandAction( Action ):
 		Can only be called after execution."""
 		if not self.__started:
 			raise MomError( 'timedOut() queried before the command was executed' )
-		return self._getRunner().getTimedOut();
+		return self._getRunner().getTimedOut()
 

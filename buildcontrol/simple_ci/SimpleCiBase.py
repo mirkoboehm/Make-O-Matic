@@ -140,7 +140,7 @@ class SimpleCiBase( MApplication ):
 					self.message( self, 'build script test run finished with an error for "{0}".'.format( script ) )
 					error = True
 			except MomError:
-				self.message( 'self, build script test run triggered an exception for "{0}"'.format( script ) )
+				self.message( self, 'build script test run triggered an exception for "{0}"'.format( script ) )
 				caughtException = True
 		if caughtException:
 			raise MomError( 'exception during build script test runs.' )

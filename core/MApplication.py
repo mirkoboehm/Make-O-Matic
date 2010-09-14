@@ -63,7 +63,8 @@ class MApplication( Instructions ):
 			# only if there was no previous error:
 			self.__returnCode = code
 		else:
-			self.debugN( self, 3, 'new return code {0} ignored, return code is already set to {1}.'.format( code, self.getReturnCode() ) )
+			self.debugN( self, 3, 'new return code {0} ignored, return code is already set to {1}.'
+						.format( code, self.getReturnCode() ) )
 
 	def getReturnCode( self ):
 		return self.__returnCode

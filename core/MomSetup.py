@@ -23,7 +23,7 @@ import os
 def momRootDir():
 	'''momRootDir returns the src folder of the local clone of the KDAB autobuild.git repository. The KDAB specific 
 	modules are located in this folder. '''
-	file = inspect.getfile( core )
-	path = os.path.split( file )[ 0 ]
+	filePath = inspect.getfile( core )
+	path = os.path.split( filePath )[ 0 ]
 	path = os.path.split( path )[ 0 ]
 	return path

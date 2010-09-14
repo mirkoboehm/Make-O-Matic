@@ -29,10 +29,10 @@ class MomException( Exception ):
 		return repr( self.value ).rstrip()
 
 	def getReturnCode( self ):
-		raise Exception( "(Abstract) base class method called!" );
+		raise Exception( "(Abstract) base class method called!" )
 
 	def getDescription( self ):
-		return self.__doc__;
+		return self.__doc__
 
 class BuildError( MomException ):
 	"""A build error is raised if the build fails due to a problem caused by the project."""

@@ -89,7 +89,7 @@ class SCMGit( SourceCodeProvider ):
 			else:
 				return revisions
 		elif runner.getTimedOut() == True:
-			raise ConfigurationError( 'Getting git log for "{0}" timed out.'.format( self.url() ) )
+			raise ConfigurationError( 'Getting git log for "{0}" timed out.'.format( self.getUrl() ) )
 		else:
 			raise ConfigurationError( 'Getting git log failed, is there no git in the path?' )
 

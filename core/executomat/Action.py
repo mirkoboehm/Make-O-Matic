@@ -53,10 +53,10 @@ class Action( MObject ):
 		self._setStdErr( None )
 		self.setIgnorePreviousFailure( False )
 
-	def setWorkingDirectory( self, dir ):
+	def setWorkingDirectory( self, workingDir ):
 		"""Set the directory to execute the command in."""
-		check_for_path( dir, "The working directory parameter must be a string containing a directory name." )
-		self.__workingDir = dir
+		check_for_path( workingDir, "The working directory parameter must be a string containing a directory name." )
+		self.__workingDir = workingDir
 
 	def getWorkingDirectory( self ):
 		"""Return the working directory."""
@@ -177,7 +177,7 @@ class Action( MObject ):
 		stderrElement = document.createElement( "stderr" )
 		try:
 			data = self.getStdErr()
-		except:
+		except MomError:
 			data = ""
 		textNode = document.createTextNode( str( data ) )
 		stderrElement.appendChild( textNode )
@@ -186,7 +186,7 @@ class Action( MObject ):
 		stdoutElement = document.createElement( "stdout" )
 		try:
 			data = self.getStdOut()
-		except:
+		except MomError:
 			data = ""
 		textNode = document.createTextNode( str( data ) ) # TODO: FIXME
 		stdoutElement.appendChild( textNode )

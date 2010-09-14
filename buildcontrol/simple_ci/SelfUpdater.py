@@ -23,7 +23,7 @@ class SelfUpdater( Plugin ):
 
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
-		self.setFolder( [] )
+		self.setFolders( [] )
 
 	def setFolders( self, folders ):
 		self.__folders = folders

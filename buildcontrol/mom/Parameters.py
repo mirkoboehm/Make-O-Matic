@@ -23,7 +23,6 @@ from core.helpers.GlobalMApp import mApp
 import optparse
 import os
 from core.Settings import Settings
-from test.test_iterlen import len
 
 class Parameters( MObject ):
 	'''Parse the parameters of an invocation of the mom tool.'''
@@ -85,7 +84,7 @@ class Parameters( MObject ):
 			self.__path = options.buildscriptPath
 		else:
 			self.__path = os.path.join( 'mom', 'buildscript.py' )
-			mApp().message( 'no build script path specified, using "{0}"'.format( self.__path ) )
+			mApp().message( self, 'no build script path specified, using "{0}"'.format( self.__path ) )
 		if options.verbosity:
 			mApp().getSettings().set( Settings.ScriptLogLevel, options.verbosity )
 		if len( args ) > 1: # the one element is the program path

@@ -33,7 +33,7 @@ class Environments( ConfigurationBase ):
 	The configuration is then cloned for every matching environment, if this functionality is enabled for the selected build type.
 	'''
 
-	def __init__( self, dependencies = [], name = None, parent = None ):
+	def __init__( self, dependencies = None, name = None, parent = None ):
 		ConfigurationBase.__init__( self, name, parent )
 		self._setDependencies( dependencies )
 

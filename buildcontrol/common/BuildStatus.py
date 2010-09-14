@@ -24,8 +24,8 @@ from core.Exceptions import MomError, ConfigurationError
 from core.Settings import Settings
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.FilesystemAccess import make_foldername_from_string
-from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 from core.helpers.GlobalMApp import mApp
+from buildcontrol.SubprocessHelpers import extendDebugPrefix, restoreDebugPrefix
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -217,10 +217,11 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			rev = 'revision ' + str( rev )
 		else:
 			rev = 'latest revision'
-		mApp().message( self, 'starting build job for project "{0}" at revision {1}.'.format( buildInfo.getProjectName(), rev ) )
+		mApp().message( self, 'starting build job for project "{0}" at revision {1}.'
+					.format( buildInfo.getProjectName(), rev ) )
 		oldPwd = os.getcwd()
 		os.chdir( directory )
-		oldIndent = extend_debug_prefix( buildInfo.getProjectName() )
+		oldIndent = extendDebugPrefix( buildInfo.getProjectName() )
 		runner = RunCommand( cmd, 24 * 60 * 60, True ) # we have builds that run 15h
 		try:
 			runner.run()
@@ -233,7 +234,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
 					.format( e ) )
 			os.chdir( oldPwd )
-			restore_debug_prefix( oldIndent )
+			restoreDebugPrefix( oldIndent )
 			try:
 				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
 				self.updateBuildInfo( buildInfo )
@@ -296,10 +297,13 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		lines = iface.queryRevisionsSince( revision )
 		for line in lines:
 			line = line.strip()
-			if not line: continue
+			if not line:
+				continue
+
 			parts = line.split( ' ' )
 			if len( parts ) != 3:
 				MomError( 'Error in build script output in line "{0}"'.format( line ) )
+
 			buildInfo = BuildInfo()
 			buildInfo.setProjectName( projectName )
 			buildInfo.setBuildStatus( buildInfo.Status.NewRevision )
@@ -308,6 +312,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			buildInfo.setUrl( parts[2] )
 			buildInfo.setBuildScript( buildScript )
 			buildInfos.append( buildInfo )
+
 		buildInfos.reverse()
 		return buildInfos
 

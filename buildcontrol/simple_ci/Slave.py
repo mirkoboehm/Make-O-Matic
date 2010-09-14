@@ -36,9 +36,9 @@ class Slave( SimpleCiBase ):
 		# find the build scripts
 		buildScripts = self.getParameters().getBuildScripts() or []
 		if self.getParameters().getControlDir():
-			BaseDir = str( self.getParameters().getControlDir() )
-			mApp().message( self, 'using "{0}" as control directory.'.format( BaseDir ) )
-			controlDir = os.path.normpath( os.path.join( os.getcwd(), BaseDir ) )
+			baseDir = str( self.getParameters().getControlDir() )
+			mApp().message( self, 'using "{0}" as control directory.'.format( baseDir ) )
+			controlDir = os.path.normpath( os.path.join( os.getcwd(), baseDir ) )
 			if not os.path.isdir( controlDir ):
 				raise ConfigurationError( 'The control directory "{0}" does not exist!'.format( controlDir ) )
 			folderScripts = filter( lambda x: x.endswith( '.py' ), os.listdir( controlDir ) )

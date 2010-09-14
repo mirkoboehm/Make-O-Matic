@@ -188,13 +188,13 @@ class Instructions( MObject ):
 			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
 			newFolderBaseName = '{0}-{1}'.format( baseDir, extension )
 			newFolder = newFolderBaseName
-			max = 1000
-			for index in range( max ):
+			maxIterations = 1000
+			for index in range( maxIterations ):
 				if not os.path.isdir( newFolder ):
 					break
 				newFolder = newFolderBaseName + '__{0}'.format( index + 1 )
 			if os.path.isdir( newFolder ):
-				raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( max ) )
+				raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( maxIterations ) )
 			try:
 				shutil.move( baseDir, newFolder )
 			except ( OSError, shutil.Error ) as o:
@@ -221,7 +221,7 @@ class Instructions( MObject ):
 			parentLogDir = self.getParent()._getExecutomat().getLogDir()
 		else:
 			parentLogDir = self.getBaseDir()
-			logDirName = self.getSettings().get( Defaults.ProjectLogDir )
+			logDirName = mApp().getSettings().get( Defaults.ProjectLogDir )
 		assert os.path.isdir( parentLogDir )
 		logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
 		try:

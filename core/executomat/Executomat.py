@@ -36,7 +36,6 @@ class Executomat( MObject ):
 	of it's actions need to finish successfully."""
 
 	def __init__( self, name = None ):
-		"""Constructor."""
 		MObject.__init__( self, name )
 		self.__steps = []
 		self.__timeKeeper = TimeKeeper()
@@ -75,7 +74,7 @@ class Executomat( MObject ):
 		command replaces the old one."""
 		if not isinstance( newStep, Step ):
 			raise MomError( 'only executomat.Step instances can be added to the queue' )
-		check_for_nonempty_string( newStep.getName(), "Every Executomat step must have a name!" );
+		check_for_nonempty_string( newStep.getName(), "Every Executomat step must have a name!" )
 		self.__steps.append( newStep )
 
 	def _getSteps( self ):
@@ -107,7 +106,7 @@ class Executomat( MObject ):
 	def _runTimed( self, instructions ):
 		try:
 			if not os.path.isdir( self.getLogDir() ):
-				raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( self.logDir() ) ) )
+				raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( self.getLogDir() ) ) )
 			if self.getLogfileName():
 				try:
 					self.__logfile = open( self.getLogDir() + os.sep + self.getLogfileName(), 'a' )
@@ -133,10 +132,10 @@ class Executomat( MObject ):
 				self.__logfile.close()
 
 	def report( self ):
-		Report = []
-		for Step in self.__steps:
-			Report.append( Step[1].report() )
-		return Report
+		report = []
+		for step in self.__steps:
+			report.append( step[1].report() )
+		return report
 
 	def describe( self, prefix ):
 		MObject.describe( self, prefix )

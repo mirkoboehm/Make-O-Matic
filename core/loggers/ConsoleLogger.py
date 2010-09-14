@@ -43,7 +43,8 @@ class ConsoleLogger( Logger ):
 			text = re.sub( basedir, '$BASE', text )
 		except MomException:
 			pass # no base directory set yet		
-		if not text.endswith( '\n' ): text = text + '\n'
+		if not text.endswith( '\n' ):
+			text = text + '\n'
 		fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
 		sys.stderr.write( fulltext )
 

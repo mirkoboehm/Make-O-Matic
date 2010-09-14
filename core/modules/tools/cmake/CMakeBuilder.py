@@ -22,10 +22,10 @@ from core.helpers.GlobalMApp import mApp
 from core.executomat.ShellCommandAction import ShellCommandAction
 
 class CMakeVariable( object ):
-	def __init__( self, name, value, type = None ):
+	def __init__( self, name, value, typeString = None ):
 		self.setName( name )
 		self.setValue( value )
-		self.setType( type )
+		self.setType( typeString )
 
 	def setName( self, name ):
 		self.__name = name
@@ -33,11 +33,11 @@ class CMakeVariable( object ):
 	def getName( self ):
 		return self.__name
 
-	def setType( self, type ):
-		self.__type = type
+	def setType( self, typeString ):
+		self.__typeString = typeString
 
 	def getType( self ):
-		return self.__type
+		return self.__typeString
 
 	def setValue( self, value ):
 		self.__value = value
@@ -79,7 +79,7 @@ class CMakeBuilder( MakeBasedBuilder ):
 		return self.__inSourceBuild
 
 	def setCMakeVariables( self, options ):
-		self.__options = []
+		self.__options = options
 
 	def getCMakeVariables( self ):
 		return self.__options

@@ -23,40 +23,40 @@ from core.Exceptions import BuildError
 
 class PreprocessorTest( unittest.TestCase ):
 
-	def _runTest( self, input, output, msg = None ):
+	def _runTest( self, inputString, outputString, msg = None ):
 		'''Helper method to run a single test'''
 		prep = _PreprocessorAction( None )
 		if not msg:
-			msg = '{0} should resolve to {1}'.format( input, output )
-		self.assertEqual( output, prep.processLine( input ), msg )
+			msg = '{0} should resolve to {1}'.format( inputString, outputString )
+		self.assertEqual( outputString, prep.processLine( inputString ), msg )
 
-	def testEmptyInput( self ):
+	def testEmptyinputString( self ):
 		self._runTest( '', '', 'An empty input line should result in an empty output line' )
 
-	def testInputWithoutPlaceholders( self ):
-		input = 'hello world'
-		output = input
-		self._runTest( input, output, 'A line without any replacement place holders should return the input string unchanged' )
+	def testinputStringWithoutPlaceholders( self ):
+		inputString = 'hello world'
+		outputString = inputString
+		self._runTest( inputString, outputString, 'A line without any replacement place holders should return the input string unchanged' )
 
 	def testEscapePattern( self ):
-		input = '@@(@@)'
-		output = '@@'
-		self._runTest( input, output )
+		inputString = '@@(@@)'
+		outputString = '@@'
+		self._runTest( inputString, outputString )
 
 	def testMultipleEscapePatterns( self ):
-		input = 's @@(@@) @@(@@) e'
-		output = 's @@ @@ e'
-		self._runTest( input, output )
+		inputString = 's @@(@@) @@(@@) e'
+		outputString = 's @@ @@ e'
+		self._runTest( inputString, outputString )
 
 	def testUnbalancedBrackets( self ):
-		input = '@@(@@'
+		inputString = '@@(@@'
 		prep = _PreprocessorAction( None )
-		self.assertRaises( BuildError, prep.processLine, input )
+		self.assertRaises( BuildError, prep.processLine, inputString )
 
 	def testBalancedAndUnbalancedBrackets( self ):
-		input = 's @@(@@) @@(@@ e'
+		inputString = 's @@(@@) @@(@@ e'
 		prep = _PreprocessorAction( None )
-		self.assertRaises( BuildError, prep.processLine, input )
+		self.assertRaises( BuildError, prep.processLine, inputString )
 
 if __name__ == "__main__":
 	#import sys;sys.argv = ['', 'PreprocessorTest.testName']

@@ -32,8 +32,8 @@ class Parameters( MObject ):
 		self.setPerformBuilds( True )
 		self.setDelay( None )
 
-	def setControlDir( self, dir ):
-		self.__controlDir = dir
+	def setControlDir( self, controlDir ):
+		self.__controlDir = controlDir
 
 	def getControlDir( self ):
 		return self.__controlDir

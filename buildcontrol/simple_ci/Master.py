@@ -19,8 +19,8 @@
 from buildcontrol.simple_ci.SimpleCiBase import SimpleCiBase
 import os
 import sys
-from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 import time
+from buildcontrol.SubprocessHelpers import extendDebugPrefix, restoreDebugPrefix
 
 class Master( SimpleCiBase ):
 
@@ -55,11 +55,11 @@ class Master( SimpleCiBase ):
 		# execute the build control process slave:
 		cmd = '{0} {1}'.format( sys.executable, ' '.join( sys.argv + [ '--slave' ] ) )
 		self.debug( self, '*** now starting slave CI process ***' )
-		oldIndent = extend_debug_prefix( 'slave' )
+		oldIndent = extendDebugPrefix( 'slave' )
 		result = -1
 		try:
 			result = os.system( cmd ) # do not use RunCommand, it catches the output
 		finally:
-			restore_debug_prefix( oldIndent )
+			restoreDebugPrefix( oldIndent )
 		self.debug( self, '*** slave finished with exit code {0}. ***'.format( result ) )
 

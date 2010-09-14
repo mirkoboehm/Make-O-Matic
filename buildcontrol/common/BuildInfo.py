@@ -22,7 +22,7 @@ class BuildInfo( MObject ):
 	'''BuildInfo represents a single build script run.'''
 
 	class Status( object ):
-		# pylint: disable=r0903
+		# pylint: disable-msg=r0903
 		# Ignore this as we're just simulating an enum so don't need public members
 		NoStatus, NewRevision, Pending, Completed, InitialRevision = range( 5 )
 
