@@ -19,7 +19,7 @@
 
 from datetime import datetime
 from core.Plugin import Plugin
-from buildcontrol.SubprocessHelpers import getDebugPrefix
+from buildcontrol.SubprocessHelpers import get_debug_prefix
 
 class Logger( Plugin ):
 	"""Logger is the base class for Logger objects."""
@@ -41,4 +41,4 @@ class Logger( Plugin ):
 		return datetime.now().strftime( '%y%m%d-%H:%M:%S' )
 
 	def messagePrefix( self ):
-		return getDebugPrefix()
+		return get_debug_prefix()

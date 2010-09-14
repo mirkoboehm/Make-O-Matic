@@ -25,7 +25,7 @@ from core.Settings import Settings
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.GlobalMApp import mApp
-from buildcontrol.SubprocessHelpers import extendDebugPrefix, restoreDebugPrefix
+from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -221,7 +221,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 					.format( buildInfo.getProjectName(), rev ) )
 		oldPwd = os.getcwd()
 		os.chdir( directory )
-		oldIndent = extendDebugPrefix( buildInfo.getProjectName() )
+		oldIndent = extend_debug_prefix( buildInfo.getProjectName() )
 		runner = RunCommand( cmd, 24 * 60 * 60, True ) # we have builds that run 15h
 		try:
 			runner.run()
@@ -234,7 +234,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
 					.format( e ) )
 			os.chdir( oldPwd )
-			restoreDebugPrefix( oldIndent )
+			restore_debug_prefix( oldIndent )
 			try:
 				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
 				self.updateBuildInfo( buildInfo )

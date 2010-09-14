@@ -19,7 +19,7 @@
 
 import platform
 
-def machineInfo():
+def machine_info():
 	"""Returns a dict of machine information, like architecture or platform type"""
 
 	info = {}

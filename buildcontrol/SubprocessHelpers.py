@@ -21,7 +21,7 @@ from core.Settings import Settings
 import os
 from core.helpers.GlobalMApp import mApp
 
-def extendDebugPrefix( token ):
+def extend_debug_prefix( token ):
 	indentVar = mApp().getSettings().get( Settings.MomDebugIndentVariable )
 	oldIndent = None
 	if indentVar in os.environ:
@@ -29,11 +29,11 @@ def extendDebugPrefix( token ):
 	os.environ[ indentVar ] = '{0}{1}slave> '.format( oldIndent or '', ' ' if oldIndent else '' )
 	return oldIndent
 
-def restoreDebugPrefix( content ):
+def restore_debug_prefix( content ):
 	indentVar = mApp().getSettings().get( Settings.MomDebugIndentVariable )
 	os.environ[ indentVar ] = content or ''
 
-def getDebugPrefix():
+def get_debug_prefix():
 	indentVar = mApp().getSettings().get( Settings.MomDebugIndentVariable )
 	if indentVar in os.environ:
 		return os.environ[ indentVar ]

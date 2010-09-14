@@ -13,8 +13,9 @@ to stick to the following standards:
   pane. Also, uncheck "Pydev/Editor/Replace tabs with spaces when
   typing". 
 - Longer lines: Use up to 132 character per line.
-- Method and function names: camelCase with first lower
-  ("Pydev/Editor/Code Style").
+- Method and function names:
+  - Class methods: camelCase with first lower ("Pydev/Editor/Code Style").
+  - Global functions: lower_with_underscores
 - Code formatter: Simply check all boxes in "Pydev/Editor/Code
   Style/Code Formatter".
 

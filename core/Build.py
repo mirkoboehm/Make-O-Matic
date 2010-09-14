@@ -21,7 +21,7 @@ from core.Project import Project
 from core.Exceptions import ConfigurationError, MomError
 from core.Settings import Settings
 from core.Parameters import Parameters
-from core.helpers.MachineInfo import machineInfo
+from core.helpers.MachineInfo import machine_info
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -111,7 +111,7 @@ class Build( MApplication ):
 	def createXmlNode( self, document ):
 		node = MApplication.createXmlNode( self, document )
 
-		for k, v in machineInfo().items():
-			node.attributes[k] = v
+		for key, value  in machine_info().items():
+			node.attributes[key] = value
 
 		return node
