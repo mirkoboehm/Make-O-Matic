@@ -176,7 +176,7 @@ class Action( MObject ):
 
 		stderrElement = document.createElement( "stderr" )
 		try:
-			data = self.getStdErr().decode()
+			data = self.getStdErr()
 		except:
 			data = ""
 		textNode = document.createTextNode( str( data ) )
@@ -185,7 +185,7 @@ class Action( MObject ):
 
 		stdoutElement = document.createElement( "stdout" )
 		try:
-			data = self.getStdOut().decode()
+			data = self.getStdOut()
 		except:
 			data = ""
 		textNode = document.createTextNode( str( data ) ) # TODO: FIXME

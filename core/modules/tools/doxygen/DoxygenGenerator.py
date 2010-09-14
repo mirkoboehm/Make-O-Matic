@@ -17,27 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
-from core.helpers.RunCommand import RunCommand
-from core.Exceptions import ConfigurationError
-from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_path
+from core.helpers.TypeCheckers import check_for_path
 from core.executomat.ShellCommandAction import ShellCommandAction
-from core.helpers.GlobalMApp import mApp
 
 class DoxygenGenerator( Plugin ):
 
 	def __init__( self, name = None ):
 		'''Constructor'''
 		Plugin.__init__( self, name )
-		self.__doxygenPath = 'doxygen'
+		self._setCommand( "doxygen" )
 		self.__doxygenFile = None
 		self.__docsDir = 'docs'
-
-	def setDoxygenPath( self, doxygenPath ):
-		check_for_nonempty_string( doxygenPath, 'The doxygen path must be the full path to the doxygen program!' )
-		self.__doxygenPath = doxygenPath
-
-	def getDoxygenPath( self ):
-		return self.__doxygenPath
 
 	def setDoxygenFile( self, file ):
 		self.__doxygenFile = file
@@ -45,20 +35,10 @@ class DoxygenGenerator( Plugin ):
 	def getDoxygenFile( self ):
 		return self.__doxygenFile
 
-	def preFlightCheck( self ):
-		runner = RunCommand( [ self.getDoxygenPath(), '--version' ] )
-		runner.run()
-		if( runner.getReturnCode() != 0 ):
-			raise ConfigurationError( "DoxygenGenerator: doxygen not found." )
-		else:
-			lines = runner.getStdOut().decode().split( '\n' )
-			version = lines[0].rstrip()
-			mApp().debugN( self, 1, 'doxygen found: "{0}"'.format( version ) )
-
 	def setup( self ):
 		check_for_path( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
 		step = self.getInstructions().getStep( 'project-create-docs' )
-		cmd = [ self.getDoxygenPath(), str( self.getDoxygenFile() ) ]
+		cmd = [ self.getCommand(), str( self.getDoxygenFile() ) ]
 		doxygenCall = ShellCommandAction( cmd )
 		doxygenCall.setWorkingDirectory( self.getInstructions().getScm().getSrcDir() )
 		step.addMainAction( doxygenCall )

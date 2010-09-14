@@ -18,8 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class PackageProvider( Plugin ):
 
@@ -27,25 +25,9 @@ class PackageProvider( Plugin ):
 		"""Constructor"""
 		Plugin.__init__( self, name )
 
-	def _checkInstallation( self ):
-		"""Check if the package generator's prerequisite are installed."""
-		raise NotImplementedError
-
-	def getDescription( self ):
-		return self.__description
-
-	def _setDescription( self, description ):
-		check_for_nonempty_string( description, "The Packager description needs to be a non-empty string." )
-		self.__description = description
-
 	def makePackageStep( self ):
 		"""Create package for the project."""
 		raise NotImplementedError()
-
-	def preFlightCheck( self ):
-		"""Overload"""
-		self._checkInstallation()
-		mApp().debug( self, 'Packaging module initialized: {0}'.format( self.getDescription() ) )
 
 	def setup( self ):
 		"""Setup is called after the package steps have been generated, and the command line 

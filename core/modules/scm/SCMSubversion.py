@@ -22,7 +22,6 @@ from core.helpers.RunCommand import RunCommand
 from core.executomat.ShellCommandAction import ShellCommandAction
 import time
 from xml.dom import minidom
-from core.helpers.GlobalMApp import mApp
 
 class SCMSubversion( SourceCodeProvider ):
 
@@ -30,38 +29,27 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
+		self._setCommand( "svn" )
 
 	def _getRevisionInfo( self ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
 		raise NotImplementedError
-
-	def _checkInstallation( self ):
-		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-		runner = RunCommand( ['svn', '--version'] )
-		runner.run()
-		if( runner.getReturnCode() != 0 ):
-			raise ConfigurationError( "SCMSubversion::checkInstallation: svn not found." )
-		else:
-			lines = runner.getStdOut().decode().split( '\n' )
-			self._setDescription( lines[0].rstrip() )
-			mApp().debugN( self, 4, 'svn found: "{0}"'.format( self.getDescription() ) )
 
 	def _getRevisionsSince( self, project, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
 		revision = int( revision )
 		assert revision
 
-		options = 'log --xml '
+		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml' ]
 		if revision == 0:
-			options += '--limit 1 '
-		cmd = 'svn --non-interactive ' + options + '-rHEAD:' + str( revision ).strip() + ' ' + self.getUrl()
+			cmd.extend( ['--limit', '1' ] )
+		cmd.extend( ['-rHEAD:{0}'.format( str( revision ).strip() ), self.getUrl() ] )
 		runner = RunCommand( cmd, 3600 )
 		runner.run()
 
 		if runner.getReturnCode() == 0:
-			output = runner.getStdOut().decode()
 			revisions = []
-			xmldoc = minidom.parseString( output )
+			xmldoc = minidom.parseString( runner.getStdOut() )
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			for entry in logentries:
 				result = parseLogEntry( entry )
@@ -75,7 +63,7 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def _getCurrentRevision( self, project ):
 		'''Return the identifier of the current revisions.'''
-		cmd = [ 'svn', '--non-interactive', 'log', '--xml', '--limit 1', self.getUrl() ]
+		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ]
 		runner = RunCommand( project, cmd )
 		runner.run()
 
@@ -93,9 +81,8 @@ class SCMSubversion( SourceCodeProvider ):
 		"""Create steps to check out the source code"""
 		assert self.getInstructions()
 		step = self.getInstructions().getStep( 'project-checkout' )
-		cmd = 'svn --non-interactive checkout -r"{0}" {1} .'.format( 
-			self.getRevision() or 'HEAD',
-			self.getUrl() )
+		cmd = [ self.getCommand(), '--non-interactive', 'checkout',
+			'-r{0}'.format( self.getRevision() or 'HEAD' ), self.getUrl(), '.' ]
 		checkout = ShellCommandAction( cmd )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )

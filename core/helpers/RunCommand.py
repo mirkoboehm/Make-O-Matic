@@ -24,6 +24,7 @@ from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, \
 	check_for_list_of_strings
 import os.path
 import sys
+from core.Exceptions import ConfigurationError
 
 class _CommandRunner( Thread ):
 	def __init__ ( self , runner ):
@@ -59,9 +60,9 @@ class _CommandRunner( Thread ):
 		self._getRunner()._setStdErr( error )
 		self._getRunner()._setReturnCode( self._process.returncode )
 		self.__finished = True
-		mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( output.decode() ) )
+		mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( output ) )
 		if not self.__combineOutput:
-			mApp().debugN( self._getRunner(), 5, "STDERR:\n{0}".format( error.decode() ) )
+			mApp().debugN( self._getRunner(), 5, "STDERR:\n{0}".format( error ) )
 
 	def wasStarted( self ):
 		return self.__started
@@ -154,6 +155,31 @@ class RunCommand( MObject ):
 
 		return None
 
+	def checkVersion( self, parameter = "--version", lineNumber = 0 ):
+		"""Check if this command is installed."""
+		oldCmd = self.getCommand()
+		oldStdOut = self.getStdOut()
+		oldStdErr = self.getStdErr()
+		oldReturnCode = self.getReturnCode()
+		newcmd = [ self.__cmd[0], parameter ]
+		self.__cmd = newcmd
+		runner = _CommandRunner ( self )
+		runner.setCombineOutput( True )
+		runner.start()
+		runner.join()
+		returnCode = self.getReturnCode()
+		if returnCode == 0:
+			version = runner.getStdOut().splitlines().lines[ lineNumber ].strip()
+			mApp().debugN( self, 4, 'RunCommand found: "{0}"'.format( version ) )
+
+		self.__cmd = oldCmd
+		self.__stdOut = oldStdOut
+		self.__stdErr = oldStdErr
+		self.__returnCode = oldReturnCode
+
+		if returnCode != 0:
+			raise ConfigurationError( "RunCommand::checkVersion: {0} not found.".format( newcmd[0] ) )
+
 	def run( self ):
 		timeoutString = 'without a timeout'
 		if self.getTimeoutSeconds() != None:
@@ -179,4 +205,3 @@ class RunCommand( MObject ):
 		timeoutString = "timed out" if self.getTimedOut() else "completed"
 		mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( ' '.join( self.getCommand() ), timeoutString, str( self.getReturnCode() ) ) )
 		return self.getReturnCode()
-

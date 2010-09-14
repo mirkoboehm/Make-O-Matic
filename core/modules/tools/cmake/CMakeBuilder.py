@@ -68,6 +68,10 @@ class CMakeBuilder( MakeBasedBuilder ):
 	def getCMakeToolName( self ):
 		return self.__cmakeTool
 
+	def preFlightCheck( self ):
+		# TODO Check for CMake tool
+		MakeBasedBuilder.preFlightCheck( self )
+
 	def setInSourceBuild( self, onOff ):
 		self.__inSourceBuild = onOff
 

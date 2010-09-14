@@ -19,6 +19,7 @@
 from core.MObject import MObject
 from core.Exceptions import MomException
 from core.helpers.GlobalMApp import mApp
+from core.helpers.RunCommand import RunCommand
 
 class Plugin( MObject ):
 
@@ -28,6 +29,7 @@ class Plugin( MObject ):
 		self.setEnabled( True )
 		self.setOptional( False )
 		self._setInstructions( None )
+		self.__command = None
 
 	def _setInstructions( self, instructions ):
 		'''Assign this plugin to it's instruction object. 
@@ -61,7 +63,8 @@ class Plugin( MObject ):
 		Modules should check the setup of the tools they use in this phase.
 		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError 
 		exception."""
-		pass
+		if self.getCommand():
+			RunCommand( [ self.getCommand() ] ).run()
 
 	def performSetup( self ):
 		'''This method handles the execution of the setup phase. Do not overload this method to adapt it, overload 
@@ -88,6 +91,12 @@ class Plugin( MObject ):
 		ShutDown is called from the finally block of the build method, so in all normal cases, it will be called 
 		before the build script ends."""
 		pass
+
+	def getCommand( self ):
+		return self.__command
+
+	def _setCommand( self, command ):
+		self.__command = command
 
 	def setEnabled( self, onOff ):
 		self.__enabled = onOff

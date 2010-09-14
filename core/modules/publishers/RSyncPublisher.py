@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
-from core.helpers.RunCommand import RunCommand
-from core.Exceptions import ConfigurationError
 from core.executomat.ShellCommandAction import ShellCommandAction
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none
 import platform, os, re
@@ -31,6 +29,7 @@ class RSyncPublisher( Plugin ):
 	def __init__( self, name = None, uploadLocation = None, localDir = None ):
 		"""Constructor"""
 		Plugin.__init__( self, name )
+		self._setCommand( "rsync" )
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
 
@@ -48,16 +47,6 @@ class RSyncPublisher( Plugin ):
 	def getLocalDir( self ):
 		return self.__localDir
 
-	def preFlightCheck( self ):
-		runner = RunCommand( [ 'rsync', '--version' ] )
-		runner.run()
-		if( runner.getReturnCode() != 0 ):
-			raise ConfigurationError( "RSyncPublisher: rsync not found." )
-		else:
-			lines = runner.getStdOut().decode().split( '\n' )
-			version = lines[0].rstrip()
-			mApp().debugN( self, 1, 'rsync found: "{0}"'.format( version ) )
-
 	def setup( self ):
 		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
@@ -69,7 +58,7 @@ class RSyncPublisher( Plugin ):
 				return
 		step = self.getInstructions().getStep( 'project-upload-docs' )
 		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-		action = ShellCommandAction( [ 'rsync', '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ], 7200 )
+		action = ShellCommandAction( [ self.getCommand(), '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ], 7200 )
 		action.setWorkingDirectory( self.getInstructions().getBaseDir() )
 		step.addMainAction( action )
 

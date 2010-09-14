@@ -19,9 +19,6 @@
 
 from core.modules.packagers.PackageProvider import PackageProvider
 from core.executomat.ShellCommandAction import ShellCommandAction
-from core.helpers.RunCommand import RunCommand
-from core.Exceptions import ConfigurationError
-from core.helpers.GlobalMApp import mApp
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
 
 class _CPackMovePackageAction( FilesMoveAction ):
@@ -35,7 +32,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 		"""Finds the names of the CPack generated packages and moves them."""
 		if ( self.__action.getResult() != 0 ):
 			return 1
-		lines = self.__action.getStdOut().decode().splitlines()
+		lines = self.__action.getStdOut().splitlines()
 		packageLinePrefix = 'CPack: Package '
 		packageLineSuffix = ' generated.'
 		packageFiles = []
@@ -52,23 +49,14 @@ class CPack( PackageProvider ):
 	def __init__( self, name = None ):
 		"""Constructor"""
 		PackageProvider.__init__( self, name )
-
-	def _checkInstallation( self ):
-		"""Check if the package generator's prerequisite are installed."""
-		runner = RunCommand( [ 'cpack', '--version' ] )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			raise ConfigurationError( "CPack::checkInstallation: cpack not found." )
-		else:
-			self._setDescription( runner.getStdOut().decode().rstrip() )
-			mApp().debugN( self, 4, 'cpack found: "{0}"'.format( self.getDescription() ) )
+		self._setCommand( "cpack" )
 
 	def makePackageStep( self ):
 		"""Create packages for the project using CPack."""
 		step = self.getInstructions().getStep( 'conf-package' )
 		buildDirectory = self.getInstructions().getBuildDir()
 
-		makePackage = ShellCommandAction( [ 'cpack' ] )
+		makePackage = ShellCommandAction( [ self.getCommand()] )
 		makePackage.setWorkingDirectory( buildDirectory )
 		step.addMainAction( makePackage )
 

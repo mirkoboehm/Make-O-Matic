@@ -52,6 +52,7 @@ class SCMGit( SourceCodeProvider ):
 			self.__cloneArmy = os.path.join( self.__cloneArmy, "MakeOMatic" )
 		else:
 			self.__cloneArmy = os.path.expanduser( "~/.cloneArmy" )
+		self._setCommand( "git" )
 
 	def getIdentifier( self ):
 		return 'git'
@@ -63,29 +64,17 @@ class SCMGit( SourceCodeProvider ):
 		"""Set __committer, __commitMessage, __commitTime and __revision"""
 		raise NotImplementedError
 
-	def _checkInstallation( self ):
-		"""Check if this SCM can be used. Should check, for example, if the SCM is actually installed."""
-		runner = RunCommand( [ 'git', '--version'] )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			raise ConfigurationError( "SCMGit::checkInstallation: git not found." )
-		else:
-			lines = runner.getStdOut().decode().split( '\n' )
-			self._setDescription( lines[0].rstrip() )
-			mApp().debugN( self, 4, 'git found: "{0}"'.format( self.getDescription() ) )
-
 	def _getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
 		self._updateHiddenClone()
-		cmd = [ 'git', 'log', '{1}..'.format( cap or '', revision ) ]
+		cmd = [ self.getCommand(), 'log', '{0}..'.format( revision ) ]
 		runner = RunCommand( cmd, 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
 		if runner.getReturnCode() == 0:
-			output = runner.getStdOut().decode()
 			revisions = []
-			lines = output.split( '\n' )
+			lines = runner.getStdOut().decode().splitlines()
 			for line in lines:
 				if re.match( '^commit.+', line ):
 					parts = line.split( ' ' )
@@ -107,15 +96,12 @@ class SCMGit( SourceCodeProvider ):
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
 		self._updateHiddenClone()
-		runner = RunCommand( [ 'git', 'log', '-n1' ] )
+		runner = RunCommand( [ self.getCommand(), 'log', '-n1' ] )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
 		if runner.getReturnCode() == 0:
-			output = runner.getStdOut().decode()
-			lines = output.split( '\n' )
-			line1 = lines[0].strip()
-			parts = line1.split()
+			parts = runner.getStdOut().decode().splitlines()[0].strip().split()
 			assert len( parts ) == 2 and parts[0] == 'commit'
 			return parts[1]
 		else:
@@ -128,11 +114,11 @@ class SCMGit( SourceCodeProvider ):
 		step = self.getInstructions().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
-		updateClone = ShellCommandAction( [ 'git', 'clone', '--local', '--depth', '1', self._getHiddenClonePath(), "." ] )
+		updateClone = ShellCommandAction( [ self.getCommand(), 'clone', '--local', '--depth', '1', self._getHiddenClonePath(), "." ] )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
 		revision = self.getRevision() or 'HEAD'
-		checkout = ShellCommandAction( [ 'git', 'checkout', revision ] )
+		checkout = ShellCommandAction( [ self.getCommand(), 'checkout', revision ] )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 
@@ -148,7 +134,7 @@ class SCMGit( SourceCodeProvider ):
 			if not os.path.isdir( hiddenClone ):
 				raise MomError( 'hidden clone exists at "{0}", but is not a directory. Help!'.format( hiddenClone ) )
 			# FIXME get timeout value from settings
-			runner = RunCommand( [ 'git', 'fetch', '--all' ], 1200, True )
+			runner = RunCommand( [ self.getCommand(), 'fetch', '--all' ], 1200, True )
 			runner.setWorkingDir( hiddenClone )
 			runner.run()
 			if runner.getReturnCode() == 0:
@@ -158,7 +144,7 @@ class SCMGit( SourceCodeProvider ):
 		else:
 			if not os.path.exists( self.getCloneArmyDir() ):
 				os.makedirs( self.getCloneArmyDir() )
-			runner = RunCommand( [ 'git', 'clone', '--bare', self.getUrl(), make_foldername_from_string( self.getUrl() ) ], 1200, True )
+			runner = RunCommand( [ self.getCommand(), 'clone', '--bare', self.getUrl(), make_foldername_from_string( self.getUrl() ) ], 1200, True )
 			runner.setWorkingDir( self.getCloneArmyDir() )
 			runner.run()
 			if runner.getReturnCode() == 0:

@@ -19,30 +19,18 @@
 
 from core.modules.packagers.PackageProvider import PackageProvider
 from core.executomat.ShellCommandAction import ShellCommandAction
-from core.helpers.RunCommand import RunCommand
-from core.Exceptions import ConfigurationError
-from core.helpers.GlobalMApp import mApp
 
 class MakePackager( PackageProvider ):
 
 	def __init__( self, name = None ):
+		# FIXME Port to use Maketools
 		"""Constructor"""
 		PackageProvider.__init__( self, name )
-
-	def _checkInstallation( self ):
-		"""Check if the package generator's prerequisite are installed."""
-		runner = RunCommand( [ 'make', '--version' ] )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			raise ConfigurationError( "MakePackager::checkInstallation: make not found." )
-		else:
-			lines = runner.getStdOut().decode().splitlines()
-			self._setDescription( lines[0].rstrip() )
-			mApp().debugN( self, 4, 'make found: "{0}"'.format( self.getDescription() ) )
+		self._setCommand( "make" )
 
 	def makePackageStep( self ):
 		"""Create package for the project."""
 		step = self.getInstructions().getStep( 'conf-package' )
-		makePackage = ShellCommandAction( 'make package' )
+		makePackage = ShellCommandAction( self.getCommand(), 'package' )
 		makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makePackage )

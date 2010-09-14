@@ -31,6 +31,7 @@ class MakeBasedBuilder( Builder ):
 		self.__makeTool = getMakeTool()
 
 	def preFlightCheck( self ):
+		# TODO Use _checkInstallation somehow
 		self.__makeTool.getVersion()
 
 	def _getBuildDir( self ):
