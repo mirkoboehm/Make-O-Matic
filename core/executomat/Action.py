@@ -94,12 +94,6 @@ class Action( MObject ):
 	def getResult( self ):
 		return self.__result
 
-	def getExitCode( self ):
-		"""Returns the actions integer exit code. Can only be called after execution."""
-		if not self.didFinish():
-			raise MomError( 'exitCode() queried before the command was finished' )
-		return self.__exitCode
-
 	def _setStdErr( self, err ):
 		self.__stdErr = err
 
