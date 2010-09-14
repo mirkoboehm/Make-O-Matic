@@ -142,7 +142,6 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ConfigurationBuildDir ] = 'build'
 		self.getSettings()[ Defaults.ConfigurationTargetDir ] = 'install'
 		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
-		self.getSettings()[ Defaults.CMakeBuilderTool ] = 'cmake'
 		self.getSettings()[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
 		self.getSettings()[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
 		# ----- simple_ci settings:

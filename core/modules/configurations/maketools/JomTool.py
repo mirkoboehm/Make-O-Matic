@@ -16,9 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Exceptions import ConfigurationError
-from core.helpers.GlobalMApp import mApp
-from core.helpers.RunCommand import RunCommand
 from core.modules.configurations.maketools.MakeTool import MakeTool
 
 class JomTool( MakeTool ):
@@ -26,16 +23,8 @@ class JomTool( MakeTool ):
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-		self.setCommand( 'jom' )
-
-	def getVersion( self ):
-		runner = RunCommand( [ self.getCommand(), "/version" ] )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			raise ConfigurationError( 'JomTool: Jom not found.' )
-		description = runner.getStdOut().decode().split( '\n' )[0].rstrip()
-		mApp().debugN( self, 4, 'Jom found: "{0}"'.format( description ) )
-		return description
+		self._setCommand( 'jom' )
+		self._setVersionParameter( '/version' )
 
 	def getArguments( self ):
 		return [ '/nologo', '/j{0}'.format( self._getJobs() ) ]

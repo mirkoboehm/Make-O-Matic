@@ -174,7 +174,7 @@ class RunCommand( MObject ):
 		runner.join()
 		returnCode = self.getReturnCode()
 		if returnCode == 0:
-			version = self.getStdOut().splitlines().lines[ lineNumber ].strip()
+			version = self.getStdOut().decode().splitlines()[ lineNumber ].strip()
 			mApp().debugN( self, 4, 'RunCommand found: "{0}"'.format( version ) )
 
 		self.__cmd = oldCmd

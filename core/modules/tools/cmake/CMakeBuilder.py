@@ -20,6 +20,7 @@ from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.executomat.ShellCommandAction import ShellCommandAction
+from core.helpers.RunCommand import RunCommand
 
 class CMakeVariable( object ):
 	def __init__( self, name, value, typeString = None ):
@@ -58,18 +59,18 @@ class CMakeBuilder( MakeBasedBuilder ):
 
 	def __init__( self, name = None ):
 		MakeBasedBuilder.__init__( self, name )
-		self.setCMakeToolName( mApp().getSettings().get( Settings.CMakeBuilderTool ) )
+		self.__cmakeCommand = 'cmake'
 		self.setInSourceBuild( False )
 		self.setCMakeVariables( [] )
 
-	def setCMakeToolName( self, tool ):
-		self.__cmakeTool = tool
+	def _setCMakeCommand( self, cmakeCommand ):
+		self.__cmakeCommand = cmakeCommand
 
-	def getCMakeToolName( self ):
-		return self.__cmakeTool
+	def getCMakeCommand( self ):
+		return self.__cmakeCommand
 
 	def preFlightCheck( self ):
-		# TODO Check for CMake tool
+		RunCommand( [ self.getCMakeCommand() ] ).checkVersion()
 		MakeBasedBuilder.preFlightCheck( self )
 
 	def setInSourceBuild( self, onOff ):
@@ -96,7 +97,7 @@ class CMakeBuilder( MakeBasedBuilder ):
 		project = configuration.getProject()
 		srcDir = project.getSourceDir()
 		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getTargetDir() ) )
-		cmd = [ self.getCMakeToolName() ]
+		cmd = [ self.getCMakeCommand() ]
 		for variable in self.getCMakeVariables():
 			cmd.append( '-D{0}'.format( variable ) )
 		cmd.append( srcDir )

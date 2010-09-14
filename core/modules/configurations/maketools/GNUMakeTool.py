@@ -16,9 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Exceptions import ConfigurationError
-from core.helpers.GlobalMApp import mApp
-from core.helpers.RunCommand import RunCommand
 from core.modules.configurations.maketools.MakeTool import MakeTool
 
 class GNUMakeTool( MakeTool ):
@@ -26,16 +23,7 @@ class GNUMakeTool( MakeTool ):
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-		self.setCommand( 'make' )
-
-	def getVersion( self ):
-		runner = RunCommand( [ self.getCommand(), "--version" ] )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			raise ConfigurationError( 'GNUMakeTool: GNU Make not found.' )
-		description = runner.getStdOut().decode().split( '\n' )[0].rstrip()
-		mApp().debugN( self, 4, 'GNU Make found: "{0}"'.format( description ) )
-		return description
+		self._setCommand( 'make' )
 
 	def getArguments( self ):
 		return [ '-j{0}'.format( self._getJobs() )  ]

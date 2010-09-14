@@ -22,17 +22,19 @@ from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 import multiprocessing
 from core.modules.configurations.maketools import getMakeTool
+from core.helpers.RunCommand import RunCommand
 
 class MakeBasedBuilder( Builder ):
 	'''MakeBasedBuilder implements a base class for builders that implement variants of a build process that uses the make tools.'''
 
-	def __init__( self, name ):
+	def __init__( self, name = None ):
 		Builder.__init__( self, name )
 		self.__makeTool = getMakeTool()
+		self._setCommand( self.__makeTool.getCommand() )
 
 	def preFlightCheck( self ):
-		# TODO Use _checkInstallation somehow
-		self.__makeTool.getVersion()
+		parameter = self.__makeTool.getVersionParameter()
+		RunCommand( [ self.getCommand() ] ).checkVersion( parameter )
 
 	def _getBuildDir( self ):
 		return self.getInstructions().getBuildDir()

@@ -16,9 +16,6 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Exceptions import ConfigurationError
-from core.helpers.GlobalMApp import mApp
-from core.helpers.RunCommand import RunCommand
 from core.modules.configurations.maketools.MakeTool import MakeTool
 
 class NMakeTool( MakeTool ):
@@ -26,16 +23,8 @@ class NMakeTool( MakeTool ):
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-		self.setCommand( 'nmake' )
-
-	def getVersion( self ):
-		runner = RunCommand( [ self.getCommand(), "/?" ] )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			raise ConfigurationError( 'NMakeTool: NMake not found.' )
-		description = runner.getStdErr().decode().split( '\n' )[0].rstrip()
-		mApp().debugN( self, 4, 'NMake found: "{0}"'.format( description ) )
-		return description
+		self._setCommand( 'nmake' )
+		self._setVersionParameter( '/?' )
 
 	def getArguments( self ):
 		return [ '/nologo' ]

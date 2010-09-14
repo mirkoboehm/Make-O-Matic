@@ -64,7 +64,7 @@ class Plugin( MObject ):
 		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError 
 		exception."""
 		if self.getCommand():
-			RunCommand( [ self.getCommand() ] ).run()
+			RunCommand( [ self.getCommand() ] ).checkVersion()
 
 	def performSetup( self ):
 		'''This method handles the execution of the setup phase. Do not overload this method to adapt it, overload 
