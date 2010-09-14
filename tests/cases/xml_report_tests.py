@@ -48,14 +48,14 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		doc = etree.XML( xmlString )
 
 		self.assertEqual( doc.tag, "build" ) # root
-		self.assertIsNotNone( doc.find( './/project' ) )
-		self.assertIsNotNone( doc.find( './/environment' ) )
+		self.assertNotEquals( doc.find( './/project' ), None )
+		self.assertNotEquals( doc.find( './/environment' ), None )
 
-		self.assertIsNotNone( doc.find( './/plugin' ) )
-		self.assertIsNotNone( doc.find( './/step' ) )
-		self.assertIsNotNone( doc.find( './/action' ) )
+		self.assertNotEquals( doc.find( './/plugin' ), None )
+		self.assertNotEquals( doc.find( './/step' ), None )
+		self.assertNotEquals( doc.find( './/action' ), None )
 
-		self.assertIsNotNone( doc.find( './/plugin[@name="CMakeBuilder"]' ) )
+		self.assertNotEquals( doc.find( './/plugin[@name="CMakeBuilder"]' ), None )
 
 	def testConvertXmlReportToHtml( self ):
 		self._runBuild()
@@ -69,8 +69,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		# TODO: Add more _useful_ tests 
 		self.assertEqual( doc.tag, "{http://www.w3.org/1999/xhtml}html" ) # root
-		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ) )
-		self.assertIsNotNone( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ) )
+		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ), None )
+		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ), None )
 
 
 	def testConvertXmlReportToText( self ):
@@ -83,7 +83,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		text = converter.convertToText()
 
 		# TODO: Add more _useful_ tests 
-		self.assertGreater( len( text ), 1000 )
+		self.assertTrue( len( text ) > 1000 )
 
 	def testXmlReportGenerator( self ):
 		generator = XmlReportGenerator()
@@ -95,7 +95,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		reportContent = report.getReport()
 
 		file = generator.getReportFile()
-		self.assertIsNotNone( file, "Log file does not exist" )
+		self.assertNotEquals( file, None, "Log file does not exist" )
 
 		f = open( file )
 		fileContent = f.read()
