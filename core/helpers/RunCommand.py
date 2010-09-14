@@ -22,6 +22,8 @@ from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, \
 	check_for_list_of_strings
+import os.path
+import sys
 
 class _CommandRunner( Thread ):
 	def __init__ ( self , runner ):
@@ -130,6 +132,27 @@ class RunCommand( MObject ):
 
 	def getCommand( self ):
 		return self.__cmd
+
+	def findExecutable( self, program, search_paths = [] ):
+		def is_exe( fpath ):
+			return os.path.exists( fpath ) and os.access( fpath, os.X_OK )
+
+		fpath, fname = os.path.split( program )
+		if fpath:
+			if is_exe( program ):
+				return program
+		else:
+			paths = search_paths
+			paths += os.environ["PATH"].split( os.pathsep )
+
+			for path in paths:
+				exe_file = os.path.join( path, fname )
+				if is_exe( exe_file ):
+					return exe_file
+				elif sys.platform == "win32" and is_exe( exe_file + ".exe" ):
+					return exe_file + ".exe"
+
+		return None
 
 	def run( self ):
 		timeoutString = 'without a timeout'
