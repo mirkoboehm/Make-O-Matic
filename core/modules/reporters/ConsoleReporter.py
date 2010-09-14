@@ -16,8 +16,10 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.modules.Reporter import Reporter
-from core.modules.reporters.ProjectReport import ProjectReport
+from core.modules.reporters.XmlReport import XmlReport
+from core.helpers.XmlReportConverter import XmlReportConverter
 
 class ConsoleReporter( Reporter ):
 
@@ -25,6 +27,9 @@ class ConsoleReporter( Reporter ):
 		Reporter.__init__( self, name )
 
 	def wrapUp( self ):
-		report = ProjectReport( self.getInstructions() )
+		report = XmlReport( self.getInstructions() )
 		report.prepare()
-		print( report.getReport() )
+		converter = XmlReportConverter( report )
+
+		print( converter.convertToText() )
+		print() # empty line

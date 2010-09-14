@@ -148,6 +148,7 @@ class XmlReportConverter( MObject ):
 		recursionEnabled = True
 
 		if element.tag == "build":
+			out += " "
 			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
 			out += " " # new line
 			wrapper.indent()

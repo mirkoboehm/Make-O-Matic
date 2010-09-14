@@ -25,19 +25,12 @@ class XmlReport( object ):
 	def __init__( self, instructions ):
 		assert isinstance( instructions, Instructions )
 		self.__instructions = instructions
-		self.__summary = None
 		self.__doc = xml.dom.minidom.Document()
-
-	def getSummary( self ):
-		return self.__summary
 
 	def getReport( self ):
 		return self.__doc.toxml()
 
 	def prepare( self ):
-		#element = self.__doc.createElement( "root" )
-		#self.__doc.appendChild( element )
-
 		self.__doc.appendChild( self._createNode( self.__instructions ) )
 
 	def _createNode( self, instructions ):
