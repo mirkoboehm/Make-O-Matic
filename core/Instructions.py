@@ -24,6 +24,8 @@ from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_f
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 from core.Defaults import Defaults
 import os
+from core.executomat.Step import Step
+from core.Settings import Settings
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -53,10 +55,7 @@ class Instructions( MObject ):
 		self.__baseDir = folder
 
 	def getBaseDir( self ):
-		try:
-			check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
-		except Exception as e:
-			raise
+		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		return self.__baseDir
 
 	def getPlugins( self ):

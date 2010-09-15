@@ -26,7 +26,6 @@ from core.Exceptions import MomError
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
 from core.helpers.GlobalMApp import mApp
-from core.executomat.Step import Step
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
@@ -111,8 +110,5 @@ class Project( BuildInstructions ):
 		return buildSteps
 
 	def execute( self ):
-		self.getTimeKeeper().start()
-		try:
-			self.getExecutomat().run( self )
-		finally:
-			self.getTimeKeeper().stop()
+		with self.getTimeKeeper():
+			self._getExecutomat().run( self )

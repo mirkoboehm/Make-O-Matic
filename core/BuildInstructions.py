@@ -22,7 +22,7 @@ import os
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import MomError, ConfigurationError
 from core.Defaults import Defaults
-from core.helpers.TimeKeeper import formattedTime
+from core.helpers.TimeKeeper import formatted_time
 
 class BuildInstructions( Instructions ):
 	def __init__( self, name = None, parent = None ):
@@ -41,12 +41,12 @@ class BuildInstructions( Instructions ):
 
 	def createXmlNode( self, document ):
 		node = Instructions.createXmlNode( self, document )
-		node.attributes["starttime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStartTime() ) )
-		node.attributes["stoptime"] = str ( formattedTime( self._getExecutomat().getTimeKeeper().getStopTime() ) )
+		node.attributes["starttime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStartTime() ) )
+		node.attributes["stoptime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStopTime() ) )
 		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().deltaString() )
 
 		stepsElement = document.createElement( "steps" )
-		for step in self._getExecutomat()._getSteps():
+		for step in self._getExecutomat().getSteps():
 			element = step.createXmlNode( document )
 			stepsElement.appendChild( element )
 		node.appendChild( stepsElement )

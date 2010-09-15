@@ -22,7 +22,6 @@ from core.Exceptions import MomError, MomException, InterruptedException
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
 from core.Instructions import Instructions
-import os
 
 class MApplication( Instructions ):
 	'''MApplication represents the facilities provided by the currently running script.
