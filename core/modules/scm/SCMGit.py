@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.Exceptions import ConfigurationError, MomError
 from core.helpers.RunCommand import RunCommand
@@ -25,10 +26,13 @@ import os, sys
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import re
 from core.helpers.GlobalMApp import mApp
+from core.modules.scm.RevisionInfo import RevisionInfo
 
 class _UpdateHiddenCloneAction( Action ):
+
 	def __init__( self, scmgit ):
 		Action.__init__( self )
+
 		assert scmgit
 		self.__scmgit = scmgit
 
@@ -45,24 +49,50 @@ class SCMGit( SourceCodeProvider ):
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
-		if sys.platform == 'darwin':
-			self.__cloneArmy = os.path.expanduser( "~/Library/Caches/MakeOMatic/CloneArmy" )
-		elif sys.platform == 'win32':
-			self.__cloneArmy = os.getenv( 'LOCALAPPDATA' ) or os.getenv( 'APPDATA' )
-			self.__cloneArmy = os.path.join( self.__cloneArmy, "MakeOMatic" )
-		else:
-			self.__cloneArmy = os.path.expanduser( "~/.cloneArmy" )
+
 		self._setCommand( "git" )
+		self.__cloneArmy = self._findCloneArmyDir()
+		self.__revisionInfo = RevisionInfo()
 
 	def getIdentifier( self ):
 		return 'git'
 
+	def _findCloneArmyDir( self ):
+		directory = None
+		if sys.platform == 'darwin':
+			directory = os.path.expanduser( "~/Library/Caches/MakeOMatic/CloneArmy" )
+		elif sys.platform == 'win32':
+			directory = os.getenv( 'LOCALAPPDATA' ) or os.getenv( 'APPDATA' )
+			directory = os.path.join( self.__cloneArmy, "MakeOMatic" )
+		else:
+			directory = os.path.expanduser( "~/.cloneArmy" )
+		return directory
+
 	def getCloneArmyDir( self ):
 		return self.__cloneArmy
 
-	def _getRevisionInfo( self ):
-		"""Set __committer, __commitMessage, __commitTime and __revision"""
-		raise NotImplementedError
+	def getRevisionInfo( self ):
+		sep = "\t"
+		formatStr = "%cn{0}%s{0}%ci{0}%H".format( sep )
+
+		cmd = [ self.getCommand(), 'log', '--pretty=format:"{0}"'.format( formatStr ), 'HEAD^..HEAD']
+		runner = RunCommand( cmd, 3600 )
+		runner.setWorkingDir( self._getHiddenClonePath() )
+		runner.run()
+
+		info = RevisionInfo( "GitRevisionInfo" )
+
+		if runner.getReturnCode() == 0:
+			infos = runner.getStdOut().decode().split( sep )
+			info.committer = infos[0]
+			info.commitMessage = infos[1]
+			info.commitTime = infos[2]
+			info.revision = infos[3]
+		else:
+			raise ConfigurationError( 'Cannot get log for the clone of "{0}" at "{1}"'
+				.format( self.getUrl(), self._getHiddenClonePath() ) )
+
+		return info
 
 	def _getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
@@ -105,7 +135,7 @@ class SCMGit( SourceCodeProvider ):
 			assert len( parts ) == 2 and parts[0] == 'commit'
 			return parts[1]
 		else:
-			raise ConfigurationError( 'cannot get log for the clone of "{0}" at "{1}"'
+			raise ConfigurationError( 'Cannot get log for the clone of "{0}" at "{1}"'
 				.format( self.getUrl(), self._getHiddenClonePath() ) )
 
 	def makeCheckoutStep( self ):

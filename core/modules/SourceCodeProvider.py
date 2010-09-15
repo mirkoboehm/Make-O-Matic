@@ -28,9 +28,7 @@ class SourceCodeProvider( Plugin ):
 		Plugin.__init__( self, name )
 		self.__url = None
 		self.__revision = None
-		self.__committer = None
-		self.__commitTime = None
-		self.__commitMessage = None
+
 		self.__srcDir = None
 
 	def getIdentifier( self ):
@@ -55,23 +53,8 @@ class SourceCodeProvider( Plugin ):
 	def getRevision( self ):
 		return self.__revision
 
-	def getCommitter( self ):
-		if not self.__committer:
-			self._getRevisionInfo()
-		return self.__committer
-
-	def getCommitTime( self ):
-		if not self.__commitTime:
-			self._getRevisionInfo()
-		return self.__commitTime
-
-	def getCommitMessage( self ):
-		if not self.__commitMessage:
-			self._getRevisionInfo()
-		return self.__commitMessage
-
-	def _getRevisionInfo( self ):
-		"""Set __committer, __commitMessage, __commitTime and __revision"""
+	def getRevisionInfo( self ):
+		"""Returns a RevisionInfo object"""
 		raise NotImplementedError
 
 	def printRevisionsSince( self, options ):
@@ -100,6 +83,7 @@ class SourceCodeProvider( Plugin ):
 		"""Print current (most recent) revision."""
 		if options:
 			raise MomError( 'print current-revision does not understand any extra options!' )
+
 		revision = self._getCurrentRevision()
 		return revision
 
