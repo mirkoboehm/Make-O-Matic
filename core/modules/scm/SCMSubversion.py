@@ -16,27 +16,45 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.Exceptions import ConfigurationError
 from core.helpers.RunCommand import RunCommand
 from core.executomat.ShellCommandAction import ShellCommandAction
 import time
 from xml.dom import minidom
+from core.modules.scm.RevisionInfo import RevisionInfo
 
 class SCMSubversion( SourceCodeProvider ):
-
 	"""Subversion SCM Provider Class"""
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
+
 		self._setCommand( "svn" )
 
-	def _getRevisionInfo( self ):
-		"""Set __committer, __commitMessage, __commitTime and __revision"""
-		raise NotImplementedError
+	def getRevisionInfo( self ):
+		info = RevisionInfo( "SvnRevisionInfo" )
 
-	def _getRevisionsSince( self, project, revision, cap = None ):
+		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ]
+		runner = RunCommand( cmd )
+		runner.run()
+
+		if runner.getReturnCode() == 0:
+			xmldoc = minidom.parseString( runner.getStdOut() )
+			logentries = xmldoc.getElementsByTagName( 'logentry' )
+			assert len( logentries ) == 1
+			results = parse_log_entry( logentries[0] )
+			( info.committer, info.commitMessage, info.revision, info.commitTime ) = results
+		else:
+			raise ConfigurationError( 'cannot get log for "{0}"'
+				.format( self.getUrl() ) )
+
+		return info
+
+	def getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
+
 		revision = int( revision )
 		assert revision
 
@@ -52,9 +70,9 @@ class SCMSubversion( SourceCodeProvider ):
 			xmldoc = minidom.parseString( runner.getStdOut() )
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			for entry in logentries:
-				result = parseLogEntry( entry )
+				result = parse_log_entry( entry )
 				if int( result[2] ) != revision: # svn log always spits out the last revision 
-					revisions.append( ['C', int( result[2] ), project.getScmUrl() ] )
+					revisions.append( ['C', int( result[2] ), self.getUrl() ] )
 			return revisions
 		elif runner.getTimedOut() == True:
 			raise ConfigurationError( 'Getting svn log for "{0}" timed out.'.format( self.getUrl() ) )
@@ -64,14 +82,14 @@ class SCMSubversion( SourceCodeProvider ):
 	def _getCurrentRevision( self, project ):
 		'''Return the identifier of the current revisions.'''
 		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ]
-		runner = RunCommand( project, cmd )
+		runner = RunCommand( cmd )
 		runner.run()
 
 		if runner.getReturnCode() == 0:
 			xmldoc = minidom.parseString( runner.getStdOut() )
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			assert len( logentries ) == 1
-			result = parseLogEntry( logentries[0] )
+			result = parse_log_entry( logentries[0] )
 			return result[2]
 		else:
 			raise ConfigurationError( 'cannot get log for "{0}"'
@@ -88,29 +106,30 @@ class SCMSubversion( SourceCodeProvider ):
 		step.addMainAction( checkout )
 		return step
 
-
-def parseLogEntry( logentry ):
+def parse_log_entry( logentry ):
 	"""Parse one SVN log entry in XML format, return tuple (committer, message, revision, commitTime)"""
 	revision = logentry.getAttribute( 'revision' )
 	message = ''
 	committer = ''
 	commitTime = None
+
 	for child in logentry.childNodes:
 		if child.localName == 'author':
-			committer = getNodeText( child )
+			committer = get_node_text( child )
 		elif child.localName == 'date':
-			commitTime = getNodeText( child )
+			commitTime = get_node_text( child )
 		elif child.localName == 'msg':
-			message = getNodeText( child )
+			message = get_node_text( child )
 		else:
 			# this might be indentation whitespace
 			pass
+
 	# now turn commiTime into a Python datetime:
 	commitTime = commitTime.split( '.' )[0] # strip microseconds
 	commitTime = time.strptime( commitTime, '%Y-%m-%dT%H:%M:%S' )
 	return ( committer, message, revision, commitTime )
 
-def getNodeText( node ):
+def get_node_text( node ):
 	text = ''
 	for sub in node.childNodes:
 		text += sub.nodeValue

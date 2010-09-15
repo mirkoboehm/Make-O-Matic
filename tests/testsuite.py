@@ -33,6 +33,7 @@ from tests.selftest.simple_project_tests import SimpleProjectTests
 from tests.selftest.simple_ci_tests import SimpleCITests
 from tests.selftest.charm_build_tests import CharmBuildTests
 from tests.cases.xml_report_tests import XmlReportTests
+from tests.cases.scm_modules_tests import ScmModulesTests
 
 CLASSES = [
 	BuildEnvironmentTests,
@@ -45,6 +46,7 @@ CLASSES = [
 	RunModePrintTests,
 	RunWithTimeoutTest,
 	ScmFactoryTests,
+	ScmModulesTests,
 	SimpleProjectTests,
 	SimpleCITests,
 	XmlReportTests
