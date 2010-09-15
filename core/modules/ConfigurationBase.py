@@ -16,15 +16,15 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Instructions import Instructions
 from core.helpers.TimeKeeper import TimeKeeper
 from core.Project import Project
+from core.BuildInstructions import BuildInstructions
 
-class ConfigurationBase( Instructions ):
+class ConfigurationBase( BuildInstructions ):
 	'''Configurationbase encapsulates common logic of configuration-like objects.'''
 
 	def __init__( self, name, parent = None ):
-		Instructions.__init__( self, name, parent )
+		BuildInstructions.__init__( self, name, parent )
 		self.__timeKeeper = TimeKeeper()
 
 	def getTimeKeeper( self ):

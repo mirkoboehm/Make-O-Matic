@@ -36,6 +36,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 		packageLineSuffix = ' generated.'
 		packageFiles = []
 		for line in lines:
+			line = line.decode()
 			if line.startswith( packageLinePrefix ) and line.endswith( packageLineSuffix ):
 				line = line.replace( packageLinePrefix, '' )
 				packageFile = line.replace( packageLineSuffix, '' )

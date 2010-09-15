@@ -18,18 +18,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
-from core.executomat.Executomat import Executomat
-from core.Settings import Settings
 from core.helpers.FilesystemAccess import make_foldername_from_string
-import os
 from core.Exceptions import ConfigurationError, MomError
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
-from core.Defaults import Defaults
 from core.helpers.EnvironmentSaver import EnvironmentSaver
-import time
-import shutil
-from core.helpers.TimeKeeper import formatted_time
-from core.executomat.Step import Step
+from core.Defaults import Defaults
+import os
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -40,8 +34,6 @@ class Instructions( MObject ):
 
 	def __init__( self, name = None, parent = None ):
 		MObject.__init__( self, name )
-		self.__executomat = Executomat( 'Exec-o-Matic' )
-		self.setUseCwdAsBaseDir( False )
 		self._setBaseDir( None )
 		self.setParent( None )
 		if parent: # the parent instructions object
@@ -61,20 +53,11 @@ class Instructions( MObject ):
 		self.__baseDir = folder
 
 	def getBaseDir( self ):
-		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
+		try:
+			check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
+		except Exception as e:
+			raise
 		return self.__baseDir
-
-	def setUseCwdAsBaseDir( self, onOff ):
-		self.__cwdIsBaseDir = onOff
-
-	def getUseCwdAsBaseDir( self ):
-		return self.__cwdIsBaseDir
-
-	def getExecutomat( self ):
-		return self.__executomat
-
-	def getStep( self, step ):
-		return self.getExecutomat().getStep( step )
 
 	def getPlugins( self ):
 		return self.__plugins
@@ -82,6 +65,10 @@ class Instructions( MObject ):
 	def addPlugin( self, plugin ):
 		plugin.setInstructions( self )
 		self.__plugins.append( plugin )
+
+	def _getLogDir( self ):
+		logDirName = mApp().getSettings().get( Defaults.ProjectLogDir )
+		return os.path.join( self.getBaseDir(), logDirName )
 
 	def getChildren( self ):
 		return self.__instructions
@@ -120,28 +107,16 @@ class Instructions( MObject ):
 		subPrefix = prefix + '    '
 		for plugin in self.getPlugins():
 			plugin.describe( subPrefix )
-		self.getExecutomat().describe( subPrefix )
 
 	def createXmlNode( self, document ):
+		#FIXME Kevin: separate base class logic back into Instructions
 		node = MObject.createXmlNode( self, document )
-
 		node.attributes["basedir"] = str ( self.getBaseDir() )
-		node.attributes["starttime"] = str ( formatted_time( self.getExecutomat().getTimeKeeper().getStartTime() ) )
-		node.attributes["stoptime"] = str ( formatted_time( self.getExecutomat().getTimeKeeper().getStopTime() ) )
-		node.attributes["timing"] = str( self.getExecutomat().getTimeKeeper().deltaString() )
-
 		pluginsElement = document.createElement( "plugins" )
 		for plugin in self.getPlugins():
 			element = plugin.createXmlNode( document )
 			pluginsElement.appendChild( element )
 		node.appendChild( pluginsElement )
-
-		stepsElement = document.createElement( "steps" )
-		for step in self.getExecutomat().getSteps():
-			element = step.createXmlNode( document )
-			stepsElement.appendChild( element )
-		node.appendChild( stepsElement )
-
 		return node
 
 	def describeRecursively( self, prefix = '' ):
@@ -187,67 +162,6 @@ class Instructions( MObject ):
 			baseDirName = '{0}{1}{2}'.format( index, spacer, make_foldername_from_string( self.getName() ) )
 		return baseDirName
 
-	def _configureBaseDir( self ):
-		if self.getUseCwdAsBaseDir():
-			self._setBaseDir( os.getcwd() )
-			return
-		parentBaseDir = os.getcwd()
-		if self.getParent():
-			parentBaseDir = self.getParent().getBaseDir()
-		assert os.path.isdir( parentBaseDir )
-		baseDirName = self._getBaseDirName()
-		baseDir = os.path.join( parentBaseDir, baseDirName )
-		if os.path.isdir( baseDir ):
-			mApp().debug( self, 'stale base directory exists, moving it.' )
-			stats = os.stat( baseDir )
-			mtime = time.localtime( stats[8] )
-			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
-			newFolderBaseName = '{0}-{1}'.format( baseDir, extension )
-			newFolder = newFolderBaseName
-			maxIterations = 1000
-			for index in range( maxIterations ):
-				if not os.path.isdir( newFolder ):
-					break
-				newFolder = newFolderBaseName + '__{0}'.format( index + 1 )
-			if os.path.isdir( newFolder ):
-				raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( maxIterations ) )
-			try:
-				shutil.move( baseDir, newFolder )
-			except ( OSError, shutil.Error ) as e:
-				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
-					.format( baseDir, newFolder, str( e ) ) )
-			mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
-
-		try:
-			os.makedirs( baseDir )
-			self._setBaseDir( baseDir )
-		except ( OSError, IOError ) as e:
-			raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
-				.format( baseDir, self.getName(), e ) )
-		if not self.getParent():
-			os.chdir( baseDir )
-
-	def _configureLogDir( self ):
-		if self.getUseCwdAsBaseDir():
-			return
-		logDirName = self._getBaseDirName()
-		parentLogDir = self.getBaseDir()
-			# bootstrap if this is the root object
-		if self.getParent():
-			parentLogDir = self.getParent().getExecutomat().getLogDir()
-		else:
-			parentLogDir = self.getBaseDir()
-			logDirName = mApp().getSettings().get( Defaults.ProjectLogDir )
-		assert os.path.isdir( parentLogDir )
-		logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
-		try:
-			os.makedirs( logDir )
-			self.getExecutomat().setLogDir( logDir )
-		except ( OSError, IOError )as e:
-			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
-				.format( logDir, self.getName(), e ) )
-
-
 	def runPreFlightChecks( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'performing pre-flight checks' )
@@ -257,9 +171,6 @@ class Instructions( MObject ):
 	def runSetups( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'setting up' )
-			self._configureBaseDir()
-			self._configureLogDir()
-			self.__executomat.setLogfileName( mApp().getSettings().get( Settings.ProjectExecutomatLogfileName ) )
 			[ plugin.performSetup() for plugin in self.getPlugins() ]
 			for child in self.getChildren():
 				child.runSetups()

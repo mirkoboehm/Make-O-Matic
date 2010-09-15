@@ -25,14 +25,14 @@ from core.Settings import Settings
 from core.Exceptions import MomError
 from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
-from core.Instructions import Instructions
 from core.helpers.GlobalMApp import mApp
 from core.executomat.Step import Step
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
+from core.BuildInstructions import BuildInstructions
 
-class Project( Instructions ):
+class Project( BuildInstructions ):
 	"""A Project represents an entity to build. 
 	
 	FIXME: documentation
@@ -40,7 +40,7 @@ class Project( Instructions ):
 
 	def __init__( self, projectName, parent = None ):
 		"""Set up the build steps, parse the command line arguments."""
-		Instructions.__init__( self, projectName, parent )
+		BuildInstructions.__init__( self, projectName, parent )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
 		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
@@ -91,8 +91,8 @@ class Project( Instructions ):
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():
-			self.getExecutomat().addStep( step )
-		Instructions.runSetups( self )
+			self._getExecutomat().addStep( step )
+		BuildInstructions.runSetups( self )
 		create = self.getStep( 'project-create-folders' )
 		delete = self.getStep( 'project-cleanup' )
 		for folder in ( self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):

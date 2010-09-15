@@ -84,6 +84,49 @@ class Build( MApplication ):
 				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
 			raise ConfigurationError( text )
 
+	def runPreFlightChecks( self ):
+		assert not self.getParent()
+		parentBaseDir = os.getcwd()
+		assert os.path.isdir( parentBaseDir )
+		baseDirName = self._getBaseDirName()
+		baseDir = os.path.join( parentBaseDir, baseDirName )
+		if os.path.isdir( baseDir ):
+			mApp().debug( self, 'stale base directory exists, moving it.' )
+			stats = os.stat( baseDir )
+			mtime = time.localtime( stats[8] )
+			extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
+			newFolderBaseName = '{0}-{1}'.format( baseDir, extension )
+			newFolder = newFolderBaseName
+			maxIterations = 1000
+			for index in range( maxIterations ):
+				if not os.path.isdir( newFolder ):
+					break
+				newFolder = newFolderBaseName + '__{0}'.format( index + 1 )
+			if os.path.isdir( newFolder ):
+				raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( maxIterations ) )
+			try:
+				shutil.move( baseDir, newFolder )
+			except ( OSError, shutil.Error ) as o:
+				raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
+					.format( baseDir, newFolder, str( o ) ) )
+			mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
+		try:
+			os.makedirs( baseDir )
+			self._setBaseDir( baseDir )
+		except ( OSError, IOError ) as e:
+			raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
+				.format( baseDir, self.getName(), e ) )
+		os.chdir( baseDir )
+		MApplication.runPreFlightChecks( self )
+
+	def runSetups( self ):
+		try:
+			os.makedirs( self._getLogDir() )
+		except ( OSError, IOError )as e:
+			raise ConfigurationError( 'Cannot create build log directory "{0}" for {1}: {2}!'
+				.format( self._getLogDir(), self.getName(), e ) )
+		MApplication.runSetups( self )
+
 	def run( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
 			self.describeRecursively()

@@ -35,6 +35,10 @@ class SimpleCiBase( MApplication ):
 		self.__params = params
 		self.__buildStatus = BuildStatus()
 
+	def runPreFlightChecks( self ):
+		self._setBaseDir( os.getcwd() )
+		MApplication.runPreFlightChecks( self )
+
 	def getParameters( self ):
 		return self.__params
 
@@ -71,7 +75,6 @@ class SimpleCiBase( MApplication ):
 		return path
 
 	def build( self ):
-		self.setUseCwdAsBaseDir( True )
 		settings = self.getSettings()
 		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevelParameter() )
 		self.addLogger( ConsoleLogger() )

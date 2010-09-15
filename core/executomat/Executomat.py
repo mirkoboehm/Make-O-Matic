@@ -101,9 +101,9 @@ class Executomat( MObject ):
 		mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
 	def _runTimed( self, instructions ):
+		if not os.path.isdir( self.getLogDir() ):
+			raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( self.getLogDir() ) ) )
 		try:
-			if not os.path.isdir( self.getLogDir() ):
-				raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( self.getLogDir() ) ) )
 			if self.getLogfileName():
 				try:
 					self.__logfile = open( self.getLogDir() + os.sep + self.getLogfileName(), 'a' )
