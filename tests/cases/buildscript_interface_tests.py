@@ -22,6 +22,7 @@ import os
 from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
+import shutil
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
@@ -30,16 +31,19 @@ class BuildScriptInterfaceTests( MomTestCase ):
 	def testQuerySetting( self ):
 		iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
 		variable = iface.querySetting( Settings.MomVersionNumber )
+		shutil.rmtree( "makeomatic" )
 		self.assertEquals( variable, mApp().getSettings().get( Settings.MomVersionNumber ) )
 
 	def testPrintCurrentRevision( self ):
 		iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
 		variable = iface.queryCurrentRevision()
+		shutil.rmtree( "makeomatic" )
 		self.assertTrue( variable )
 
 	def testPrintRevisionsSince( self ):
 		iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
 		revisions = iface.queryRevisionsSince( '8c758c1f1de2bcc19bda516f1acadf869ba28ee4' )
+		shutil.rmtree( "makeomatic" )
 		self.assertTrue( len( revisions ) >= 5 )
 
 

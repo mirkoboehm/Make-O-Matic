@@ -21,6 +21,8 @@ import unittest
 from core.MApplication import MApplication
 from core.Project import Project
 from core.Build import Build
+import shutil
+import os
 
 class ScmModulesTests ( unittest.TestCase ):
 
@@ -54,6 +56,8 @@ class ScmModulesTests ( unittest.TestCase ):
 
 		# TODO: Add better tests
 		info = scm.getRevisionInfo()
+		os.chdir( ".." )
+		shutil.rmtree( "None" )
 		self.assertNotEquals( info.committer, None )
 		self.assertNotEquals( info.commitMessage, None )
 		self.assertNotEquals( info.commitTime, None )
@@ -69,6 +73,8 @@ class ScmModulesTests ( unittest.TestCase ):
 
 		# TODO: Add better tests
 		info = scm.getRevisionInfo()
+		os.chdir( ".." )
+		shutil.rmtree( "None" )
 		self.assertNotEquals( info.committer, None )
 		self.assertNotEquals( info.commitMessage, None )
 		self.assertNotEquals( info.commitTime, None )

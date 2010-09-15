@@ -23,6 +23,8 @@ from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Exceptions import MomError
 from core.modules.XmlReportGenerator import XmlReportGenerator
+import shutil
+import os
 
 try:
 	from lxml import etree
@@ -47,6 +49,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		xmlString = report.getReport()
 		doc = etree.XML( xmlString )
 
+		os.chdir( ".." )
+		shutil.rmtree( "xmlreporttestbuild" )
 		self.assertEqual( doc.tag, "build" ) # root
 		self.assertNotEquals( doc.find( './/project' ), None )
 		self.assertNotEquals( doc.find( './/environment' ), None )
@@ -68,10 +72,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		doc = etree.XML( xmlString )
 
 		# TODO: Add more _useful_ tests 
+		os.chdir( ".." )
+		shutil.rmtree( "xmlreporttestbuild" )
 		self.assertEqual( doc.tag, "{http://www.w3.org/1999/xhtml}html" ) # root
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ), None )
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ), None )
-
 
 	def testConvertXmlReportToText( self ):
 		self._runBuild()
@@ -82,7 +87,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		text = converter.convertToText()
 
-		# TODO: Add more _useful_ tests 
+		# TODO: Add more _useful_ tests
+		os.chdir( ".." )
+		shutil.rmtree( "xmlreporttestbuild" )
 		self.assertTrue( len( text ) > 1000 )
 
 	def testXmlReportGenerator( self ):
@@ -99,6 +106,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		f = open( filePath )
 		fileContent = f.read()
+		os.chdir( ".." )
+		shutil.rmtree( "xmlreporttestbuild" )
 		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
 
 		self.assertEqual( fileContent, reportContent, "Report file content not written correctly" )

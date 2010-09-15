@@ -20,6 +20,8 @@ from tests.helpers.MomTestCase import MomTestCase
 import os
 import unittest
 import sys
+import shutil
+import glob
 
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
@@ -30,12 +32,16 @@ class SimpleCITests( MomTestCase ):
 	def testUsageHelp( self ):
 		cmd = [ sys.executable, SimpleCITests.ToolName, '-h' ]
 		runner = self.runCommand( cmd, 'simple_ci usage help' )
+		shutil.rmtree( "makeomatic" )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunFindRevisions( self ):
 		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
 			'--pause', '1', '-b', SimpleCITests.BuildScriptName ]
 		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
+		directories = glob.glob( "makeomatic*" )
+		for directory in directories:
+			shutil.rmtree( directory )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunPerformBuilds( self ):

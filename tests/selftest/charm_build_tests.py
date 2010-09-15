@@ -21,15 +21,18 @@ import os
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.Settings import Settings
 import unittest
+import shutil
 
 class CharmBuildTests( MomTestCase ):
 	'''CharmBuildTests executes the example_charm build script with revisions known to work.'''
 
 	BuildScriptName = os.path.join( 'buildscripts', 'example_charm.py' )
 
-	def test_aaa_queryProjectName( self ):
+	def testQueryCharmProjectName( self ):
 		iface = BuildScriptInterface( CharmBuildTests.BuildScriptName )
-		self.assertTrue( iface.querySetting( Settings.ProjectName ) )
+		projectNameQueryResult = iface.querySetting( Settings.ProjectName )
+		shutil.rmtree( "charm" )
+		self.assertTrue( projectNameQueryResult )
 
 if __name__ == "__main__":
 	unittest.main()

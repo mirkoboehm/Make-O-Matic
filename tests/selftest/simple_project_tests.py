@@ -69,7 +69,7 @@ class SimpleProjectTests( MomTestCase ):
 		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, '-v', '-t', buildType ]
 		runner = RunCommand( cmd )
 		runner.run()
-		shutil.rmtree( 'makeomatic', True )
+		shutil.rmtree( 'makeomatic' )
 		if runner.getReturnCode() != 0:
 			print( '\nbuild script run failed for build type {0}'.format( buildType ) )
 			print( 'output:' )
