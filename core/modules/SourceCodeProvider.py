@@ -20,6 +20,7 @@
 from core.Exceptions import MomError
 from core.helpers.TypeCheckers import check_for_path
 from core.Plugin import Plugin
+from core.helpers.XmlUtils import create_child_node
 
 class SourceCodeProvider( Plugin ):
 
@@ -133,10 +134,3 @@ class SourceCodeProvider( Plugin ):
 		create_child_node( document, node, "commitMessage", info.commitMessage )
 
 		return node
-
-
-def create_child_node( document, parentNode, tagName, text ):
-	elementNode = document.createElement( tagName )
-	textNode = document.createTextNode( str( text ) )
-	elementNode.appendChild( textNode )
-	parentNode.appendChild( elementNode )

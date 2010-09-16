@@ -22,6 +22,7 @@ from core.Exceptions import MomError, MomException, BuildError
 import os
 from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
+from core.helpers.XmlUtils import create_child_node
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -164,31 +165,23 @@ class Action( MObject ):
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
+
 		node.attributes["finished"] = str( self.didFinish() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
 		node.attributes["returncode"] = str( self.getResult() )
 
-		stderrElement = document.createElement( "stderr" )
-		try:
-			data = self.getStdErr()
-		except MomError:
-			data = ""
-		textNode = document.createTextNode( str( data ) )
-		stderrElement.appendChild( textNode )
-		node.appendChild( stderrElement )
-
-		stdoutElement = document.createElement( "stdout" )
-		try:
-			data = self.getStdOut()
-		except MomError:
-			data = ""
-		textNode = document.createTextNode( str( data ) ) # TODO: FIXME
-		stdoutElement.appendChild( textNode )
-		node.appendChild( stdoutElement )
-
-		logElement = document.createElement( "logdescription" )
-		textNode = document.createTextNode( self.getLogDescription() )
-		logElement.appendChild( textNode )
-		node.appendChild( logElement )
+		stderr, stdout = self._getOutput()
+		create_child_node( document, node, "stderr", stderr )
+		create_child_node( document, node, "stdout", stdout )
+		create_child_node( document, node, "logdescription", self.getLogDescription() )
 
 		return node
+
+	def _getOutput( self ):
+		try:
+			stderr = self.getStdErr()
+			stdout = self.getStdOut()
+		except MomError:
+			stderr = ""
+			stdout = ""
+		return stderr, stdout
