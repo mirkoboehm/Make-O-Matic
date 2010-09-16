@@ -53,9 +53,7 @@ class SimpleCiBase( MApplication ):
 		return name
 
 	def getInstanceDir( self ):
-		folder = make_foldername_from_string( self.getToolName() )
-		# FIXME verify on Windows
-		path = os.path.join( os.path.expanduser( '~' ), '.mom', folder )
+		path = self.getSettings().userFolder( self.getToolName() )
 		if not os.path.isdir( path ):
 			try:
 				os.makedirs( path )
