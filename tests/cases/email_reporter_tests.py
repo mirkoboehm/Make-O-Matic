@@ -20,6 +20,7 @@
 import unittest
 from core.modules.reporters.EmailReporter import EmailReporter
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
+from core.loggers.ConsoleLogger import ConsoleLogger
 
 class EmailReporterTest( MomBuildMockupTestCase ):
 
@@ -27,8 +28,10 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		# TODO: Modify email recipients list for testing
 
 		# add EmailReporter plugin
+		self.build.addLogger( ConsoleLogger() )
 		self.build.addPlugin( EmailReporter() )
 
+		self.build.initialize()
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 		self.build.buildAndReturn()

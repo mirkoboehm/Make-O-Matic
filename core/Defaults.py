@@ -69,10 +69,13 @@ class Defaults( MObject ):
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- RSync publisher settings (should be set in .mom/config.py):
 	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
-	# ----- reporter settings:
-	EmailReporterSender = 'reporter.email.sender'
-	EmailReporterRecipients = 'reporter.email.recipient'
-	# ----- email sender settings:
+	# ----- EmailReporter settings:
+	EmailReporterEnableHtml = 'emailreporter.enablehtml'
+	EmailReporterSender = 'emailreporter.sender'
+	EmailReporterDefaultRecipients = 'emailreporter.defaultrecipients'
+	EmailReporterMomErrorRecipients = 'emailreporter.momerrorrecipients'
+	EmailReporterNotifyCommitterOnFailure = 'emailreporter.notifycommitteronfailure'
+	# ----- Emailer settings:
 	EmailerSmtpServer = 'emailer.smtpserver'
 	EmailerServerPort = 'emailer.serverport'
 	EmailerTimeout = 'emailer.timeout'
@@ -86,8 +89,10 @@ class Defaults( MObject ):
 	def __init__( self ):
 		'''Constructor'''
 		MObject.__init__( self )
+
 		self.__settings = {}
 		home = os.path.expanduser( "~" )
+
 		# store defaults:
 		# ----- store the make-o-matic version these scripts use:
 		self.getSettings()[ Defaults.MomVersionNumber ] = '0.5.0'
@@ -140,6 +145,10 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
 		self.getSettings()[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
 		self.getSettings()[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
+		# ----- EmailReporter settings:
+		self.getSettings()[ Defaults.EmailReporterMomErrorRecipients] = None
+		self.getSettings()[ Defaults.EmailReporterEnableHtml ] = False
+		self.getSettings()[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
 		# ----- simple_ci settings:
 		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
 

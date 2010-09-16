@@ -22,6 +22,9 @@ from core.modules.reporters.XmlReport import XmlReport
 from core.helpers.GlobalMApp import mApp
 from core.helpers.Emailer import Email, Emailer
 from core.helpers.XmlReportConverter import XmlReportConverter
+from core.Build import Build
+from core.Settings import Settings
+from core.Exceptions import MomError, BuildError
 
 class EmailReporter( Reporter ):
 
@@ -29,24 +32,59 @@ class EmailReporter( Reporter ):
 		Reporter.__init__( self, name )
 
 	def wrapUp( self ):
-		report = XmlReport( mApp() )
-		report.prepare()
+		instructions = mApp()
+		assert isinstance( instructions, Build )
 
-		conv = XmlReportConverter( report )
-		html = conv.convertToHtml()
+		# get settings
+		reporterDefaultRecipients = mApp().getSettings().get( Settings.EmailReporterDefaultRecipients )
+		reporterMomErrorRecipients = mApp().getSettings().get( Settings.EmailReporterMomErrorRecipients )
+		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
+		reporterEnableHtml = mApp().getSettings().get( Settings.EmailReporterEnableHtml )
 
+		# get project info
+		returnCode = mApp().getReturnCode()
+		scm = instructions.getProject().getScm()
+		info = scm.getRevisionInfo()
+
+		# header
 		email = Email()
-		email.setSubject( 'Build report for {0}, revision {1}'.format( '<Project>', '<4711>' ) )
-		email.addHtmlPart( html )
-		# TODO: Add recipients list
+		email.setSubject( 'Build report for {0}, revision {1}'.format( instructions.getName(), info.revision ) )
+		email.setFromAddress( reporterSender )
+		recipients = [ reporterDefaultRecipients ]
 
-		#print( "DEBUG: " + html )
+		if returnCode == 0: # no error
+			pass
 
+		elif returnCode == BuildError.getReturnCode():
+			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
+				recipients.append( info.committerEmail )
+
+		elif returnCode == MomError.getReturnCode():
+			if reporterMomErrorRecipients is not None:
+				recipients.append( reporterMomErrorRecipients )
+
+		if len( recipients ) == 0:
+			mApp().debug( self, 'Not sending mail, no recipients added' )
+			return
+
+		email.setToAddresses( ", ".join( recipients ) )
+
+		# body
+		report = XmlReport( instructions )
+		report.prepare()
+		conv = XmlReportConverter( report )
+
+		if reporterEnableHtml:
+			email.addHtmlPart( conv.convertToHtml() )
+		else:
+			email.addTextPart( conv.convertToText() )
+
+		# send mail
 		e = Emailer( 'Emailer' )
 		try:
 			e.setup()
 			e.send( email )
 			e.quit()
+			mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( email.getToAddresses() ) )
 		except Exception as e:
-			mApp().debug( self, 'Sending a test email failed: {0}'.format( e ) )
-
+			mApp().debug( self, 'Sending E-Mail failed: {0}'.format( e ) )
