@@ -33,6 +33,7 @@ class SimpleCITests( MomTestCase ):
 	def tearDown( self ):
 		os.chdir( self.CurrentDirectory )
 		removeDirectories = glob.glob( "make-o-matic*" )
+		removeDirectories.extend( glob.glob( "builds" ) )
 		for directory in removeDirectories:
 			shutil.rmtree( directory )
 
