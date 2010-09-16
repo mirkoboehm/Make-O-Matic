@@ -46,7 +46,7 @@ class Plugin( MObject ):
 	def performPreFlightCheck( self ):
 		'''This method handles the execution of the pre flight check. Do not overload this method to adapt it, overload 
 		preFlightCheck instead!'''
-		if not self.getEnabled():
+		if not self.isEnabled():
 			mApp().debugN( self, 2, 'this plugin is disabled, skipping pre flight check.' )
 			return
 		try:
@@ -70,7 +70,7 @@ class Plugin( MObject ):
 	def performSetup( self ):
 		'''This method handles the execution of the setup phase. Do not overload this method to adapt it, overload 
 		setup instead!'''
-		if self.getEnabled():
+		if self.isEnabled():
 			self.setup()
 		else:
 			mApp().debugN( self, 2, 'this plugin is disabled, not generating any actions.' )
@@ -102,7 +102,7 @@ class Plugin( MObject ):
 	def setEnabled( self, onOff ):
 		self.__enabled = onOff
 
-	def getEnabled( self ):
+	def isEnabled( self ):
 		return self.__enabled
 
 	def setOptional( self, onOff ):

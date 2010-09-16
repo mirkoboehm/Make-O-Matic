@@ -145,7 +145,6 @@ class XmlReportConverter( MObject ):
 		"""Recursive method for parsing an ElementTree and converting it to plain text"""
 
 		out = []
-		recursionEnabled = True
 
 		if element.tag == "build":
 			out += " "
@@ -202,10 +201,12 @@ class XmlReportConverter( MObject ):
 				out += wrapper.wrap( "Steps:" )
 
 		elif element.tag == "step":
+			if element.attrib["isEmpty"] == "True":
+				return out # do not show empty step
 
-			if element.attrib["enabled"] == "False":
+			if element.attrib["isEnabled"] == "False":
 				status = "disabled"
-			elif len( element.getchildren() ) == 0:
+			elif element.attrib["isEmpty"] == "True":
 				status = "noaction"
 			elif element.attrib["failed"] == "True":
 				status = "!failed!"
@@ -219,7 +220,7 @@ class XmlReportConverter( MObject ):
 			) )
 
 			if element.attrib["failed"] == "False":
-				recursionEnabled = False # do not show children
+				return out # do not show children
 
 #		elif element.tag == "action":
 #			wrapper.subsequent_indent += " " * 10
@@ -235,12 +236,11 @@ class XmlReportConverter( MObject ):
 #				out += wrapper.wrap( "--- end of stderr output ---" )
 #				wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
 
-		if recursionEnabled != False:
-			wrapper.indent()
+		wrapper.indent()
 
-			for childElement in element.getchildren():
-				out += self._toText( childElement, wrapper ) # enter recursion
+		for childElement in element.getchildren():
+			out += self._toText( childElement, wrapper ) # enter recursion
 
-			wrapper.dedent()
+		wrapper.dedent()
 
 		return out

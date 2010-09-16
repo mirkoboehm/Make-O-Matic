@@ -112,7 +112,7 @@ class Parameters( MObject ):
 		# debug info:
 		texts = []
 		for stepName in buildSteps:
-			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
+			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.isEnabled() else 'disabled' ) )
 		return ', '.join( texts )
 
 	def applyBuildSequenceSwitches( self, buildSteps ):

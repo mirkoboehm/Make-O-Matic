@@ -44,7 +44,7 @@ class Step( MObject ):
 	def setEnabled( self, enabled = True ):
 		self.__enabled = enabled
 
-	def getEnabled( self ):
+	def isEnabled( self ):
 		return self.__enabled
 
 	def setIgnorePreviousFailure( self, doIt ):
@@ -156,7 +156,8 @@ class Step( MObject ):
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
-		node.attributes["enabled"] = str( self.getEnabled() )
+		node.attributes["isEmpty"] = str ( self.isEmpty() )
+		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
 		node.attributes["failed"] = str( self.failed() )
 
