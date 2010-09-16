@@ -17,36 +17,74 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Instructions import Instructions
-from core.executomat.Executomat import Executomat
 import os
 from core.helpers.GlobalMApp import mApp
-from core.Exceptions import MomError, ConfigurationError
+from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.Defaults import Defaults
-from core.helpers.TimeKeeper import formatted_time
+from core.helpers.TimeKeeper import formatted_time, TimeKeeper
+from core.Settings import Settings
+from core.helpers.TypeCheckers import check_for_path_or_none, check_for_nonempty_string
+from core.executomat.Step import Step
 
 class BuildInstructions( Instructions ):
 	def __init__( self, name = None, parent = None ):
 		Instructions.__init__( self, name, parent )
-		self.__executomat = Executomat( 'Exec-o-Matic' )
+		self.__steps = []
+		self.__timeKeeper = TimeKeeper()
+		self.setLogDir( None )
+		self.__failedStep = None
 
-	def _getExecutomat( self ):
-		return self.__executomat
+	def hasFailed( self ):
+		return self.__failedStep != None
 
-	def getStep( self, step ):
-		return self._getExecutomat().getStep( step )
+	def logFilePathForFailedStep( self ):
+		if self.__failedStep:
+			return self.__failedStep.getLogFileName()
+
+	def setLogDir( self, path ):
+		"""Set the directory where all log information is stored."""
+		check_for_path_or_none( path, "The log directory name must be a string containing a path name." )
+		self.__logDir = path
+
+	# FIXME bad name, Project has getLogDir, this is confusing
+	def _getLogDir( self ):
+		"""Return the log dir."""
+		return self.__logDir
+
+	def addStep( self, newStep ):
+		"""Add a newStep identified by identifier. If the identifier already exists, the new 
+		command replaces the old one."""
+		if not isinstance( newStep, Step ):
+			raise MomError( 'only executomat.Step instances can be added to the queue' )
+		check_for_nonempty_string( newStep.getName(), "Every Executomat step must have a name!" )
+		self.__steps.append( newStep )
+
+	def getSteps( self ):
+		return self.__steps
+
+	def getStep( self, identifier ):
+		"""Find the step with this identifier and return it."""
+		for step in self.getSteps():
+			if step.getName() == identifier:
+				return step
+		raise MomError( 'no such step "{0}"'.format( identifier ) )
+
+	def getTimeKeeper( self ):
+		return self.__timeKeeper
 
 	def describe( self, prefix ):
 		Instructions.describe( self, prefix )
-		self._getExecutomat().describe( prefix + '    ' )
+		for step in self.getSteps():
+			step.describe( prefix + '    ' )
 
 	def createXmlNode( self, document ):
 		node = Instructions.createXmlNode( self, document )
-		node.attributes["starttime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStartTime() ) )
-		node.attributes["stoptime"] = str ( formatted_time( self._getExecutomat().getTimeKeeper().getStopTime() ) )
-		node.attributes["timing"] = str( self._getExecutomat().getTimeKeeper().deltaString() )
+		node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
+		node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
+		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
 
 		stepsElement = document.createElement( "steps" )
-		for step in self._getExecutomat().getSteps():
+		for step in self.getSteps():
 			element = step.createXmlNode( document )
 			stepsElement.appendChild( element )
 		node.appendChild( stepsElement )
@@ -68,9 +106,6 @@ class BuildInstructions( Instructions ):
 			raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
 				.format( baseDir, self.getName(), e ) )
 
-	def _getLogDir( self ):
-		return self._getExecutomat().getLogDir()
-
 	def _configureLogDir( self ):
 		assert self.getParent()
 		logDirName = self._getBaseDirName()
@@ -79,14 +114,40 @@ class BuildInstructions( Instructions ):
 		logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
 		try:
 			os.makedirs( logDir )
-			self._getExecutomat().setLogfileName( mApp().getSettings().get( Defaults.ProjectExecutomatLogfileName ) )
-			self._getExecutomat().setLogDir( logDir )
+			self.setLogDir( logDir )
 		except ( OSError, IOError )as e:
 			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
 				.format( logDir, self.getName(), e ) )
 
 	def runSetups( self ):
+		for step in self.calculateBuildSequence():
+			self.addStep( step )
 		self._configureBaseDir()
 		self._configureLogDir()
 		Instructions.runSetups( self )
 
+	def calculateBuildSequence( self ):
+		buildSteps = self._setupBuildSteps( Settings.ProjectBuildSequence )
+		# apply customizations passed as command line parameters:
+		mApp().getParameters().applyBuildSequenceSwitches( buildSteps )
+		return buildSteps
+
+	def _executeStepRecursively( self, instructions, name ):
+		self.executeStep( name )
+		for child in instructions.getChildren():
+			child._executeStepRecursively( child, name )
+
+	def executeStep( self, stepName ):
+		step = self.getStep( stepName )
+		if step.isEmpty():
+			mApp().debugN( self, 4, 'step "{0}" is empty for {1}'.format( step.getName(), self.getName() ) )
+			return
+		mApp().debugN( self, 2, 'now executing step "{0}"'.format( step.getName() ) )
+		if step.execute( self ):
+			mApp().debugN( self, 1, 'success: "{0}"'.format( step.getName() ) )
+		else:
+			if self.__failedStep == None:
+				# we are only interested in the log files for the first failure 
+				self.__failedStep = step
+			mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
+			mApp().debugN( self, 1, 'failure: "{0}"'.format( step.getName() ) )

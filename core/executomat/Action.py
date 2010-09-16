@@ -112,26 +112,27 @@ class Action( MObject ):
 			raise MomError( 'stdOut() queried before the action was finished' )
 		return self.__stdOut
 
-	def executeAction( self, executomat, step ):
+	def executeAction( self, step, instructions ):
 		try:
 			self.__timeKeeper.start()
-			return self._executeActionTimed( executomat, step )
+			return self._executeActionTimed( instructions, step )
 		finally:
 			self.__timeKeeper.stop()
 			mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
 
-	def _executeActionTimed( self, executomat, step ):
+	def _executeActionTimed( self, instructions, step ):
 		oldPwd = None
 		try:
 			if self.getWorkingDirectory():
+				# FIXME is this correct sequence of things?
 				oldPwd = os.getcwd()
-				executomat.log( '# changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
+				mApp().debugN( self, 3, '# changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
 				try:
 					os.chdir( str( self.getWorkingDirectory() ) )
 				except ( OSError, IOError ) as e:
 					raise BuildError( str( e ) )
 			self._aboutToStart()
-			executomat.log( '# {0}'.format( self.getLogDescription() ) )
+			mApp().debugN( self, 3, 'executing action {0}'.format( self.getLogDescription() ) )
 			try:
 				result = self.run()
 				if result == None or not isinstance( result, int ):
@@ -144,19 +145,18 @@ class Action( MObject ):
 				mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
 				self._setResult( e.getReturnCode() )
 			if step.getLogfileName():
-				f = open( step.getLogfileName(), 'a' )
-				if f:
-					if self.getStdOut():
-						f.writelines( self.getStdOut().decode() )
-					else:
-						f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
-					f.close()
-				else:
-					raise MomError( 'cannot write to log file "{0}"'.format( step.getLogfileName() ) )
+				try:
+					with open( step.getLogfileName(), 'a' ) as f:
+						if self.getStdOut():
+							f.writelines( self.getStdOut().decode() )
+						else:
+							f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
+				except Exception as e:
+					raise MomError( 'cannot write to log file "{0}": {1}'.format( step.getLogfileName(), str( e ) ) )
 			return self.getResult()
 		finally:
 			if oldPwd:
-				executomat.log( '# changing back to "{0}"'.format( oldPwd ) )
+				mApp().debugN( self, 3, 'changing back to "{0}"'.format( oldPwd ) )
 				os.chdir( oldPwd )
 
 	def getTagName( self ):

@@ -50,22 +50,14 @@ class Environment( ConfigurationBase ):
 		assert dep not in self.__deps
 		self.__deps.append( dep )
 
-	def buildConfiguration( self ):
-		'''Apply the environment, build the configuration, restore the environment.'''
-		error = False
-		for configuration in self.getChildren():
-			with EnvironmentSaver():
-				# apply environment:
-				for dep in self.getDependencies():
-					dep.apply()
-				# build configuration:
-				if configuration.buildConfiguration() != 0:
-					error = True
-		# return result
-		if error:
-			return 1
-		else:
-			return 0
+	def _executeStepRecursively( self, instructions, name ):
+		'''Apply the environment, call the base class method, restore the environment.'''
+		with EnvironmentSaver():
+			# apply environment:
+			for dep in self.getDependencies():
+				dep.apply()
+			# build configuration (error handling is done in the configuration)
+			ConfigurationBase._executeStepRecursively( self, instructions, name )
 
 	def makeDescription( self ):
 		names = []

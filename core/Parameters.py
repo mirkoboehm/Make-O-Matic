@@ -115,7 +115,7 @@ class Parameters( MObject ):
 			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.getEnabled() else 'disabled' ) )
 		return ', '.join( texts )
 
-	def applyBuildSequenceSwitches( self, buildSteps, prefix ):
+	def applyBuildSequenceSwitches( self, buildSteps ):
 		mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'
 			.format( self.__getBuildSequenceDescription( buildSteps ) ) )
 		switches = self.getBuildSteps()
@@ -133,15 +133,14 @@ class Parameters( MObject ):
 				else:
 					raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
 											.format( switch ) )
-				if stepName.startswith( prefix ):
-					# apply:
-					found = False
-					for step in buildSteps:
-						if step.getName() == stepName:
-							step.setEnabled( enable )
-							found = True
-							break
-					if not found:
-						raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
+				# apply:
+				found = False
+				for step in buildSteps:
+					if step.getName() == stepName:
+						step.setEnabled( enable )
+						found = True
+						break
+				if not found:
+					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
 			mApp().debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
 

@@ -18,12 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
-from core.Build import Build
-from core.actions.ExecuteConfigurationBaseAction import ExecuteConfigurationBaseAction
-from core.Exceptions import MomError
 import core
 from core.modules.ConfigurationBase import ConfigurationBase
-from core.helpers.EnvironmentSaver import EnvironmentSaver
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.helpers.PathResolver import PathResolver
@@ -50,36 +46,8 @@ class Configuration( ConfigurationBase ):
 	def getTargetDir( self ):
 		return self._getNormPath( Settings.ConfigurationTargetDir )
 
-	def buildConfiguration( self ):
-		'''Helper method used by configuration-like objects that executes the whole instructions as part of a step of a superior 
-		instructions object.'''
-		mApp().debug( self, 'building configuration "{0}"'.format( self.getName() ) )
-		with EnvironmentSaver():
-			self.getTimeKeeper().start()
-			try:
-				self._getExecutomat().run( self )
-				if self._getExecutomat().hasFailed():
-					return 1
-				else:
-					return 0
-			except MomError as e:
-				mApp().message( self, 'error while building configuration "{0}"'.format( e ) )
-				# mApp().registerReturnCode( e.getReturnCode() )
-				return e.getReturnCode()
-			finally:
-				self.getTimeKeeper().stop()
-				mApp().debug( self, 'finished building configuration "{0}"'.format( self.getName() ) )
-
 	def runSetups( self ):
-		for step in self.calculateBuildSequence():
-			self._getExecutomat().addStep( step )
-		action = ExecuteConfigurationBaseAction( self )
-		action.setIgnorePreviousFailure( True )
-		try:
-			step = self.getParent().getStep( 'project-build-configurations' )
-			step.addMainAction( action )
-		except MomError:
-			mApp().debugN( self, 5, 'parent is not a Project, not generating actions' )
+		ConfigurationBase.runSetups( self )
 		settings = mApp().getSettings()
 		folders = [ settings.get( Settings.ConfigurationBuildDir ), settings.get( Settings.ConfigurationTargetDir ) ]
 		create = self.getStep( 'conf-create-folders' )
@@ -89,10 +57,3 @@ class Configuration( ConfigurationBase ):
 		folders.reverse()
 		for folder in folders:
 			cleanup.addMainAction( RmDirAction( PathResolver( self.getBaseDir, folder ) ) )
-		ConfigurationBase.runSetups( self )
-
-	def calculateBuildSequence( self ):
-		buildSteps = self._setupBuildSteps( Settings.ConfigurationBuildSteps )
-		assert isinstance( mApp(), Build )
-		mApp().getParameters().applyBuildSequenceSwitches( buildSteps, 'conf' )
-		return buildSteps

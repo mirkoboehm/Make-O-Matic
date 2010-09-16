@@ -36,6 +36,7 @@ class Dependency( MObject ):
 		self.setFolder( folder )
 		self._setValid( False )
 		self.setEnabled( False )
+		self.__description = None
 
 	def _getControlFileName( self, path ):
 		return os.path.join( path, Dependency._ControlFileName )
@@ -138,17 +139,17 @@ class Dependency( MObject ):
 				if export:
 					variable = str( export.group( 2 ) )
 					value = self._expandVariables( export.group( 3 ) )
-					mApp().debugN( self, 2, 'setBuildEnvironment: >export< ' + variable + '="' + value + '"' )
+					mApp().debugN( self, 4, 'setBuildEnvironment: >export< ' + variable + '="' + value + '"' )
 					os.environ[variable] = value
 				elif addTo:
 					variable = str( addTo.group( 2 ) )
 					mode = self._expandVariables( addTo.group( 3 ) )
 					value = self._expandVariables( addTo.group( 4 ) )
 					if mode == 'APPEND':
-						mApp().debugN( self, 2, 'setBuildEnvironment: >append< ' + variable + ': "' + value + '"' )
+						mApp().debugN( self, 4, 'setBuildEnvironment: >append< ' + variable + ': "' + value + '"' )
 						add_to_path_collection( variable, value, 'append' )
 					elif mode == 'PREPEND':
-						mApp().debugN( self, 2, 'setBuildEnvironment: >prepend< ' + variable + ': "' + value + '"' )
+						mApp().debugN( self, 4, 'setBuildEnvironment: >prepend< ' + variable + ': "' + value + '"' )
 						add_to_path_collection( variable, value, 'prepend' )
 					else:
 						raise ConfigurationError( 'mode missing' )
@@ -169,7 +170,6 @@ class Dependency( MObject ):
 				mApp().message( self, 'error (' + str( value ) + ') in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
 			except IndexError:
 				mApp().message( self, 'syntax error in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
-
 
 	def verify( self ):
 		'''Verify that the folder contains a MOM package control file. If so, evaluate it.'''

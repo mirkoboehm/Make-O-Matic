@@ -54,6 +54,9 @@ class Step( MObject ):
 	def getExecuteOnFailure( self ):
 		return self.__ignorePreviousFailure
 
+	def isEmpty( self ):
+		return not self.getPreActions() and not self.getMainActions() and not self.getPostActions()
+
 	def setLogfileName( self, logfileName ):
 		check_for_string( logfileName, "The log file parameter must be a string containing a file name." )
 		self.__logfileName = logfileName
@@ -93,30 +96,28 @@ class Step( MObject ):
 		for key in os.environ:
 			mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
 
-	def execute( self, executomat, instructions ):
+	def execute( self, instructions ):
 		try:
 			self.__timeKeeper.start()
-			return self._executeTimed( executomat, instructions )
+			return self._executeTimed( instructions )
 		finally:
 			self.__timeKeeper.stop()
 			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
-	def _executeTimed( self, executomat, instructions ):
+	def _executeTimed( self, instructions ):
 		"""Execute the step"""
 		if not self.getName():
 			raise MomError( "Cannot execute a step with no name!" )
 		if not self.__enabled:
-			executomat.log( '# step "{0}" disabled, skipping.'.format( self.getName() ) )
+			mApp().debugN( self, 2, 'step "{0}" disabled, skipping.'.format( self.getName() ) )
 			return True
-		if executomat.hasFailed() and not self.getExecuteOnFailure():
+		if instructions.hasFailed() and not self.getExecuteOnFailure():
 			mApp().debugN( self, 4, 'aborting because of errors earlier in the build' )
 			return True
-		executomat.log( '# Executing step "{0}"'.format( self.getName() ) )
-		executomat.log( '# ... in directory "{0}"'.format( os.getcwd() ) )
-		self._logEnvironment( executomat )
+		self._logEnvironment( instructions )
 
 		logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
-		logfileName = os.path.join( executomat.getLogDir(), logfileName )
+		logfileName = os.path.join( instructions._getLogDir(), logfileName )
 		self.setLogfileName( logfileName )
 
 		phases = [ [ 'preparatory actions', self.__preActions ],
@@ -124,14 +125,14 @@ class Step( MObject ):
 				[ 'post actions', self.__postActions ] ]
 		for phase, actions in phases:
 			if not actions:
-				executomat.log( '# Phase "{0}" is empty (no actions registered)'.format( phase ) )
+				mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
 			for action in actions:
 				if not self.__failed or action.getIgnorePreviousFailure():
-					result = action.executeAction( executomat, self )
+					result = action.executeAction( self, instructions )
 					resultText = 'successful'
 					if result != 0:
 						resultText = 'failed'
-					executomat.log( '# {0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
+					mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
 					if result != 0:
 						self.__failed = True
 				else:

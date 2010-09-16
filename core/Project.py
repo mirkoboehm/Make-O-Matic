@@ -20,7 +20,6 @@
 from __future__ import print_function
 
 from core.modules.SourceCodeProvider import SourceCodeProvider
-from core.helpers.TimeKeeper import TimeKeeper
 from core.Settings import Settings
 from core.Exceptions import MomError
 from core.modules.scm.Factory import SourceCodeProviderFactory
@@ -41,7 +40,6 @@ class Project( BuildInstructions ):
 		"""Set up the build steps, parse the command line arguments."""
 		BuildInstructions.__init__( self, projectName, parent )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
-		self.__timeKeeper = TimeKeeper()
 		self.__scm = None
 
 	def getBuild( self ):
@@ -85,12 +83,11 @@ class Project( BuildInstructions ):
 	def getLogDir( self ):
 		return self.__getNormPath( Settings.ProjectLogDir )
 
-	def getTimeKeeper( self ):
-		return self.__timeKeeper
-
 	def runSetups( self ):
-		for step in self.calculateBuildSequence():
-			self._getExecutomat().addStep( step )
+		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
+		assert len( buildType ) == 1
+		mApp().debug( self, 'build type: {0} ({1})'
+			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		BuildInstructions.runSetups( self )
 		create = self.getStep( 'project-create-folders' )
 		delete = self.getStep( 'project-cleanup' )
@@ -98,17 +95,11 @@ class Project( BuildInstructions ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
 
-	def calculateBuildSequence( self ):
-		assert self.getBuild()
-		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
-		assert len( buildType ) == 1
-		buildSteps = self._setupBuildSteps( Settings.ProjectBuildSteps )
-		mApp().debug( self, 'build type: {0} ({1})'
-			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
-		# apply customizations passed as command line parameters:
-		#self.getBuild().getParameters().applyBuildSequenceSwitches( buildSteps, 'project' )
-		return buildSteps
+	def executeSteps( self ):
+		for step in self.getSteps():
+			self._executeStepRecursively( self, step.getName() )
 
 	def execute( self ):
 		with self.getTimeKeeper():
-			self._getExecutomat().run( self )
+			self.executeSteps()
+			BuildInstructions.execute( self )

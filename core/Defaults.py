@@ -48,7 +48,7 @@ class Defaults( MObject ):
 	ProjectExecutomatLogfileName = 'project.executomat.logfilename'
 	ProjectBuildType = 'project.buildtype'
 	ProjectBuildTypeDescriptions = 'project.buildtypedescriptions'
-	ProjectBuildSteps = 'project.buildsteps'
+	ProjectBuildSequence = 'project.buildsequence'
 	ProjectSourceLocation = 'project.sourcelocation'
 	ProjectRevision = 'project.revision'
 	ProjectSourceDir = 'project.srcdir'
@@ -58,7 +58,6 @@ class Defaults( MObject ):
 	ProjectLogDir = 'project.logdir'
 	ProjectBuildSequenceSwitches = 'project.buildsequenceswitches'
 	# ----- Configuration settings (not specific to individual configurations, but to all)
-	ConfigurationBuildSteps = 'configuration.buildsteps'
 	ConfigurationBuildDir = 'configuration.builddir'
 	ConfigurationTargetDir = 'configuration.targetdir'
 	# ----- auto-detected environment settings:
@@ -102,10 +101,17 @@ class Defaults( MObject ):
 		# ----- project settings:
 		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'
-		self.getSettings()[ Defaults.ProjectBuildSteps] = [ # name, modes, execute-on-failure
+		self.getSettings()[ Defaults.ProjectBuildSequence] = [ # name, modes, execute-on-failure
 			[ 'project-create-folders', 'mcdhpsf', False ],
 			[ 'project-checkout', 'mcdhpsf', False ],
-			[ 'project-build-configurations', 'mcdhpsf', False ],
+			[ 'conf-create-folders', 'mcdhpsf', False ],
+			[ 'conf-export-sources', 'mcdhpsf', False ],
+			[ 'conf-configure', 'mcdhpsf', False ],
+			[ 'conf-make', 'mcdhpsf', False ],
+			[ 'conf-make-test', 'mcdhpsf', False ],
+			[ 'conf-make-install', 'mcdhpsf', False ],
+			[ 'conf-package', 'dsfp', False ],
+			[ 'conf-cleanup', 'cdsf', False ],
 			[ 'project-create-docs', 'mcdhpsf', False ],
 			[ 'project-package', 'dsf', False ],
 			[ 'project-upload-docs', 'dsf', False ],
@@ -129,16 +135,6 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ProjectTempDir ] = 'tmp'
 		self.getSettings()[ Defaults.ProjectLogDir ] = 'log'
 		# ----- configuration settings:
-		self.getSettings()[ Defaults.ConfigurationBuildSteps ] = [ # name, modes, execute-on-failure
-			[ 'conf-create-folders', 'mcdhpsf', False ],
-			[ 'conf-export-sources', 'mcdhpsf', False ],
-			[ 'conf-configure', 'mcdhpsf', False ],
-			[ 'conf-make', 'mcdhpsf', False ],
-			[ 'conf-make-test', 'mcdhpsf', False ],
-			[ 'conf-make-install', 'mcdhpsf', False ],
-			[ 'conf-package', 'dsfp', False ],
-			[ 'conf-cleanup', 'cdsf', False ],
-		]
 		self.getSettings()[ Defaults.ConfigurationBuildDir ] = 'build'
 		self.getSettings()[ Defaults.ConfigurationTargetDir ] = 'install'
 		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'

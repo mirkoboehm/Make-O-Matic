@@ -17,8 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
 from core.executomat.ShellCommandAction import ShellCommandAction
 from core.helpers.RunCommand import RunCommand
 

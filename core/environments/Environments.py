@@ -16,8 +16,6 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from core.actions.ExecuteConfigurationBaseAction import ExecuteConfigurationBaseAction
 from core.modules.ConfigurationBase import ConfigurationBase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
@@ -76,15 +74,9 @@ class Environments( ConfigurationBase ):
 			for config in configs:
 				self.removeChild( config )
 			for environment in environments:
+				environment.setName( environment.makeDescription() )
 				environment.cloneConfigurations( configs )
 		ConfigurationBase.runPreFlightChecks( self )
-
-	def runSetups( self ):
-		action = ExecuteConfigurationBaseAction( self )
-		action.setIgnorePreviousFailure( True ) # there may be multiple configurations
-		step = self.getParent().getStep( 'project-build-configurations' )
-		step.addMainAction( action )
-		ConfigurationBase.runSetups( self )
 
 	def _findMomDependencies( self, folder ):
 		"""recursively find leaf nodes within folder"""
