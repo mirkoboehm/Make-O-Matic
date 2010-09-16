@@ -56,7 +56,7 @@ class SourceCodeProviderFactory( MObject ):
 		The description consists of an implementation identifier, and an implementation
 		specific location. Examples: 
 		'svn:svn+ssh://svn.kde.org/home/kde/abcde' describes a Subversion repository.
-		'git:git@gitorious.org:make-o-matic/mom.git' describes a GIT repository.
+		'git:git://github.com/mirkoboehm/Make-O-Matic.git' describes a GIT repository.
 		'localdir:/home/dude/myproject/src' describes a local directory to be used.
 		'''
 		implementation, location = self.parseDescription( description )

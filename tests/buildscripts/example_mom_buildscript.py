@@ -28,7 +28,7 @@ from core.helpers.BoilerPlate import setupStandardBuildAndProject
 
 build, project = setupStandardBuildAndProject( projectName = 'MakeOMatic', minimumMomVersion = "0.5.0",
 	projectVersionNumber = '0.5.0', projectVersionName = 'French Fries',
-	scmUrl = 'git:git://gitorious.org/make-o-matic/mom.git' )
+	scmUrl = 'git:git://github.com/mirkoboehm/Make-O-Matic.git' )
 
 # add a preprocessor that generates the Doxygen input file
 prep = Preprocessor( project, inputFilename = PathResolver( project.getSourceDir, 'doxygen.cfg.in' ),

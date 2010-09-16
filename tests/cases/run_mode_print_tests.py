@@ -30,7 +30,7 @@ class RunModePrintTests( MomTestCase ):
 		self.project = Project( 'ScmFactoryTest' )
 		self.build.setProject( self.project )
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.project.createScm( 'git:git://gitorious.org/make-o-matic/mom.git' )
+		self.project.createScm( 'git:git://github.com/mirkoboehm/Make-O-Matic.git' )
 
 	def testPrintRevisionsSince( self ):
 		revision = '57307ee83930c089d0eb9b4e7342c87784257071'

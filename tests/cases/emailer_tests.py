@@ -33,15 +33,15 @@ class EmailerTest( MomTestCase ):
 		email.setToAddresses( 'mirko@kdab.com' )
 		email.setSubject( 'Build report for {0}, revision {1}'.format( '<Project>', '<4711>' ) )
 		email.addTextPart( '''\
-This is a test email sent by make-o-matic.
-Check it out at http://gitorious.org/make-o-matic
+This is a test email sent by Make-O-Matic.
+Check it out at http://github.com/mirkoboehm/Make-O-Matic
 ''' )
 		email.addHtmlPart( """\
 		<html>
-			<head>make-o-matic Test Email</head>
+			<head>Make-O-Matic Test Email</head>
 			<body>
 				<p>This is the HTML part of the test email<br>
-					 Check out make-o-matic at <a href="http://gitorious.org/make-o-matic">Gitorious</a>.
+					 Check out Make-O-Matic at <a href="http://github.com/mirkoboehm/Make-O-Matic">GitHub</a>.
 				</p>
 			</body>
 		</html>
