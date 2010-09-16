@@ -23,11 +23,14 @@ from smtplib import SMTP, SMTPHeloError, SMTPAuthenticationError, SMTPException
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
+from email.utils import COMMASPACE
 
 class Email( MObject ):
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
+
 		self.__msg = MIMEMultipart( 'alternative' )
+		self.__recipients = []
 
 	def _getMessage( self ):
 		return self.__msg
@@ -38,11 +41,15 @@ class Email( MObject ):
 	def getFromAddress( self ):
 		return self._getMessage()[ 'From' ]
 
+	def addToAddress( self, address ):
+		self.setToAddresses( self.getToAddresses() + [address] )
+
 	def setToAddresses( self, addresses ):
-		self._getMessage()[ 'To' ] = addresses
+		self.__recipients = addresses
+		self._getMessage()['To'] = COMMASPACE.join( self.__recipients )
 
 	def getToAddresses( self ):
-		return self._getMessage()[ 'To' ]
+		return self.__recipients
 
 	def setSubject( self, subject ):
 		self._getMessage()['Subject'] = subject
@@ -74,7 +81,7 @@ class Emailer( MObject ):
 			password = mApp().getSettings().get( Settings.EmailerPassword )
 			try:
 				self.__server.login( user, password )
-				#self.__server.set_debuglevel( 3 )
+				self.__server.set_debuglevel( 3 )
 			except SMTPHeloError as e:
 				raise ConfigurationError( 'The SMTP server rejected the connection: {0}'.format( e ) )
 			except SMTPAuthenticationError:
@@ -86,10 +93,10 @@ class Emailer( MObject ):
 			self.__server.ehlo()
 
 	def send( self, email ):
-		if ( email.getFromAddress() and email.getToAddresses() ):
+		if email.getFromAddress() and len( email.getToAddresses() ) > 0:
 			self.__server.sendmail( email.getFromAddress(), email.getToAddresses(), email.getMessageText() )
 		else:
-			raise ConfigurationError( 'Sender/recipient address missing, cannot send mail!' )
+			raise ConfigurationError( 'Sender/recipient addresses missing, cannot send mail!' )
 
 	def quit( self ):
 		self.__server.quit()

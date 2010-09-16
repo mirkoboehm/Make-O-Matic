@@ -73,6 +73,7 @@ class Defaults( MObject ):
 	EmailReporterEnableHtml = 'emailreporter.enablehtml'
 	EmailReporterSender = 'emailreporter.sender'
 	EmailReporterDefaultRecipients = 'emailreporter.defaultrecipients'
+	EmailReporterConfigurationErrorRecipients = 'emailreporter.configurationerrorrecipients'
 	EmailReporterMomErrorRecipients = 'emailreporter.momerrorrecipients'
 	EmailReporterNotifyCommitterOnFailure = 'emailreporter.notifycommitteronfailure'
 	# ----- Emailer settings:

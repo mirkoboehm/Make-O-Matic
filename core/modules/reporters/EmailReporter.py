@@ -24,7 +24,7 @@ from core.helpers.Emailer import Email, Emailer
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Build import Build
 from core.Settings import Settings
-from core.Exceptions import MomError, BuildError
+from core.Exceptions import MomError, BuildError, ConfigurationError
 
 class EmailReporter( Reporter ):
 
@@ -37,6 +37,7 @@ class EmailReporter( Reporter ):
 
 		# get settings
 		reporterDefaultRecipients = mApp().getSettings().get( Settings.EmailReporterDefaultRecipients )
+		reporterConfigurationErrorRecipients = mApp().getSettings().get( Settings.EmailReporterConfigurationErrorRecipients )
 		reporterMomErrorRecipients = mApp().getSettings().get( Settings.EmailReporterMomErrorRecipients )
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
 		reporterEnableHtml = mApp().getSettings().get( Settings.EmailReporterEnableHtml )
@@ -50,24 +51,26 @@ class EmailReporter( Reporter ):
 		email = Email()
 		email.setSubject( 'Build report for {0}, revision {1}'.format( instructions.getName(), info.revision ) )
 		email.setFromAddress( reporterSender )
-		recipients = [ reporterDefaultRecipients ]
+		email.setToAddresses( [reporterDefaultRecipients] )
 
 		if returnCode == 0: # no error
 			pass
 
 		elif returnCode == BuildError.getReturnCode():
 			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
-				recipients.append( info.committerEmail )
+				email.addToAddress( info.committerEmail )
+
+		elif returnCode == ConfigurationError.getReturnCode():
+			if reporterConfigurationErrorRecipients:
+				email.addToAddress( reporterConfigurationErrorRecipients )
 
 		elif returnCode == MomError.getReturnCode():
 			if reporterMomErrorRecipients is not None:
-				recipients.append( reporterMomErrorRecipients )
+				email.addToAddress( reporterMomErrorRecipients )
 
-		if len( recipients ) == 0:
+		if len( email.getToAddresses() ) == 0:
 			mApp().debug( self, 'Not sending mail, no recipients added' )
 			return
-
-		email.setToAddresses( ", ".join( recipients ) )
 
 		# body
 		report = XmlReport( instructions )
@@ -85,6 +88,6 @@ class EmailReporter( Reporter ):
 			e.setup()
 			e.send( email )
 			e.quit()
-			mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( email.getToAddresses() ) )
+			mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( ", ".join( email.getToAddresses() ) ) )
 		except Exception as e:
 			mApp().debug( self, 'Sending E-Mail failed: {0}'.format( e ) )
