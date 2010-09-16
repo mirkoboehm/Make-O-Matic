@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
-from core.Exceptions import ConfigurationError, MomError
+from core.Exceptions import ConfigurationError, MomError, returncode_to_description
 from core.helpers.GlobalMApp import mApp
 from core.MObject import MObject
 from textwrap import TextWrapper
@@ -157,6 +157,8 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrap( "Platform:     {0} ({1})".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
 			out += wrapper.wrap( "Architecture: {0}".format( element.attrib["sys-architecture"] ) )
 			out += wrapper.wrap( "Node name:    {0}".format( element.attrib["sys-nodename"] ) )
+			out += " "
+			out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
 			wrapper.dedent()
 
 		elif element.tag == "project":

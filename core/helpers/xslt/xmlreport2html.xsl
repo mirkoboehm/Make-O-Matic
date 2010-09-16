@@ -49,6 +49,10 @@ th {
 .log {
 	padding-left: 10px;
 }
+.build-status {
+	font-weight: bold;
+	font-size: 10pt;
+}
 .step-status {
 	font-weight: bold;
 }
@@ -61,6 +65,23 @@ th {
 					Platform: <xsl:value-of select="@sys-platform" /> (<xsl:value-of select="@sys-version" />)<br />
 					Architecture: <xsl:value-of select="@sys-architecture" /><br />
 					Node name: <xsl:value-of select="@sys-nodename" />
+				</p>
+				<p class="build-status">
+					Build Status:
+					<xsl:choose>
+						<xsl:when test="@returncode = 0">
+							<span class="neutral">SUCCESS</span>
+						</xsl:when>
+						<xsl:when test="@returncode = 1">
+							<span class="fail">Build error</span>
+						</xsl:when>
+						<xsl:when test="@returncode = 2">
+							<span class="fail">Configuration error</span>
+						</xsl:when>
+						<xsl:otherwise>
+							<span class="fail">Make-O-Matic error</span>
+						</xsl:otherwise>
+					</xsl:choose>
 				</p>
 				<xsl:apply-templates />
 			</body>

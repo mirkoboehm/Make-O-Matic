@@ -162,4 +162,6 @@ class Build( MApplication ):
 		for key, value  in machine_info().items():
 			node.attributes[key] = value
 
+		node.attributes["returncode"] = str( self.getReturnCode() )
+
 		return node
