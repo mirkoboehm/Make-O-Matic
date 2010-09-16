@@ -106,3 +106,36 @@ class SourceCodeProvider( Plugin ):
 		self.makeCheckoutStep()
 		# FIXME it needs to be decided by the builder if this gets called!
 		# self.makeExportStep( project )
+
+	def getXslTemplates( self ):
+		return { "html":
+			"""
+			Revision: <xsl:value-of select="@revision"/><br/>
+			Committer: <xsl:value-of select="@committer"/><br/>
+			Time: <xsl:value-of select="@commitTime"/><br/>
+			Message: <xsl:value-of select="commitMessage"/>
+			""" }
+
+	def getXmlTemplate( self, element, wrapper ):
+		return wrapper.wrap( "Revision: {0}".format( element.attrib["revision"] ) ) + \
+			wrapper.wrap( "Committer: {0}".format( element.attrib["committer"] ) ) + \
+			wrapper.wrap( "Time: {0}".format( element.attrib["commitTime"] ) ) + \
+			wrapper.wrap( "Message: {0}".format( element.find( "commitMessage" ).text ) )
+
+	def createXmlNode( self, document ):
+		node = Plugin.createXmlNode( self, document )
+
+		info = self.getRevisionInfo()
+		node.attributes["revision"] = info.revision
+		node.attributes["committer"] = info.committer
+		node.attributes["commitTime"] = info.commitTime
+		create_child_node( document, node, "commitMessage", info.commitMessage )
+
+		return node
+
+
+def create_child_node( document, parentNode, tagName, text ):
+	elementNode = document.createElement( tagName )
+	textNode = document.createTextNode( str( text ) )
+	elementNode.appendChild( textNode )
+	parentNode.appendChild( elementNode )

@@ -57,11 +57,7 @@ class XmlReportConverter( MObject ):
 		self.__xmlTemplateFunctions = {}
 		self.__registeredPlugins = []
 
-		# load stylesheets from XSL_STYLESHEETS into memory
-		for key, value in self.XSL_STYLESHEETS.items():
-			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
-			self.__xslTemplateSnippets[key] = etree.XML( f.read() )
-
+		self._initializeXslTemplates()
 		self._fetchTemplates( mApp() )
 
 	def _convertTo( self, destinationFormat ):
@@ -69,6 +65,13 @@ class XmlReportConverter( MObject ):
 
 		transform = etree.XSLT( self.__xslTemplateSnippets[destinationFormat] )
 		return str( transform( self.__xml ) )
+
+	def _initializeXslTemplates( self ):
+		"""Load stylesheets from XSL_STYLESHEETS into memory"""
+
+		for key, value in self.XSL_STYLESHEETS.items():
+			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
+			self.__xslTemplateSnippets[key] = etree.XML( f.read() )
 
 	def _fetchTemplates( self, instructions ):
 		"""Fetches templates from all registered plugins in the Instruction object
@@ -122,9 +125,9 @@ class XmlReportConverter( MObject ):
 		parsing the tree"""
 
 		# check if this plugin overwrites the getXmlTemplate method
-		classMembers = plugin.__class__.__dict__.keys()
-		if 'getXmlTemplate' not in classMembers:
-			return # getXmlTemplate has not been overwritten, do not add function pointer
+		#classMembers = plugin.__class__.__dict__.keys()
+		#if 'getXmlTemplate' not in classMembers:
+		#	return # getXmlTemplate has not been overwritten, do not add function pointer
 
 		functionPointer = plugin.getXmlTemplate
 		self.__xmlTemplateFunctions[plugin.getName()] = functionPointer
@@ -161,8 +164,8 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrap( "Project: {0}".format( element.attrib["name"] ) )
 			out += " "
 			wrapper.indent()
-			out += wrapper.wrap( "Base directory: {0}".format( element.attrib["basedir"] ) )
-			out += " "
+			#out += wrapper.wrap( "Base directory: {0}".format( element.attrib["basedir"] ) )
+			#out += " "
 			out += wrapper.wrap( "Start time (UTC): {0}".format( element.attrib["starttime"] ) )
 			out += wrapper.wrap( "Stop time (UTC):  {0}".format( element.attrib["stoptime"] ) )
 			out += " "
@@ -181,11 +184,15 @@ class XmlReportConverter( MObject ):
 
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()
+				text = None
 				try:
-					out += self.__xmlTemplateFunctions[name]( element, wrapper )
+					text = self.__xmlTemplateFunctions[name]( element, wrapper )
 				except AttributeError:
 					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
 				wrapper.dedent()
+
+				if text is not None:
+					out += text
 
 		elif element.tag == "configuration":
 			out += " "

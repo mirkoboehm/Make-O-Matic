@@ -69,9 +69,11 @@ th {
 
 	<xsl:template match="project">
 		<h2>Project: <xsl:value-of select="@name" /></h2>
+		<!--
 		<p>
 			Base directory: <xsl:value-of select="@basedir" />
 		</p>
+		-->
 		<p>
 			Start time: <xsl:value-of select="@starttime" /><br />
 			Stop time : <xsl:value-of select="@stoptime" />
