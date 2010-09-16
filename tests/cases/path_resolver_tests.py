@@ -20,12 +20,13 @@
 import os
 from core.helpers.PathResolver import PathResolver
 import unittest
+from tests.helpers.MomTestCase import MomTestCase
 
 class FolderTester( object ):
 	def pathMethod( self ):
 		return os.getcwd()
 
-class PathResolverTest( unittest.TestCase ):
+class PathResolverTest( MomTestCase ):
 
 	def testPathResolver( self ):
 		tester = FolderTester()

@@ -54,6 +54,5 @@ Check it out at http://gitorious.org/make-o-matic
 		except Exception as e:
 			self.fail( 'Sending a test email failed: {0}'.format( e ) )
 
-
 if __name__ == "__main__":
 	unittest.main()

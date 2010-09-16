@@ -18,13 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.modules.reporters.XmlReport import XmlReport
-from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
-from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Exceptions import MomError
+from core.modules.reporters.XmlReport import XmlReport
+from core.helpers.XmlReportConverter import XmlReportConverter
 from core.modules.XmlReportGenerator import XmlReportGenerator
-import shutil
-import os
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
 try:
 	from lxml import etree
@@ -33,24 +31,17 @@ except ImportError:
 
 class XmlReportTests( MomBuildMockupTestCase ):
 
-	def setUp( self ):
-		MomBuildMockupTestCase.setUp( self )
-
-	def _runBuild( self ):
+	def getXmlReport( self ):
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 		self.build.buildAndReturn()
-
-	def testCreateXmlReport( self ):
-		self._runBuild()
 		report = XmlReport( self.build )
 		report.prepare()
+		return report
 
-		xmlString = report.getReport()
-		doc = etree.XML( xmlString )
+	def testCreateXmlReport( self ):
+		doc = etree.XML( self.getXmlReport().getReport() )
 
-		os.chdir( ".." )
-		shutil.rmtree( "xmlreporttestbuild" )
 		self.assertEqual( doc.tag, "build" ) # root
 		self.assertNotEquals( doc.find( './/project' ), None )
 		self.assertNotEquals( doc.find( './/environment' ), None )
@@ -62,56 +53,36 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEquals( doc.find( './/plugin[@name="CMakeBuilder"]' ), None )
 
 	def testConvertXmlReportToHtml( self ):
-		self._runBuild()
-
-		report = XmlReport( self.build )
-		report.prepare()
-		converter = XmlReportConverter( report )
-
+		converter = XmlReportConverter( self.getXmlReport() )
 		xmlString = converter.convertToHtml()
 		doc = etree.XML( xmlString )
 
 		# TODO: Add more _useful_ tests 
-		os.chdir( ".." )
-		shutil.rmtree( "xmlreporttestbuild" )
 		self.assertEqual( doc.tag, "{http://www.w3.org/1999/xhtml}html" ) # root
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ), None )
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ), None )
 
 	def testConvertXmlReportToText( self ):
-		self._runBuild()
-
-		report = XmlReport( self.build )
-		report.prepare()
-		converter = XmlReportConverter( report )
-
+		converter = XmlReportConverter( self.getXmlReport() )
 		text = converter.convertToText()
 
 		# TODO: Add more _useful_ tests
-		os.chdir( ".." )
-		shutil.rmtree( "xmlreporttestbuild" )
 		self.assertTrue( len( text ) > 1000 )
 
 	def testXmlReportGenerator( self ):
 		generator = XmlReportGenerator()
 		self.build.addPlugin( generator )
-		self._runBuild()
 
-		report = XmlReport( self.build )
-		report.prepare()
-		reportContent = report.getReport()
-
+		reportContent = self.getXmlReport().getReport()
 		filePath = generator.getReportFile()
+
 		self.assertNotEquals( filePath, None, "Log file does not exist" )
 
-		f = open( filePath )
-		fileContent = f.read()
-		os.chdir( ".." )
-		shutil.rmtree( "xmlreporttestbuild" )
+		file = open( filePath )
+		fileContent = file.read()
 		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
 
 		self.assertEqual( fileContent, reportContent, "Report file content not written correctly" )
-
 
 if __name__ == "__main__":
 	unittest.main()

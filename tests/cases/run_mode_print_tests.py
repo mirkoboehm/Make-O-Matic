@@ -20,23 +20,17 @@ import unittest
 from core.Project import Project
 from core.Settings import Settings
 from core.Build import Build
-from core.MApplication import MApplication
+from tests.helpers.MomTestCase import MomTestCase
 
-class RunModePrintTests( unittest.TestCase ):
+class RunModePrintTests( MomTestCase ):
 
 	def setUp( self ):
-		if MApplication.instance:
-			# do not try this at home!
-			MApplication.instance = None
+		MomTestCase.setUp( self, False )
 		self.build = Build()
 		self.project = Project( 'ScmFactoryTest' )
 		self.build.setProject( self.project )
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		# self.build.addLogger( ConsoleLogger() )
 		self.project.createScm( 'git:git://gitorious.org/make-o-matic/mom.git' )
-
-	def tearDown( self ):
-		MApplication.instance = None
 
 	def testPrintRevisionsSince( self ):
 		revision = '57307ee83930c089d0eb9b4e7342c87784257071'
@@ -64,5 +58,4 @@ class RunModePrintTests( unittest.TestCase ):
 		return result
 
 if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
 	unittest.main()

@@ -24,42 +24,33 @@ from core.modules.scm.SCMGit import SCMGit
 from core.Settings import Settings
 from core.Exceptions import ConfigurationError
 from core.Build import Build
-from core.MApplication import MApplication
+from tests.helpers.MomTestCase import MomTestCase
 
-class ScmFactoryTests( unittest.TestCase ):
+class ScmFactoryTests( MomTestCase ):
 
 	def setUp( self ):
-		if MApplication.instance:
-			# do not try this at home!
-			MApplication.instance = None
+		MomTestCase.setUp( self, False )
 		self.build = Build()
 		self.project = Project( 'ScmFactoryTest' )
 		self.build.setProject( self.project )
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		# self.build.addLogger( ConsoleLogger() )
 		self.project.createScm( 'git:git://gitorious.org/make-o-matic/mom.git' )
 
-	def tearDown( self ):
-		MApplication.instance = None
-
-	def __createAndReturnScm( self, description ):
-		factory = SourceCodeProviderFactory()
-		return factory.makeScmImplementation( description )
+	def createAndReturnScm( self, description ):
+		return SourceCodeProviderFactory().makeScmImplementation( description )
 
 	def testCreateGitScm( self ):
 		description = 'git:git://gitorious.org/make-o-matic/mom.git'
-		scm = self.__createAndReturnScm( description )
+		scm = self.createAndReturnScm( description )
 		self.assertTrue( isinstance( scm, SCMGit ), 'The descriptor {0} should result in a ScmGit object!'.format( description ) )
 
 	def testCreateUnknownScm( self ):
-		description = 'nonsense:more nonsense'
 		try:
-			self.__createAndReturnScm( description )
+			self.createAndReturnScm( 'nonsense:more nonsense' )
 		except ConfigurationError:
 			pass # just as expected
 		else:
 			self.fail( "Trying to create an unknown source code provider implementation should throw a configuration error!" )
 
 if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
 	unittest.main()

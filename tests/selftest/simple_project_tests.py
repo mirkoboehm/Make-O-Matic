@@ -25,14 +25,21 @@ from core.helpers.RunCommand import RunCommand
 from core.helpers.GlobalMApp import mApp
 from tests.helpers.MomTestCase import MomTestCase
 import shutil
+import glob
 
 class SimpleProjectTests( MomTestCase ):
 	'''SimpleProjectTests runs the example_mom_builscript in the three major run modes.
 	It assumes that it is executed in the tests/ sub-directory of the mom repository.'''
 
-	BuildScriptName = os.path.join( 'buildscripts', 'example_mom_buildscript.py' )
+	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_mom_buildscript.py' ) )
 
-	def _querySetting( self, name ):
+	def tearDown( self ):
+		MomTestCase.tearDown( self )
+		removeDirectories = glob.glob( "makeomatic*" )
+		for directory in removeDirectories:
+			shutil.rmtree( directory )
+
+	def querySetting( self, name ):
 		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, 'query', name ]
 		runner = RunCommand( cmd )
 		runner.run()
@@ -44,13 +51,13 @@ class SimpleProjectTests( MomTestCase ):
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testQueryProjectName( self ):
-		runner = self._querySetting( Settings.ProjectName )
+		runner = self.querySetting( Settings.ProjectName )
 		self.assertEquals( runner.getReturnCode(), 0 )
 		line = runner.getStdOut().decode().strip()
 		self.assertEquals( line, 'project.name: MakeOMatic' )
 
 	def testQueryMomVersion( self ):
-		runner = self._querySetting( Settings.MomVersionNumber )
+		runner = self.querySetting( Settings.MomVersionNumber )
 		self.assertEquals( runner.getReturnCode(), 0 )
 		line = runner.getStdOut().decode().strip()
 		expectedVersion = mApp().getSettings().get( Settings.MomVersionNumber )
@@ -65,42 +72,33 @@ class SimpleProjectTests( MomTestCase ):
 		# we cannot know what the current revision is, but if the return code is not zero, it should not be empty:
 		self.assertTrue( line )
 
-	def _testBuild( self, buildType ):
+	def runTestBuild( self, buildType ):
 		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, '-v', '-t', buildType ]
-		runner = RunCommand( cmd )
-		runner.run()
-		shutil.rmtree( 'makeomatic' )
-		if runner.getReturnCode() != 0:
-			print( '\nbuild script run failed for build type {0}'.format( buildType ) )
-			print( 'output:' )
-			print( runner.getStdOut().decode() )
-			print( 'error output:' )
-			print( runner.getStdErr().decode() )
-			self.assert_( runner.getReturnCode(), 0 )
+		self.runCommand( cmd, "Make-O-Matic buildscript: build type {0}".format( buildType ) )
 
 	def testEBuild( self ):
-		self._testBuild( 'E' )
+		self.runTestBuild( 'E' )
 
 	def testMBuild( self ):
-		self._testBuild( 'M' )
+		self.runTestBuild( 'M' )
 
 	def testCBuild( self ):
-		self._testBuild( 'C' )
+		self.runTestBuild( 'C' )
 
 	def testDBuild( self ):
-		self._testBuild( 'D' )
+		self.runTestBuild( 'D' )
 
 	def testSBuild( self ):
-		self._testBuild( 'S' )
+		self.runTestBuild( 'S' )
 
 	def testHBuild( self ):
-		self._testBuild( 'H' )
+		self.runTestBuild( 'H' )
 
 	def testPBuild( self ):
-		self._testBuild( 'P' )
+		self.runTestBuild( 'P' )
 
 	def testFBuild( self ):
-		self._testBuild( 'F' )
+		self.runTestBuild( 'F' )
 
 if __name__ == "__main__":
 	unittest.main()

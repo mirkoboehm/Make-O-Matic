@@ -26,22 +26,25 @@ import glob
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
 
-	BuildScriptName = os.path.join( 'buildscripts', 'example_mom_buildscript.py' )
-	ToolName = os.path.join( '..', 'tools', 'simple_ci.py' )
+	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_mom_buildscript.py' ) )
+	ToolName = os.path.abspath( os.path.join( sys.path[0], '..', 'tools', 'simple_ci.py' ) )
+	CurrentDirectory = os.getcwd()
+
+	def tearDown( self ):
+		os.chdir( self.CurrentDirectory )
+		removeDirectories = glob.glob( "makeomatic*" )
+		for directory in removeDirectories:
+			shutil.rmtree( directory )
 
 	def testUsageHelp( self ):
 		cmd = [ sys.executable, SimpleCITests.ToolName, '-h' ]
 		runner = self.runCommand( cmd, 'simple_ci usage help' )
-		shutil.rmtree( "makeomatic" )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunFindRevisions( self ):
 		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
 			'--pause', '1', '-b', SimpleCITests.BuildScriptName ]
 		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
-		directories = glob.glob( "makeomatic*" )
-		for directory in directories:
-			shutil.rmtree( directory )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunPerformBuilds( self ):

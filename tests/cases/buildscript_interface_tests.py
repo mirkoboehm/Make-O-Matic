@@ -23,27 +23,30 @@ from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
 import shutil
+import sys
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
-	BuildScriptName = os.path.join( 'buildscripts', 'example_mom_buildscript.py' )
+	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_mom_buildscript.py' ) )
+
+	def setUp( self ):
+		MomTestCase.setUp( self )
+		self.iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
+
+	def tearDown( self ):
+		MomTestCase.tearDown( self )
+		shutil.rmtree( "makeomatic" )
 
 	def testQuerySetting( self ):
-		iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
-		variable = iface.querySetting( Settings.MomVersionNumber )
-		shutil.rmtree( "makeomatic" )
+		variable = self.iface.querySetting( Settings.MomVersionNumber )
 		self.assertEquals( variable, mApp().getSettings().get( Settings.MomVersionNumber ) )
 
 	def testPrintCurrentRevision( self ):
-		iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
-		variable = iface.queryCurrentRevision()
-		shutil.rmtree( "makeomatic" )
+		variable = self.iface.queryCurrentRevision()
 		self.assertTrue( variable )
 
 	def testPrintRevisionsSince( self ):
-		iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
-		revisions = iface.queryRevisionsSince( '8c758c1f1de2bcc19bda516f1acadf869ba28ee4' )
-		shutil.rmtree( "makeomatic" )
+		revisions = self.iface.queryRevisionsSince( '8c758c1f1de2bcc19bda516f1acadf869ba28ee4' )
 		self.assertTrue( len( revisions ) >= 5 )
 
 

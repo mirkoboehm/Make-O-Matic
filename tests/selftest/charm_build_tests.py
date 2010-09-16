@@ -22,16 +22,20 @@ from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.Settings import Settings
 import unittest
 import shutil
+import sys
 
 class CharmBuildTests( MomTestCase ):
 	'''CharmBuildTests executes the example_charm build script with revisions known to work.'''
 
-	BuildScriptName = os.path.join( 'buildscripts', 'example_charm.py' )
+	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_charm.py' ) )
+
+	def tearDown( self ):
+		MomTestCase.tearDown( self )
+		shutil.rmtree( "charm_build" )
 
 	def testQueryCharmProjectName( self ):
 		iface = BuildScriptInterface( CharmBuildTests.BuildScriptName )
 		projectNameQueryResult = iface.querySetting( Settings.ProjectName )
-		shutil.rmtree( "charm" )
 		self.assertTrue( projectNameQueryResult )
 
 if __name__ == "__main__":

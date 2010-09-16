@@ -17,31 +17,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 from core.Project import Project
 from core.Settings import Settings
-from core.MApplication import MApplication
-import os.path
-import inspect
 from core.environments.Environments import Environments
 from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder
 from core.Configuration import Configuration
 from core.modules.testers.CTest import CTest
 from core.modules.packagers.CPack import CPack
-import sys
 from core.Build import Build
+from tests.helpers.MomTestCase import MomTestCase
+import os
+import inspect
+import sys
+import shutil
 
-class MomBuildMockupTestCase( unittest.TestCase ):
+class MomBuildMockupTestCase( MomTestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
 
 	def setUp( self ):
-		if MApplication.instance:
-			# do not try this at home!
-			MApplication.instance = None
+		MomTestCase.setUp( self, False )
 
-		self._initializeBuildMockup()
-
-	def _initializeBuildMockup( self ):
 		myFile = inspect.getfile( inspect.currentframe() )
 		myFilePath = os.path.split( myFile )
 		myDir = myFilePath[0]
@@ -70,5 +65,7 @@ class MomBuildMockupTestCase( unittest.TestCase ):
 		self.build = build
 
 	def tearDown( self ):
-		MApplication.instance = None
-
+		MomTestCase.tearDown( self )
+		os.chdir( ".." )
+		os.chdir( ".." )
+		shutil.rmtree( "xmlreporttestbuild" )

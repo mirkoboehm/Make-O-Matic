@@ -19,8 +19,9 @@
 import unittest
 import os
 from core.helpers.EnvironmentSaver import EnvironmentSaver
+from tests.helpers.MomTestCase import MomTestCase
 
-class EnvironmentSaverTest( unittest.TestCase ):
+class EnvironmentSaverTest( MomTestCase ):
 
 	def testSetVariable( self ):
 		testVariable = 'TEST_ENVIRONMENT_VARIABLE'

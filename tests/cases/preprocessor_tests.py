@@ -20,8 +20,9 @@
 import unittest
 from core.modules.Preprocessor import _PreprocessorAction
 from core.Exceptions import BuildError
+from tests.helpers.MomTestCase import MomTestCase
 
-class PreprocessorTest( unittest.TestCase ):
+class PreprocessorTest( MomTestCase ):
 
 	def _runTest( self, inputString, outputString, msg = None ):
 		'''Helper method to run a single test'''

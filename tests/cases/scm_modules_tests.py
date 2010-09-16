@@ -18,67 +18,49 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.MApplication import MApplication
 from core.Project import Project
 from core.Build import Build
 import shutil
 import os
+from tests.helpers.MomTestCase import MomTestCase
 
-class ScmModulesTests ( unittest.TestCase ):
+class ScmModulesTests ( MomTestCase ):
 
 	def setUp( self ):
-		if MApplication.instance:
-			# do not try this at home!
-			MApplication.instance = None
-
+		MomTestCase.setUp( self, False )
 		self.build = Build()
 		self.project = Project( 'ScmFactoryTest' )
 		self.build.setProject( self.project )
 
 	def tearDown( self ):
-		MApplication.instance = None
+		MomTestCase.tearDown( self )
+		os.chdir( ".." )
+		shutil.rmtree( "None" )
 
-	def _initializeBuild( self ):
-		"""Create project checkout-step (required)"""
+	def runScmTests( self, description ):
+		self.project.createScm( description )
+		scm = self.project.getScm()
 
 		self.build.getParameters().parse()
 		self.build.initialize()
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 
-	def testScmGit( self ):
-		self.project.createScm( 'git:git://gitorious.org/make-o-matic/mom.git' )
-		scm = self.project.getScm()
-		self._initializeBuild()
-
 		# run scm step only 
 		scm.getInstructions().execute()
 
 		# TODO: Add better tests
 		info = scm.getRevisionInfo()
-		os.chdir( ".." )
-		shutil.rmtree( "None" )
 		self.assertNotEquals( info.committer, None )
 		self.assertNotEquals( info.commitMessage, None )
 		self.assertNotEquals( info.commitTime, None )
 		self.assertNotEquals( info.revision, None )
+
+	def testScmGit( self ):
+		self.runScmTests( 'git:git://gitorious.org/make-o-matic/mom.git' )
 
 	def testScmSvn( self ):
-		self.project.createScm( 'svn:http://ratproxy.googlecode.com/svn/trunk/' ) # random light-weight repository
-		scm = self.project.getScm()
-		self._initializeBuild()
-
-		# run scm step only 
-		scm.getInstructions().execute()
-
-		# TODO: Add better tests
-		info = scm.getRevisionInfo()
-		os.chdir( ".." )
-		shutil.rmtree( "None" )
-		self.assertNotEquals( info.committer, None )
-		self.assertNotEquals( info.commitMessage, None )
-		self.assertNotEquals( info.commitTime, None )
-		self.assertNotEquals( info.revision, None )
+		self.runScmTests( 'svn:http://ratproxy.googlecode.com/svn/trunk/' )
 
 if __name__ == "__main__":
 	unittest.main()

@@ -19,16 +19,14 @@
 import unittest
 from buildcontrol.common.BuildStatus import BuildStatus
 from buildcontrol.common.BuildInfo import BuildInfo
-import tempfile
+from tempfile import NamedTemporaryFile
 import os
+from tests.helpers.MomTestCase import MomTestCase
 
-class BuildStatusPersistenceTests( unittest.TestCase ):
-	def getTemporaryDatabaseFilename( self ):
-		return tempfile.NamedTemporaryFile( suffix = '.sqlite' ).name
-
+class BuildStatusPersistenceTests( MomTestCase ):
 	def testPersistBuildInfo( self ):
 		status = BuildStatus()
-		filename = self.getTemporaryDatabaseFilename()
+		filename = NamedTemporaryFile( suffix = '.sqlite' ).name
 		status.setDatabaseFilename( filename )
 		info = BuildInfo()
 		info.setProjectName( status.getName() )
@@ -45,5 +43,4 @@ class BuildStatusPersistenceTests( unittest.TestCase ):
 		os.remove( filename )
 
 if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
 	unittest.main()

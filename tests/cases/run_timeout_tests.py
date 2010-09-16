@@ -17,42 +17,30 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.RunCommand import RunCommand
 import unittest
-from core.MApplication import MApplication
 from core.Build import Build
 import sys
+from tests.helpers.MomTestCase import MomTestCase
 
-# FIXME the test will need a Build object now! setup/tearDown?
-class RunWithTimeoutTest( unittest.TestCase ):
+class RunWithTimeoutTest( MomTestCase ):
 
 	def setUp( self ):
-		if MApplication.instance:
-			# do not try this at home!
-			MApplication.instance = None
+		MomTestCase.setUp( self, False )
 		self.build = Build()
 		if sys.platform == 'win32':
-			self.sleepCommand = [ 'ping', '127.0.0.1', '-n', '10' ]
+			self.sleepCommand = [ 'ping', '127.0.0.1', '-n', '2' ]
 		else:
-			self.sleepCommand = [ 'sleep', '5']
-
-	def tearDown( self ):
-		MApplication.instance = None
+			self.sleepCommand = [ 'sleep', '2']
 
 	def testRunWithTimeout( self ):
 		timeout = 1
-		runner = RunCommand( self.sleepCommand, timeout, True )
-		runner.run()
+		runner = self.runCommand( self.sleepCommand, self.sleepCommand[0], timeout, False )
 		self.assertTrue( runner.getTimedOut() )
-		self.assertNotEquals( runner.getReturnCode(), 0 )
 
 	def testRunWithoutTimeout( self ):
 		timeout = 10
-		runner = RunCommand( self.sleepCommand, timeout, True )
-		runner.run()
+		runner = self.runCommand( self.sleepCommand, self.sleepCommand[0], timeout, True )
 		self.assertFalse( runner.getTimedOut() )
-		self.assertEqual( runner.getReturnCode(), 0 )
 
 if __name__ == "__main__":
-	#import sys;sys.argv = ['', 'Test.testName']
 	unittest.main()

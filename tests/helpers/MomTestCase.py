@@ -25,26 +25,28 @@ from core.helpers.RunCommand import RunCommand
 class MomTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
 
-	def setUp( self ):
+	def setUp( self, createBuild = True ):
 		if MApplication.instance:
 			# do not try this at home!
 			MApplication.instance = None
-		self.build = Build()
+		if createBuild:
+			self.build = Build()
 
 	def tearDown( self ):
 		MApplication.instance = None
 
-	def runCommand( self, cmd, description ):
+	def runCommand( self, cmd, description, timeout = None, zeroReturnCode = True ):
 		'''Helper method to run shell commands in tests. It creates a RunCommand object, runs it, 
 		and returns it. If the return code is not zero, it dumps the output of the command.'''
-		runner = RunCommand( cmd )
+		runner = RunCommand( cmd, timeout )
 		runner.run()
-		if runner.getReturnCode() != 0:
+		if zeroReturnCode and runner.getReturnCode() != 0:
 			print( '\n' )
 			print( 'command failed: {0}'.format( description ) )
 			print( 'output:' )
 			print( runner.getStdOut().decode() )
 			print( 'error output:' )
 			print( runner.getStdErr().decode() )
+		self.assertEqual( runner.getReturnCode() == 0, zeroReturnCode )
 		return runner
 
