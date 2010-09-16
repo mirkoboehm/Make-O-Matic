@@ -111,14 +111,14 @@ class SourceCodeProvider( Plugin ):
 		return { "html":
 			"""
 			Revision: <xsl:value-of select="@revision"/><br/>
-			Committer: <xsl:value-of select="@committer"/><br/>
+			Committer: <xsl:value-of select="@committerName"/> &lt;<xsl:value-of select="@committerEmail"/>&gt;<br/>
 			Time: <xsl:value-of select="@commitTime"/><br/>
 			Message: <xsl:value-of select="commitMessage"/>
 			""" }
 
 	def getXmlTemplate( self, element, wrapper ):
 		return wrapper.wrap( "Revision: {0}".format( element.attrib["revision"] ) ) + \
-			wrapper.wrap( "Committer: {0}".format( element.attrib["committer"] ) ) + \
+			wrapper.wrap( "Committer: {0} <{1}>".format( element.attrib["committerName"], element.attrib["committerEmail"] ) ) + \
 			wrapper.wrap( "Time: {0}".format( element.attrib["commitTime"] ) ) + \
 			wrapper.wrap( "Message: {0}".format( element.find( "commitMessage" ).text ) )
 
@@ -127,7 +127,8 @@ class SourceCodeProvider( Plugin ):
 
 		info = self.getRevisionInfo()
 		node.attributes["revision"] = info.revision
-		node.attributes["committer"] = info.committer
+		node.attributes["committerName"] = info.committerName
+		node.attributes["committerEmail"] = info.committerEmail
 		node.attributes["commitTime"] = info.commitTime
 		create_child_node( document, node, "commitMessage", info.commitMessage )
 

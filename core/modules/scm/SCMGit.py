@@ -73,7 +73,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def getRevisionInfo( self ):
 		sep = "\t"
-		formatStr = "%cn{0}%s{0}%ci{0}%H".format( sep )
+		formatStr = "%cn{0}%ce{0}%s{0}%ci{0}%H".format( sep )
 
 		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), 'HEAD^..HEAD']
 		runner = RunCommand( cmd, 3600 )
@@ -84,10 +84,11 @@ class SCMGit( SourceCodeProvider ):
 
 		if runner.getReturnCode() == 0:
 			infos = runner.getStdOut().decode().split( sep )
-			info.committer = infos[0]
-			info.commitMessage = infos[1]
-			info.commitTime = infos[2]
-			info.revision = infos[3]
+			info.committerName = infos[0]
+			info.committerEmail = infos[1]
+			info.commitMessage = infos[2]
+			info.commitTime = infos[3]
+			info.revision = infos[4]
 		else:
 			raise ConfigurationError( 'Cannot get log for the clone of "{0}" at "{1}"'
 				.format( self.getUrl(), self._getHiddenClonePath() ) )

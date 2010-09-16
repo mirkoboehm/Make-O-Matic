@@ -45,7 +45,7 @@ class SCMSubversion( SourceCodeProvider ):
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			assert len( logentries ) == 1
 			results = parse_log_entry( logentries[0] )
-			( info.committer, info.commitMessage, info.revision, info.commitTime ) = results
+			( info.committerName, info.commitMessage, info.revision, info.commitTime ) = results
 		else:
 			raise ConfigurationError( 'cannot get log for "{0}"'
 				.format( self.getUrl() ) )
