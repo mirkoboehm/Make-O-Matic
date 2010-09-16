@@ -20,7 +20,6 @@ from core.Instructions import Instructions
 import os
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import MomError, ConfigurationError, BuildError
-from core.Defaults import Defaults
 from core.helpers.TimeKeeper import formatted_time, TimeKeeper
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_nonempty_string
