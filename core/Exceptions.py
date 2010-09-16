@@ -28,7 +28,8 @@ class MomException( Exception ):
 	def __str__( self ):
 		return repr( self.value ).rstrip()
 
-	def getReturnCode( self ):
+	@staticmethod
+	def getReturnCode():
 		raise NotImplementedError( "Abstract base class method called!" )
 
 	def getDescription( self ):
@@ -36,24 +37,43 @@ class MomException( Exception ):
 
 class BuildError( MomException ):
 	"""A build error is raised if the build fails due to a problem caused by the project."""
-	def getReturnCode( self ):
+
+	@staticmethod
+	def getReturnCode():
 		return 1
 
 class ConfigurationError( MomException ):
 	"""A configuration error is raised if the build fails due to a mis-configuration of the run environment.
 	The error is not caused by the project, and it is not an internal error in the make-o-matic code. 
 	ConfigurationErrors need to be fixed by the administrators of the CI system."""
-	def getReturnCode( self ):
+
+	@staticmethod
+	def getReturnCode():
 		return 2
 
 class MomError( MomException ):
 	"""A MomError is raised if an error was detected that was caused by make-o-matic itself.
 	MomErrors need to be fixed by the make-o-matic developers."""
-	def getReturnCode( self ):
+
+	@staticmethod
+	def getReturnCode():
 		return 3
 
 class InterruptedException( MomError ):
 	"""This class is not used directly by MOM, it only defines the correct return code."""
-	def getReturnCode( self ):
+
+	@staticmethod
+	def getReturnCode():
 		return signal.SIGINT + 128
 
+def returncode_to_description( returnCode ):
+	"""Returns a string representing the description of the return code"""
+
+	if returnCode == 0: # no error
+		return "Build finished successfully"
+	elif returnCode == BuildError.getReturnCode():
+		return "An error occured while building the project"
+	elif returnCode == MomError.getReturnCode():
+		return "An error in Make-O-Matic occured"
+	else:
+		return "Something unexpected occured"
