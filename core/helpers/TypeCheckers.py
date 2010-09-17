@@ -22,7 +22,7 @@ def check_for_list_of_strings( expression, description ):
 	if not isinstance( expression, list ):
 		raise ConfigurationError( description )
 	for obj in expression:
-		if not isinstance( obj, str ):
+		if not isinstance( obj, str ) and not isinstance( obj, unicode ):
 			raise ConfigurationError( description )
 
 def check_for_string( expression, description ):
