@@ -30,7 +30,7 @@ class XmlReportGenerator( Plugin ):
 		self.__fileHandle = None
 		self.__reportFile = None
 
-	def wrapUp( self ):
+	def shutDown( self ):
 		report = XmlReport( self.getInstructions() )
 		report.prepare()
 

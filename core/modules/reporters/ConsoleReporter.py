@@ -26,10 +26,10 @@ class ConsoleReporter( Reporter ):
 	def __init__( self, name = None ):
 		Reporter.__init__( self, name )
 
-	def wrapUp( self ):
+	def shutDown( self ):
 		report = XmlReport( self.getInstructions() )
 		report.prepare()
 		converter = XmlReportConverter( report )
 
 		print( converter.convertToText() )
-		print() # empty line
+		print( " " ) # empty line

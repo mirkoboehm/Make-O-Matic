@@ -25,6 +25,7 @@ import sys
 from core.Project import Project
 from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.modules.reporters.EmailReporter import EmailReporter
+from core.modules.XmlReportGenerator import XmlReportGenerator
 
 def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 	try:
@@ -33,6 +34,7 @@ def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 		mApp().getSettings().set( Settings.ScriptLogLevel, build.getParameters().getDebugLevel() )
 		logger = ConsoleLogger()
 		build.addLogger( logger )
+		build.addPlugin( XmlReportGenerator() )
 		build.initialize()
 
 		if mApp().getSettings().get( Settings.EmailReporterEnableOnAllBuilds ):
