@@ -51,7 +51,7 @@ class Parameters( MObject ):
 			help = 'ignore commit message commands (like "MOM:BuildType=S")' )
 		parser.add_option( '-s', '--build-steps', action = 'store', dest = 'buildSteps',
 			help = 'enable or disable individual builds steps on top of the defaults for the build type' )
-		parser.add_option( '-v', '--verbose', action = 'count', dest = 'verbosity', default = 0,
+		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
 			help = 'level of debug output' )
 		return parser
 

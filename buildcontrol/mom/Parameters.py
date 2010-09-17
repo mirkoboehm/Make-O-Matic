@@ -68,7 +68,7 @@ class Parameters( MObject ):
 			help = 'SCM location including SCM identifier' )
 		parser.add_option( '-p', '--path', action = 'store', dest = 'buildscriptPath',
 			help = 'path of the build script in the specified repository' )
-		parser.add_option( '-v', '--verbose', action = 'count', dest = 'verbosity', default = 0,
+		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
 			help = 'level of debug output' )
 		# parse options:
 		( options, args ) = parser.parse_args( momOptions )

@@ -22,12 +22,12 @@ from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.Settings import Settings
 import unittest
 import shutil
-import sys
 
 class CharmBuildTests( MomTestCase ):
 	'''CharmBuildTests executes the example_charm build script with revisions known to work.'''
 
-	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_charm.py' ) )
+	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
+	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_charm.py' )
 
 	def tearDown( self ):
 		MomTestCase.tearDown( self )

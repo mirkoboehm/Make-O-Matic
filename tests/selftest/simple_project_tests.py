@@ -31,7 +31,8 @@ class SimpleProjectTests( MomTestCase ):
 	'''SimpleProjectTests runs the example_mom_builscript in the three major run modes.
 	It assumes that it is executed in the tests/ sub-directory of the mom repository.'''
 
-	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_mom_buildscript.py' ) )
+	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
+	BuildScriptName = os.path.join( ThisFilePath , '..', 'buildscripts', 'example_mom_buildscript.py' )
 
 	def tearDown( self ):
 		MomTestCase.tearDown( self )

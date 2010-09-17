@@ -23,11 +23,11 @@ from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
 import shutil
-import sys
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
-	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_mom_buildscript.py' ) )
+	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
+	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
 
 	def setUp( self ):
 		MomTestCase.setUp( self )

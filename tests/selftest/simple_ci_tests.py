@@ -26,8 +26,9 @@ import glob
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
 
-	BuildScriptName = os.path.abspath( os.path.join( sys.path[0], 'buildscripts', 'example_mom_buildscript.py' ) )
-	ToolName = os.path.abspath( os.path.join( sys.path[0], '..', 'tools', 'simple_ci.py' ) )
+	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
+	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
+	ToolName = os.path.join( ThisFilePath, '..', '..', 'tools', 'simple_ci.py' )
 	CurrentDirectory = os.getcwd()
 
 	def tearDown( self ):

@@ -85,7 +85,7 @@ class Parameters( MObject ):
 		parser = optparse.OptionParser()
 		parser.add_option( "-c", "--control-folder", type = "string", dest = "control_dir",
 			help = "select control folder that contains the build scripts" )
-		parser.add_option( '-v', '--verbose', action = 'count', dest = 'verbosity',
+		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity',
 			help = 'level of debug output' )
 		parser.add_option( "-d", "--test-run", action = "store_true", dest = "test_run",
 			help = "compile the last revision of every product for testing" )
