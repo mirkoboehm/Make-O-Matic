@@ -51,7 +51,7 @@ class EmailReporter( Reporter ):
 		email = Email()
 		email.setSubject( 'Build report for {0}, revision {1}'.format( instructions.getName(), info.revision ) )
 		email.setFromAddress( reporterSender )
-		email.setToAddresses( [reporterDefaultRecipients] )
+		email.setToAddresses( reporterDefaultRecipients )
 
 		if returnCode == 0: # no error
 			pass
