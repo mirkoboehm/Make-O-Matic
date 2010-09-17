@@ -51,6 +51,7 @@ class Project( BuildInstructions ):
 		factory = SourceCodeProviderFactory()
 		scm = factory.makeScmImplementation( description )
 		scm.setSrcDir( PathResolver( self.getSourceDir ) )
+		scm.setRevision( mApp().getParameters().getRevision() )
 		self.setScm( scm )
 
 	def setScm( self, scm ):

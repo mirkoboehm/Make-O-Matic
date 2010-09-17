@@ -75,7 +75,8 @@ class SCMGit( SourceCodeProvider ):
 		sep = "\t"
 		formatStr = "%cn{0}%ce{0}%s{0}%ci{0}%H".format( sep )
 
-		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), 'HEAD^..HEAD']
+		revision = self.getRevision() or 'HEAD'
+		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), '{0}^..{0}'.format( revision )]
 		runner = RunCommand( cmd, 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
