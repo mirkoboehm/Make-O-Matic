@@ -86,7 +86,7 @@ class Parameters( MObject ):
 		parser.add_option( "-c", "--control-folder", type = "string", dest = "control_dir",
 			help = "select control folder that contains the build scripts" )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity',
-			help = 'level of debug output' )
+			help = 'level of debug output. More than 5 "v"s will enable verbose output in buildscripts' )
 		parser.add_option( "-d", "--test-run", action = "store_true", dest = "test_run",
 			help = "compile the last revision of every product for testing" )
 		parser.add_option( "-f" , "--no-find", action = "store_true", dest = "no_find",

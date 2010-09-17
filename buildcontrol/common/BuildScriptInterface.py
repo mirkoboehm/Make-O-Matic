@@ -16,18 +16,31 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.MObject import MObject
 import sys
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import MomError
 import re
+from core.helpers.GlobalMApp import mApp
 
 class BuildScriptInterface( MObject ):
 	'''BuildScriptInterface encapsulates ways to invoke a build script.'''
 
 	def __init__( self, buildScript, name = None ):
 		MObject.__init__( self, name )
+
+		self._initializeParameters()
 		self.setBuildScript( buildScript )
+
+	def _initializeParameters( self ):
+		self.__parameters = []
+
+		if mApp().getParameters().getDebugLevelParameter() > 5:
+			self.__parameters.append( "-" + ( mApp().getParameters().getDebugLevelParameter() - 5 ) * "v" )
+
+	def getParameters( self ):
+		return self.__parameters
 
 	def setBuildScript( self, script ):
 		self.__buildScript = script
@@ -36,7 +49,7 @@ class BuildScriptInterface( MObject ):
 		return self.__buildScript
 
 	def querySetting( self, setting ):
-		cmd = [ sys.executable, self.getBuildScript(), 'query', setting ]
+		cmd = [ sys.executable, self.getBuildScript(), 'query', setting ] + self.getParameters()
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
@@ -56,7 +69,7 @@ class BuildScriptInterface( MObject ):
 
 	def queryRevisionsSince( self, revision ):
 		'''Execute the build script, and return the lines it outputs for "query revisions-since"'''
-		cmd = [ sys.executable, self.getBuildScript(), 'print', 'revisions-since', revision ]
+		cmd = [ sys.executable, self.getBuildScript(), 'print', 'revisions-since', revision ] + self.getParameters()
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
@@ -70,7 +83,7 @@ class BuildScriptInterface( MObject ):
 		return lines
 
 	def queryCurrentRevision( self ):
-		cmd = [ sys.executable, self.getBuildScript(), 'print', 'current-revision' ]
+		cmd = [ sys.executable, self.getBuildScript(), 'print', 'current-revision' ] + self.getParameters()
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
