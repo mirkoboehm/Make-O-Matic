@@ -81,7 +81,7 @@ class Emailer( MObject ):
 			password = mApp().getSettings().get( Settings.EmailerPassword )
 			try:
 				self.__server.login( user, password )
-				self.__server.set_debuglevel( 3 )
+				#self.__server.set_debuglevel( 3 )
 			except SMTPHeloError as e:
 				raise ConfigurationError( 'The SMTP server rejected the connection: {0}'.format( e ) )
 			except SMTPAuthenticationError:

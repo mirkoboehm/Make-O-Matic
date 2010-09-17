@@ -36,9 +36,9 @@ class EmailReporter( Reporter ):
 		assert isinstance( instructions, Build )
 
 		# get settings
-		reporterDefaultRecipients = mApp().getSettings().get( Settings.EmailReporterDefaultRecipients )
-		reporterConfigurationErrorRecipients = mApp().getSettings().get( Settings.EmailReporterConfigurationErrorRecipients )
-		reporterMomErrorRecipients = mApp().getSettings().get( Settings.EmailReporterMomErrorRecipients )
+		reporterDefaultRecipients = mApp().getSettings().get( Settings.EmailReporterDefaultRecipients, False )
+		reporterConfigurationErrorRecipients = mApp().getSettings().get( Settings.EmailReporterConfigurationErrorRecipients, False )
+		reporterMomErrorRecipients = mApp().getSettings().get( Settings.EmailReporterMomErrorRecipients, False )
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
 		reporterEnableHtml = mApp().getSettings().get( Settings.EmailReporterEnableHtml )
 
@@ -51,7 +51,8 @@ class EmailReporter( Reporter ):
 		email = Email()
 		email.setSubject( 'Build report for {0}, revision {1}'.format( instructions.getName(), info.revision ) )
 		email.setFromAddress( reporterSender )
-		email.setToAddresses( reporterDefaultRecipients )
+		if reporterDefaultRecipients:
+			email.setToAddresses( reporterDefaultRecipients )
 
 		if returnCode == 0: # no error
 			pass
