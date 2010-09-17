@@ -84,7 +84,7 @@ class _CommandRunner( Thread ):
 			self.join( 5 )
 
 class RunCommand( MObject ):
-	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False ):
+	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False, searchPaths = None ):
 		MObject.__init__( self )
 		check_for_list_of_strings( cmd, "The command must be a list of strings." )
 		self.__cmd = cmd
@@ -97,6 +97,7 @@ class RunCommand( MObject ):
 		self.__stdErr = None
 		self.__returnCode = None
 		self.__timedOut = False
+		self.resolveCommand( searchPaths )
 
 	def getTimeoutSeconds( self ):
 		return self.__timeoutSeconds
@@ -135,8 +136,8 @@ class RunCommand( MObject ):
 	def getCommand( self ):
 		return self.__cmd
 
-	def findExecutable( self, program, searchPaths = None ):
-		"""Returns path to program found in system's PATH, returns None if nothing found"""
+	def resolveCommand( self, searchPaths ):
+		"""Sets the full path to the command by searching PATH and other specified search paths"""
 
 		def isExecutable( fpath ):
 			return os.path.exists( fpath ) and os.access( fpath, os.X_OK )
@@ -144,22 +145,18 @@ class RunCommand( MObject ):
 		if searchPaths is None:
 			searchPaths = []
 
-		fpath, fname = os.path.split( program )
-		if fpath:
-			if isExecutable( program ):
-				return program
-		else:
+		command = self.__cmd[0]
+		fpath, fname = os.path.split( command )
+		if not fpath or not isExecutable( command ):
 			paths = searchPaths
 			paths += os.environ["PATH"].split( os.pathsep )
 
 			for path in paths:
 				executableFile = os.path.join( path, fname )
 				if isExecutable( executableFile ):
-					return executableFile
+					self.__cmd[0] = executableFile
 				elif sys.platform == "win32" and isExecutable( executableFile + ".exe" ):
-					return executableFile + ".exe"
-
-		return None
+					self.__cmd[0] = executableFile + ".exe"
 
 	def checkVersion( self, parameter = "--version", lineNumber = 0 ):
 		"""Check if this command is installed."""

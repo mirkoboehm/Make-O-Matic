@@ -30,6 +30,7 @@ class Plugin( MObject ):
 		self.setOptional( False )
 		self.setInstructions( None )
 		self.__command = None
+		self.__commandSearchPaths = None
 
 	def setInstructions( self, instructions ):
 		'''Assign this plugin to it's instruction object. 
@@ -96,8 +97,8 @@ class Plugin( MObject ):
 	def getCommand( self ):
 		return self.__command
 
-	def _setCommand( self, command ):
-		self.__command = command
+	def _setCommand( self, command, searchPaths = None ):
+		self.__command = RunCommand( [ command ], None, False, searchPaths ).getCommand()[0]
 
 	def setEnabled( self, onOff ):
 		self.__enabled = onOff

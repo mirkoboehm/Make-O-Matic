@@ -50,7 +50,7 @@ class SCMGit( SourceCodeProvider ):
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
 
-		self._setCommand( "git" )
+		self._setCommand( "git", [ "/usr/local/bin" ] )
 		self.__cloneArmy = self._findCloneArmyDir()
 		self.__revisionInfo = RevisionInfo()
 
