@@ -18,10 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
+import time
 
 def formatted_time( datetimeObj ):
 	try:
-		text = datetime.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
+		text = time.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
 	except Exception:
 		text = datetimeObj
 	return text
