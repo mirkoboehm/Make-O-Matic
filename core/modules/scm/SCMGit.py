@@ -175,7 +175,7 @@ class SCMGit( SourceCodeProvider ):
 		else:
 			if not os.path.exists( self.getCloneArmyDir() ):
 				os.makedirs( self.getCloneArmyDir() )
-			runner = RunCommand( [ self.getCommand(), 'clone', '--bare',
+			runner = RunCommand( [ self.getCommand(), 'clone', '--mirror',
 				self.getUrl(), make_foldername_from_string( self.getUrl() ) ], 1200, True )
 			runner.setWorkingDir( self.getCloneArmyDir() )
 			runner.run()
