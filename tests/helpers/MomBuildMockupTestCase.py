@@ -63,9 +63,9 @@ class MomBuildMockupTestCase( MomTestCase ):
 		build.getSettings().set( Settings.EnvironmentsBaseDir, testMomEnvironments )
 
 		self.build = build
+		self.cwd = os.getcwd()
 
 	def tearDown( self ):
 		MomTestCase.tearDown( self )
-		os.chdir( ".." )
-		os.chdir( ".." )
+		os.chdir( self.cwd )
 		shutil.rmtree( "xmlreporttestbuild" )
