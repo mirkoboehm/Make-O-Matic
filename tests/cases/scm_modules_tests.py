@@ -57,7 +57,7 @@ class ScmModulesTests ( MomTestCase ):
 		self.assertNotEquals( info.revision, None )
 
 	def testScmGit( self ):
-		self.runScmTests( 'git:git://github.com/mirkoboehm/Make-O-Matic.git' )
+		self.runScmTests( 'git:git://github.com/KDAB/Make-O-Matic.git' )
 
 	def testScmSvn( self ):
 		self.runScmTests( 'svn:http://ratproxy.googlecode.com/svn/trunk/' )

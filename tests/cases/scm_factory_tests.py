@@ -34,13 +34,13 @@ class ScmFactoryTests( MomTestCase ):
 		self.project = Project( 'ScmFactoryTest' )
 		self.build.setProject( self.project )
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.project.createScm( 'git:git://github.com/mirkoboehm/Make-O-Matic.git' )
+		self.project.createScm( 'git:git://github.com/KDAB/Make-O-Matic.git' )
 
 	def createAndReturnScm( self, description ):
 		return SourceCodeProviderFactory().makeScmImplementation( description )
 
 	def testCreateGitScm( self ):
-		description = 'git:git://github.com/mirkoboehm/Make-O-Matic.git'
+		description = 'git:git://github.com/KDAB/Make-O-Matic.git'
 		scm = self.createAndReturnScm( description )
 		self.assertTrue( isinstance( scm, SCMGit ), 'The descriptor {0} should result in a ScmGit object!'.format( description ) )
 
