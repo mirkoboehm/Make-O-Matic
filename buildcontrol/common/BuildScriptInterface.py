@@ -36,8 +36,8 @@ class BuildScriptInterface( MObject ):
 	def _initializeParameters( self ):
 		self.__parameters = []
 
-		if mApp().getParameters().getDebugLevelParameter() > 5:
-			self.__parameters.append( "-" + ( mApp().getParameters().getDebugLevelParameter() - 5 ) * "v" )
+		if mApp().getParameters().getDebugLevel() > 5:
+			self.__parameters.append( "-" + ( mApp().getParameters().getDebugLevel() - 5 ) * "v" )
 
 	def getParameters( self ):
 		return self.__parameters
