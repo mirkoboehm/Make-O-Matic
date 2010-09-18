@@ -74,12 +74,12 @@ class SimpleCiBase( MApplication ):
 
 	def build( self ):
 		settings = self.getSettings()
-		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevelParameter() )
+		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevel() )
 		self.addLogger( ConsoleLogger() )
 		# parse settings:
 		settings.evalConfigurationFiles( self.getToolName() )
-		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevelParameter() )
-		self.debug( self, 'debug level is {0}'.format( self.getParameters().getDebugLevelParameter() ) )
+		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevel() )
+		self.debug( self, 'debug level is {0}'.format( self.getParameters().getDebugLevel() ) )
 		database = os.path.join( self.getDataDir(), 'buildstatus.sqlite' )
 		self.getBuildStatus().setDatabaseFilename( database )
 		MApplication.build( self ) # call base class implementation

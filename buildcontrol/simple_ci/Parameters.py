@@ -23,7 +23,7 @@ class Parameters( MObject ):
 
 	def __init__( self ):
 		MObject.__init__( self )
-		self.setDebugLevelParameter( 0 )
+		self.setDebugLevel( 0 )
 		self.setBuildScripts( None )
 		self.setControlDir( None )
 		self.setPerformTestBuilds( False )
@@ -38,10 +38,10 @@ class Parameters( MObject ):
 	def getControlDir( self ):
 		return self.__controlDir
 
-	def setDebugLevelParameter( self, level ):
+	def setDebugLevel( self, level ):
 		self.__debugLevelParameter = level
 
-	def getDebugLevelParameter( self ):
+	def getDebugLevel( self ):
 		return self.__debugLevelParameter
 
 	def setPerformTestBuilds( self, doIt ):
@@ -104,7 +104,7 @@ class Parameters( MObject ):
 			self.setControlDir( str( options.control_dir ) )
 		if options.verbosity:
 			level = int( options.verbosity )
-			self.setDebugLevelParameter( level )
+			self.setDebugLevel( level )
 		if options.test_run:
 			self.setPerformTestBuilds( True )
 		if options.slaveMode:
