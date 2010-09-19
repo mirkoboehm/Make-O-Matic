@@ -42,24 +42,25 @@ class Parameters( MObject ):
 	def getPath( self ):
 		return self.__path
 
-	def parse( self ):
+	def parse( self, arguments ):
 		'''The mom command line contains two parts, a set of options for the mom tool itself, and a set of options for the 
 		invoked build script. The latter are ignored by mom, and will be passed down to the build script only. Both sections are 
 		separated by a single dash. If the single dash is not found, it is assumed that all parameters are to be parsed by the mom 
 		tool. Example: 
 		mom -vv -u git:git://github.com/KDAB/Make-O-Matic.git -p mom/buildscript.py -r4711 - -vv -t H -r4711
 		'''
+		# make a copy to avoid accidentally modifying sys.args
+		momOptions = arguments[:]
 		# split up the command line into the two sections: 
 		index = 0
-		momOptions = sys.argv[:]
 		self.__buildScriptOptions = []
-		for item in sys.argv:
+		for item in arguments:
 			if item.strip() == '-':
-				momOptions = sys.argv[0:index]
-				self.__buildScriptOptions = sys.argv[index + 1:]
+				momOptions = arguments[0:index]
+				self.__buildScriptOptions = arguments[index + 1:]
 				break
 			index = index + 1
-		mApp().debugN( self, 2, 'mom tool options: {0}'.format( ' '.join( momOptions ) ) )
+		mApp().debugN( self, 2, 'mom tool options: {0}'.format( ' '.join( arguments ) ) )
 		# set up the parser:
 		parser = optparse.OptionParser()
 		parser.add_option( '-r', '--revision', action = 'store', dest = 'revision',

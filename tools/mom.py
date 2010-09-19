@@ -21,6 +21,7 @@ from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 from buildcontrol.mom.Parameters import Parameters
 from core.helpers.GlobalMApp import mApp
+import sys
 
 class MomRemoteRunner( MApplication ):
 	'''MomRemoteRunner takes the location descriptor of a remote build script, fetches the build script, 
@@ -44,7 +45,7 @@ class MomRemoteRunner( MApplication ):
 		pass
 
 	def build( self ):
-		self.__parameters.parse()
+		self.__parameters.parse( sys.argv )
 		settings = self.getSettings()
 		settings.set( Settings.ScriptLogLevel, 3 ) # FIXME
 		self.addLogger( ConsoleLogger() )
