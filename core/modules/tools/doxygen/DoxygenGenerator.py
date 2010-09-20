@@ -25,7 +25,8 @@ class DoxygenGenerator( Plugin ):
 	def __init__( self, name = None ):
 		'''Constructor'''
 		Plugin.__init__( self, name )
-		self._setCommand( "doxygen", [ "/usr/local/bin" ] )
+		searchPaths = [ "C:/Program Files/doxygen/bin" ]
+		self._setCommand( "doxygen", searchPaths )
 		self.__doxygenFile = None
 		self.__docsDir = 'docs'
 

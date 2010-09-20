@@ -23,7 +23,8 @@ class JomTool( MakeTool ):
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-		self._setCommand( 'jom' )
+		searchPaths = [ "C:/Program Files/jom" ]
+		self._setCommand( 'jom', searchPaths )
 		self._setVersionParameter( '/version' )
 
 	def getArguments( self ):

@@ -150,8 +150,11 @@ class RunCommand( MObject ):
 		if not fpath or not isExecutable( command ):
 			paths = searchPaths
 			paths += os.environ["PATH"].split( os.pathsep )
+			if not '/usr/local/bin' in paths:
+				paths += '/usr/local/bin'
 
 			for path in paths:
+				path = os.path.normpath( path )
 				executableFile = os.path.join( path, fname )
 				if isExecutable( executableFile ):
 					self.__cmd[0] = executableFile

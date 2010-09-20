@@ -19,6 +19,7 @@
 
 from core.modules.packagers.PackageProvider import PackageProvider
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
+from core.modules.tools.cmake.CMakeBuilder import CMakeSearchPaths
 
 class _CPackMovePackageAction( FilesMoveAction ):
 	def __init__( self, cpackAction, destination ):
@@ -49,7 +50,7 @@ class CPack( PackageProvider ):
 	def __init__( self, name = None ):
 		"""Constructor"""
 		PackageProvider.__init__( self, name )
-		self._setCommand( "cpack" )
+		self._setCommand( "cpack", CMakeSearchPaths )
 		self._setPackageArgument( "--verbose" )
 
 	def makePackageStep( self ):

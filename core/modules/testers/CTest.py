@@ -18,11 +18,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.modules.testers.TestProvider import TestProvider
+from core.modules.tools.cmake.CMakeBuilder import CMakeSearchPaths
 
 class CTest( TestProvider ):
 
 	def __init__( self, name = None ):
 		"""Constructor"""
 		TestProvider.__init__( self, name )
-		self._setCommand( "ctest" )
+		self._setCommand( "ctest", CMakeSearchPaths )
 		self._setTestArgument( "--verbose" )

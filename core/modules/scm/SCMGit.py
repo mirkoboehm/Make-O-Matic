@@ -49,8 +49,8 @@ class SCMGit( SourceCodeProvider ):
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
-
-		self._setCommand( "git", [ "/usr/local/bin" ] )
+		searchPaths = [ "C:/Program Files/Git/bin" ]
+		self._setCommand( "git", searchPaths )
 		self.__cloneArmy = self._findCloneArmyDir()
 		self.__revisionInfo = RevisionInfo()
 

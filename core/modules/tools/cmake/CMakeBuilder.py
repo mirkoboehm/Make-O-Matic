@@ -20,6 +20,11 @@ from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
 from core.executomat.ShellCommandAction import ShellCommandAction
 from core.helpers.RunCommand import RunCommand
 
+CMakeSearchPaths = [
+				"C:\Program Files\CMake 2.8\bin",
+				"C:\Program Files\CMake 2.6\bin"
+]
+
 class CMakeVariable( object ):
 	def __init__( self, name, value, typeString = None ):
 		self.setName( name )
@@ -57,7 +62,11 @@ class CMakeBuilder( MakeBasedBuilder ):
 
 	def __init__( self, name = None ):
 		MakeBasedBuilder.__init__( self, name )
-		self.__cmakeCommand = 'cmake'
+		# Use the Plugin support for finding the CMake command
+		makeCommand = self.getCommand()
+		self._setCommand( 'cmake', CMakeSearchPaths )
+		self.__cmakeCommand = self.getCommand()
+		self._setCommand( makeCommand )
 		self.setInSourceBuild( False )
 		self.setCMakeVariables( [] )
 

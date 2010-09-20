@@ -30,7 +30,6 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
-
 		self._setCommand( "svn" )
 
 	def getRevisionInfo( self ):

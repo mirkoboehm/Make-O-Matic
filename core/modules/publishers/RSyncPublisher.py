@@ -29,7 +29,8 @@ class RSyncPublisher( Plugin ):
 	def __init__( self, name = None, uploadLocation = None, localDir = None ):
 		"""Constructor"""
 		Plugin.__init__( self, name )
-		self._setCommand( "rsync" )
+		searchPaths = [ "C:/Program Files/cwRsync/bin" ]
+		self._setCommand( "rsync", searchPaths )
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
 

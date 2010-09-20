@@ -23,7 +23,10 @@ class NMakeTool( MakeTool ):
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-		self._setCommand( 'nmake' )
+		searchPaths = [ "C:/Program Files/Microsoft Visual Studio 9.0/VC/bin" ]
+		searchPaths += "C:/Program Files\Microsoft Visual Studio 8/VC/BIN"
+		searchPaths += "C:/Program Files/Microsoft Visual Studio .NET 2003/VC/BIN"
+		self._setCommand( 'nmake', searchPaths )
 		self._setVersionParameter( '/?' )
 
 	def getArguments( self ):
