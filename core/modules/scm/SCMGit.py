@@ -185,3 +185,6 @@ class SCMGit( SourceCodeProvider ):
 			else:
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 
+	def fetchRepositoryFolder( self, remotePath ):
+		self.updateHiddenClone()
+		raise NotImplementedError()

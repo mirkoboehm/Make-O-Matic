@@ -134,3 +134,8 @@ class SourceCodeProvider( Plugin ):
 		create_child_node( document, node, "commitMessage", info.commitMessage )
 
 		return node
+
+	def fetchRepositoryFolder( self, remotePath ):
+		'''Retrieve a remote path from the repository. The path will be retrieved with the revision specified by getRevision(). 
+		The method returns the path where the folder has been stored.'''
+		raise NotImplementedError()

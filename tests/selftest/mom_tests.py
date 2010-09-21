@@ -20,6 +20,8 @@ from tests.helpers.MomTestCase import MomTestCase
 from buildcontrol.mom.Parameters import Parameters
 import sys
 import unittest
+from core.modules.scm.RevisionInfo import RevisionInfo
+from buildcontrol.mom.Remotebuilder import RemoteBuilder
 
 class MomTests( MomTestCase ):
 	'''MomTests tests the mom remote runner tool.'''
@@ -33,6 +35,18 @@ class MomTests( MomTestCase ):
 		params = Parameters()
 		params.parse( args )
 		self.assertEqual( buildscriptArgs, params.getBuildScriptOptions() )
+
+	def testFetchRemoteBuildscript( self ):
+		revInfo = RevisionInfo()
+		revInfo.revision = 'HEAD'
+		name = 'buildscript.py'
+		path = 'admin'
+		location = 'git:git://github.com/KDAB/Make-O-Matic.git'
+		remote = RemoteBuilder( revInfo, location = location, path = path, script = name )
+		try:
+			remote.fetchBuildScript()
+		except Exception as e:
+			self.fail( 'fetching the remote build script fails: {0}'.format( e ) )
 
 if __name__ == "__main__":
 	unittest.main()
