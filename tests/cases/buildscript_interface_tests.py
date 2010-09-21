@@ -49,6 +49,12 @@ class BuildScriptInterfaceTests( MomTestCase ):
 		revisions = self.iface.queryRevisionsSince( '8c758c1f1de2bcc19bda516f1acadf869ba28ee4' )
 		self.assertTrue( len( revisions ) >= 5 )
 
+	def testExecuteBuildScript( self ):
+		try:
+			runner = self.iface.execute( buildType = 'c', revision = 'HEAD' )
+			self.assertEqual( 0, runner.getReturnCode() )
+		except:
+			self.fail( 'The build script interface fails to execute the build script.' )
 
 if __name__ == "__main__":
 	unittest.main()

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-import sys
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
 import optparse

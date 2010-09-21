@@ -48,5 +48,17 @@ class MomTests( MomTestCase ):
 		except Exception as e:
 			self.fail( 'fetching the remote build script fails: {0}'.format( e ) )
 
+	def testExecuteRemoteHBuild( self ):
+		revInfo = RevisionInfo()
+		revInfo.revision = 'HEAD'
+		name = 'buildscript.py'
+		path = 'admin'
+		location = 'git:git://github.com/KDAB/Make-O-Matic.git'
+		remote = RemoteBuilder( revInfo, location = location, path = path, script = name )
+		try:
+			remote.invokeBuild( args = [ '-vv', '-t', 'H'] )
+		except Exception as e:
+			self.fail( 'executing the remote build script fails: {0}'.format( e ) )
+
 if __name__ == "__main__":
 	unittest.main()

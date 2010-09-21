@@ -20,6 +20,7 @@ import os
 from core.MObject import MObject
 from core.Exceptions import ConfigurationError
 from core.modules.scm import getScm
+from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 
 class RemoteBuilder( MObject ):
 	def __init__( self, revisionInfo = None, location = None, path = None, script = None, name = None ):
@@ -65,3 +66,10 @@ class RemoteBuilder( MObject ):
 			raise ConfigurationError( 'The build script {0} was not found at the path {1} in the repository at revision {2}'.format( 
 				self.getBuildscript(), self.getPath(), self.getRevisionInfo().revision ) )
 
+	def invokeBuild( self, args, timeout = None ):
+		path = self.fetchBuildScript()
+		iface = BuildScriptInterface( path )
+		# the build type would be specified in the arguments
+		runner = iface.execute( timeout = timeout, buildType = 'x', revision = self.getRevisionInfo().revision,
+			url = self.getLocation() )
+		return runner

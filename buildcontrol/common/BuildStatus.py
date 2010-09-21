@@ -26,6 +26,7 @@ from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.GlobalMApp import mApp
 from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
+from core.helpers.EnvironmentSaver import EnvironmentSaver
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -208,44 +209,27 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			os.makedirs( directory )
 		except ( OSError, IOError )as e:
 			raise ConfigurationError( 'Cannot create required build directory "{0}"!'.format( directory ) )
-		# now run the build script:
-		cmd = [ sys.executable, os.path.abspath( buildInfo.getBuildScript() ), '-t', buildType ]
-		if buildInfo.getUrl():
-			cmd.extend( [ '-u', buildInfo.getUrl() ] )
-		if rev:
-			cmd.extend( [ '-r', str( rev ) ] )
-			rev = 'revision ' + str( rev )
-		else:
-			rev = 'latest revision'
 		mApp().message( self, 'starting build job for project "{0}" at revision {1}.'
 					.format( buildInfo.getProjectName(), rev ) )
-		oldPwd = os.getcwd()
-		os.chdir( directory )
-		oldIndent = extend_debug_prefix( buildInfo.getProjectName() )
-		runner = RunCommand( cmd, 24 * 60 * 60, True ) # we have builds that run 15h
+		runner = None
 		try:
-			runner.run()
-		finally:
-			try:
-				with open( 'buildscript.log', 'w' ) as f:
-					text = runner.getStdOut() or b''
-					f.write( text.decode() )
-			except Exception as e:
-				mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
-					.format( e ) )
-			os.chdir( oldPwd )
-			restore_debug_prefix( oldIndent )
-			try:
-				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
-				self.updateBuildInfo( buildInfo )
-			except Exception as e:
-				mApp().message( self, 'Problem! updating the build status failed during handling an exception! {0}1'
-					.format( e ) )
-		if runner.getReturnCode() != 0:
-			mApp().message( self, 'build failed for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
-			# FIXME send out email reports on configuration or MOM errors
-			mApp().message( self, 'exit code {0}'.format( runner.getReturnCode() ) )
-			print( """\
+			with EnvironmentSaver():
+				os.chdir( directory )
+				extend_debug_prefix( buildInfo.getProjectName() )
+				iface = BuildScriptInterface( os.path.abspath( buildInfo.getBuildScript() ) )
+				runner = iface.execute( revision = rev, url = buildInfo.getUrl(), buildType = buildType )
+				try:
+					with open( 'buildscript.log', 'w' ) as f:
+						text = runner.getStdOut() or b''
+						f.write( text.decode() )
+				except Exception as e:
+					mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
+						.format( e ) )
+			if runner.getReturnCode() != 0:
+				mApp().message( self, 'build failed for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
+				# FIXME send out email reports on configuration or MOM errors
+				mApp().message( self, 'exit code {0}'.format( runner.getReturnCode() ) )
+				print( """\
 -->   ____        _ _     _   _____     _ _          _ 
 -->  | __ ) _   _(_) | __| | |  ___|_ _(_) | ___  __| |
 -->  |  _ \| | | | | |/ _` | | |_ / _` | | |/ _ \/ _` |
@@ -253,17 +237,24 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 -->  |____/ \__,_|_|_|\__,_| |_|  \__,_|_|_|\___|\__,_|
 --> 
 """ )
-			return False
-		else:
-			mApp().message( self, 'build succeeded for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
-			print( """\
+				return False
+			else:
+				mApp().message( self, 'build succeeded for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
+				print( """\
 -->   _         _ _    _      _
 -->  | |__ _  _(_) |__| |  __| |___ _ _  ___
 -->  | '_ \ || | | / _` | / _` / _ \ ' \/ -_)
 -->  |_.__/\_,_|_|_\__,_| \__,_\___/_||_\___|
 --> 
 """ )
-		return True
+				return True
+		finally:
+			try:
+				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
+				self.updateBuildInfo( buildInfo )
+			except Exception as e:
+				mApp().message( self, 'Problem! updating the build status failed during handling an exception! {0}1'
+					.format( e ) )
 
 	def getNewestBuildInfo( self, buildScript ):
 		connection = self.getConnection()

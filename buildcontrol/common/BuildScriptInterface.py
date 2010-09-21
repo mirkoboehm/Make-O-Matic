@@ -23,13 +23,13 @@ from core.helpers.RunCommand import RunCommand
 from core.Exceptions import MomError
 import re
 from core.helpers.GlobalMApp import mApp
+import os
 
 class BuildScriptInterface( MObject ):
 	'''BuildScriptInterface encapsulates ways to invoke a build script.'''
 
 	def __init__( self, buildScript, name = None ):
 		MObject.__init__( self, name )
-
 		self._initializeParameters()
 		self.setBuildScript( buildScript )
 
@@ -90,3 +90,23 @@ class BuildScriptInterface( MObject ):
 			raise MomError( 'Cannot get initial revision for build script "{0}".'.format( self.getBuildScript() ) )
 		revision = runner.getStdOut().decode().strip()
 		return revision
+
+	def execute( self, timeout = 24 * 60 * 60, buildType = 'm', revision = None, url = None, args = None ):
+		'''Execute the build script. 
+		The method returns the RunCommand object used to execute the build script, through which the return code and the output 
+		can be retrieved.'''
+		cmd = [ sys.executable, os.path.abspath( self.getBuildScript() ), '-t', buildType ]
+		if url:
+			cmd.extend( [ '-u', url ] )
+		if revision:
+			cmd.extend( [ '-r', str( revision ) ] )
+			revText = 'revision ' + str( revision )
+		else:
+			revText = 'latest revision'
+		if args:
+			cmd.extend( args )
+		mApp().debugN( self, 2, 'starting build script "{0}" at revision {1}.'.format( self.getBuildScript(), revText ) )
+		runner = RunCommand( cmd, timeout, True )
+		runner.run()
+		mApp().debugN( self, 2, 'build script finished, return code is {0}.'.format( runner.getReturnCode() ) )
+		return runner
