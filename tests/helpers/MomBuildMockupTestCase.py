@@ -46,7 +46,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 		build = Build( None, 'XmlReportTestBuild' )
 		project = Project( 'XmlReportTestProject' )
 		build.setProject( project )
-		project.createScm( 'git:git://github.com/KDAB/Make-O-Matic.git' )
+		project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
 		environments = Environments( [ 'Qt-4.[67].?-Shared-*' ], 'Qt 4', project )
 
 		debug = Configuration( 'Debug', environments, )

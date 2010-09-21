@@ -28,7 +28,7 @@ class MomTests( MomTestCase ):
 	def testParseParameters( self ):
 		'''Verify that the parser passes the correct subset of arguments to the remote build script.'''
 		buildscriptArgs = [ '-vv', '-t', 'H', '-r', '4711' ]
-		momArgs = [ sys.argv[0], '-vv', '-u', 'git:git://gitorious.org/make-o-matic/mom.git',
+		momArgs = [ sys.argv[0], '-vv', '-u', 'git://github.com/KDAB/Make-O-Matic.git',
 			'-p', 'mom/buildscript.py', '-r', '4711', '-' ]
 		args = momArgs + buildscriptArgs
 		params = Parameters()
@@ -40,7 +40,7 @@ class MomTests( MomTestCase ):
 		revInfo.revision = 'HEAD'
 		name = 'buildscript.py'
 		path = 'admin'
-		location = 'git:git://github.com/KDAB/Make-O-Matic.git'
+		location = 'git://github.com/KDAB/Make-O-Matic.git'
 		remote = RemoteBuilder( revInfo, location = location, path = path, script = name )
 		try:
 			path = remote.fetchBuildScript()

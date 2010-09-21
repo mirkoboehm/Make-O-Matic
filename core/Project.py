@@ -22,13 +22,13 @@ from __future__ import print_function
 from core.modules.SourceCodeProvider import SourceCodeProvider
 from core.Settings import Settings
 from core.Exceptions import MomError
-from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.helpers.PathResolver import PathResolver
 from core.helpers.GlobalMApp import mApp
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
 from core.BuildInstructions import BuildInstructions
+from core.modules.scm import getScm
 
 class Project( BuildInstructions ):
 	"""A Project represents an entity to build. 
@@ -47,9 +47,8 @@ class Project( BuildInstructions ):
 		assert isinstance( self.getParent(), Build )
 		return self.getParent()
 
-	def createScm( self, description ):
-		factory = SourceCodeProviderFactory()
-		scm = factory.makeScmImplementation( description )
+	def createScm( self, url ):
+		scm = getScm( url )
 		scm.setSrcDir( PathResolver( self.getSourceDir ) )
 		scm.setRevision( mApp().getParameters().getRevision() )
 		self.setScm( scm )

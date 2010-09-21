@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
 from core.MObject import MObject
-from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.Exceptions import ConfigurationError
+from core.modules.scm import getScm
 
 class RemoteBuilder( MObject ):
 	def __init__( self, revisionInfo = None, location = None, path = None, script = None, name = None ):
@@ -55,7 +55,7 @@ class RemoteBuilder( MObject ):
 
 	def fetchBuildScript( self ):
 		# create SCM implementation:
-		scm = SourceCodeProviderFactory().makeScmImplementation( self.getLocation() )
+		scm = getScm( self.getLocation() )
 		scm.setRevision( self.getRevisionInfo().revision )
 		path = scm.fetchRepositoryFolder( self.getPath() )
 		localBuildscript = os.path.join( path, self.getBuildscript() )

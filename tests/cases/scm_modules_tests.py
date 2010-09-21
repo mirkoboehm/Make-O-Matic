@@ -57,10 +57,10 @@ class ScmModulesTests ( MomTestCase ):
 		self.assertNotEquals( info.revision, None )
 
 	def testScmGit( self ):
-		self.runScmTests( 'git:git://github.com/KDAB/Make-O-Matic.git' )
+		self.runScmTests( 'git://github.com/KDAB/Make-O-Matic.git' )
 
 	def testScmSvn( self ):
-		self.runScmTests( 'svn:http://ratproxy.googlecode.com/svn/trunk/' )
+		self.runScmTests( 'http://ratproxy.googlecode.com/svn/trunk/' )
 
 if __name__ == "__main__":
 	unittest.main()

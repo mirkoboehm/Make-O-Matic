@@ -18,13 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.modules.scm.Factory import SourceCodeProviderFactory
 from core.Project import Project
 from core.modules.scm.SCMGit import SCMGit
 from core.Settings import Settings
 from core.Exceptions import ConfigurationError
 from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
+from core.modules.scm import getScm
+from core.modules.scm.SCMSubversion import SCMSubversion
 
 class ScmFactoryTests( MomTestCase ):
 
@@ -34,19 +35,24 @@ class ScmFactoryTests( MomTestCase ):
 		self.project = Project( 'ScmFactoryTest' )
 		self.build.setProject( self.project )
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.project.createScm( 'git:git://github.com/KDAB/Make-O-Matic.git' )
+		self.project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
 
-	def createAndReturnScm( self, description ):
-		return SourceCodeProviderFactory().makeScmImplementation( description )
+	def checkScm( self, url, type ):
+		scm = getScm( url )
+		if type:
+			self.assertTrue( isinstance( scm, type ), 'The descriptor {0} should result in a {1} object!'.format( url, type ) )
 
 	def testCreateGitScm( self ):
-		description = 'git:git://github.com/KDAB/Make-O-Matic.git'
-		scm = self.createAndReturnScm( description )
-		self.assertTrue( isinstance( scm, SCMGit ), 'The descriptor {0} should result in a ScmGit object!'.format( description ) )
+		self.checkScm( 'git:git://github.com/KDAB/Make-O-Matic.git', SCMGit )
+		self.checkScm( 'git://github.com/KDAB/Make-O-Matic.git', SCMGit )
+
+	def testCreateSvnScm( self ):
+		self.checkScm( 'svn:http://ratproxy.googlecode.com/svn/trunk/', SCMSubversion )
+		self.checkScm( 'http://ratproxy.googlecode.com/svn/trunk/', SCMSubversion )
 
 	def testCreateUnknownScm( self ):
 		try:
-			self.createAndReturnScm( 'nonsense:more nonsense' )
+			self.checkScm( 'nonsense:nonsense', None )
 		except ConfigurationError:
 			pass # just as expected
 		else:

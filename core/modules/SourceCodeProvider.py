@@ -29,7 +29,6 @@ class SourceCodeProvider( Plugin ):
 		Plugin.__init__( self, name )
 		self.__url = None
 		self.__revision = None
-
 		self.__srcDir = None
 
 	def getIdentifier( self ):

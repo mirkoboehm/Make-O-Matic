@@ -47,7 +47,7 @@ class Parameters( MObject ):
 		invoked build script. The latter are ignored by mom, and will be passed down to the build script only. Both sections are 
 		separated by a single dash. If the single dash is not found, it is assumed that all parameters are to be parsed by the mom 
 		tool. Example: 
-		mom -vv -u git:git://github.com/KDAB/Make-O-Matic.git -p mom/buildscript.py -r4711 - -vv -t H -r4711
+		mom -vv -u git://github.com/KDAB/Make-O-Matic.git -p mom/buildscript.py -r4711 - -vv -t H -r4711
 		'''
 		# make a copy to avoid accidentally modifying sys.args
 		momOptions = arguments[:]

@@ -16,9 +16,8 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
 from core.executomat.ShellCommandAction import ShellCommandAction
-from core.helpers.RunCommand import RunCommand
+from core.modules.tools.qmake.QMakeBuilder import QMakeBuilder
 
 CMakeSearchPaths = [
 				"C:\Program Files\CMake 2.8\bin",
@@ -57,34 +56,18 @@ class CMakeVariable( object ):
 			self.getValue() )
 		return text
 
-class CMakeBuilder( MakeBasedBuilder ):
+class CMakeBuilder( QMakeBuilder ):
 	'''CMakeBuilder generates the actions to build a project with cmake.'''
 
 	def __init__( self, name = None ):
-		MakeBasedBuilder.__init__( self, name )
+		QMakeBuilder.__init__( self, name )
 		# Use the Plugin support for finding the CMake command
 		makeCommand = self.getCommand()
 		self._setCommand( 'cmake', CMakeSearchPaths )
-		self.__cmakeCommand = self.getCommand()
+		self._setMakefileGeneratorCommand( self.getCommand() )
 		self._setCommand( makeCommand )
 		self.setInSourceBuild( False )
 		self.setCMakeVariables( [] )
-
-	def _setCMakeCommand( self, cmakeCommand ):
-		self.__cmakeCommand = cmakeCommand
-
-	def getCMakeCommand( self ):
-		return self.__cmakeCommand
-
-	def preFlightCheck( self ):
-		RunCommand( [ self.getCMakeCommand() ] ).checkVersion()
-		MakeBasedBuilder.preFlightCheck( self )
-
-	def setInSourceBuild( self, onOff ):
-		self.__inSourceBuild = onOff
-
-	def getInSourceBuild( self ):
-		return self.__inSourceBuild
 
 	def setCMakeVariables( self, options ):
 		self.__options = options
@@ -104,7 +87,7 @@ class CMakeBuilder( MakeBasedBuilder ):
 		project = configuration.getProject()
 		srcDir = project.getSourceDir()
 		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getTargetDir() ) )
-		cmd = [ self.getCMakeCommand() ]
+		cmd = [ self.getMakefileGeneratorCommand() ]
 		for variable in self.getCMakeVariables():
 			cmd.append( '-D{0}'.format( variable ) )
 		cmd.append( srcDir )
