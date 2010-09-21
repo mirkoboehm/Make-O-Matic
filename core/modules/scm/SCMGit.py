@@ -209,6 +209,7 @@ class SCMGit( SourceCodeProvider ):
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 
 	def updateCachedCheckout( self ):
+		assert self.getRevision()
 		if not os.path.exists( self.getCachedCheckoutsDir() ):
 			try:
 				os.makedirs( self.getCachedCheckoutsDir() )
@@ -219,32 +220,35 @@ class SCMGit( SourceCodeProvider ):
 			# update an existing repository
 			mApp().debugN( self, 2, 'updating the cached checkout at "{0}"  to revision {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getRevision() ) )
-			cmd = [ self.getCommand(), 'checkout', self.getRevision() or 'HEAD' ]
-			runner = RunCommand( cmd )
-			runner.setWorkingDir( self._getCachedCheckoutPath() )
-			runner.run()
-			if runner.getReturnCode() != 0:
+			# pull, to get all new revisions into the cached checkout
+			pullCmd = [ self.getCommand(), 'pull', '--rebase' ]
+			pullRunner = RunCommand( pullCmd )
+			pullRunner.setWorkingDir( self._getCachedCheckoutPath() )
+			pullRunner.run()
+			if pullRunner.getReturnCode() != 0:
 				# FIXME delete, continue with regular checkout
-				raise ConfigurationError( 'Cannot update the checkout at {0} to revision {1}'.format( 
-					self.getCachedCheckoutsDir(), self.getRevision() ) )
+				raise ConfigurationError( 'Cannot pull new commits into the cached checkout at {0}'.format( 
+					self.getCachedCheckoutsDir() ) )
 		else:
 			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with revision {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getRevision() ) )
 			# create the clone
-			cmd1 = [ self.getCommand(), 'clone', self._getHiddenClonePath(), self.__getTempRepoName() ]
-			runner1 = RunCommand( cmd1 )
-			runner1.setWorkingDir( self.getCachedCheckoutsDir() )
-			runner1.run()
-			if runner1.getReturnCode() != 0:
+			cloneCmd = [ self.getCommand(), 'clone', self._getHiddenClonePath(), self.__getTempRepoName() ]
+			cloneRunner = RunCommand( cloneCmd )
+			cloneRunner.setWorkingDir( self.getCachedCheckoutsDir() )
+			cloneRunner.run()
+			if cloneRunner.getReturnCode() != 0:
 				raise ConfigurationError( 'Cannot create the cached checkout at {0}'.format( 
 					self.getCachedCheckoutsDir() ) )
-			cmd2 = [ self.getCommand(), 'checkout', self.getRevision() ]
-			runner2 = RunCommand( cmd2 )
-			runner2.setWorkingDir( self._getCachedCheckoutPath() )
-			runner2.run()
-			if runner2.getReturnCode() != 0:
-				raise ConfigurationError( 'Cannot update the cached checkout to revision {0}'.format( 
-					self.getRevision() ) )
+		# now checkout the requested revision
+		checkoutCmd = [ self.getCommand(), 'checkout', self.getRevision() ]
+		checkoutRunner = RunCommand( checkoutCmd )
+		checkoutRunner.setWorkingDir( self._getCachedCheckoutPath() )
+		checkoutRunner.run()
+		if checkoutRunner.getReturnCode() != 0:
+			# FIXME delete, continue with regular checkout
+			raise ConfigurationError( 'Cannot update the checkout at {0} to revision {1}'.format( 
+				self.getCachedCheckoutsDir(), self.getRevision() ) )
 
 	def fetchRepositoryFolder( self, remotePath ):
 		self.updateHiddenClone()

@@ -18,8 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from tests.helpers.MomTestCase import MomTestCase
 from buildcontrol.mom.Parameters import Parameters
-import sys
-import unittest
+import os, sys, unittest
 from core.modules.scm.RevisionInfo import RevisionInfo
 from buildcontrol.mom.Remotebuilder import RemoteBuilder
 
@@ -45,7 +44,7 @@ class MomTests( MomTestCase ):
 		remote = RemoteBuilder( revInfo, location = location, path = path, script = name )
 		try:
 			path = remote.fetchBuildScript()
-			print( path )
+			self.assertTrue( os.path.exists( path ) )
 		except Exception as e:
 			self.fail( 'fetching the remote build script fails: {0}'.format( e ) )
 
