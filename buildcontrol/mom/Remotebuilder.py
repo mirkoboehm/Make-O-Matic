@@ -16,9 +16,10 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import os
 from core.MObject import MObject
 from core.modules.scm.Factory import SourceCodeProviderFactory
-import os
+from core.Exceptions import ConfigurationError
 
 class RemoteBuilder( MObject ):
 	def __init__( self, revisionInfo = None, location = None, path = None, script = None, name = None ):
@@ -55,7 +56,12 @@ class RemoteBuilder( MObject ):
 	def fetchBuildScript( self ):
 		# create SCM implementation:
 		scm = SourceCodeProviderFactory().makeScmImplementation( self.getLocation() )
-		localFolder = os.path.join( os.getcwd(), 'temp-mom_tests' )
-		remoteFolder = 'admin'
-		scm.fetchRepositoryFolder( remoteFolder, localFolder )
+		scm.setRevision( self.getRevisionInfo().revision )
+		path = scm.fetchRepositoryFolder( self.getPath() )
+		localBuildscript = os.path.join( path, self.getBuildscript() )
+		if os.path.exists( localBuildscript ):
+			return localBuildscript
+		else:
+			raise ConfigurationError( 'The build script {0} was not found at the path {1} in the repository at revision {2}'.format( 
+				self.getBuildscript(), self.getPath(), self.getRevisionInfo().revision ) )
 

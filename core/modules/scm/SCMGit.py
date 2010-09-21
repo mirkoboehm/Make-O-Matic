@@ -52,24 +52,40 @@ class SCMGit( SourceCodeProvider ):
 		searchPaths = [ "C:/Program Files/Git/bin" ]
 		self._setCommand( "git", searchPaths )
 		self.__cloneArmy = self._findCloneArmyDir()
+		self.__cachedCheckoutsDir = self._findCachedCheckoutsDir()
 		self.__revisionInfo = RevisionInfo()
 
 	def getIdentifier( self ):
 		return 'git'
 
-	def _findCloneArmyDir( self ):
+	def _getCachesDir( self ):
 		directory = None
 		if sys.platform == 'darwin':
-			directory = os.path.expanduser( "~/Library/Caches/Make-O-Matic/CloneArmy" )
+			directory = os.path.expanduser( "~/Library/Caches/Make-O-Matic" )
 		elif sys.platform == 'win32':
 			directory = os.getenv( 'LOCALAPPDATA' ) or os.getenv( 'APPDATA' )
-			directory = os.path.join( self.__cloneArmy, "Make-O-Matic" )
+			directory = os.path.join( directory, "Make-O-Matic", 'caches' )
 		else:
-			directory = os.path.expanduser( "~/.mom/clonearmy" )
+			directory = os.path.expanduser( "~/.mom/caches" )
 		return directory
+
+	def _findCloneArmyDir( self ):
+		name = 'clonearmy'
+		if sys.platform == 'darwin':
+			name = 'CloneArmy'
+		path = os.path.join( self._getCachesDir(), name )
+		return path
+
+	def _findCachedCheckoutsDir( self ):
+		name = 'checkouts'
+		path = os.path.join( self._getCachesDir(), name )
+		return path
 
 	def getCloneArmyDir( self ):
 		return self.__cloneArmy
+
+	def getCachedCheckoutsDir( self ):
+		return self.__cachedCheckoutsDir
 
 	def getRevisionInfo( self ):
 		sep = "\t"
@@ -154,10 +170,17 @@ class SCMGit( SourceCodeProvider ):
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 
+	def __getTempRepoName( self ):
+		tempName = make_foldername_from_string( self.getUrl() )
+		return tempName
+
 	def _getHiddenClonePath( self ):
-		clonename = make_foldername_from_string( self.getUrl() )
-		hiddenClone = os.path.join( self.getCloneArmyDir(), clonename )
+		hiddenClone = os.path.join( self.getCloneArmyDir(), self.__getTempRepoName() )
 		return hiddenClone
+
+	def _getCachedCheckoutPath( self ):
+		cachedCheckout = os.path.join( self.getCachedCheckoutsDir(), self.__getTempRepoName() )
+		return cachedCheckout
 
 	def updateHiddenClone( self ):
 		hiddenClone = self._getHiddenClonePath()
@@ -185,6 +208,50 @@ class SCMGit( SourceCodeProvider ):
 			else:
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 
+	def updateCachedCheckout( self ):
+		if not os.path.exists( self.getCachedCheckoutsDir() ):
+			try:
+				os.makedirs( self.getCachedCheckoutsDir() )
+			except ( IOError, OSError ) as e:
+				raise MomError( 'Error creating cached checkouts dir at {0}: {1}'.format( 
+					self.getCachedCheckoutsDir(), e ) )
+		if os.path.exists( self._getCachedCheckoutPath() ):
+			# update an existing repository
+			mApp().debugN( self, 2, 'updating the cached checkout at "{0}"  to revision {1}'.format( 
+				self.getCachedCheckoutsDir(), self.getRevision() ) )
+			cmd = [ self.getCommand(), 'checkout', self.getRevision() or 'HEAD' ]
+			runner = RunCommand( cmd )
+			runner.setWorkingDir( self._getCachedCheckoutPath() )
+			runner.run()
+			if runner.getReturnCode() != 0:
+				# FIXME delete, continue with regular checkout
+				raise ConfigurationError( 'Cannot update the checkout at {0} to revision {1}'.format( 
+					self.getCachedCheckoutsDir(), self.getRevision() ) )
+		else:
+			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with revision {1}'.format( 
+				self.getCachedCheckoutsDir(), self.getRevision() ) )
+			# create the clone
+			cmd1 = [ self.getCommand(), 'clone', self._getHiddenClonePath(), self.__getTempRepoName() ]
+			runner1 = RunCommand( cmd1 )
+			runner1.setWorkingDir( self.getCachedCheckoutsDir() )
+			runner1.run()
+			if runner1.getReturnCode() != 0:
+				raise ConfigurationError( 'Cannot create the cached checkout at {0}'.format( 
+					self.getCachedCheckoutsDir() ) )
+			cmd2 = [ self.getCommand(), 'checkout', self.getRevision() ]
+			runner2 = RunCommand( cmd2 )
+			runner2.setWorkingDir( self._getCachedCheckoutPath() )
+			runner2.run()
+			if runner2.getReturnCode() != 0:
+				raise ConfigurationError( 'Cannot update the cached checkout to revision {0}'.format( 
+					self.getRevision() ) )
+
 	def fetchRepositoryFolder( self, remotePath ):
 		self.updateHiddenClone()
-		raise NotImplementedError()
+		self.updateCachedCheckout()
+		hiddenCheckoutPath = os.path.join( self._getCachedCheckoutPath(), remotePath )
+		if os.path.exists( hiddenCheckoutPath ):
+			return hiddenCheckoutPath
+		else:
+			raise ConfigurationError( 'The remote path {0} was not found in the repository at revision {1}'.format( 
+					remotePath, self.getRevision() ) )
