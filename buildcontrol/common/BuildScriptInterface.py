@@ -24,6 +24,8 @@ from core.Exceptions import MomError
 import re
 from core.helpers.GlobalMApp import mApp
 import os
+from core.helpers.EnvironmentSaver import EnvironmentSaver
+from buildcontrol.SubprocessHelpers import extend_debug_prefix
 
 class BuildScriptInterface( MObject ):
 	'''BuildScriptInterface encapsulates ways to invoke a build script.'''
@@ -36,8 +38,9 @@ class BuildScriptInterface( MObject ):
 	def _initializeParameters( self ):
 		self.__parameters = []
 
-		if mApp().getParameters().getDebugLevel() > 5:
-			self.__parameters.append( "-" + ( mApp().getParameters().getDebugLevel() - 5 ) * "v" )
+		# FIXME This is broken
+		# if mApp().getParameters().getDebugLevel() > 5:
+		#	self.__parameters.append( "-" + ( mApp().getParameters().getDebugLevel() - 5 ) * "v" )
 
 	def getParameters( self ):
 		return self.__parameters
@@ -91,7 +94,7 @@ class BuildScriptInterface( MObject ):
 		revision = runner.getStdOut().decode().strip()
 		return revision
 
-	def execute( self, timeout = 24 * 60 * 60, buildType = 'm', revision = None, url = None, args = None ):
+	def execute( self, timeout = 24 * 60 * 60, buildType = 'm', revision = None, url = None, args = None, captureOutput = True ):
 		'''Execute the build script. 
 		The method returns the RunCommand object used to execute the build script, through which the return code and the output 
 		can be retrieved.'''
@@ -105,8 +108,10 @@ class BuildScriptInterface( MObject ):
 			revText = 'latest revision'
 		if args:
 			cmd.extend( args )
-		mApp().debugN( self, 2, 'starting build script "{0}" at revision {1}.'.format( self.getBuildScript(), revText ) )
-		runner = RunCommand( cmd, timeout, True )
-		runner.run()
+		mApp().message( self, 'invoking remote build script "{0}" at revision {1}.'.format( self.getBuildScript(), revText ) )
+		with EnvironmentSaver():
+			extend_debug_prefix( 'script>' )
+			runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = False )
+			runner.run()
 		mApp().debugN( self, 2, 'build script finished, return code is {0}.'.format( runner.getReturnCode() ) )
 		return runner

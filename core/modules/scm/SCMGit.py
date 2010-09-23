@@ -209,16 +209,17 @@ class SCMGit( SourceCodeProvider ):
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 
 	def updateCachedCheckout( self ):
-		assert self.getRevision()
 		if not os.path.exists( self.getCachedCheckoutsDir() ):
 			try:
 				os.makedirs( self.getCachedCheckoutsDir() )
 			except ( IOError, OSError ) as e:
 				raise MomError( 'Error creating cached checkouts dir at {0}: {1}'.format( 
 					self.getCachedCheckoutsDir(), e ) )
+		if not self.getRevision():
+			self.setRevision( 'HEAD' )
 		if os.path.exists( self._getCachedCheckoutPath() ):
 			# update an existing repository
-			mApp().debugN( self, 2, 'updating the cached checkout at "{0}"  to revision {1}'.format( 
+			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to revision {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getRevision() ) )
 			# pull, to get all new revisions into the cached checkout
 			pullCmd = [ self.getCommand(), 'pull', '--rebase' ]

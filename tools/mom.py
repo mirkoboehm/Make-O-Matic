@@ -20,8 +20,9 @@ from core.MApplication import MApplication
 from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 from buildcontrol.mom.Parameters import Parameters
-from core.helpers.GlobalMApp import mApp
 import sys
+from buildcontrol.mom.Remotebuilder import RemoteBuilder
+from core.modules.scm.RevisionInfo import RevisionInfo
 
 class MomRemoteRunner( MApplication ):
 	'''MomRemoteRunner takes the location descriptor of a remote build script, fetches the build script, 
@@ -38,19 +39,26 @@ class MomRemoteRunner( MApplication ):
 		return self.__parameters
 
 	def execute( self ):
-		mApp().debugN( self, 2, 'build script options: {0}'.format( ' '.join( self.getParameters().getBuildScriptOptions() ) ) )
-		# fetch the directory with the specified build script
-		# ...
-		# execute the build script:
-		pass
+#		mApp().debugN( self, 2, 'now invoking the build script {0} with options {1}'.format( 
+#			self.getParameters().getBuildscriptName(),
+#			' '.join( self.getParameters().getBuildScriptOptions() ) ) )
+		revInfo = RevisionInfo()
+		revInfo.revision = self.getParameters().getRevision()
+		remote = RemoteBuilder( revisionInfo = revInfo,
+			location = self.getParameters().getUrl(),
+			path = self.getParameters().getPath(),
+			script = self.getParameters().getBuildscriptName() )
+		# FIXME add a timeout?
+		runner = remote.invokeBuild( self.getParameters().getBuildScriptOptions() )
+		if runner.getStdOut():
+			print( runner.getStdOut().decode() )
+		self.registerReturnCode( runner.getReturnCode() )
 
 	def build( self ):
 		self.__parameters.parse( sys.argv )
 		settings = self.getSettings()
-		settings.set( Settings.ScriptLogLevel, 3 ) # FIXME
 		self.addLogger( ConsoleLogger() )
 		settings.evalConfigurationFiles( self.getToolName() )
-		self.debug( self, 'debug level is {0}'.format( settings.get( Settings.ScriptLogLevel ) ) )
 		MApplication.build( self )
 
 if __name__ == "__main__":

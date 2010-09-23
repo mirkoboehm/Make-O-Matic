@@ -53,7 +53,7 @@ def check_for_int( expression, description, lessThan = None ):
 		value = int( expression )
 		if lessThan != None and value < lessThan:
 			raise ConfigurationError( description )
-	except ValueError:
+	except ValueError, TypeError:
 		raise ConfigurationError( description )
 
 def check_for_nonnegative_int( expression, description ):

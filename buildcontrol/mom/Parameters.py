@@ -20,7 +20,6 @@ from core.MObject import MObject
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
 import optparse
-import os
 from core.Settings import Settings
 
 class Parameters( MObject ):
@@ -40,6 +39,9 @@ class Parameters( MObject ):
 
 	def getPath( self ):
 		return self.__path
+
+	def getBuildscriptName( self ):
+		return self.__name
 
 	def parse( self, arguments ):
 		'''The mom command line contains two parts, a set of options for the mom tool itself, and a set of options for the 
@@ -66,8 +68,10 @@ class Parameters( MObject ):
 			help = 'build script revision to be retrieved' )
 		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
 			help = 'SCM location including SCM identifier' )
-		parser.add_option( '-p', '--path', action = 'store', dest = 'buildscriptPath',
-			help = 'path of the build script in the specified repository' )
+		parser.add_option( '-p', '--path', action = 'store', dest = 'buildscriptPath', default = 'admin',
+			help = 'path of the build script in the specified repository, without the build script' )
+		parser.add_option( '-n', '--name', action = 'store', dest = 'buildscriptName', default = 'buildscript.py',
+			help = 'filename of the build script' )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
 			help = 'level of debug output' )
 		# parse options:
@@ -75,7 +79,8 @@ class Parameters( MObject ):
 		if options.revision:
 			self.__revision = options.revision
 		else:
-			raise ConfigurationError( 'No revision specified!' )
+			self.__revision = None
+			mApp().message( self, 'no revision specified, using the equivalent of HEAD' )
 		if options.url:
 			self.__url = options.url
 		else:
@@ -83,8 +88,13 @@ class Parameters( MObject ):
 		if options.buildscriptPath:
 			self.__path = options.buildscriptPath
 		else:
-			self.__path = os.path.join( 'mom', 'buildscript.py' )
+			self.__path = 'admin'
 			mApp().message( self, 'no build script path specified, using "{0}"'.format( self.__path ) )
+		if options.buildscriptName:
+			self.__name = options.buildscriptName
+		else:
+			self.__name = 'buildscript.py'
+			mApp().message( self, 'no build script name specified, using "{0}"'.format( self.__name ) )
 		if options.verbosity:
 			mApp().getSettings().set( Settings.ScriptLogLevel, options.verbosity )
 		if len( args ) > 1: # the one element is the program path

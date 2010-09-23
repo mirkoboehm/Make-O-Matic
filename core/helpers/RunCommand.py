@@ -28,7 +28,7 @@ from core.Exceptions import ConfigurationError
 
 class _CommandRunner( Thread ):
 
-	def __init__ ( self , runner ):
+	def __init__ ( self, runner ):
 		Thread.__init__( self )
 		self.__started = None
 		self.__finished = None
@@ -55,15 +55,23 @@ class _CommandRunner( Thread ):
 		stderrValue = subprocess.PIPE
 		if self.__combineOutput:
 			stderrValue = subprocess.STDOUT
-		self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False, cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
-		output, error = self._process.communicate()
-		self._getRunner().setStdOut( output )
-		self._getRunner().setStdErr( error )
-		self._getRunner().setReturnCode( self._process.returncode )
+		if self._getRunner().getCaptureOutput():
+			self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False,
+				cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
+			output, error = self._process.communicate()
+			self._getRunner().setStdOut( output )
+			self._getRunner().setStdErr( error )
+			mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( self._getRunner().getStdOut() ) )
+			if not self.__combineOutput:
+				mApp().debugN( self._getRunner(), 5, "STDERR:\n{0}".format( self._getRunner().getStdErr() ) )
+			self._getRunner().setReturnCode( self._process.returncode )
+		else:
+			self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False,
+				cwd = self._getRunner().getWorkingDir() )
+			self._getRunner().setReturnCode( os.waitpid( self._process.pid, 0 )[1] )
+			self._getRunner().setStdOut( None )
+			self._getRunner().setStdErr( None )
 		self.__finished = True
-		mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( output ) )
-		if not self.__combineOutput:
-			mApp().debugN( self._getRunner(), 5, "STDERR:\n{0}".format( error ) )
 
 	def wasStarted( self ):
 		return self.__started
@@ -84,7 +92,7 @@ class _CommandRunner( Thread ):
 			self.join( 5 )
 
 class RunCommand( MObject ):
-	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False, searchPaths = None ):
+	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False, searchPaths = None, captureOutput = True ):
 		MObject.__init__( self )
 		check_for_list_of_strings( cmd, "The command must be a list of strings." )
 		self.__cmd = cmd
@@ -92,6 +100,7 @@ class RunCommand( MObject ):
 			check_for_positive_int( timeoutSeconds, "The timeout period must be a positive integer number! " )
 		self.__timeoutSeconds = timeoutSeconds
 		self.__workingDir = None
+		self.__captureOutput = captureOutput
 		self.__combineOutput = combineOutput
 		self.__stdOut = None
 		self.__stdErr = None
@@ -114,6 +123,9 @@ class RunCommand( MObject ):
 
 	def getCombineOutput( self ):
 		return self.__combineOutput
+
+	def getCaptureOutput( self ):
+		return self.__captureOutput
 
 	def setReturnCode( self, code ):
 		self.__returnCode = code
