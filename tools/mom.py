@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MApplication import MApplication
-from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 from buildcontrol.mom.Parameters import Parameters
 import sys
