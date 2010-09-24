@@ -108,7 +108,6 @@ class Instructions( MObject ):
 			plugin.describe( subPrefix )
 
 	def createXmlNode( self, document ):
-		#FIXME Kevin: separate base class logic back into Instructions
 		node = MObject.createXmlNode( self, document )
 		node.attributes["basedir"] = str ( self.getBaseDir() )
 		pluginsElement = document.createElement( "plugins" )
