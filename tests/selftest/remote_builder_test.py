@@ -16,10 +16,5 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from buildcontrol.mom.Remotebuilder import RemoteBuilder
-import sys
-# FIXME extract revision information, use build script from the same revision
-builder = RemoteBuilder( location = 'git://github.com/KDAB/Make-O-Matic.git', path = 'admin', script = 'buildscript.py' )
-options = sys.argv[1:]
-rc = builder.invokeBuild( options ).getReturnCode()
-sys.exit( rc )
+from buildcontrol.ProxyBuilder import ProxyBuilder
+ProxyBuilder( location = 'git://github.com/KDAB/Make-O-Matic.git' ).build()

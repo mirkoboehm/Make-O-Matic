@@ -23,18 +23,18 @@ from core.modules.scm import getScm
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 
 class RemoteBuilder( MObject ):
-	def __init__( self, revisionInfo = None, location = None, path = None, script = None, name = None ):
+	def __init__( self, revision = None, location = None, path = None, script = None, name = None ):
 		MObject.__init__( self, name )
-		self.setRevisionInfo( revisionInfo )
+		self.setRevision( revision )
 		self.setBuildscript( script )
 		self.setLocation( location )
 		self.setPath( path )
 
-	def setRevisionInfo( self, revInfo ):
-		self.__revisionInfo = revInfo
+	def setRevision( self, revision ):
+		self.__revision = revision
 
-	def getRevisionInfo( self ):
-		return self.__revisionInfo
+	def getRevision( self ):
+		return self.__revision
 
 	def setLocation( self, location ):
 		self.__location = location
@@ -57,19 +57,19 @@ class RemoteBuilder( MObject ):
 	def fetchBuildScript( self ):
 		# create SCM implementation:
 		scm = getScm( self.getLocation() )
-		scm.setRevision( self.getRevisionInfo().revision )
+		scm.setRevision( self.getRevision() )
 		path = scm.fetchRepositoryFolder( self.getPath() )
 		localBuildscript = os.path.join( path, self.getBuildscript() )
 		if os.path.exists( localBuildscript ):
 			return localBuildscript
 		else:
 			raise ConfigurationError( 'The build script {0} was not found at the path {1} in the repository at revision {2}'.format( 
-				self.getBuildscript(), self.getPath(), self.getRevisionInfo().revision ) )
+				self.getBuildscript(), self.getPath(), self.getRevision() ) )
 
 	def invokeBuild( self, args, timeout = None ):
 		path = self.fetchBuildScript()
 		iface = BuildScriptInterface( path )
 		# the build type would be specified in the arguments
-		runner = iface.execute( timeout = timeout, buildType = 'x', revision = self.getRevisionInfo().revision,
+		runner = iface.execute( timeout = timeout, buildType = 'x', revision = self.getRevision(),
 			url = self.getLocation(), args = args )
 		return runner
