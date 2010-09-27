@@ -16,12 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import subprocess, time
 from threading import Thread
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, \
-	check_for_list_of_strings
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_strings
 import os.path
 import sys
 from core.Exceptions import ConfigurationError
@@ -92,6 +92,7 @@ class _CommandRunner( Thread ):
 			self.join( 5 )
 
 class RunCommand( MObject ):
+
 	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False, searchPaths = None, captureOutput = True ):
 		MObject.__init__( self )
 		check_for_list_of_strings( cmd, "The command must be a list of strings." )
@@ -173,12 +174,20 @@ class RunCommand( MObject ):
 				elif sys.platform == "win32" and isExecutable( executableFile + ".exe" ):
 					self.__cmd[0] = executableFile + ".exe"
 
-	def checkVersion( self, parameter = "--version", lineNumber = 0 ):
-		"""Check if this command is installed."""
+	def checkVersion( self, parameter = "--version", lineNumber = 0, expectedReturnCode = 0 ):
+		"""Check if this command is installed.
+		
+		@param parameter Command parameter
+		@param lineNumber Line number of version string in command output
+		@param expectedReturnCode Return code which command should return on success"""
+
+		# backup old data
 		oldCmd = self.getCommand()
 		oldStdOut = self.getStdOut()
 		oldStdErr = self.getStdErr()
 		oldReturnCode = self.getReturnCode()
+
+		# run version check
 		newcmd = [ self.__cmd[0], parameter ]
 		self.__cmd = newcmd
 		runner = _CommandRunner ( self )
@@ -186,17 +195,21 @@ class RunCommand( MObject ):
 		runner.start()
 		runner.join()
 		returnCode = self.getReturnCode()
-		if returnCode == 0:
-			version = self.getStdOut().decode().splitlines()[ lineNumber ].strip()
-			mApp().debugN( self, 4, 'RunCommand found: "{0}"'.format( version ) )
+		getStdOut = self.getStdOut()
 
+		# reset
 		self.__cmd = oldCmd
 		self.__stdOut = oldStdOut
 		self.__stdErr = oldStdErr
 		self.__returnCode = oldReturnCode
 
-		if returnCode != 0:
+		if returnCode == expectedReturnCode:
+			version = getStdOut.decode().splitlines()[ lineNumber ].strip()
+			mApp().debugN( self, 4, 'RunCommand found: "{0}"'.format( version ) )
+		else:
 			raise ConfigurationError( "RunCommand::checkVersion: {0} not found.".format( newcmd[0] ) )
+
+
 
 	def run( self ):
 		timeoutString = 'without a timeout'

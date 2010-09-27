@@ -41,7 +41,7 @@ class QMakeBuilder( MakeBasedBuilder ):
 		return self.__inSourceBuild
 
 	def preFlightCheck( self ):
-		RunCommand( [ self.getMakefileGeneratorCommand() ] ).checkVersion()
+		RunCommand( [ self.getMakefileGeneratorCommand() ] ).checkVersion( expectedReturnCode = 154 )
 		MakeBasedBuilder.preFlightCheck( self )
 
 	def createPrepareSourceDirActions( self ):
