@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 from tests.helpers.MomTestCase import MomTestCase
-import os, inspect, unittest
+import os, unittest
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.environments.Environments import Environments
@@ -27,15 +27,14 @@ from core.helpers.EnvironmentSaver import EnvironmentSaver
 
 class BuildEnvironmentTests( MomTestCase ):
 
-	myFile = inspect.getfile( inspect.currentframe() )
-	myFilePath = os.path.split( myFile )
-	myDir = myFilePath[0]
-	TestMomEnvironments = os.path.join( myDir, 'test-mom-environments' )
+	myFilePath = os.path.realpath( __file__ )
+	myDirectory = os.path.split( myFilePath )[0]
+	testMomEnvironments = os.path.join( myDirectory , 'test-mom-environments' )
 
 	def setUp( self ):
 		MomTestCase.setUp( self )
 		mApp().getSettings().set( Settings.ScriptLogLevel, 1 )
-		mApp().getSettings().set( Settings.EnvironmentsBaseDir, BuildEnvironmentTests.TestMomEnvironments )
+		mApp().getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
 		mApp().addLogger( ConsoleLogger() )
 
 	def testTryFindNonExistantEnv( self ):
@@ -69,7 +68,7 @@ class BuildEnvironmentTests( MomTestCase ):
 				allPaths.append( dependency.getFolder() )
 
 	def testApplyPackageConfiguration( self ):
-		packageFolder = os.path.join( BuildEnvironmentTests.TestMomEnvironments, 'dep-a-1.1.0' )
+		packageFolder = os.path.join( self.testMomEnvironments, 'dep-a-1.1.0' )
 		packageFile = os.path.join( packageFolder, Dependency._ControlFileName )
 		self.assertTrue( os.path.exists( packageFile ) )
 		dep = Dependency()
@@ -82,7 +81,7 @@ class BuildEnvironmentTests( MomTestCase ):
 			self.assertEquals( os.environ[ 'EXAMPLE_VARIABLE'], 'example_variable' )
 
 	def testApplyDisabledPackageConfiguration( self ):
-		packageFolder = os.path.join( BuildEnvironmentTests.TestMomEnvironments, 'dep-a-1.2.0' )
+		packageFolder = os.path.join( self.testMomEnvironments, 'dep-a-1.2.0' )
 		packageFile = os.path.join( packageFolder, Dependency._ControlFileName )
 		self.assertTrue( os.path.exists( packageFile ) )
 		dep = Dependency()

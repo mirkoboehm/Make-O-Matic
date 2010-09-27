@@ -45,7 +45,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertEqual( doc.tag, "build" ) # root
 		self.assertNotEquals( doc.find( './/project' ), None )
 		self.assertNotEquals( doc.find( './/environment' ), None )
-
+		self.assertNotEquals( doc.find( './/configuration' ), None )
 		self.assertNotEquals( doc.find( './/plugin' ), None )
 		self.assertNotEquals( doc.find( './/step' ), None )
 		self.assertNotEquals( doc.find( './/action' ), None )
