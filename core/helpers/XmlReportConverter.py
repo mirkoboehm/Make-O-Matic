@@ -41,6 +41,12 @@ class MyTextWrapper( TextWrapper ):
 	def dedent( self ):
 		self.initial_indent = self.subsequent_indent = self.initial_indent[:-len( self.MY_INDENT )]
 
+	def wrapMultiLine( self, text ):
+		out = []
+		for line in text.splitlines():
+			out += self.wrap( line )
+		return out
+
 class XmlReportConverter( MObject ):
 	"""Converts a XmlReport instance to HTML, plain text and maybe others"""
 
@@ -149,10 +155,19 @@ class XmlReportConverter( MObject ):
 
 		out = []
 
-		if element.tag == "build":
-			out += " "
-			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
+		if element.tag == "exception":
+			out += wrapper.wrap( "Exception: {0}".format( element.attrib["type"] ) )
+
+#		elif element.tag == "traceback":
+#			out += wrapper.wrapMultiLine( element.text )
+
+		elif element.tag == "description":
+			out += wrapper.wrapMultiLine( element.text )
+
+		elif element.tag == "build":
 			out += " " # new line
+			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
+			out += " "
 			wrapper.indent()
 			out += wrapper.wrap( "Platform:     {0} ({1})".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
 			out += wrapper.wrap( "Architecture: {0}".format( element.attrib["sys-architecture"] ) )
@@ -182,14 +197,14 @@ class XmlReportConverter( MObject ):
 		elif element.tag == "plugin":
 			name = element.attrib["name"]
 
-			out += wrapper.wrap( "Plugin: {0}".format( element.attrib["name"] ) )
+			out += wrapper.wrap( "Plugin: {0}".format( name ) )
 
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()
 				text = None
 				try:
 					text = self.__xmlTemplateFunctions[name]( element, wrapper )
-				except AttributeError:
+				except ( AttributeError, KeyError ):
 					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
 				wrapper.dedent()
 
@@ -246,10 +261,8 @@ class XmlReportConverter( MObject ):
 #				wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
 
 		wrapper.indent()
-
 		for childElement in element.getchildren():
 			out += self._toText( childElement, wrapper ) # enter recursion
-
 		wrapper.dedent()
 
 		return out

@@ -73,6 +73,8 @@ def returncode_to_description( returnCode ):
 		return "Build finished successfully"
 	elif returnCode == BuildError.getReturnCode():
 		return "An error occured while building the project"
+	elif returnCode == ConfigurationError.getReturnCode():
+		return "A configuration error occured"
 	elif returnCode == MomError.getReturnCode():
 		return "An error in Make-O-Matic occured"
 	else:

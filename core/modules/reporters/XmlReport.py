@@ -19,6 +19,8 @@
 
 import xml.dom.minidom
 from core.Instructions import Instructions
+import traceback
+from core.helpers.XmlUtils import create_exception_xml_node
 
 class XmlReport( object ):
 
@@ -31,7 +33,12 @@ class XmlReport( object ):
 		return self.__doc.toxml()
 
 	def prepare( self ):
-		self.__doc.appendChild( self._createNode( self.__instructions ) )
+		try:
+			rootNode = self._createNode( self.__instructions )
+		except Exception as e:
+			traceback.print_exc()
+			rootNode = create_exception_xml_node( self.__doc, e, traceback.format_exc() )
+		self.__doc.appendChild( rootNode )
 
 	def _createNode( self, instructions ):
 		"""Create XML node from Instructions object

@@ -17,8 +17,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from core.Exceptions import MomException, returncode_to_description
+
 def create_child_node( document, parentNode, tagName, text ):
 	elementNode = document.createElement( tagName )
 	textNode = document.createTextNode( str( text ) )
 	elementNode.appendChild( textNode )
 	parentNode.appendChild( elementNode )
+	return elementNode
+
+def create_exception_xml_node( document, exception, traceback ):
+	node = document.createElement( "exception" )
+	create_child_node( document, node, "description", exception )
+	create_child_node( document, node, "traceback", traceback )
+
+	if isinstance( exception, MomException ):
+		node.attributes["type"] = returncode_to_description( exception.getReturnCode() )
+		node.attributes["returncode"] = str( exception.getReturnCode() )
+	else:
+		node.attributes["type"] = "An unhandled exception occured"
+		node.attributes["returncode"] = str( None )
+
+	return node
