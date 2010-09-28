@@ -22,7 +22,7 @@ from core.helpers.GlobalMApp import mApp
 import re
 from core.Exceptions import ConfigurationError
 from core.helpers.EnvironmentVariables import add_to_path_collection
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_int
 
 class Dependency( MObject ):
 	'''Dependency represents a single installed dependency, and the adaptations to the environment variables needed to use it.'''
@@ -36,6 +36,7 @@ class Dependency( MObject ):
 		self.setFolder( folder )
 		self._setValid( False )
 		self.setEnabled( False )
+		self.setScore( 0 )
 		self.__description = None
 
 	def _getControlFileName( self, path ):
@@ -61,6 +62,13 @@ class Dependency( MObject ):
 
 	def isEnabled( self ):
 		return self.__enabled
+
+	def setScore( self, score ):
+		check_for_int( score, 'The package score must be an integer number.' )
+		self.__score = int( score )
+
+	def getScore( self ):
+		return self.__score
 
 	def _addCommand( self, line ):
 		self.__commands.append( line )
@@ -99,6 +107,7 @@ class Dependency( MObject ):
 	def applyProperty( self, controlFile, line ):
 		enabledLine = re.match( '^({0}PACKAGE_ENABLED)\s+(\w+)$'.format( Dependency._CommandPrefix ), line )
 		descriptionLine = re.match( '^({0}PACKAGE_DESCRIPTION)\s+(.+)$'.format( Dependency._CommandPrefix ), line )
+		scoreLine = re.match( '^({0}PACKAGE_SCORE)\s+(.+)$'.format( Dependency._CommandPrefix ), line )
 		# parse for "enabled" commands:
 		try:
 			if enabledLine:
@@ -115,6 +124,11 @@ class Dependency( MObject ):
 				description = str( descriptionLine.group( 2 ) )
 				self._setDescription( description )
 				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getDescription() ) )
+				return True
+			elif scoreLine:
+				score = str( scoreLine.group( 2 ) )
+				self.setScore( score )
+				mApp().debugN( self, 3, '>score< "{0}"'.format( self.getScore() ) )
 				return True
 			return False
 		except ConfigurationError as value:

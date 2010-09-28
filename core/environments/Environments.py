@@ -50,6 +50,7 @@ class Environments( ConfigurationBase ):
 	def _getInstalledDependencies( self ):
 		return self.__installedDeps
 
+	# FIXME I think this is not used anymore.
 	def buildConfiguration( self ):
 		'''For every child found during setup, apply the child, and build the configuration.'''
 		error = False
@@ -62,6 +63,7 @@ class Environments( ConfigurationBase ):
 		else:
 			return 0
 
+	# FIXME use modes (Ignore, BuildHighestRanking, BuildAll) that are configured in the settings per build type. 
 	def runPreFlightChecks( self ):
 		# discover matching environments:
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
@@ -102,7 +104,6 @@ class Environments( ConfigurationBase ):
 			folder = os.path.normpath( os.path.abspath( dep.getFolder() ) )
 			deps[ folder ] = dep
 		self._setInstalledDependencies( deps )
-		# mApp().debugN( self, 3, 'found MOM dependencies: {0}'.format( ', '.join( str( detectedDependencies ) ) ) )
 
 	def calculateMatches( self, packages, remainingDependencies, folders ):
 		matches = []

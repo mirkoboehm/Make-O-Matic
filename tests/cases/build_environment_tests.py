@@ -79,6 +79,7 @@ class BuildEnvironmentTests( MomTestCase ):
 		with EnvironmentSaver():
 			dep.apply()
 			self.assertEquals( os.environ[ 'EXAMPLE_VARIABLE'], 'example_variable' )
+			self.assertTrue( os.environ['PATH'].startswith( 'example_path' ) )
 
 	def testApplyDisabledPackageConfiguration( self ):
 		packageFolder = os.path.join( self.testMomEnvironments, 'dep-a-1.2.0' )
@@ -89,6 +90,7 @@ class BuildEnvironmentTests( MomTestCase ):
 		self.assertTrue( dep._readControlFile( packageFile ) )
 		self.assertTrue( not dep.isEnabled() )
 		self.assertEquals( dep.getDescription(), 'Test Disabled MOM Package' )
+		self.assertEquals( dep.getScore(), 120 )
 
 if __name__ == "__main__":
 	unittest.main()
