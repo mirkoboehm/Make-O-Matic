@@ -206,10 +206,10 @@ class RunCommand( MObject ):
 		if returnCode == expectedReturnCode:
 			version = getStdOut.decode().splitlines()[ lineNumber ].strip()
 			mApp().debugN( self, 4, 'RunCommand found: "{0}"'.format( version ) )
+			return version
 		else:
-			raise ConfigurationError( "RunCommand::checkVersion: {0} not found.".format( newcmd[0] ) )
-
-
+			raise ConfigurationError( "RunCommand::checkVersion: {0} returned {1}, expected: {2}."
+				.format( newcmd[0], returnCode, expectedReturnCode ) )
 
 	def run( self ):
 		timeoutString = 'without a timeout'

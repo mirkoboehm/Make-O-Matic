@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.executomat.ShellCommandAction import ShellCommandAction
 from core.modules.tools.qmake.QMakeBuilder import QMakeBuilder
 
@@ -95,3 +96,6 @@ class CMakeBuilder( QMakeBuilder ):
 		action.setWorkingDirectory( configuration.getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-configure' )
 		step.addMainAction( action )
+
+	def preFlightCheck( self ):
+		self.getMakeTool().checkVersion()

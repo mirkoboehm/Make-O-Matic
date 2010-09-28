@@ -16,9 +16,9 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
 from core.executomat.ShellCommandAction import ShellCommandAction
-from core.helpers.RunCommand import RunCommand
 
 class QMakeBuilder( MakeBasedBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
@@ -40,10 +40,6 @@ class QMakeBuilder( MakeBasedBuilder ):
 	def getInSourceBuild( self ):
 		return self.__inSourceBuild
 
-	def preFlightCheck( self ):
-		RunCommand( [ self.getMakefileGeneratorCommand() ] ).checkVersion( expectedReturnCode = 154 )
-		MakeBasedBuilder.preFlightCheck( self )
-
 	def createPrepareSourceDirActions( self ):
 		if not self.getInSourceBuild():
 			raise NotImplementedError( 'Sorry, out-of-source builds with QMake are not implemented.' )
@@ -54,3 +50,6 @@ class QMakeBuilder( MakeBasedBuilder ):
 		action.setWorkingDirectory( configuration.getSourceDir() )
 		step = self.getInstructions().getStep( 'conf-configure' )
 		step.addMainAction( action )
+
+	def preFlightCheck( self ):
+		self.getMakeTool().checkVersion( expectedReturnCode = 154 )

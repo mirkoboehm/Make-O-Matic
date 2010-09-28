@@ -28,8 +28,12 @@ class MakeTool():
 		self.__versionOutputLine = 0
 		self.__jobs = 1
 
-	def checkVersion( self ):
-		RunCommand( [ self.getCommand() ] ).checkVersion( self.getVersionParameter(), self.getVersionOutputLine() )
+	def checkVersion( self, expectedReturnCode = 0 ):
+		RunCommand( [ self.getCommand() ] ).checkVersion( 
+			self.getVersionParameter(),
+			self.getVersionOutputLine(),
+			expectedReturnCode = 0
+		)
 
 	def _setCommand( self, command ):
 		check_for_nonempty_string( command, 'The make tool command must be a non-empty string' )
