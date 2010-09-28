@@ -27,27 +27,32 @@ from core.modules.packagers.CPack import CPack
 from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
 import os
-import inspect
 import sys
 import shutil
 
 class MomBuildMockupTestCase( MomTestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
 
-	def setUp( self ):
+	myFilePath = os.path.realpath( __file__ )
+	myDirectory = os.path.split( myFilePath )[0]
+	testMomEnvironments = os.path.abspath( os.path.join( myDirectory , '..', 'cases', 'test-mom-environments' ) )
+
+	def setUp( self, useScm = False, useEnvironments = False ):
 		MomTestCase.setUp( self, False )
 
-		myFile = inspect.getfile( inspect.currentframe() )
-		myFilePath = os.path.split( myFile )
-		myDir = myFilePath[0]
-		testMomEnvironments = os.path.join( myDir, 'test-mom-environments' )
 		sys.argv = [] # reset command line arguments
 
-		build = Build( None, 'XmlReportTestBuild' )
+		build = Build( name = 'XmlReportTestBuild' )
 		project = Project( 'XmlReportTestProject' )
 		build.setProject( project )
-		project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
-		environments = Environments( [ 'Qt-4.[67].?-Shared-*' ], 'Qt 4', project )
+
+		if useScm:
+			project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
+
+		if useEnvironments:
+			environments = Environments( [ 'dep-a-1.?.0' ], 'Test dependency', project )
+		else:
+			environments = Environments()
 
 		debug = Configuration( 'Debug', environments, )
 		cmakeDebug = CMakeBuilder()
@@ -59,8 +64,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 		release.addPlugin( CTest() )
 		release.addPlugin( CPack() )
 
-		build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		build.getSettings().set( Settings.EnvironmentsBaseDir, testMomEnvironments )
+		build.getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
 
 		self.build = build
 		self.cwd = os.getcwd()

@@ -23,6 +23,8 @@ from core.modules.reporters.XmlReport import XmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.modules.XmlReportGenerator import XmlReportGenerator
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
+from core.helpers.GlobalMApp import mApp
+from core.Settings import Settings
 
 try:
 	from lxml import etree
@@ -31,20 +33,30 @@ except ImportError:
 
 class XmlReportTests( MomBuildMockupTestCase ):
 
-	def getXmlReport( self ):
+	def setUp( self ):
+		MomBuildMockupTestCase.setUp( self, useEnvironments = True )
+
+	def _build( self, type = 'm' ):
+		mApp().getSettings().set( Settings.ScriptLogLevel, 2 )
+		mApp().getSettings().set( Settings.ProjectBuildType, type )
+
+		#self.build.addLogger( ConsoleLogger() )
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 		self.build.buildAndReturn()
+
+	def getXmlReport( self ):
 		report = XmlReport( self.build )
 		report.prepare()
 		return report
 
 	def testCreateXmlReport( self ):
+		self._build()
 		doc = etree.XML( self.getXmlReport().getReport() )
 
 		self.assertEqual( doc.tag, "build" ) # root
 		self.assertNotEquals( doc.find( './/project' ), None )
-		self.assertNotEquals( doc.find( './/environment' ), None )
+		self.assertNotEquals( doc.find( './/environments' ), None )
 		self.assertNotEquals( doc.find( './/configuration' ), None )
 		self.assertNotEquals( doc.find( './/plugin' ), None )
 		self.assertNotEquals( doc.find( './/step' ), None )
@@ -52,7 +64,22 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		self.assertNotEquals( doc.find( './/plugin[@name="CMakeBuilder"]' ), None )
 
+	def testEnvironmentExpand( self ):
+		# TODO: FIXME: This test fails for some reason
+
+		self._build( 'c' )
+		doc = etree.XML( self.getXmlReport().getReport() )
+
+		self.assertNotEquals( doc.find( './/environments/environment' ), None, "Did not find matching environments" )
+
+	def testNoEnvironmentExpand( self ):
+		self._build( 'm' )
+		doc = etree.XML( self.getXmlReport().getReport() )
+
+		self.assertNotEquals( doc.find( './/environments/configuration' ), None, )
+
 	def testConvertXmlReportToHtml( self ):
+		self._build()
 		converter = XmlReportConverter( self.getXmlReport() )
 		xmlString = converter.convertToHtml()
 		doc = etree.XML( xmlString )
@@ -63,6 +90,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ), None )
 
 	def testConvertXmlReportToText( self ):
+		self._build()
 		converter = XmlReportConverter( self.getXmlReport() )
 		text = converter.convertToText()
 
@@ -72,12 +100,14 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportGenerator( self ):
 		generator = XmlReportGenerator()
 		self.build.addPlugin( generator )
+		self._build()
 
 		reportContent = self.getXmlReport().getReport()
 		filePath = generator.getReportFile()
 
 		self.assertNotEquals( filePath, None, "Log file does not exist" )
 
+		# check file content
 		file = open( filePath )
 		fileContent = file.read()
 		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )

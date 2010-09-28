@@ -179,12 +179,6 @@ class Environments( ConfigurationBase ):
 		environments = frozenset( environments )
 		return environments
 
-	def createXmlNode( self, document ):
-		node = document.createElement( "environment" )
-		node.attributes["name"] = self.getName()
-
-		return node
-
 	def describe( self, prefix ):
 		ConfigurationBase.describe( self, prefix )
 		deps = '{0}- dependencies: {1}'.format( prefix, ', '.join( self.getDependencies() ) )
