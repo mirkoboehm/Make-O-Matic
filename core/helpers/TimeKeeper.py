@@ -18,11 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime
-import time
 
 def formatted_time( datetimeObj ):
 	try:
-		text = time.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
+		text = datetimeObj.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
 	except Exception:
 		text = datetimeObj
 	return text
@@ -94,4 +93,3 @@ class TimeKeeper( object ):
 		if not self.getStartTime() or not self.getStopTime():
 			return '---'
 		return formatted_time_delta( self.delta() )
-
