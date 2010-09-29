@@ -112,7 +112,7 @@ class Instructions( MObject ):
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
-		node.attributes["basedir"] = str ( self.getBaseDir() )
+		#node.attributes["basedir"] = str ( self.getBaseDir() )
 		pluginsElement = document.createElement( "plugins" )
 		for plugin in self.getPlugins():
 			try:

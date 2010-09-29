@@ -41,8 +41,6 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		mApp().getSettings().set( Settings.ProjectBuildType, type )
 
 		#self.build.addLogger( ConsoleLogger() )
-		self.build.runPreFlightChecks()
-		self.build.runSetups()
 		self.build.buildAndReturn()
 
 	def getXmlReport( self ):
@@ -65,12 +63,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEquals( doc.find( './/plugin[@name="CMakeBuilder"]' ), None )
 
 	def testEnvironmentExpand( self ):
-		# TODO: FIXME: This test fails for some reason
-
 		self._build( 'c' )
 		doc = etree.XML( self.getXmlReport().getReport() )
 
 		self.assertNotEquals( doc.find( './/environments/environment' ), None, "Did not find matching environments" )
+		self.assertNotEquals( doc.find( './/environment/configuration' ), None )
 
 	def testNoEnvironmentExpand( self ):
 		self._build( 'm' )
