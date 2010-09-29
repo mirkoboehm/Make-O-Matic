@@ -29,14 +29,20 @@ class XmlReportGenerator( Plugin ):
 
 		self.__fileHandle = None
 		self.__reportFile = None
+		self.__finished = False
 
 	def shutDown( self ):
+		if self.__finished:
+			return
+
 		report = XmlReport( self.getInstructions() )
 		report.prepare()
 
 		self._openReportFile()
 		self._writeReport( report )
 		self._saveReportFile()
+
+		self.__finished = True
 
 	def getReportFile( self ):
 		return self.__reportFile

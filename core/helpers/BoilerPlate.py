@@ -35,6 +35,7 @@ def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 		logger = ConsoleLogger()
 		build.addLogger( logger )
 		build.addPlugin( XmlReportGenerator() )
+		build.addPlugin( ConsoleReporter() )
 		build.initialize()
 
 		if mApp().getSettings().get( Settings.EmailReporterEnableOnAllBuilds ):
@@ -55,8 +56,6 @@ def setupStandardProject( build, projectName = None,
 	project = Project( projectName )
 	# the command line parameter takes precedence
 	url = build.getParameters().getScmLocation() or scmUrl
-	reporter = ConsoleReporter()
-	project.addPlugin( reporter )
 	mApp().getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
 	mApp().getSettings().set( Settings.ProjectVersionName, projectVersionName )
 	project.createScm( url )
