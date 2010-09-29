@@ -23,8 +23,12 @@ from core.Build import Build
 import shutil
 import os
 from tests.helpers.MomTestCase import MomTestCase
+from datetime import datetime
 
 class ScmModulesTests ( MomTestCase ):
+
+	GIT_EXAMPLE = 'git://github.com/KDAB/Make-O-Matic.git'
+	SVN_EXAMPLE = 'http://ratproxy.googlecode.com/svn/trunk/'
 
 	def setUp( self ):
 		MomTestCase.setUp( self, False )
@@ -37,30 +41,50 @@ class ScmModulesTests ( MomTestCase ):
 		os.chdir( ".." )
 		shutil.rmtree( "None" )
 
-	def runScmTests( self, description ):
-		self.project.createScm( description )
-		scm = self.project.getScm()
+	def _initialize( self, scmUrl ):
+		self.project.createScm( scmUrl )
 
 		self.build.getParameters().parse()
 		self.build.initialize()
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 
-		# run scm step only
-		scm.getInstructions().execute()
-
+	def _validateRevisionInfoContent( self ):
 		# TODO: Add better tests
-		info = scm.getRevisionInfo()
+		info = self.project.getScm().getRevisionInfo()
 		self.assertNotEquals( info.committerName, None )
 		self.assertNotEquals( info.commitMessage, None )
 		self.assertNotEquals( info.commitTime, None )
 		self.assertNotEquals( info.revision, None )
 
 	def testScmGit( self ):
-		self.runScmTests( 'git://github.com/KDAB/Make-O-Matic.git' )
+		self._initialize( self.GIT_EXAMPLE )
+		self._validateRevisionInfoContent()
 
 	def testScmSvn( self ):
-		self.runScmTests( 'http://ratproxy.googlecode.com/svn/trunk/' )
+		self._initialize( self.SVN_EXAMPLE )
+		self._validateRevisionInfoContent()
+
+	def testScmSvnRevisionInfoCache( self ):
+		self._initialize( self.SVN_EXAMPLE )
+
+		scm = self.project.getScm()
+		scm.setRevision( 9 ) # set revision explicitly, HEAD revision info isn't cached
+		info1 = scm.getRevisionInfo()
+
+		# test if cache is working
+		startTime = datetime.utcnow()
+		info2 = scm.getRevisionInfo()
+		stopTime = datetime.utcnow()
+		delta = stopTime - startTime
+		self.assertTrue( delta.microseconds < 1000, "Fetching revision info for a cached revision took too long" )
+
+		# also test if info is the same
+		self.assertEqual( info1.committerName, info2.committerName )
+		self.assertEqual( info1.commitMessage, info2.commitMessage )
+		self.assertEqual( info1.commitTime, info2.commitTime )
+		self.assertEqual( info1.revision, info2.revision )
+
 
 if __name__ == "__main__":
 	unittest.main()

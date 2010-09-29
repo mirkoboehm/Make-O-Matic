@@ -30,15 +30,24 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
+
 		self._setCommand( "svn" )
+		self.__revisionInfoCache = {} # key: revision, value: RevisionInfo instance
+
 
 	def getIdentifier( self ):
 		return 'svn'
 
 	def getRevisionInfo( self ):
+		revision = self.getRevision() or 'HEAD'
+
+		# check if specified revision is in cache. do not check for 'HEAD'
+		if self.getRevision() in self.__revisionInfoCache:
+			return self.__revisionInfoCache[self.getRevision()]
+
 		info = RevisionInfo( "SvnRevisionInfo" )
 
-		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ]
+		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', '-r', str( revision ), self.getUrl() ]
 		runner = RunCommand( cmd )
 		runner.run()
 
@@ -51,6 +60,10 @@ class SCMSubversion( SourceCodeProvider ):
 		else:
 			raise ConfigurationError( 'cannot get log for "{0}"'
 				.format( self.getUrl() ) )
+
+		# add to cache. do not add 'HEAD'
+		if self.getRevision():
+			self.__revisionInfoCache[self.getRevision()] = info
 
 		return info
 
