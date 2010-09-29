@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_list_of_strings
 from core.executomat.ShellCommandAction import ShellCommandAction
 
 class PackageProvider( Plugin ):
@@ -26,21 +26,23 @@ class PackageProvider( Plugin ):
 	def __init__( self, name = None ):
 		"""Constructor"""
 		Plugin.__init__( self, name )
-		self.__packageArgument = None
+		self.__packageArguments = None
 
-	def _setPackageArgument( self, packageArgument ):
-		check_for_nonempty_string( packageArgument, "The package argument needs to be a non-empty string" )
-		self.__packageArgument = packageArgument
+	def _setPackageArguments( self, packageArguments ):
+		check_for_list_of_strings( packageArguments, "The package argument needs to be a list of strings" )
+		self.__packageArguments = packageArguments
 
-	def _getPackageArgument( self ):
-		return self.__packageArgument
+	def _getPackageArguments( self ):
+		return self.__packageArguments
 
 	def makePackageStep( self ):
 		"""Create package for the project."""
-		if self._getPackageArgument() == None:
+		if self._getPackageArguments() == None:
 			raise NotImplementedError()
 		step = self.getInstructions().getStep( 'conf-package' )
-		makePackage = ShellCommandAction( [ self.getCommand(), self._getPackageArgument() ] )
+		command = [ self.getCommand() ]
+		command.extend( self._getPackageArguments() )
+		makePackage = ShellCommandAction( command )
 		makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makePackage )
 		return makePackage

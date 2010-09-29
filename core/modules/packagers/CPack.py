@@ -20,6 +20,40 @@
 from core.modules.packagers.PackageProvider import PackageProvider
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
 from core.modules.tools.cmake.CMakeBuilder import CMakeSearchPaths
+import os
+from core.helpers.GlobalMApp import mApp
+from core.Settings import Settings
+
+_CPackConfig = '''SET(CPACK_PACKAGE_NAME "@CPACK_PACKAGE_NAME@")
+SET(CPACK_PACKAGE_VERSION_MAJOR "@CPACK_PACKAGE_VERSION_MAJOR@")
+SET(CPACK_PACKAGE_VERSION_MINOR "@CPACK_PACKAGE_VERSION_MINOR@")
+SET(CPACK_PACKAGE_VERSION_PATCH "@CPACK_PACKAGE_VERSION_PATCH@")
+SET(CPACK_INSTALL_DIRECTORY "@CPACK_INSTALL_DIRECTORY@")
+
+SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+GET_FILENAME_COMPONENT(CPACK_INSTALLED_DIRECTORIES "${CPACK_INSTALL_DIRECTORY}" REALPATH)
+LIST(APPEND CPACK_INSTALLED_DIRECTORIES ".")
+
+IF(WIN32)
+	SET(CPACK_GENERATOR "NSIS;ZIP")
+	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+	SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_FILE_NAME}")
+	SET(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_FILE_NAME}")
+	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_FILE_NAME}")
+ELSEIF(APPLE)
+	SET(CPACK_GENERATOR "DragNDrop;TBZ2")
+	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+	SET(CPACK_SYSTEM_NAME "OSX")
+ELSE()
+	SET(CPACK_GENERATOR "STGZ;TBZ2")
+	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+ENDIF()
+
+SET(CPACK_TOPLEVEL_TAG "${CPACK_SYSTEM_NAME}")
+SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_FILE_NAME}")
+SET(CPACK_IGNORE_FILES "/\\.svn/;/\\.git/")
+SET(CPACK_PACKAGE_DESCRIPTION "")
+'''
 
 class _CPackMovePackageAction( FilesMoveAction ):
 	def __init__( self, cpackAction, destination ):
@@ -45,18 +79,64 @@ class _CPackMovePackageAction( FilesMoveAction ):
 		self.setFiles( packageFiles )
 		return FilesMoveAction.run( self )
 
+
+class _CPackGenerateConfigurationAction( FilesMoveAction ):
+	def __init__( self, config, directory ):
+		FilesMoveAction.__init__( self )
+		self._config = config;
+		self._directory = directory;
+
+	def _formattedConfiguration( self ):
+		config = _CPackConfig
+		# Can't do this with str.format because of CMake's variable escaping conflicting
+		# with Python's format escaping
+		config = config.replace( "@CPACK_PACKAGE_NAME@", mApp().getSettings().get( Settings.ProjectName ), 1 )
+
+		versionList = mApp().getSettings().get( Settings.ProjectVersionNumber ).split( '.', 2 )
+		config = config.replace( "@CPACK_PACKAGE_VERSION_MAJOR@", versionList[0] or 1, 1 )
+		config = config.replace( "@CPACK_PACKAGE_VERSION_MINOR@", versionList[1] or 0, 1 )
+		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
+		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", self._directory, 1 )
+		return config
+
+	def run( self ):
+		"""Generates a CPack configuration file if needed."""
+		config = os.path.join( self.getWorkingDirectory(), self._config )
+		if ( os.path.exists( config ) ):
+			return
+
+		with open( config, 'w' ) as configFile:
+			configFile.write( self._formattedConfiguration() )
+
+		return 0
+
+
 class CPack( PackageProvider ):
 
-	def __init__( self, name = None ):
+	def __init__( self, sourcePackage = False, name = None ):
 		"""Constructor"""
 		PackageProvider.__init__( self, name )
 		self._setCommand( "cpack", CMakeSearchPaths )
-		self._setPackageArgument( "--verbose" )
+		if sourcePackage:
+			self.__configFile = "CPackSourceConfig.cmake"
+		else:
+			self.__configFile = "CPackConfig.cmake"
+		self._sourcePackage = sourcePackage
+		self._setPackageArguments( [ "--verbose", "--config", self.__configFile ] )
 
 	def makePackageStep( self ):
 		"""Create packages for the project using CPack."""
+		instructions = self.getInstructions()
+		step = instructions.getStep( 'conf-package' )
+		project = instructions.getProject()
+		if self._sourcePackage:
+			packagedDirectory = project.getSourceDir()
+		else:
+			packagedDirectory = instructions.getTargetDir()
+		generateConfig = _CPackGenerateConfigurationAction( self.__configFile, packagedDirectory )
+		generateConfig.setWorkingDirectory( instructions.getBuildDir() );
+		step.addMainAction( generateConfig )
 		makePackage = PackageProvider.makePackageStep( self )
-		step = self.getInstructions().getStep( 'conf-package' )
-		movePackageDestination = self.getInstructions().getProject().getPackagesDir()
+		movePackageDestination = project.getPackagesDir()
 		movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
 		step.addMainAction( movePackage )
