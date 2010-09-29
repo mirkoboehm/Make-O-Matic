@@ -30,8 +30,8 @@ class ConfigurationBase( BuildInstructions ):
 	def getTimeKeeper( self ):
 		return self.__timeKeeper
 
-	def buildConfiguration( self ):
-		raise NotImplementedError
+#	def buildConfiguration( self ):
+#		raise NotImplementedError
 
 	def getProject( self ):
 		project = self.getParent()

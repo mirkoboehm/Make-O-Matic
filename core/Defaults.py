@@ -31,7 +31,16 @@ class Defaults( MObject ):
 	RunMode_Print = 'print'
 	RunMode_Describe = 'describe'
 	RunModes = [ RunMode_Build, RunMode_Query, RunMode_Print, RunMode_Describe ]
-
+	EnvironmentExpansionMode_Ignore = 1
+	EnvironmentExpansionMode_BuildHighestScoring = 2
+	EnvironmentExpansionMode_BuildAll = 3
+	EnvironmentsExpansionModes = {
+		EnvironmentExpansionMode_Ignore : 'EnvironmentExpansionMode_Ignore: do not expand environments',
+		EnvironmentExpansionMode_BuildHighestScoring : 'EnvironmentExpansionMode_Ignore: expand environments, '
+			+ 'build against the best scoring one',
+		EnvironmentExpansionMode_BuildAll : 'EnvironmentExpansionMode_BuildAll: expand environemnts, '
+			+ 'build against all matches'
+	}
 	# Constants (setting variable names)
 	# ----- script settings:
 	ScriptLogLevel = 'script.loglevel'
@@ -63,6 +72,7 @@ class Defaults( MObject ):
 	# ----- auto-detected environment settings:
 	EnvironmentsBaseDir = 'environments.basedir'
 	EnvironmentsApplicableBuildTypes = 'environments.applicablebuildtypes'
+	EnvironmentsExpansionModeMapping = 'environments.expansionmodes'
 	# ----- Builder settings
 	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
 	# ----- CMake Builder settings
@@ -129,7 +139,7 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
 			'e' : 'Empty build. All build steps are disabled. Useful for debugging build scripts.',
 			'm' : 'Manual build. Does not modify environment variables. Deletes temporary folders.',
-			'c' : 'Continuous build. Builds configurations against the latest matching environment. Deletes temporary folders.',
+			'c' : 'Continuous build. Builds configurations against the best scoring matching environment. Deletes temporary folders.',
 			'd' : 'Daily build. Builds configurations against every matching environment. Deletes temporary folders.',
 			'h' : 'Hacker build. Similar to manual builds. Does not delete temporary folders.',
 			'p' : '1337 coder build. Similar to daily builds. Does not delete temporary folders.',
@@ -146,6 +156,13 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.ConfigurationTargetDir ] = 'install'
 		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
 		self.getSettings()[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
+		self.getSettings()[ Defaults.EnvironmentsExpansionModeMapping ] = {
+			'c' : Defaults.EnvironmentExpansionMode_BuildHighestScoring,
+			'd' : Defaults.EnvironmentExpansionMode_BuildAll,
+			's' : Defaults.EnvironmentExpansionMode_BuildAll,
+			'p' : Defaults.EnvironmentExpansionMode_BuildAll,
+			'f' : Defaults.EnvironmentExpansionMode_BuildAll
+		}
 		self.getSettings()[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
 		# ----- EmailReporter settings:
 		self.getSettings()[ Defaults.EmailReporterEnableOnAllBuilds ] = False

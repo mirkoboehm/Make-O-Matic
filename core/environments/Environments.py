@@ -20,10 +20,13 @@ from core.modules.ConfigurationBase import ConfigurationBase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 import os
-from core.Exceptions import MomError
+from core.Exceptions import MomError, ConfigurationError
 from core.environments.Dependency import Dependency
 from fnmatch import fnmatch
 from core.environments.Environment import Environment
+from bundlebuilder import Defaults
+from core import Defaults
+from test.test_iterlen import len
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches 
@@ -51,33 +54,64 @@ class Environments( ConfigurationBase ):
 		return self.__installedDeps
 
 	# FIXME I think this is not used anymore.
-	def buildConfiguration( self ):
-		'''For every child found during setup, apply the child, and build the configuration.'''
-		error = False
-		for child in self.getChildren():
-			assert isinstance( child, ConfigurationBase )
-			if child.buildConfiguration() != 0:
-				error = True
-		if error:
-			return 1
-		else:
-			return 0
+#	def buildConfiguration( self ):
+#		'''For every child found during setup, apply the child, and build the configuration.'''
+#		error = False
+#		for child in self.getChildren():
+#			assert isinstance( child, ConfigurationBase )
+#			if child.buildConfiguration() != 0:
+#				error = True
+#		if error:
+#			return 1
+#		else:
+#			return 0
+
+	def __selectBestScoringEnvironment( self, environments ):
+		assert len( environments ) > 0
+		decoratedTuples = []
+		index = 0
+		for env in environments:
+			scores = []
+			for dep in env.getDependencies():
+				scores.append( dep.getScore() )
+			decoratedTuples.append( [ scores, index, env ] )
+			index += 1
+		decoratedTuples.sort()
+		return decoratedTuples[0][2]
+
+	def __expandConfigurations( self, configs, environments ):
+		for config in configs:
+			self.removeChild( config )
+		for environment in environments:
+			environment.setName( environment.makeDescription() )
+			environment.cloneConfigurations( configs )
 
 	# FIXME use modes (Ignore, BuildHighestRanking, BuildAll) that are configured in the settings per build type. 
 	def runPreFlightChecks( self ):
 		# discover matching environments:
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
-		if buildType not in mApp().getSettings().get( Settings.EnvironmentsApplicableBuildTypes ).lower():
-			mApp().debugN( self, 2, 'environments will not be applied in build type {0}'.format( buildType ) )
-			return
+		# FIXME this may have to be a property, so that the expansion mode can be added to the build report 
+		mode = Settings.EnvironmentExpansionMode_Ignore
+		if buildType in mApp().getSettings().get( Settings.EnvironmentsExpansionModeMapping ):
+			mode = mApp().getSettings().get( Settings.EnvironmentsExpansionModeMapping )[ buildType ]
+		description = Settings.EnvironmentsExpansionModes[ mode ]
+		mApp().debugN( self, 2, 'Environment expansion mode for build type {0} is "{1}"'.format( buildType, description ) )
 		configs = self.getChildren()[:]
 		environments = self.findMatchingEnvironments()
-		if environments:
-			for config in configs:
-				self.removeChild( config )
-			for environment in environments:
-				environment.setName( environment.makeDescription() )
-				environment.cloneConfigurations( configs )
+		if mode == Settings.EnvironmentExpansionMode_BuildAll:
+			if not environments:
+				raise ConfigurationError( 'No environment found that matches the project requirements!' )
+			self.__expandConfigurations( configs, environments )
+		elif mode == Settings.EnvironmentExpansionMode_BuildHighestScoring:
+			if not environments:
+				raise ConfigurationError( 'No environment found that matches the project requirements!' )
+			environment = self.__selectBestScoringEnvironment( environments )
+			self.__expandConfigurations( configs, [ environment ] )
+		elif mode == Settings.EnvironmentExpansionMode_Ignore:
+			mApp().debugN( self, 2, 'environments will not be applied in build type {0}'.format( buildType ) )
+		else:
+			# should not happen
+			raise MomError( 'The environment mode {0} is undefined!'.format( mode ) )
 		ConfigurationBase.runPreFlightChecks( self )
 
 	def _findMomDependencies( self, folder ):
@@ -133,6 +167,11 @@ class Environments( ConfigurationBase ):
 						matches.append( newPackages )
 		return matches
 
+	def __ensureDependencyOrder( self, matches, dependencies ):
+		# FIXME we promised to return the deps in the order they were initially specified in the environment
+		# (otherwise, ordering them by score is broken)
+		raise NotImplementedError
+
 	def findMatchingEnvironments( self ):
 		# find all leaf nodes:
 		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )
@@ -165,6 +204,7 @@ class Environments( ConfigurationBase ):
 			mApp().debugN( self, 5, 'incremental paths: {0}'.format( ', '.join( reversePaths ) ) )
 			matches = self.calculateMatches( [], list( self.getDependencies() ), reversePaths )
 			if matches:
+				self.__ensureDependencyOrder( matches, self.getDependencies() )
 				allRawEnvironments.extend( matches )
 		# convert to Environment objects, make them unique, because the matching algorithm potentially finds duplicates:
 		environments = []
