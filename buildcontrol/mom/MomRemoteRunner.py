@@ -41,9 +41,7 @@ class MomRemoteRunner( MApplication ):
 #		mApp().debugN( self, 2, 'now invoking the build script {0} with options {1}'.format( 
 #			self.getParameters().getBuildscriptName(),
 #			' '.join( self.getParameters().getBuildScriptOptions() ) ) )
-		revInfo = RevisionInfo()
-		revInfo.revision = self.getParameters().getRevision()
-		remote = RemoteBuilder( revisionInfo = revInfo,
+		remote = RemoteBuilder( revision = self.getParameters().getRevision(),
 			location = self.getParameters().getUrl(),
 			path = self.getParameters().getPath(),
 			script = self.getParameters().getBuildscriptName() )
