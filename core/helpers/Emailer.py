@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
+
 from core.MObject import MObject
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
@@ -26,10 +27,12 @@ from core.Exceptions import ConfigurationError
 from email.utils import COMMASPACE
 
 class Email( MObject ):
+
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
 
 		self.__msg = MIMEMultipart( 'alternative' )
+		self.__msg.set_charset( "utf-8" )
 		self.__recipients = []
 
 	def _getMessage( self ):
@@ -41,13 +44,12 @@ class Email( MObject ):
 	def getFromAddress( self ):
 		return self._getMessage()[ 'From' ]
 
-	def addToAddress( self, address ):
-		assert isinstance( address, list )
-		self.setToAddresses( self.getToAddresses() + address )
+	def addToAddresses( self, addresses ):
+		assert isinstance( addresses, list )
+		self.setToAddresses( self.getToAddresses() + addresses )
 
 	def setToAddresses( self, addresses ):
-		self.__recipients = addresses
-		self._getMessage()['To'] = COMMASPACE.join( self.__recipients )
+		self.__recipients = list( set( addresses ) ) # remove duplicates
 
 	def getToAddresses( self ):
 		return self.__recipients
@@ -58,6 +60,12 @@ class Email( MObject ):
 	def getSubject( self ):
 		return self._getMessage()['Subject']
 
+	def addTextAttachment( self, text, filename ):
+		part = MIMEText( 'plain' )
+		part.set_payload( text )
+		part.add_header( 'Content-Disposition', 'attachment; filename={0}'.format( filename ) )
+		self._getMessage().attach( part )
+
 	def addTextPart( self, text ):
 		self._getMessage().attach( MIMEText( text, 'plain' ) )
 
@@ -65,9 +73,13 @@ class Email( MObject ):
 		self._getMessage().attach( MIMEText( html, 'html' ) )
 
 	def getMessageText( self ):
+		# finalize Email at the end, the 'To'-field can only be set once
+		self._getMessage()['To'] = COMMASPACE.join( self.__recipients )
+
 		return self._getMessage().as_string()
 
 class Emailer( MObject ):
+
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
 		self.__server = None
@@ -77,12 +89,12 @@ class Emailer( MObject ):
 		if not server:
 			raise ConfigurationError( 'No emailer SMTP server specified, please check configuration!' )
 		self.__server = SMTP( server )
+		#self.__server.set_debuglevel( 3 )
 		if mApp().getSettings().get( Settings.EmailerDoLogin, False ):
 			user = mApp().getSettings().get( Settings.EmailerUsername )
 			password = mApp().getSettings().get( Settings.EmailerPassword )
 			try:
 				self.__server.login( user, password )
-				#self.__server.set_debuglevel( 3 )
 			except SMTPHeloError as e:
 				raise ConfigurationError( 'The SMTP server rejected the connection: {0}'.format( e ) )
 			except SMTPAuthenticationError:

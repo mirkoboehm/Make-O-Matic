@@ -39,7 +39,7 @@ class EmailReporter( Reporter ):
 			return
 
 		# send mail
-		e = Emailer( 'Emailer' )
+		e = Emailer()
 		try:
 			e.setup()
 			e.send( email )
@@ -72,9 +72,11 @@ class EmailReporter( Reporter ):
 			revision = "N/A"
 			committer = None
 
+		status = u"\u263A" if returnCode == 0 else u"\u2620" # to smile or not to smile, that's the question
+
 		# header
 		email = Email()
-		email.setSubject( 'Build report for {0}, revision {1}'.format( instructions.getName(), revision ) )
+		email.setSubject( '{2} Build report for {0}, revision {1}'.format( instructions.getName(), revision, status.encode( "utf8" ) ) )
 		email.setFromAddress( reporterSender )
 
 		# add recipients
@@ -83,15 +85,15 @@ class EmailReporter( Reporter ):
 
 		if returnCode == ConfigurationError.getReturnCode() or committer is None:
 			if reporterConfigurationErrorRecipients:
-				email.addToAddress( reporterConfigurationErrorRecipients )
+				email.addToAddresses( reporterConfigurationErrorRecipients )
 
 		elif returnCode == BuildError.getReturnCode():
 			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
-				email.addToAddress( [info.committerEmail] )
+				email.addToAddresses( [info.committerEmail] )
 
 		elif returnCode == MomError.getReturnCode():
 			if reporterMomErrorRecipients:
-				email.addToAddress( reporterMomErrorRecipients )
+				email.addToAddresses( reporterMomErrorRecipients )
 
 		# body
 		report = XmlReport( instructions )
@@ -101,6 +103,9 @@ class EmailReporter( Reporter ):
 		if reporterEnableHtml:
 			email.addHtmlPart( conv.convertToHtml() )
 		else:
-			email.addTextPart( conv.convertToText() )
+			email.addTextPart( conv.convertToText( short = True ) )
+
+		if mApp().getException():
+			email.addTextAttachment( "\n\n".join( mApp().getException() ), "build.log" )
 
 		return email

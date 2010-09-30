@@ -143,17 +143,25 @@ class XmlReportConverter( MObject ):
 
 		return self._convertTo( "html" )
 
-	def convertToText( self ):
+	def convertToText( self, short = False ):
 		"""Convenience method for converting the report to plain text using the recursive _toText() method"""
 
 		wrapper = MyTextWrapper( drop_whitespace = False, width = 80 )
 
-		return "\n".join( self._toText( self.__xml, wrapper ) )
+		if short:
+			ignoredTags = ["exception"]
+		else:
+			ignoredTags = []
 
-	def _toText( self, element, wrapper ):
+		return "\n".join( self._toText( self.__xml, wrapper, ignoredTags ) )
+
+	def _toText( self, element, wrapper, ignoredTags ):
 		"""Recursive method for parsing an ElementTree and converting it to plain text"""
 
 		out = []
+
+		if element.tag in ignoredTags:
+			return out
 
 		# exception stuff
 		if element.tag == "exception":
@@ -268,7 +276,7 @@ class XmlReportConverter( MObject ):
 
 		wrapper.indent()
 		for childElement in element.getchildren():
-			out += self._toText( childElement, wrapper ) # enter recursion
+			out += self._toText( childElement, wrapper, ignoredTags ) # enter recursion
 		wrapper.dedent()
 
 		return out
