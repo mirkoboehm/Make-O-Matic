@@ -26,6 +26,7 @@ from core.Project import Project
 from core.modules.reporters.ConsoleReporter import ConsoleReporter
 from core.modules.reporters.EmailReporter import EmailReporter
 from core.modules.XmlReportGenerator import XmlReportGenerator
+from core.Configuration import Configuration
 
 def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 	try:
@@ -74,3 +75,12 @@ def setupStandardBuildAndProject( buildName = None, minimumMomVersion = None,
 	build = setupStandardBuild( buildName, minimumMomVersion )
 	project = setupStandardProject( build, projectName, projectVersionNumber, projectVersionName, scmUrl )
 	return build, project
+
+def setupStandardBuildAndConfiguration( buildName = None, minimumMomVersion = None,
+		projectName = None,
+		projectVersionNumber = None, projectVersionName = None,
+		scmUrl = None ):
+	build, project = setupStandardBuildAndProject( buildName, minimumMomVersion, projectName,
+												projectVersionNumber, projectVersionName, scmUrl )
+	configuration = Configuration( project.getName(), project )
+	return build, configuration
