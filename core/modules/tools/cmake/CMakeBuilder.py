@@ -87,4 +87,4 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 			arguments.append( '-D{0}'.format( variable ) )
 		arguments.append( configuration.getProject().getSourceDir() )
 		self._setMakefileGeneratorArguments( arguments )
-		QMakeBuilder.createConfigureActions( self )
+		MakefileGeneratorBuilder.createConfigureActions( self )

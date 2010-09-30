@@ -24,7 +24,6 @@ from core.Exceptions import MomError, ConfigurationError
 from core.environments.Dependency import Dependency
 from fnmatch import fnmatch
 from core.environments.Environment import Environment
-from test.test_iterlen import len
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches 
