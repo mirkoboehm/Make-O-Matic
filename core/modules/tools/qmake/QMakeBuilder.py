@@ -23,19 +23,26 @@ import os
 class QMakeBuilder( MakefileGeneratorBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
 
-	def __init__( self, name = None ):
+	def __init__( self, name = None, projectFile = None ):
 		MakefileGeneratorBuilder.__init__( self, name )
+		self._projectFile = projectFile
 		self._setMakefileGeneratorCommand( "qmake" )
 
 	def createConfigureActions( self ):
 		if not self.getInSourceBuild():
-			# If not an in-source build, work out the project name argument
-			sourceDirectory = self.getInstructions().getSourceDir()
-			sourceDirectoryName = os.path.basename( sourceDirectory )
-			projectFile = "{0}.pro".format( sourceDirectoryName )
-			projectFilePath = os.path.join( sourceDirectory, projectFile )
+			project = self.getInstructions().getProject()
+			sourceDirectory = project.getSourceDir()
+			if not self._projectFile:
+				# If we don't have a project file, guess from the name
+				# FIXME: We should probably check this somehow but can't be done until after preFlightCheck
+				self._projectFile = "{0}.pro".format( project.getName() )
+			projectFilePath = os.path.join( sourceDirectory, self._projectFile )
 			self._setMakefileGeneratorArguments( [ projectFilePath ] )
 		MakefileGeneratorBuilder.createConfigureActions( self )
+
+	def createConfMakeInstallActions( self ):
+		# Stupidly, QMake doesn't have a standard way of installing to a prefix so just disable this
+		pass
 
 	def preFlightCheck( self ):
 		self.getMakeTool().checkVersion( expectedReturnCode = 154 )

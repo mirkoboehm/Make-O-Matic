@@ -50,11 +50,10 @@ class MakefileGeneratorBuilder( MakeBasedBuilder ):
 	def createConfigureActions( self ):
 		if not self.__makefileGeneratorCommand:
 			raise NotImplementedError()
-		configuration = self.getInstructions()
 		command = [ self.getMakefileGeneratorCommand() ]
 		command.extend( self.__makefileGeneratorArguments )
 		action = ShellCommandAction( command )
-		action.setWorkingDirectory( configuration.getBuildDir() )
+		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-configure' )
 		step.addMainAction( action )
 
