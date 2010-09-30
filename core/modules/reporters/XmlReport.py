@@ -21,6 +21,7 @@ import xml.dom.minidom
 from core.Instructions import Instructions
 import traceback
 from core.helpers.XmlUtils import create_exception_xml_node
+from core.helpers.GlobalMApp import mApp
 
 class XmlReport( object ):
 
@@ -33,11 +34,17 @@ class XmlReport( object ):
 		return self.__doc.toxml()
 
 	def prepare( self ):
-		try:
-			rootNode = self._createNode( self.__instructions )
-		except Exception as e:
-			traceback.print_exc()
-			rootNode = create_exception_xml_node( self.__doc, e, traceback.format_exc() )
+		# fetch exception if any from mApp
+		exception = mApp().getException()
+		if exception:
+			rootNode = mApp().createXmlNode( self.__doc, recursive = False )
+			rootNode.appendChild( create_exception_xml_node( self.__doc, exception[0], exception[1] ) )
+		else:
+			try:
+				rootNode = self._createNode( self.__instructions )
+			except Exception as e:
+				rootNode = mApp().createXmlNode( self.__doc, recursive = False )
+				rootNode.appendChild( create_exception_xml_node( self.__doc, e, traceback.format_exc() ) )
 		self.__doc.appendChild( rootNode )
 
 	def _createNode( self, instructions ):

@@ -22,6 +22,7 @@ from core.Exceptions import MomError, MomException, InterruptedException
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
 from core.Instructions import Instructions
+import traceback
 
 class MApplication( Instructions ):
 	'''MApplication represents the facilities provided by the currently running script.
@@ -39,6 +40,7 @@ class MApplication( Instructions ):
 
 		self.__loggers = []
 		self.__settings = Settings()
+		self.__exception = None
 		self.__returnCode = 0
 
 		self._checkMinimumMomVersion( minimumMomVersion )
@@ -97,6 +99,12 @@ class MApplication( Instructions ):
 	def getReturnCode( self ):
 		return self.__returnCode
 
+	def setException( self, exception ):
+		self.__exception = exception
+
+	def getException( self ):
+		return self.__exception
+
 	def message( self, mobject, text ):
 		[ logger.message( self, mobject, text ) for logger in self.getLoggers() ]
 
@@ -133,13 +141,16 @@ class MApplication( Instructions ):
 
 	def _buildAndReturn( self ):
 		'''Helper method that can be overloaded.'''
-		self.runPreFlightChecks()
 		try:
+			self.runPreFlightChecks()
 			self.runSetups()
 			self.run()
+		except MomException as e:
+			self.registerReturnCode( e.getReturnCode() )
+			self.setException( ( e, traceback.format_exc() ) )
+			raise # rethrow exception
 		finally:
 			self.runShutDowns()
-
 
 	def buildAndReturn( self ):
 		'''buildAndReturn executes the build and returns the exit code of the script.
@@ -149,6 +160,7 @@ class MApplication( Instructions ):
 		that does not inherit MomException will pass. '''
 		try:
 			self._buildAndReturn()
+			self.message( self, 'Returning, return code {0}'.format( self.getReturnCode() ) )
 			return self.getReturnCode()
 		except MomException as e:
 			self.message( self, 'Error, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )

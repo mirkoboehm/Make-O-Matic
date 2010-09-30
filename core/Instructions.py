@@ -27,7 +27,6 @@ import os
 from core.executomat.Step import Step
 from core.Settings import Settings
 import traceback
-from core.helpers.XmlUtils import create_exception_xml_node
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
@@ -109,20 +108,22 @@ class Instructions( MObject ):
 		for plugin in self.getPlugins():
 			plugin.describe( subPrefix )
 
-	def createXmlNode( self, document ):
+	def createXmlNode( self, document, recursive = True ):
 		node = MObject.createXmlNode( self, document )
-		#node.attributes["basedir"] = str ( self.getBaseDir() )
-		pluginsElement = document.createElement( "plugins" )
-		for plugin in self.getPlugins():
-			try:
+
+		if recursive:
+			pluginsElement = document.createElement( "plugins" )
+			for plugin in self.getPlugins():
+#				#try:
 				element = plugin.createXmlNode( document )
-			except Exception as e:
-				element = document.createElement( plugin.getTagName() )
-				element.attributes["name"] = str( plugin.getName() )
-				exceptionNode = create_exception_xml_node( document, e, traceback.format_exc() )
-				element.appendChild( exceptionNode )
-			pluginsElement.appendChild( element )
-		node.appendChild( pluginsElement )
+#				except Exception as e:
+#					element = document.createElement( plugin.getTagName() )
+#					element.attributes["name"] = str( plugin.getName() )
+#					exceptionNode = create_exception_xml_node( document, e, traceback.format_exc() )
+#					element.appendChild( exceptionNode )
+				pluginsElement.appendChild( element )
+			node.appendChild( pluginsElement )
+
 		return node
 
 	def describeRecursively( self, prefix = '' ):

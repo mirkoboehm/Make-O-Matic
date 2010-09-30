@@ -50,7 +50,7 @@ class MObject( object ):
 		else:
 			print( '{0}{1}'.format( prefix, clazz ) )
 
-	def createXmlNode( self, document ):
+	def createXmlNode( self, document, recursive = True ):
 		"""Create XML node for this object
 		
 		Feel free to overwrite in subclasses to add more details"""

@@ -156,9 +156,10 @@ class Build( MApplication ):
 					self.getSettings().get( Settings.ScriptRunMode ),
 					', '.join( Settings.RunModes ) ) )
 
-	def createXmlNode( self, document ):
-		node = MApplication.createXmlNode( self, document )
+	def createXmlNode( self, document, recursive = True ):
+		node = MApplication.createXmlNode( self, document, recursive )
 
+		# add machine info
 		for key, value  in machine_info().items():
 			node.attributes[key] = value
 

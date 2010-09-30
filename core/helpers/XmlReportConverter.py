@@ -155,8 +155,14 @@ class XmlReportConverter( MObject ):
 
 		out = []
 
+		# exception stuff
 		if element.tag == "exception":
-			out += wrapper.wrap( "Exception: {0}".format( element.attrib["type"] ) )
+			out += " "
+			out += wrapper.wrap( "Exception: {1} (returned {0})".format( element.attrib["returncode"], element.attrib["type"] ) )
+		elif element.tag == "description":
+			out += wrapper.wrapMultiLine( "Description: {0}".format( element.text ) )
+		elif element.tag == "traceback":
+			out += wrapper.wrapMultiLine( element.text )
 
 #		elif element.tag == "traceback":
 #			out += wrapper.wrapMultiLine( element.text )
