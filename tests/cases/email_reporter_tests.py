@@ -20,21 +20,75 @@
 import unittest
 from core.modules.reporters.EmailReporter import EmailReporter
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
-from core.loggers.ConsoleLogger import ConsoleLogger
+from core.helpers.GlobalMApp import mApp
+from core.Settings import Settings
+from core.Exceptions import ConfigurationError, MomError, BuildError
 
 class EmailReporterTest( MomBuildMockupTestCase ):
 
-	def testEmailReporterPlugin( self ):
-		# TODO: Modify email recipients list for testing
+	def setUp( self ):
+		MomBuildMockupTestCase.setUp( self, useScm = True )
+
+		mApp().getSettings().set( Settings.EmailReporterDefaultRecipients, ["DR"] )
+		mApp().getSettings().set( Settings.EmailReporterConfigurationErrorRecipients, ["CER"] )
+		mApp().getSettings().set( Settings.EmailReporterMomErrorRecipients, ["MER"] )
+		mApp().getSettings().set( Settings.EmailReporterSender, ["S"] )
 
 		# add EmailReporter plugin
-		self.build.addLogger( ConsoleLogger() )
-		self.build.addPlugin( EmailReporter() )
+		self.reporter = EmailReporter( "TestEmailReporter" )
+		self.build.addPlugin( self.reporter )
 
-		self.build.initialize()
-		self.build.runPreFlightChecks()
-		self.build.runSetups()
-		self.build.buildAndReturn()
+	def testCreateEmail1( self ):
+		self.build.registerReturnCode( 0 ) # no failure
+		email = self.reporter.createEmail()
+
+		self.assertEquals( email.getToAddresses(), ["DR"] )
+
+	def testCreateEmail2( self ):
+		self.build.registerReturnCode( ConfigurationError.getReturnCode() )
+		email = self.reporter.createEmail()
+
+		self.assertTrue( "DR" in email.getToAddresses() and "CER" in email.getToAddresses() )
+
+	def testCreateEmail3( self ):
+		self.build.registerReturnCode( MomError.getReturnCode() )
+		email = self.reporter.createEmail()
+
+		self.assertTrue( "DR" in email.getToAddresses() and "MER" in email.getToAddresses() )
+
+	def testCreateEmail4( self ):
+		self.build.registerReturnCode( BuildError.getReturnCode() )
+		scm = self.build.getProject().getScm()
+
+		scm.setRevision( "409ae013ff1a9dccf41a60b4cefcd849309893bd" ) # commit by Mirko
+		email = self.reporter.createEmail()
+		self.assertTrue( "DR" in email.getToAddresses() and "mirko@kdab.com" in email.getToAddresses() )
+
+		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" ) # commit by Kevin
+		email = self.reporter.createEmail()
+		self.assertTrue( "DR" in email.getToAddresses() and "krf@electrostorm.net" in email.getToAddresses() )
+
+	def testCreateEmailNoRecipients( self ):
+		mApp().getSettings().set( Settings.EmailReporterDefaultRecipients, None )
+		email = self.reporter.createEmail()
+
+		self.assertEquals( len( email.getToAddresses() ), 0 )
+
+	def testCreateEmailSubject( self ):
+		scm = self.build.getProject().getScm()
+
+		# test revision in subject
+		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" )
+		email = self.reporter.createEmail()
+		self.assertTrue( scm.getRevision() in email.getSubject() )
+
+		# test invalid revision
+		scm.setRevision( "---" )
+		email = self.reporter.createEmail()
+		self.assertTrue( "N/A" in email.getSubject() )
+
+	# TODO: Implement at some point
+	#def testCreateEmailBody( self ):
 
 if __name__ == "__main__":
 	unittest.main()

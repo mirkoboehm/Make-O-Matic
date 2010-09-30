@@ -42,7 +42,8 @@ class Email( MObject ):
 		return self._getMessage()[ 'From' ]
 
 	def addToAddress( self, address ):
-		self.setToAddresses( self.getToAddresses() + [address] )
+		assert isinstance( address, list )
+		self.setToAddresses( self.getToAddresses() + address )
 
 	def setToAddresses( self, addresses ):
 		self.__recipients = addresses

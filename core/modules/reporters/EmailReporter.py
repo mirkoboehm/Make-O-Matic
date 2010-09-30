@@ -24,14 +24,31 @@ from core.helpers.Emailer import Email, Emailer
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Build import Build
 from core.Settings import Settings
-from core.Exceptions import MomError, BuildError, ConfigurationError
+from core.Exceptions import MomError, BuildError, ConfigurationError, MomException
 
 class EmailReporter( Reporter ):
 
 	def __init__( self, name = None ):
 		Reporter.__init__( self, name )
 
-	def wrapUp( self ):
+	def shutDown( self ):
+		email = self.createEmail()
+
+		if len( email.getToAddresses() ) == 0:
+			mApp().debug( self, 'Not sending mail, no recipients added' )
+			return
+
+		# send mail
+		e = Emailer( 'Emailer' )
+		try:
+			e.setup()
+			e.send( email )
+			e.quit()
+			mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( ", ".join( email.getToAddresses() ) ) )
+		except Exception as e:
+			mApp().debug( self, 'Sending E-Mail failed: {0}'.format( e ) )
+
+	def createEmail( self ):
 		instructions = mApp()
 		assert isinstance( instructions, Build )
 
@@ -45,33 +62,36 @@ class EmailReporter( Reporter ):
 		# get project info
 		returnCode = mApp().getReturnCode()
 		scm = instructions.getProject().getScm()
-		info = scm.getRevisionInfo()
+
+		# revision info may fail, ensure mail is still sent
+		try:
+			info = scm.getRevisionInfo()
+			revision = info.revision
+			committer = info.committerEmail
+		except MomException:
+			revision = "N/A"
+			committer = None
 
 		# header
 		email = Email()
-		email.setSubject( 'Build report for {0}, revision {1}'.format( instructions.getName(), info.revision ) )
+		email.setSubject( 'Build report for {0}, revision {1}'.format( instructions.getName(), revision ) )
 		email.setFromAddress( reporterSender )
+
+		# add recipients
 		if reporterDefaultRecipients:
 			email.setToAddresses( reporterDefaultRecipients )
 
-		if returnCode == 0: # no error
-			pass
-
-		elif returnCode == BuildError.getReturnCode():
-			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
-				email.addToAddress( info.committerEmail )
-
-		elif returnCode == ConfigurationError.getReturnCode():
+		if returnCode == ConfigurationError.getReturnCode() or committer is None:
 			if reporterConfigurationErrorRecipients:
 				email.addToAddress( reporterConfigurationErrorRecipients )
 
-		elif returnCode == MomError.getReturnCode():
-			if reporterMomErrorRecipients is not None:
-				email.addToAddress( reporterMomErrorRecipients )
+		elif returnCode == BuildError.getReturnCode():
+			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
+				email.addToAddress( [info.committerEmail] )
 
-		if len( email.getToAddresses() ) == 0:
-			mApp().debug( self, 'Not sending mail, no recipients added' )
-			return
+		elif returnCode == MomError.getReturnCode():
+			if reporterMomErrorRecipients:
+				email.addToAddress( reporterMomErrorRecipients )
 
 		# body
 		report = XmlReport( instructions )
@@ -83,12 +103,4 @@ class EmailReporter( Reporter ):
 		else:
 			email.addTextPart( conv.convertToText() )
 
-		# send mail
-		e = Emailer( 'Emailer' )
-		try:
-			e.setup()
-			e.send( email )
-			e.quit()
-			mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( ", ".join( email.getToAddresses() ) ) )
-		except Exception as e:
-			mApp().debug( self, 'Sending E-Mail failed: {0}'.format( e ) )
+		return email
