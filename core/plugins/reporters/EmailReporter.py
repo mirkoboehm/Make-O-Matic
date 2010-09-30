@@ -105,7 +105,8 @@ class EmailReporter( Reporter ):
 		else:
 			email.addTextPart( conv.convertToText( short = True ) )
 
-		if mApp().getException():
-			email.addTextAttachment( "\n\n".join( mApp().getException() ), "build.log" )
+		exception = mApp().getException()
+		if exception:
+			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], exception[1] ), "build.log" )
 
 		return email

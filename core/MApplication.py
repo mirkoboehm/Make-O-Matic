@@ -147,7 +147,7 @@ class MApplication( Instructions ):
 			self.run()
 		except MomException as e:
 			self.registerReturnCode( e.getReturnCode() )
-			self.setException( ( str( e ), traceback.format_exc() ) )
+			self.setException( ( e, traceback.format_exc() ) )
 			raise # rethrow exception
 		finally:
 			self.runShutDowns()
