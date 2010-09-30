@@ -22,8 +22,6 @@ from core.MApplication import MApplication
 from core.Build import Build
 from core.helpers.RunCommand import RunCommand
 from datetime import datetime
-import sys
-from core.helpers.TimeKeeper import formatted_time_delta
 
 class MomTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
@@ -40,8 +38,7 @@ class MomTestCase( unittest.TestCase ):
 	def tearDown( self ):
 		MApplication.instance = None
 
-		sys.stdout.write( "[time: {0}] -> ".format( formatted_time_delta( datetime.utcnow() - self.startTime ) ) )
-		sys.stdout.flush()
+		#print( "[time: {0}]".format( datetime.utcnow() - self.startTime ) )
 
 	def runCommand( self, cmd, description, timeout = None, zeroReturnCode = True ):
 		'''Helper method to run shell commands in tests. It creates a RunCommand object, runs it, 
