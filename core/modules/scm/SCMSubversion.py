@@ -24,6 +24,9 @@ from core.executomat.ShellCommandAction import ShellCommandAction
 import time
 from xml.dom import minidom
 from core.modules.scm.RevisionInfo import RevisionInfo
+import os
+import tempfile
+from core.helpers.FilesystemAccess import make_foldername_from_string
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -120,6 +123,25 @@ class SCMSubversion( SourceCodeProvider ):
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 		return step
+
+	def fetchRepositoryFolder( self, remotePath ):
+		# FIXME Mike abstract cache location
+		path = tempfile.mkdtemp( prefix = 'mom_buildscript-', suffix = make_foldername_from_string( self.getUrl() ) )
+		if not self.getRevision():
+			self.setRevision( 'HEAD' )
+		location = self.getUrl()
+		if remotePath:
+			location += '/' + remotePath
+		cmd = [ self.getCommand(), 'co', '-r', self.getRevision(), location ]
+		runner = RunCommand( cmd )
+		runner.setWorkingDir( path )
+		runner.run()
+		if runner.getReturnCode() == 0:
+			localPath = os.path.join( path, remotePath )
+			if os.path.exists( localPath ):
+				return localPath
+		raise ConfigurationError( 'The remote path {0} was not found in the repository at revision {1}'.format( 
+				remotePath, self.getRevision() ) )
 
 def parse_log_entry( logentry ):
 	"""Parse one SVN log entry in XML format, return tuple (committer, message, revision, commitTime)"""
