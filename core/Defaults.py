@@ -36,7 +36,7 @@ class Defaults( MObject ):
 	EnvironmentExpansionMode_BuildAll = 3
 	EnvironmentsExpansionModes = {
 		EnvironmentExpansionMode_Ignore : 'EnvironmentExpansionMode_Ignore: do not expand environments',
-		EnvironmentExpansionMode_BuildHighestScoring : 'EnvironmentExpansionMode_Ignore: expand environments, '
+		EnvironmentExpansionMode_BuildHighestScoring : 'EnvironmentExpansionMode_BuildHighestScoring: expand environments, '
 			+ 'build against the best scoring one',
 		EnvironmentExpansionMode_BuildAll : 'EnvironmentExpansionMode_BuildAll: expand environemnts, '
 			+ 'build against all matches'

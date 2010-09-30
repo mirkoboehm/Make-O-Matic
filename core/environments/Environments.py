@@ -24,8 +24,6 @@ from core.Exceptions import MomError, ConfigurationError
 from core.environments.Dependency import Dependency
 from fnmatch import fnmatch
 from core.environments.Environment import Environment
-from bundlebuilder import Defaults
-from core import Defaults
 from test.test_iterlen import len
 
 class Environments( ConfigurationBase ):
@@ -86,11 +84,10 @@ class Environments( ConfigurationBase ):
 			environment.setName( environment.makeDescription() )
 			environment.cloneConfigurations( configs )
 
-	# FIXME use modes (Ignore, BuildHighestRanking, BuildAll) that are configured in the settings per build type. 
 	def runPreFlightChecks( self ):
 		# discover matching environments:
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
-		# FIXME this may have to be a property, so that the expansion mode can be added to the build report 
+		# FIXME (Kevin, what do you think?) this may have to be a property, so that the expansion mode can be added to the build report 
 		mode = Settings.EnvironmentExpansionMode_Ignore
 		if buildType in mApp().getSettings().get( Settings.EnvironmentsExpansionModeMapping ):
 			mode = mApp().getSettings().get( Settings.EnvironmentsExpansionModeMapping )[ buildType ]
@@ -106,6 +103,8 @@ class Environments( ConfigurationBase ):
 			if not environments:
 				raise ConfigurationError( 'No environment found that matches the project requirements!' )
 			environment = self.__selectBestScoringEnvironment( environments )
+			mApp().debugN( self, 2, 'best scoring environment is "{0}" (out of {1})'
+				.format( environment.makeDescription(), len( environments ) ) )
 			self.__expandConfigurations( configs, [ environment ] )
 		elif mode == Settings.EnvironmentExpansionMode_Ignore:
 			mApp().debugN( self, 2, 'environments will not be applied in build type {0}'.format( buildType ) )
@@ -154,7 +153,7 @@ class Environments( ConfigurationBase ):
 						mApp().debugN( self, 4, 'dependency {0} matches, but is not enabled'.format( item ) )
 						continue
 					newPackages = list( packages )
-					newPackages.append( path )
+					newPackages.append( [ path, dep ] )
 					newDeps = list( self.getDependencies() )
 					newDeps.remove( dep )
 					if newDeps:
@@ -167,10 +166,18 @@ class Environments( ConfigurationBase ):
 						matches.append( newPackages )
 		return matches
 
-	def __ensureDependencyOrder( self, matches, dependencies ):
-		# FIXME we promised to return the deps in the order they were initially specified in the environment
-		# (otherwise, ordering them by score is broken)
-		raise NotImplementedError
+	def __ensureDependencyOrder( self, unsortedMatches, dependencies ):
+		matches = []
+		for match in unsortedMatches:
+			assert len( match ) == len( dependencies )
+			sortedMatch = []
+			for dep in dependencies:
+				for element in match:
+					if element[1] == dep:
+						sortedMatch.append( element[ 0 ] )
+			assert len( sortedMatch ) == len( match )
+			matches.append( sortedMatch )
+		return matches
 
 	def findMatchingEnvironments( self ):
 		# find all leaf nodes:
@@ -204,8 +211,8 @@ class Environments( ConfigurationBase ):
 			mApp().debugN( self, 5, 'incremental paths: {0}'.format( ', '.join( reversePaths ) ) )
 			matches = self.calculateMatches( [], list( self.getDependencies() ), reversePaths )
 			if matches:
-				self.__ensureDependencyOrder( matches, self.getDependencies() )
-				allRawEnvironments.extend( matches )
+				sortedMatches = self.__ensureDependencyOrder( matches, self.getDependencies() )
+				allRawEnvironments.extend( sortedMatches )
 		# convert to Environment objects, make them unique, because the matching algorithm potentially finds duplicates:
 		environments = []
 		for env in allRawEnvironments:

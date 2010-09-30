@@ -28,7 +28,6 @@ from core.executomat.Step import Step
 from core.Settings import Settings
 import traceback
 from core.helpers.XmlUtils import create_exception_xml_node
-from core.Plugin import Plugin
 
 class Instructions( MObject ):
 	'''Instructions is the base class for anything that can be built by make-o-matic. 
