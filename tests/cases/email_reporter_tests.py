@@ -18,7 +18,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.modules.reporters.EmailReporter import EmailReporter
+from core.plugins.reporters.EmailReporter import EmailReporter
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings

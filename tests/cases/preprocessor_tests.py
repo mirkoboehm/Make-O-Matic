@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.modules.Preprocessor import _PreprocessorAction
+from core.plugins.Preprocessor import _PreprocessorAction
 from core.Exceptions import BuildError
 from tests.helpers.MomTestCase import MomTestCase
 

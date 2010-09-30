@@ -19,7 +19,7 @@
 from tests.helpers.MomTestCase import MomTestCase
 from buildcontrol.mom.Parameters import Parameters
 import os, sys, unittest
-from core.modules.scm.RevisionInfo import RevisionInfo
+from core.plugins.sourcecode.RevisionInfo import RevisionInfo
 from buildcontrol.mom.Remotebuilder import RemoteBuilder
 
 class MomTests( MomTestCase ):

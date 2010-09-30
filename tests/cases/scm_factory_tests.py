@@ -19,13 +19,13 @@
 
 import unittest
 from core.Project import Project
-from core.modules.scm.SCMGit import SCMGit
+from core.plugins.sourcecode.SCMGit import SCMGit
 from core.Settings import Settings
 from core.Exceptions import ConfigurationError
 from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
-from core.modules.scm import getScm
-from core.modules.scm.SCMSubversion import SCMSubversion
+from core.plugins.sourcecode import getScm
+from core.plugins.sourcecode.SCMSubversion import SCMSubversion
 
 class ScmFactoryTests( MomTestCase ):
 

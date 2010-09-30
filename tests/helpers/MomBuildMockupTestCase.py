@@ -20,10 +20,10 @@
 from core.Project import Project
 from core.Settings import Settings
 from core.environments.Environments import Environments
-from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder
+from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder
 from core.Configuration import Configuration
-from core.modules.testers.CTest import CTest
-from core.modules.packagers.CPack import CPack
+from core.plugins.testers.CTest import CTest
+from core.plugins.packagers.CPack import CPack
 from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
 import os

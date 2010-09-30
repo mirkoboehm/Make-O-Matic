@@ -16,22 +16,27 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.actions.Action import Action
-import os
 
-class TouchAction( Action ):
-	"""TouchAction encapsulates the creation of an empty file or updated the time-stamp on an existing one.
-	It is mostly used internally, but can be of general use as well."""
-	def __init__( self, file ):
-		Action.__init__( self )
-		self._file = file;
+from core.plugins.reporters.Reporter import Reporter
+from core.plugins.reporters.XmlReport import XmlReport
+from core.helpers.XmlReportConverter import XmlReportConverter
 
-	def getLogDescription( self ):
-		"""Provide a textual description for the Action that can be added to the execution log file."""
-		return 'touch "{0}"'.format( self._file )
+class ConsoleReporter( Reporter ):
 
-	def run( self ):
-		"""Touches the list of files."""
-		with file( self._file, 'a' ):
-			os.utime( self._file, None )
-		return 0
+	def __init__( self, name = None ):
+		Reporter.__init__( self, name )
+
+		self.__finished = False
+
+	def shutDown( self ):
+		if self.__finished:
+			return
+
+		report = XmlReport( self.getInstructions() )
+		report.prepare()
+		converter = XmlReportConverter( report )
+
+		print( converter.convertToText() )
+		print( " " ) # empty line
+
+		self.__finished = True

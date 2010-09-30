@@ -22,10 +22,10 @@
 from core.helpers.BoilerPlate import getBuildProject
 from core.Configuration import Configuration
 from core.helpers.PathResolver import PathResolver
-from core.modules.publishers.RSyncPublisher import RSyncPublisher
-from core.modules.tools.cmake.CMakeBuilder import CMakeBuilder, CMakeVariable
-from core.modules.packagers.CPack import CPack
-from core.modules.testers.CTest import CTest
+from core.plugins.RSyncPublisher import RSyncPublisher
+from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder, CMakeVariable
+from core.plugins.packagers.CPack import CPack
+from core.plugins.testers.CTest import CTest
 from core.environments.Environments import Environments
 
 build, project = getBuildProject( buildName = 'Charm Build', projectName = 'Charm',

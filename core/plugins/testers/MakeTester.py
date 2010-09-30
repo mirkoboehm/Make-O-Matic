@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-# Author: Mirko Boehm <mirko@kdab.com>
+# Author: Mike McQuaid <mike.mcquaid@kdab.com>
 # 
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,22 +16,21 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.actions.Action import Action
-import os
 
-class TouchAction( Action ):
-	"""TouchAction encapsulates the creation of an empty file or updated the time-stamp on an existing one.
-	It is mostly used internally, but can be of general use as well."""
-	def __init__( self, file ):
-		Action.__init__( self )
-		self._file = file;
+from core.plugins.testers.TestProvider import TestProvider
+from core.plugins.builders import maketools
 
-	def getLogDescription( self ):
-		"""Provide a textual description for the Action that can be added to the execution log file."""
-		return 'touch "{0}"'.format( self._file )
+class MakeTester( TestProvider ):
 
-	def run( self ):
-		"""Touches the list of files."""
-		with file( self._file, 'a' ):
-			os.utime( self._file, None )
-		return 0
+	def __init__( self, name = None ):
+		"""Constructor"""
+		TestProvider.__init__( self, name )
+		self.__makeTool = maketools.getMakeTool()
+		self._setCommand( self.__makeTool.getCommand() )
+		self._setTestArgument( "test" )
+
+	def preFlightCheck( self ):
+		self.getMakeTool().checkVersion()
+
+	def getMakeTool( self ):
+		return self.__makeTool

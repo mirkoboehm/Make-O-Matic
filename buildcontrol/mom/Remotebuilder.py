@@ -19,7 +19,7 @@
 import os
 from core.MObject import MObject
 from core.Exceptions import ConfigurationError
-from core.modules.scm import getScm
+from core.plugins.sourcecode import getScm
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 
 class RemoteBuilder( MObject ):

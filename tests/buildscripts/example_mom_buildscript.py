@@ -19,9 +19,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.modules.tools.doxygen.DoxygenGenerator import DoxygenGenerator
-from core.modules.publishers.RSyncPublisher import RSyncPublisher
-from core.modules.Preprocessor import Preprocessor
+from core.plugins.DoxygenGenerator import DoxygenGenerator
+from core.plugins.RSyncPublisher import RSyncPublisher
+from core.plugins.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
 from core.Configuration import Configuration
 from core.helpers.BoilerPlate import getBuildProject

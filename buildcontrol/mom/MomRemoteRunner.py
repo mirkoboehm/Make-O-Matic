@@ -21,7 +21,6 @@ from core.loggers.ConsoleLogger import ConsoleLogger
 from buildcontrol.mom.Parameters import Parameters
 import sys
 from buildcontrol.mom.Remotebuilder import RemoteBuilder
-from core.modules.scm.RevisionInfo import RevisionInfo
 
 class MomRemoteRunner( MApplication ):
 	'''MomRemoteRunner takes the location descriptor of a remote build script, fetches the build script, 

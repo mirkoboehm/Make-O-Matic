@@ -20,8 +20,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.helpers.BoilerPlate import getBuildConfiguration
-from core.modules.tools.qmake.QMakeBuilder import QMakeBuilder
-from core.modules.packagers.CPack import CPack
+from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
+from core.plugins.packagers.CPack import CPack
 
 build, config = getBuildConfiguration( projectName = 'Jom', projectVersionNumber = '1.0.0',
 									scmUrl = 'git://gitorious.org/qt-labs/jom.git' )

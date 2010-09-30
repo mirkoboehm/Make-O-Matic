@@ -19,9 +19,9 @@
 
 import unittest
 from core.Exceptions import MomError, ConfigurationError, BuildError
-from core.modules.reporters.XmlReport import XmlReport
+from core.plugins.reporters.XmlReport import XmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
-from core.modules.XmlReportGenerator import XmlReportGenerator
+from core.plugins.reporters.XmlReportGenerator import XmlReportGenerator
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings

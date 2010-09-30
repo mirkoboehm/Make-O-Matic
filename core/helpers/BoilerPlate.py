@@ -23,9 +23,9 @@ from core.loggers.ConsoleLogger import ConsoleLogger
 from core.Exceptions import MomException
 import sys
 from core.Project import Project
-from core.modules.reporters.ConsoleReporter import ConsoleReporter
-from core.modules.reporters.EmailReporter import EmailReporter
-from core.modules.XmlReportGenerator import XmlReportGenerator
+from core.plugins.reporters.ConsoleReporter import ConsoleReporter
+from core.plugins.reporters.EmailReporter import EmailReporter
+from core.plugins.reporters.XmlReportGenerator import XmlReportGenerator
 from core.Configuration import Configuration
 
 def getBuild( buildName = "MOMBuild", minimumMomVersion = "0.5.0" ):

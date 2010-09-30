@@ -19,7 +19,7 @@
 
 from __future__ import print_function
 
-from core.modules.SourceCodeProvider import SourceCodeProvider
+from core.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
 from core.Settings import Settings
 from core.Exceptions import MomError
 from core.helpers.PathResolver import PathResolver
@@ -28,7 +28,7 @@ import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
 from core.BuildInstructions import BuildInstructions
-from core.modules.scm import getScm
+from core.plugins.sourcecode import getScm
 
 class Project( BuildInstructions ):
 	"""A Project represents an entity to build. 

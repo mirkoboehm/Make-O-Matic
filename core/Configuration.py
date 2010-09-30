@@ -19,7 +19,7 @@
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 import core
-from core.modules.ConfigurationBase import ConfigurationBase
+from core.ConfigurationBase import ConfigurationBase
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.helpers.PathResolver import PathResolver
