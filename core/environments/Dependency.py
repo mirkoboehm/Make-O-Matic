@@ -88,7 +88,7 @@ class Dependency( MObject ):
 	def _readControlFile( self, controlFile ):
 		try:
 			with open( controlFile, 'r' ) as inputFile:
-				mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
+				mApp().debugN( self, 3, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
 				self._setValid( True )
 				for line in inputFile.readlines():
 					if re.match( '^\s*#', line ):
