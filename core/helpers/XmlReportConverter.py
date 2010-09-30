@@ -207,11 +207,11 @@ class XmlReportConverter( MObject ):
 
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()
-				text = None
 				try:
 					text = self.__xmlTemplateFunctions[name]( element, wrapper )
-				except ( AttributeError, KeyError ):
+				except Exception:
 					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
+					text = wrapper.wrap( "(Exception while getting plugin report, see log)" )
 				wrapper.dedent()
 
 				if text is not None:

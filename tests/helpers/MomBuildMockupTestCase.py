@@ -72,4 +72,5 @@ class MomBuildMockupTestCase( MomTestCase ):
 	def tearDown( self ):
 		MomTestCase.tearDown( self )
 		os.chdir( self.cwd )
-		shutil.rmtree( "xmlreporttestbuild" )
+		if os.path.exists( "xmlreporttestbuild" ):
+			shutil.rmtree( "xmlreporttestbuild" )

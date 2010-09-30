@@ -18,13 +18,14 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Exceptions import MomError
+from core.Exceptions import MomError, ConfigurationError, BuildError
 from core.modules.reporters.XmlReport import XmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.modules.XmlReportGenerator import XmlReportGenerator
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
+from core.loggers.ConsoleLogger import ConsoleLogger
 
 try:
 	from lxml import etree
@@ -33,11 +34,13 @@ except ImportError:
 
 class XmlReportTests( MomBuildMockupTestCase ):
 
+	EXCEPTION_LOCATION = "exception"
+
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self, useEnvironments = True )
 
 	def _build( self, type = 'm' ):
-		mApp().getSettings().set( Settings.ScriptLogLevel, 2 )
+		mApp().getSettings().set( Settings.ScriptLogLevel, 5 )
 		mApp().getSettings().set( Settings.ProjectBuildType, type )
 
 		#self.build.addLogger( ConsoleLogger() )
@@ -110,6 +113,87 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
 
 		self.assertEqual( fileContent, reportContent, "Report file content not written correctly" )
+
+	def testXmlReportOnException( self ):
+		# Covers runSetups phase
+
+		def runSetups_new():
+			raise MomError( "Test Error" )
+
+		# inject erroneous method
+		self.build.runSetups = runSetups_new
+
+		self._build()
+		doc = etree.XML( self.getXmlReport().getReport() )
+
+		e = self.EXCEPTION_LOCATION
+		self.assertEqual( doc.tag, "build" ) # root
+		self.assertNotEquals( doc.find( e ), None )
+		self.assertNotEquals( doc.find( "{0}/description".format( e ) ), None )
+		self.assertNotEquals( doc.find( "{0}/traceback".format( e ) ), None )
+
+		self.assertTrue( "self.runSetups()" in doc.find( "{0}/traceback".format( e ) ).text )
+
+		self.assertNotEquals( doc.find( '{0}[@returncode="{1}"]'.format( e, MomError.getReturnCode() ) )
+							, None, "Wrong returncode in exception" )
+
+	def testXmlReportOnException1( self ):
+		# Covers runPreflightChecks phase
+
+		def runPreFlightChecks_new():
+			raise ConfigurationError( "Test Error" )
+
+		# inject erroneous method
+		self.build.runPreFlightChecks = runPreFlightChecks_new
+
+		self._build()
+		doc = etree.XML( self.getXmlReport().getReport() )
+
+		e = self.EXCEPTION_LOCATION
+		self.assertEqual( doc.tag, "build" ) # root
+		self.assertNotEquals( doc.find( e ), None )
+		self.assertNotEquals( doc.find( "{0}/description".format( e ) ), None )
+		self.assertNotEquals( doc.find( "{0}/traceback".format( e ) ), None )
+
+		self.assertTrue( "self.runPreFlightChecks()" in doc.find( "{0}/traceback".format( e ) ).text )
+
+		self.assertNotEquals( doc.find( '{0}[@returncode="{1}"]'.format( e, ConfigurationError.getReturnCode() ) )
+							, None, "Wrong returncode in exception" )
+
+	def testXmlReportOnException2( self ):
+		# Covers run phase
+
+		def run_new():
+			raise BuildError( "Test Error" )
+
+		# inject erroneous method
+		self.build.run = run_new
+
+		self._build()
+		doc = etree.XML( self.getXmlReport().getReport() )
+
+		# only minor checks, rest already covered in previous tests
+		e = self.EXCEPTION_LOCATION
+		self.assertEqual( doc.tag, "build" ) # root
+		self.assertNotEquals( doc.find( e ), None )
+
+		self.assertTrue( "self.run()" in doc.find( "{0}/traceback".format( e ) ).text )
+
+	def testXmlReportOnExceptionInXmlReportGeneration( self ):
+		def command_new( arg1, arg2 ):
+			raise MomError( "Test Error" )
+
+		# inject invalid XML template function into plugin
+		logger = ConsoleLogger()
+		self.build.addPlugin( logger )
+		logger.getXmlTemplate = command_new
+
+		self._build()
+
+		converter = XmlReportConverter( self.getXmlReport() )
+		text = converter.convertToText()
+		self.assertTrue( "ConsoleLogger" in text )
+		self.assertTrue( "Exception" in text )
 
 if __name__ == "__main__":
 	unittest.main()
