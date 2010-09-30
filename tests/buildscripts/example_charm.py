@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.BoilerPlate import setupStandardBuildAndProject
+from core.helpers.BoilerPlate import getBuildProject
 from core.Configuration import Configuration
 from core.helpers.PathResolver import PathResolver
 from core.modules.publishers.RSyncPublisher import RSyncPublisher
@@ -28,9 +28,8 @@ from core.modules.packagers.CPack import CPack
 from core.modules.testers.CTest import CTest
 from core.environments.Environments import Environments
 
-build, project = setupStandardBuildAndProject( buildName = 'Charm Build', projectName = 'Charm', minimumMomVersion = "0.5.0",
-	projectVersionNumber = '1.4.0',
-	scmUrl = 'git://gitorious.org/charm/charm.git' )
+build, project = getBuildProject( buildName = 'Charm Build', projectName = 'Charm',
+								projectVersionNumber = '1.4.0', scmUrl = 'git://gitorious.org/charm/charm.git' )
 
 # helper variable to set a CMake parameter
 enableCharmTools = CMakeVariable( 'CHARM_ENABLE_TOOLS_BUILD', 'TRUE', 'BOOL' )

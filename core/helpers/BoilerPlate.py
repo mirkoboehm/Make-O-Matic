@@ -28,7 +28,7 @@ from core.modules.reporters.EmailReporter import EmailReporter
 from core.modules.XmlReportGenerator import XmlReportGenerator
 from core.Configuration import Configuration
 
-def setupStandardBuild( buildName = None, minimumMomVersion = None ):
+def getBuild( buildName = "MOMBuild", minimumMomVersion = "0.5.0" ):
 	try:
 		build = Build( minimumMomVersion, buildName )
 		build.getParameters().parse()
@@ -47,8 +47,8 @@ def setupStandardBuild( buildName = None, minimumMomVersion = None ):
 		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), sys.stderr )
 		sys.exit( e.getReturnCode() )
 
-def setupStandardProject( build, projectName = None,
-				projectVersionNumber = None, projectVersionName = None,
+def getProject( build, projectName = "MOMProject",
+				projectVersionNumber = "0.0.1", projectVersionName = None,
 				scmUrl = None ):
 	'''Create a standard default Project object.
 	A default project will have a ConsoleLogger, and a ConsoleReporter.
@@ -63,7 +63,7 @@ def setupStandardProject( build, projectName = None,
 	build.setProject( project )
 	return project
 
-def setupStandardBuildAndProject( buildName = None, minimumMomVersion = None,
+def getBuildProject( buildName = None, minimumMomVersion = None,
 		projectName = None,
 		projectVersionNumber = None, projectVersionName = None,
 		scmUrl = None ):
@@ -72,15 +72,15 @@ def setupStandardBuildAndProject( buildName = None, minimumMomVersion = None,
 		projectName = buildName
 	if projectName and not buildName:
 		buildName = projectName
-	build = setupStandardBuild( buildName, minimumMomVersion )
-	project = setupStandardProject( build, projectName, projectVersionNumber, projectVersionName, scmUrl )
+	build = getBuild( buildName, minimumMomVersion )
+	project = getProject( build, projectName, projectVersionNumber, projectVersionName, scmUrl )
 	return build, project
 
-def setupStandardBuildAndConfiguration( buildName = None, minimumMomVersion = None,
+def getBuildConfiguration( buildName = None, minimumMomVersion = None,
 		projectName = None,
 		projectVersionNumber = None, projectVersionName = None,
 		scmUrl = None ):
-	build, project = setupStandardBuildAndProject( buildName, minimumMomVersion, projectName,
+	build, project = getBuildProject( buildName, minimumMomVersion, projectName,
 												projectVersionNumber, projectVersionName, scmUrl )
 	configuration = Configuration( project.getName(), project )
 	return build, configuration

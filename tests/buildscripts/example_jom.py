@@ -19,12 +19,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.BoilerPlate import setupStandardBuildAndConfiguration
+from core.helpers.BoilerPlate import getBuildConfiguration
 from core.modules.tools.qmake.QMakeBuilder import QMakeBuilder
 from core.modules.packagers.CPack import CPack
 
-
-build, config = setupStandardBuildAndConfiguration( projectName = 'Jom', projectVersionNumber = '1.0.0', scmUrl = 'git://gitorious.org/qt-labs/jom.git' )
+build, config = getBuildConfiguration( projectName = 'Jom', projectVersionNumber = '1.0.0',
+									scmUrl = 'git://gitorious.org/qt-labs/jom.git' )
 
 config.addPlugin( QMakeBuilder() )
 config.addPlugin( CPack( sourcePackage = True ) )
