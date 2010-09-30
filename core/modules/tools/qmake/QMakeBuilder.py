@@ -17,39 +17,25 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.modules.configurations.MakeBasedBuilder import MakeBasedBuilder
-from core.executomat.ShellCommandAction import ShellCommandAction
+from core.modules.tools.MakefileGeneratorBuilder import MakefileGeneratorBuilder
+import os
 
-class QMakeBuilder( MakeBasedBuilder ):
+class QMakeBuilder( MakefileGeneratorBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
 
 	def __init__( self, name = None ):
-		MakeBasedBuilder.__init__( self, name )
-		self.__makefileGeneratorCommand = 'qmake'
-		self.setInSourceBuild( True )
-
-	def _setMakefileGeneratorCommand( self, makefileGeneratorCommand ):
-		self.__makefileGeneratorCommand = makefileGeneratorCommand
-
-	def getMakefileGeneratorCommand( self ):
-		return self.__makefileGeneratorCommand
-
-	def setInSourceBuild( self, onOff ):
-		self.__inSourceBuild = onOff
-
-	def getInSourceBuild( self ):
-		return self.__inSourceBuild
-
-	def createPrepareSourceDirActions( self ):
-		if not self.getInSourceBuild():
-			raise NotImplementedError( 'Sorry, out-of-source builds with QMake are not implemented.' )
+		MakefileGeneratorBuilder.__init__( self, name )
+		self._setMakefileGeneratorCommand( "qmake" )
 
 	def createConfigureActions( self ):
-		configuration = self.getInstructions()
-		action = ShellCommandAction( [ self.getMakefileGeneratorCommand() ] )
-		action.setWorkingDirectory( configuration.getSourceDir() )
-		step = self.getInstructions().getStep( 'conf-configure' )
-		step.addMainAction( action )
+		if not self.getInSourceBuild():
+			# If not an in-source build, work out the project name argument
+			sourceDirectory = self.getInstructions().getSourceDir()
+			sourceDirectoryName = os.path.basename( sourceDirectory )
+			projectFile = "{0}.pro".format( sourceDirectoryName )
+			projectFilePath = os.path.join( sourceDirectory, projectFile )
+			self._setMakefileGeneratorArguments( [ projectFilePath ] )
+		MakefileGeneratorBuilder.createConfigureActions( self )
 
 	def preFlightCheck( self ):
 		self.getMakeTool().checkVersion( expectedReturnCode = 154 )

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
+from core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
+import os
 
 class Builder( Plugin ):
 	'''A Builder creates the actions to build a configuration for a project. 
@@ -24,9 +26,36 @@ class Builder( Plugin ):
 
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
+		self.__inSourceBuild = False
+		self.__inSourceBuildSupported = False
+		self.__outOfSourceBuildSupported = False
+
+	def setInSourceBuild( self, inSourceBuild ):
+		self.__inSourceBuild = inSourceBuild
+
+	def getInSourceBuild( self ):
+		return self.__inSourceBuild
+
+	def _setInSourceBuildSupported( self, inSourceBuildSupported ):
+		self.__inSourceBuildSupported = inSourceBuildSupported
+
+	def _setOutOfSourceBuildSupported( self, outOfSourceBuildSupported ):
+		self.__outOfSourceBuildSupported = outOfSourceBuildSupported
 
 	def createPrepareSourceDirActions( self ):
-		raise NotImplementedError()
+		if self.getInSourceBuild():
+			if not self.__inSourceBuildSupported:
+				raise NotImplementedError( 'In-source builds are not implemented.' )
+			# If we're doing an in-source build, copy the tree to the build directory
+			configuration = self.getInstructions()
+			source = os.path.join( configuration.getProject().getSourceDir(), configuration.getSourcePrefix() )
+			build = configuration.getBuildDir()
+			ignore = ['.svn/', '.git/']
+			step = self.getInstructions().getStep( 'conf-export-sources' )
+			step.addMainAction( DirectoryTreeCopyAction( source, build, ignore ) )
+		else:
+			if not self.__outOfSourceBuildSupported:
+				raise NotImplementedError( 'Out-of-source builds are not implemented.' )
 
 	def createConfigureActions( self ):
 		raise NotImplementedError()

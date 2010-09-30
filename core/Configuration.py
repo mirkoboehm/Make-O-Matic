@@ -24,6 +24,7 @@ import os
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.helpers.PathResolver import PathResolver
 from core.actions.filesystem.RmDirAction import RmDirAction
+from core.helpers.TypeCheckers import check_for_string
 
 class Configuration( ConfigurationBase ):
 	'''Configuration represents a variant of how a project is built.
@@ -31,6 +32,7 @@ class Configuration( ConfigurationBase ):
 
 	def __init__( self, configName, parent = None ):
 		ConfigurationBase.__init__( self, configName, parent )
+		self.__sourcePrefix = ""
 
 	def _setProject( self, project ):
 		assert isinstance( project, core.Project.Project )
@@ -45,6 +47,13 @@ class Configuration( ConfigurationBase ):
 
 	def getTargetDir( self ):
 		return self._getNormPath( Settings.ConfigurationTargetDir )
+
+	def setSourcePrefix( self, sourcePrefix ):
+		check_for_string( sourcePrefix, "The source prefix needs to be a string" )
+		self.__sourcePrefix = sourcePrefix
+
+	def getSourcePrefix( self ):
+		return self.__sourcePrefix
 
 	def runSetups( self ):
 		ConfigurationBase.runSetups( self )

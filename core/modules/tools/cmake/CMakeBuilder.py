@@ -17,8 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.executomat.ShellCommandAction import ShellCommandAction
-from core.modules.tools.qmake.QMakeBuilder import QMakeBuilder
+from core.modules.tools.MakefileGeneratorBuilder import MakefileGeneratorBuilder
 
 CMakeSearchPaths = [
 				"C:\Program Files\CMake 2.8\bin",
@@ -57,17 +56,18 @@ class CMakeVariable( object ):
 			self.getValue() )
 		return text
 
-class CMakeBuilder( QMakeBuilder ):
+class CMakeBuilder( MakefileGeneratorBuilder ):
 	'''CMakeBuilder generates the actions to build a project with cmake.'''
 
-	def __init__( self, name = None ):
-		QMakeBuilder.__init__( self, name )
+	def __init__( self, name = None, inSourceBuild = False ):
+		MakefileGeneratorBuilder.__init__( self, name )
 		# Use the Plugin support for finding the CMake command
 		makeCommand = self.getCommand()
 		self._setCommand( 'cmake', CMakeSearchPaths )
 		self._setMakefileGeneratorCommand( self.getCommand() )
 		self._setCommand( makeCommand )
-		self.setInSourceBuild( False )
+		self.setInSourceBuild( inSourceBuild )
+		self._setOutOfSourceBuildSupported( True )
 		self.setCMakeVariables( [] )
 
 	def setCMakeVariables( self, options ):
@@ -79,23 +79,12 @@ class CMakeBuilder( QMakeBuilder ):
 	def addCMakeVariable( self, option ):
 		self.getCMakeVariables().append( option )
 
-	def createPrepareSourceDirActions( self ):
-		if self.getInSourceBuild():
-			raise NotImplementedError( 'Sorry, in-source builds with CMake are not implemented.' )
-
 	def createConfigureActions( self ):
 		configuration = self.getInstructions()
-		project = configuration.getProject()
-		srcDir = project.getSourceDir()
 		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getTargetDir() ) )
-		cmd = [ self.getMakefileGeneratorCommand() ]
+		arguments = []
 		for variable in self.getCMakeVariables():
-			cmd.append( '-D{0}'.format( variable ) )
-		cmd.append( srcDir )
-		action = ShellCommandAction( cmd )
-		action.setWorkingDirectory( configuration.getBuildDir() )
-		step = self.getInstructions().getStep( 'conf-configure' )
-		step.addMainAction( action )
-
-	def preFlightCheck( self ):
-		self.getMakeTool().checkVersion()
+			arguments.append( '-D{0}'.format( variable ) )
+		arguments.append( configuration.getProject().getSourceDir() )
+		self._setMakefileGeneratorArguments( arguments )
+		QMakeBuilder.createConfigureActions( self )

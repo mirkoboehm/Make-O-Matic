@@ -29,24 +29,37 @@ SET(CPACK_PACKAGE_VERSION_MAJOR "@CPACK_PACKAGE_VERSION_MAJOR@")
 SET(CPACK_PACKAGE_VERSION_MINOR "@CPACK_PACKAGE_VERSION_MINOR@")
 SET(CPACK_PACKAGE_VERSION_PATCH "@CPACK_PACKAGE_VERSION_PATCH@")
 SET(CPACK_INSTALL_DIRECTORY "@CPACK_INSTALL_DIRECTORY@")
+SET(CPACK_PACKAGE_SOURCE @CPACK_PACKAGE_SOURCE@)
 
 SET(CPACK_PACKAGE_VERSION "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 GET_FILENAME_COMPONENT(CPACK_INSTALLED_DIRECTORIES "${CPACK_INSTALL_DIRECTORY}" REALPATH)
 LIST(APPEND CPACK_INSTALLED_DIRECTORIES ".")
 
 IF(WIN32)
+	IF(CPACK_PACKAGE_SOURCE)
+		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION} Source")
+	ELSE()
+		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
+	ENDIF()
 	SET(CPACK_GENERATOR "NSIS;ZIP")
-	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
 	SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_FILE_NAME}")
 	SET(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_FILE_NAME}")
 	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_FILE_NAME}")
 ELSEIF(APPLE)
+	IF(CPACK_PACKAGE_SOURCE)
+		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-Source")
+	ELSE()
+		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+	ENDIF()
 	SET(CPACK_GENERATOR "DragNDrop;TBZ2")
-	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 	SET(CPACK_SYSTEM_NAME "OSX")
 ELSE()
+	IF(CPACK_PACKAGE_SOURCE)
+		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}-Source")
+	ELSE()
+		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
+	ENDIF()
 	SET(CPACK_GENERATOR "STGZ;TBZ2")
-	SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 ENDIF()
 
 SET(CPACK_TOPLEVEL_TAG "${CPACK_SYSTEM_NAME}")
@@ -81,10 +94,11 @@ class _CPackMovePackageAction( FilesMoveAction ):
 
 
 class _CPackGenerateConfigurationAction( FilesMoveAction ):
-	def __init__( self, config, directory ):
+	def __init__( self, sourcePackage, config, directory ):
 		FilesMoveAction.__init__( self )
-		self._config = config;
+		self._sourcePackage = sourcePackage;
 		self._directory = directory;
+		self._config = config
 
 	def _formattedConfiguration( self ):
 		config = _CPackConfig
@@ -97,6 +111,11 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 		config = config.replace( "@CPACK_PACKAGE_VERSION_MINOR@", versionList[1] or 0, 1 )
 		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
 		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", self._directory, 1 )
+		if self._sourcePackage:
+			cpackSource = "TRUE"
+		else:
+			cpackSource = "FALSE"
+		config = config.replace( "@CPACK_PACKAGE_SOURCE@", cpackSource, 1 )
 		return config
 
 	def run( self ):
@@ -126,15 +145,15 @@ class CPack( PackageProvider ):
 
 	def makePackageStep( self ):
 		"""Create packages for the project using CPack."""
-		instructions = self.getInstructions()
-		step = instructions.getStep( 'conf-package' )
-		project = instructions.getProject()
+		configuration = self.getInstructions()
+		step = configuration.getStep( 'conf-package' )
+		project = configuration.getProject()
 		if self._sourcePackage:
-			packagedDirectory = project.getSourceDir()
+			packagedDirectory = os.path.join( project.getSourceDir(), configuration.getSourcePrefix() )
 		else:
-			packagedDirectory = instructions.getTargetDir()
-		generateConfig = _CPackGenerateConfigurationAction( self.__configFile, packagedDirectory )
-		generateConfig.setWorkingDirectory( instructions.getBuildDir() );
+			packagedDirectory = configuration.getTargetDir()
+		generateConfig = _CPackGenerateConfigurationAction( self._sourcePackage, self.__configFile, packagedDirectory )
+		generateConfig.setWorkingDirectory( configuration.getBuildDir() );
 		step.addMainAction( generateConfig )
 		makePackage = PackageProvider.makePackageStep( self )
 		movePackageDestination = project.getPackagesDir()
