@@ -61,6 +61,7 @@ class BuildScriptInterface( MObject ):
 				.format( setting, self.getBuildScript(), stderr ) )
 		output = runner.getStdOut()
 		if not output:
+			stderr = runner.getStdErr().decode()
 			raise MomError( 'The build script "{0}" did not specify a project name! It said: {1}'
 				.format( self.getBuildScript(), stderr ) )
 		line = output.decode().strip()
