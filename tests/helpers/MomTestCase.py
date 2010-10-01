@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from core.MApplication import MApplication
 from core.Build import Build
-from core.helpers.RunCommand import RunCommand
+from core.MApplication import MApplication
 from datetime import datetime
+import unittest
+from core.helpers.RunCommand import RunCommand
 
 class MomTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''

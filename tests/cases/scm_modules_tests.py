@@ -49,9 +49,8 @@ class ScmModulesTests ( MomTestCase ):
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 
-	def _validateRevisionInfoContent( self ):
+	def _validateRevisionInfoContent( self, info ):
 		# TODO: Add better tests
-		info = self.project.getScm().getRevisionInfo()
 		self.assertNotEquals( info.committerName, None )
 		self.assertNotEquals( info.commitMessage, None )
 		self.assertNotEquals( info.commitTime, None )
@@ -59,11 +58,17 @@ class ScmModulesTests ( MomTestCase ):
 
 	def testScmGit( self ):
 		self._initialize( self.GIT_EXAMPLE )
-		self._validateRevisionInfoContent()
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+		self.assertNotEquals( info.shortRevision, None, "Git should short revision" )
 
 	def testScmSvn( self ):
 		self._initialize( self.SVN_EXAMPLE )
-		self._validateRevisionInfoContent()
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+		self.assertEquals( info.shortRevision, None, "Svn should not have short revision" )
 
 	def testScmSvnRevisionInfoCache( self ):
 		self._initialize( self.SVN_EXAMPLE )

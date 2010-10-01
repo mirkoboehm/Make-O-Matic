@@ -80,7 +80,7 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		# test revision in subject
 		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" )
 		email = self.reporter.createEmail()
-		self.assertTrue( scm.getRevision() in email.getSubject() )
+		self.assertTrue( scm.getRevision()[:6] in email.getSubject(), "No abbreviated commit hash in subject" )
 
 		# test invalid revision
 		scm.setRevision( "---" )

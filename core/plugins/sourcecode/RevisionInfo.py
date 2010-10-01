@@ -28,6 +28,7 @@ class RevisionInfo( MObject ):
 
 	def reset( self ):
 		self.revision = None
+		self.shortRevision = None
 		self.committerName = None
 		self.committerEmail = None
 		self.commitTime = None

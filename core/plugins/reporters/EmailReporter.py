@@ -60,23 +60,25 @@ class EmailReporter( Reporter ):
 		reporterEnableHtml = mApp().getSettings().get( Settings.EmailReporterEnableHtml )
 
 		# get project info
-		returnCode = mApp().getReturnCode()
+		returnCode = instructions.getReturnCode()
 		scm = instructions.getProject().getScm()
 
 		# revision info may fail, ensure mail is still sent
 		try:
 			info = scm.getRevisionInfo()
-			revision = info.revision
+			revision = info.shortRevision if info.shortRevision else info.revision
 			committer = info.committerEmail
 		except MomException:
 			revision = "N/A"
 			committer = None
 
-		status = u"\u263A" if returnCode == 0 else u"\u2620" # to smile or not to smile, that's the question
+		status = ( u"\u263A" if returnCode == 0 else u"\u2620" ).encode( "utf8" ) # to smile or not to smile, that's the question
+		type = instructions.getSettings().get( Settings.ProjectBuildType )
 
-		# header
 		email = Email()
-		email.setSubject( '{2} Build report for {0}, revision {1}'.format( instructions.getName(), revision, status.encode( "utf8" ) ) )
+
+		# build header
+		email.setSubject( '{0} {1} ({2}), {3}'.format( status, instructions.getName(), type, revision, ) )
 		email.setFromAddress( reporterSender )
 
 		# add recipients
