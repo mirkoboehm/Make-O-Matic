@@ -93,7 +93,11 @@ class EmailReporter( Reporter ):
 
 		elif returnCode == BuildError.getReturnCode():
 			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
-				email.addToAddresses( [ info.committerEmail] )
+				if info.committerEmail:
+					email.addToAddresses( [ info.committerEmail] )
+				else:
+					mApp().debug( self, 'Could not add committer {0} as recipient, email address is missing: {0}'
+								.format( info.committerName ) )
 
 		elif returnCode == MomError.getReturnCode():
 			if reporterMomErrorRecipients:

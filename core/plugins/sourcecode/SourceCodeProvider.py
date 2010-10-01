@@ -126,10 +126,10 @@ class SourceCodeProvider( Plugin ):
 		node = Plugin.createXmlNode( self, document )
 
 		info = self.getRevisionInfo()
-		node.attributes["revision"] = info.revision
-		node.attributes["committerName"] = info.committerName
-		node.attributes["committerEmail"] = info.committerEmail
-		node.attributes["commitTime"] = info.commitTime
+		node.attributes["revision"] = str( info.revision )
+		node.attributes["committerName"] = str( info.committerName )
+		node.attributes["committerEmail"] = str( info.committerEmail )
+		node.attributes["commitTime"] = str( info.commitTime )
 		create_child_node( document, node, "commitMessage", info.commitMessage )
 
 		return node

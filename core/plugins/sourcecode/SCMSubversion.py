@@ -41,16 +41,16 @@ class SCMSubversion( SourceCodeProvider ):
 	def getIdentifier( self ):
 		return 'svn'
 
+	# TODO: Add support for fetching committer's email address from some lookup table
 	def getRevisionInfo( self ):
-		revision = self.getRevision() or 'HEAD'
-
 		# check if specified revision is in cache. do not check for 'HEAD'
 		if self.getRevision() in self.__revisionInfoCache:
 			return self.__revisionInfoCache[self.getRevision()]
 
 		info = RevisionInfo( "SvnRevisionInfo" )
 
-		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', '-r', str( revision ), self.getUrl() ]
+		revisionParameter = ['-r', str( self.getRevision() )] if self.getRevision() else []
+		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ] + revisionParameter
 		runner = RunCommand( cmd )
 		runner.run()
 
@@ -164,7 +164,7 @@ def parse_log_entry( logentry ):
 	# now turn commiTime into a Python datetime:
 	commitTime = commitTime.split( '.' )[0] # strip microseconds
 	commitTime = time.strptime( commitTime, '%Y-%m-%dT%H:%M:%S' )
-	return ( committer, message, revision, commitTime )
+	return ( committer, message, revision, time.strftime( "%Y-%m-%dT%H:%M", commitTime ) )
 
 def get_node_text( node ):
 	text = ''
