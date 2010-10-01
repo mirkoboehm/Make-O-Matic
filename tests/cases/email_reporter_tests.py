@@ -37,6 +37,7 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		# add EmailReporter plugin
 		self.reporter = EmailReporter( "TestEmailReporter" )
 		self.build.addPlugin( self.reporter )
+		self.build.runPreFlightChecks()
 
 	def testCreateEmail1( self ):
 		self.build.registerReturnCode( 0 ) # no failure
@@ -60,11 +61,15 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		self.build.registerReturnCode( BuildError.getReturnCode() )
 		scm = self.build.getProject().getScm()
 
+		# commit1
 		scm.setRevision( "409ae013ff1a9dccf41a60b4cefcd849309893bd" ) # commit by Mirko
+		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
 		self.assertTrue( "DR" in email.getToAddresses() and "mirko@kdab.com" in email.getToAddresses() )
 
+		# commit2
 		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" ) # commit by Kevin
+		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
 		self.assertTrue( "DR" in email.getToAddresses() and "krf@electrostorm.net" in email.getToAddresses() )
 
@@ -74,16 +79,21 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 
 		self.assertEquals( len( email.getToAddresses() ), 0 )
 
-	def testCreateEmailSubject( self ):
+	def testCreateEmailSubjectWithValidRevision( self ):
 		scm = self.build.getProject().getScm()
 
-		# test revision in subject
 		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" )
-		email = self.reporter.createEmail()
-		self.assertTrue( scm.getRevision()[:6] in email.getSubject(), "No abbreviated commit hash in subject" )
+		self.build.runPreFlightChecks()
 
-		# test invalid revision
+		email = self.reporter.createEmail()
+		self.assertTrue( scm.getRevision()[:7] in email.getSubject(), "No abbreviated commit hash in subject" )
+
+	def testCreateEmailSubjectWithInvalidRevision( self ):
+		scm = self.build.getProject().getScm()
+
 		scm.setRevision( "---" )
+		self.failUnlessRaises( ConfigurationError, self.build.runPreFlightChecks )
+
 		email = self.reporter.createEmail()
 		self.assertTrue( "N/A" in email.getSubject() )
 

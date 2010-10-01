@@ -145,8 +145,11 @@ class MApplication( Instructions ):
 			self.runPreFlightChecks()
 			self.runSetups()
 			self.run()
-		except MomException as e:
-			self.registerReturnCode( e.getReturnCode() )
+		except Exception as e:
+			if isinstance( e, MomException ):
+				self.registerReturnCode( e.getReturnCode() )
+			else:
+				self.registerReturnCode( 42 )
 			self.setException( ( e, traceback.format_exc() ) )
 			raise # rethrow exception
 		finally:

@@ -24,12 +24,21 @@ from core.helpers.Emailer import Email, Emailer
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Build import Build
 from core.Settings import Settings
-from core.Exceptions import MomError, BuildError, ConfigurationError, MomException
+from core.Exceptions import MomError, BuildError, ConfigurationError
+from core.plugins.sourcecode.RevisionInfo import RevisionInfo
 
 class EmailReporter( Reporter ):
 
 	def __init__( self, name = None ):
 		Reporter.__init__( self, name )
+
+		self.__info = None
+
+	def preFlightCheck( self ):
+		self.__info = None
+
+		# try to get info, may fail
+		self.__info = mApp().getProject().getScm().getRevisionInfo()
 
 	def shutDown( self ):
 		email = self.createEmail()
@@ -59,19 +68,11 @@ class EmailReporter( Reporter ):
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
 		reporterEnableHtml = mApp().getSettings().get( Settings.EmailReporterEnableHtml )
 
-		# get project info
+		# get revision info, do not crash here
+		info = self.__info or RevisionInfo()
+		revision = ( info.shortRevision if info.shortRevision else info.revision ) or "N/A"
+
 		returnCode = instructions.getReturnCode()
-		scm = instructions.getProject().getScm()
-
-		# revision info may fail, ensure mail is still sent
-		try:
-			info = scm.getRevisionInfo()
-			revision = info.shortRevision if info.shortRevision else info.revision
-			committer = info.committerEmail
-		except MomException:
-			revision = "N/A"
-			committer = None
-
 		status = ( u"\u263A" if returnCode == 0 else u"\u2620" ).encode( "utf8" ) # to smile or not to smile, that's the question
 		type = instructions.getSettings().get( Settings.ProjectBuildType )
 
@@ -85,13 +86,14 @@ class EmailReporter( Reporter ):
 		if reporterDefaultRecipients:
 			email.setToAddresses( reporterDefaultRecipients )
 
-		if returnCode == ConfigurationError.getReturnCode() or committer is None:
+
+		if returnCode == ConfigurationError.getReturnCode() or ( info.revision is None ):
 			if reporterConfigurationErrorRecipients:
 				email.addToAddresses( reporterConfigurationErrorRecipients )
 
 		elif returnCode == BuildError.getReturnCode():
 			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
-				email.addToAddresses( [info.committerEmail] )
+				email.addToAddresses( [ info.committerEmail] )
 
 		elif returnCode == MomError.getReturnCode():
 			if reporterMomErrorRecipients:
@@ -100,12 +102,11 @@ class EmailReporter( Reporter ):
 		# body
 		report = XmlReport( instructions )
 		report.prepare()
-		conv = XmlReportConverter( report )
-
+		converter = XmlReportConverter( report )
 		if reporterEnableHtml:
-			email.addHtmlPart( conv.convertToHtml() )
+			email.addHtmlPart( converter.convertToHtml() )
 		else:
-			email.addTextPart( conv.convertToText( short = True ) )
+			email.addTextPart( converter.convertToText( short = True ) )
 
 		exception = mApp().getException()
 		if exception:
