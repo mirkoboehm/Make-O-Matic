@@ -34,7 +34,7 @@ from tests.selftest.simple_ci_tests import SimpleCITests
 from tests.selftest.charm_build_tests import CharmBuildTests
 from tests.cases.xml_report_tests import XmlReportTests
 from tests.cases.scm_modules_tests import ScmModulesTests
-#from tests.cases.email_reporter_tests import EmailReporterTest
+from tests.cases.email_reporter_tests import EmailReporterTest
 #from tests.cases.emailer_tests import EmailerTest
 
 CLASSES = [
@@ -43,7 +43,7 @@ CLASSES = [
 	BuildStatusPersistenceTests,
 	CharmBuildTests,
 #	EmailerTest,
-#	EmailReporterTest,
+	EmailReporterTest,
 	EnvironmentSaverTest,
 	PathResolverTest,
 	PreprocessorTest,

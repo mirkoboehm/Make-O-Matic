@@ -94,7 +94,7 @@ class BuildScriptInterface( MObject ):
 		revision = runner.getStdOut().decode().strip()
 		return revision
 
-	def execute( self, timeout = 24 * 60 * 60, buildType = 'm', revision = None, url = None, args = None, captureOutput = True ):
+	def execute( self, timeout = 24 * 60 * 60, buildType = 'm', revision = None, url = None, args = None, captureOutput = False ):
 		'''Execute the build script. 
 		The method returns the RunCommand object used to execute the build script, through which the return code and the output 
 		can be retrieved.'''
@@ -111,7 +111,7 @@ class BuildScriptInterface( MObject ):
 		mApp().message( self, 'invoking remote build script "{0}" at revision {1}.'.format( self.getBuildScript(), revText ) )
 		with EnvironmentSaver():
 			extend_debug_prefix( 'script>' )
-			runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = False )
+			runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
 			runner.run()
 		mApp().debugN( self, 2, 'build script finished, return code is {0}.'.format( runner.getReturnCode() ) )
 		return runner

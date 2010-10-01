@@ -23,6 +23,7 @@ from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
 import shutil
+from test.test_support import captured_output
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
@@ -35,7 +36,8 @@ class BuildScriptInterfaceTests( MomTestCase ):
 
 	def tearDown( self ):
 		MomTestCase.tearDown( self )
-		shutil.rmtree( "make-o-matic" )
+		if os.path.exists( "make-o-matic" ):
+			shutil.rmtree( "make-o-matic" )
 
 	def testQuerySetting( self ):
 		variable = self.iface.querySetting( Settings.MomVersionNumber )
@@ -50,11 +52,8 @@ class BuildScriptInterfaceTests( MomTestCase ):
 		self.assertTrue( len( revisions ) >= 5 )
 
 	def testExecuteBuildScript( self ):
-		try:
-			runner = self.iface.execute( buildType = 'c', revision = 'HEAD' )
-			self.assertEqual( 0, runner.getReturnCode() )
-		except:
-			self.fail( 'The build script interface fails to execute the build script.' )
+		runner = self.iface.execute( buildType = 'c', revision = 'HEAD', captureOutput = True )
+		self.assertEqual( 0, runner.getReturnCode() )
 
 if __name__ == "__main__":
 	unittest.main()
