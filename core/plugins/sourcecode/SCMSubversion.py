@@ -97,7 +97,7 @@ class SCMSubversion( SourceCodeProvider ):
 		else:
 			raise ConfigurationError( 'Getting svn log failed, is there no svn in the path?' )
 
-	def _getCurrentRevision( self, project ):
+	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
 		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ]
 		runner = RunCommand( cmd )
