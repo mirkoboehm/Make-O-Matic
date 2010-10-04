@@ -70,7 +70,7 @@ class SCMSubversion( SourceCodeProvider ):
 
 		return info
 
-	def getRevisionsSince( self, revision, cap = None ):
+	def _getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
 
 		revision = int( revision )
