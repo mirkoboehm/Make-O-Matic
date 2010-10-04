@@ -222,15 +222,14 @@ class SCMGit( SourceCodeProvider ):
 			# update an existing repository
 			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to revision {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getRevision() ) )
-			# pull, to get all new revisions into the cached checkout
-			pullCmd = [ self.getCommand(), 'pull', '--rebase' ]
-			pullRunner = RunCommand( pullCmd )
-			pullRunner.setWorkingDir( self._getCachedCheckoutPath() )
-			pullRunner.run()
-			if pullRunner.getReturnCode() != 0:
-				# FIXME delete, continue with regular checkout
-				raise ConfigurationError( 'Cannot pull new commits into the cached checkout at {0}'.format( 
-					self.getCachedCheckoutsDir() ) )
+			# reset the hidden clone to a branch
+			resetRunner = RunCommand( [ self.getCommand(), 'fetch', '--all' ] )
+			resetRunner.setWorkingDir( self._getCachedCheckoutPath() )
+			resetRunner.run()
+			if resetRunner.getReturnCode() == 0:
+				mApp().debugN( self, 4, 'fetched revisions into the hidden clone' )
+			else:
+				raise MomError( 'error fetching revisions into the hidden clone' )
 		else:
 			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with revision {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getRevision() ) )
