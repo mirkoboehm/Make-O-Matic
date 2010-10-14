@@ -21,7 +21,6 @@ import os
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.Settings import Settings
 import unittest
-import shutil
 
 class CharmBuildTests( MomTestCase ):
 	'''CharmBuildTests executes the example_charm build script with revisions known to work.'''
@@ -31,12 +30,14 @@ class CharmBuildTests( MomTestCase ):
 
 	def tearDown( self ):
 		MomTestCase.tearDown( self )
-		shutil.rmtree( "charm_build" )
 
 	def testQueryCharmProjectName( self ):
 		iface = BuildScriptInterface( CharmBuildTests.BuildScriptName )
 		projectNameQueryResult = iface.querySetting( Settings.ProjectName )
 		self.assertTrue( projectNameQueryResult )
+		# FIXME make the base dir queryable, so that we do not rely on a hardcoded name
+		# the base directory should *NOT* have been created during the query:
+		self.assertTrue( not os.path.isdir( "charm_build" ) )
 
 if __name__ == "__main__":
 	unittest.main()
