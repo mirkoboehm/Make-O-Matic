@@ -107,7 +107,7 @@ class RunCommand( MObject ):
 		self.__stdErr = None
 		self.__returnCode = None
 		self.__timedOut = False
-		self.resolveCommand( searchPaths )
+		self.__searchPaths = searchPaths
 
 	def getTimeoutSeconds( self ):
 		return self.__timeoutSeconds
@@ -190,6 +190,7 @@ class RunCommand( MObject ):
 		@param parameter Command parameter
 		@param lineNumber Line number of version string in command output
 		@param expectedReturnCode Return code which command should return on success"""
+		self.resolveCommand( self.__searchPaths )
 
 		# backup old data
 		oldCmd = self.getCommand()
@@ -222,6 +223,7 @@ class RunCommand( MObject ):
 				.format( newcmd[0], returnCode, expectedReturnCode ) )
 
 	def run( self ):
+		self.resolveCommand( self.__searchPaths )
 		timeoutString = 'without a timeout'
 		if self.getTimeoutSeconds() != None:
 			timeoutString = 'with timeout of {0} seconds'.format( self.getTimeoutSeconds() )
