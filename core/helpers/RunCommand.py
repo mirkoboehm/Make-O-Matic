@@ -159,8 +159,12 @@ class RunCommand( MObject ):
 			searchPaths = []
 
 		command = self.__cmd[0]
+		if isExecutable( command ):
+			return
+
 		fpath, fname = os.path.split( command )
-		if not fpath or not isExecutable( command ):
+
+		if not fpath:
 			paths = searchPaths
 			paths += os.environ["PATH"].split( os.pathsep )
 			if not '/usr/local/bin' in paths:
@@ -171,8 +175,14 @@ class RunCommand( MObject ):
 				executableFile = os.path.join( path, fname )
 				if isExecutable( executableFile ):
 					self.__cmd[0] = executableFile
-				elif sys.platform == "win32" and isExecutable( executableFile + ".exe" ):
-					self.__cmd[0] = executableFile + ".exe"
+					return
+				if sys.platform == "win32":
+					executableFile += ".exe"
+					if isExecutable( executableFile ):
+						self.__cmd[0] = executableFile
+						return
+
+		raise ConfigurationError( 'Cannot find command "{0}" in PATH or supplied search paths'.format( command ) )
 
 	def checkVersion( self, parameter = "--version", lineNumber = 0, expectedReturnCode = 0 ):
 		"""Check if this command is installed.
