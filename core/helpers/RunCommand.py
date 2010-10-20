@@ -164,23 +164,30 @@ class RunCommand( MObject ):
 
 		fpath, fname = os.path.split( command )
 
-		if not fpath:
-			paths = searchPaths
-			paths += os.environ["PATH"].split( os.pathsep )
-			if not '/usr/local/bin' in paths:
-				paths += '/usr/local/bin'
+		if fpath:
+			return
 
-			for path in paths:
-				path = os.path.normpath( path )
-				executableFile = os.path.join( path, fname )
+		paths = searchPaths
+		paths += os.environ["PATH"].split( os.pathsep )
+
+		# These paths are often used by package managers but might not be in the path
+		extraPaths = [ '/usr/local/bin', '/opt/local/bin', '/sw/bin' ]
+		for extraPath in extraPaths:
+			if not extraPath in paths:
+				if os.path.exists( extraPath ):
+					paths += extraPath
+
+		for path in paths:
+			path = os.path.normpath( path )
+			executableFile = os.path.join( path, fname )
+			if isExecutable( executableFile ):
+				self.__cmd[0] = executableFile
+				return
+			if sys.platform == "win32":
+				executableFile += ".exe"
 				if isExecutable( executableFile ):
 					self.__cmd[0] = executableFile
 					return
-				if sys.platform == "win32":
-					executableFile += ".exe"
-					if isExecutable( executableFile ):
-						self.__cmd[0] = executableFile
-						return
 
 		raise ConfigurationError( 'Cannot find command "{0}" in PATH or supplied search paths'.format( command ) )
 
