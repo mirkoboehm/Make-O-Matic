@@ -175,7 +175,7 @@ class RunCommand( MObject ):
 		for extraPath in extraPaths:
 			if not extraPath in paths:
 				if os.path.exists( extraPath ):
-					paths += extraPath
+					paths.append( extraPath )
 
 		for path in paths:
 			path = os.path.normpath( path )
