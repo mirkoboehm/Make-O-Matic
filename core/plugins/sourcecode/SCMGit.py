@@ -204,9 +204,12 @@ class SCMGit( SourceCodeProvider ):
 				self.getUrl(), make_foldername_from_string( self.getUrl() ) ], 1200, True )
 			runner.setWorkingDir( self.getCloneArmyDir() )
 			runner.run()
+
 			if runner.getReturnCode() == 0:
 				mApp().debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )
 			else:
+				if runner.getStdOut().find( "unknown option `mirror'" ):
+					raise ConfigurationError( 'Please install newer version of Git that supports the "--mirror" option' )
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 
 	def updateCachedCheckout( self ):
