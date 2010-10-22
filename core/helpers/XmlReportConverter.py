@@ -149,7 +149,7 @@ class XmlReportConverter( MObject ):
 		wrapper = MyTextWrapper( drop_whitespace = False, width = 80 )
 
 		if short:
-			ignoredTags = ["exception"]
+			ignoredTags = ["traceback"]
 		else:
 			ignoredTags = []
 
