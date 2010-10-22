@@ -66,7 +66,7 @@ class Email( MObject ):
 		self._getMessage()['Subject'] = h
 
 	def getSubject( self ):
-		return self._getMessage()['Subject']
+		return str( self._getMessage()['Subject'] )
 
 	def addTextAttachment( self, text, filename ):
 		part = MIMEText( 'plain' )

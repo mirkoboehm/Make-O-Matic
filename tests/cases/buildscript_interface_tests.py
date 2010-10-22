@@ -23,7 +23,6 @@ from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
 import shutil
-from test.test_support import captured_output
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
