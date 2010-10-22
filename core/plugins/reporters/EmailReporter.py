@@ -73,7 +73,7 @@ class EmailReporter( Reporter ):
 		revision = ( info.shortRevision if info.shortRevision else info.revision ) or "N/A"
 
 		returnCode = instructions.getReturnCode()
-		status = ( u"\u263A" if returnCode == 0 else u"\u2620" ).encode( "utf8" ) # to smile or not to smile, that's the question
+		status = ( "☺" if returnCode == 0 else "☠" ) # to smile or not to smile, that's the question
 		type = instructions.getSettings().get( Settings.ProjectBuildType )
 
 		email = Email()

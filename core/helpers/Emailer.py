@@ -25,8 +25,12 @@ from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
 from email.utils import COMMASPACE
+from email.header import Header
 
 class Email( MObject ):
+	""" Convenience class for sending Emails
+
+	Note: Use UTF-8 encoding for all entities! """
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
@@ -55,7 +59,11 @@ class Email( MObject ):
 		return self.__recipients
 
 	def setSubject( self, subject ):
-		self._getMessage()['Subject'] = subject
+		# Need to use Header class to use UTF-8 encoded text
+		# see http://docs.python.org/library/email.header.html
+
+		h = Header( subject, 'utf-8' )
+		self._getMessage()['Subject'] = h
 
 	def getSubject( self ):
 		return self._getMessage()['Subject']
@@ -67,10 +75,10 @@ class Email( MObject ):
 		self._getMessage().attach( part )
 
 	def addTextPart( self, text ):
-		self._getMessage().attach( MIMEText( text, 'plain' ) )
+		self._getMessage().attach( MIMEText( text.encode( "utf-8" ), 'plain', _charset = 'utf-8' ) )
 
 	def addHtmlPart( self, html ):
-		self._getMessage().attach( MIMEText( html, 'html' ) )
+		self._getMessage().attach( MIMEText( html.encode( "utf-8" ), 'html', _charset = 'utf-8' ) )
 
 	def getMessageText( self ):
 		# finalize Email at the end, the 'To'-field can only be set once
