@@ -20,14 +20,22 @@ import sys
 from core.plugins.builders.maketools.NMakeTool import NMakeTool
 from core.plugins.builders.maketools.GNUMakeTool import GNUMakeTool
 from core.plugins.builders.maketools.JomTool import JomTool
+from core.Exceptions import ConfigurationError
 
 def getMakeTool():
-	#FIXME Look in the path rather than doing this per-platform
-	if sys.platform == 'win32':
-		jom = False
-		if jom:
-			return JomTool()
-		else:
-			return NMakeTool()
-	else:
+	try:
+		return JomTool()
+	except ConfigurationError:
+		pass
+
+	try:
+		return NMakeTool()
+	except ConfigurationError:
+		pass
+
+	try:
 		return GNUMakeTool()
+	except ConfigurationError:
+		pass
+
+	raise ConfigurationError( 'Cannot find any valid make tool' )

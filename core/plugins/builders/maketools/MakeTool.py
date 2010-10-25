@@ -16,7 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string, \
+	check_for_list_of_strings
 from core.helpers.RunCommand import RunCommand
 
 class MakeTool():
@@ -35,9 +36,14 @@ class MakeTool():
 			expectedReturnCode = 0
 		)
 
-	def _setCommand( self, command ):
+	def _setCommand( self, command, searchPaths = None ):
 		check_for_nonempty_string( command, 'The make tool command must be a non-empty string' )
-		self.__command = command
+		if searchPaths == None:
+			searchPaths = []
+		check_for_list_of_strings( searchPaths, 'The search paths must be a list of strings' )
+		runCommand = RunCommand( [ command ] )
+		runCommand.resolveCommand( searchPaths )
+		self.__command = runCommand.getCommand()[0]
 
 	def getCommand( self ):
 		return self.__command
