@@ -73,6 +73,8 @@ class Defaults( MObject ):
 	EnvironmentsBaseDir = 'environments.basedir'
 	EnvironmentsApplicableBuildTypes = 'environments.applicablebuildtypes'
 	EnvironmentsExpansionModeMapping = 'environments.expansionmodes'
+	# ----- System path settings:
+	SystemExtraPaths = 'system.extrapaths'
 	# ----- Builder settings
 	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
 	# ----- CMake Builder settings
@@ -164,6 +166,8 @@ class Defaults( MObject ):
 			'f' : Defaults.EnvironmentExpansionMode_BuildAll
 		}
 		self.getSettings()[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
+		# ----- System path settings:
+		self.getSettings()[ Defaults.SystemExtraPaths ] = []
 		# ----- EmailReporter settings:
 		self.getSettings()[ Defaults.EmailReporterEnableOnAllBuilds ] = False
 		self.getSettings()[ Defaults.EmailReporterMomErrorRecipients] = None

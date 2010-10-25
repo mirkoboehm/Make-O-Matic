@@ -25,6 +25,7 @@ from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, ch
 import os.path
 import sys
 from core.Exceptions import ConfigurationError
+from core.Settings import Settings
 
 class _CommandRunner( Thread ):
 
@@ -176,6 +177,15 @@ class RunCommand( MObject ):
 			if not extraPath in paths:
 				if os.path.exists( extraPath ):
 					paths.append( extraPath )
+
+		# These paths have been added by the local configuration so complain when we can't find them
+		extraPaths = mApp().getSettings().get( Settings.SystemExtraPaths )
+		for extraPath in extraPaths:
+			if not extraPath in paths:
+				if os.path.exists( extraPath ):
+					paths.append( extraPath )
+				else:
+					raise ConfigurationError( "RunCommand::resolveCommand: Can't find extra PATH '{0}' appended in configuration.".format( extraPath ) )
 
 		for path in paths:
 			path = os.path.normpath( path )
