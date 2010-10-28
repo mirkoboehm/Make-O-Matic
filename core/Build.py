@@ -98,25 +98,33 @@ class Build( MApplication ):
 			baseDirName = self._getBaseDirName()
 			baseDir = os.path.join( parentBaseDir, baseDirName )
 			if os.path.isdir( baseDir ):
-				mApp().debug( self, 'stale base directory exists, moving it.' )
-				stats = os.stat( baseDir )
-				mtime = time.localtime( stats[8] )
-				extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
-				newFolderBaseName = '{0}-{1}'.format( baseDir, extension )
-				newFolder = newFolderBaseName
-				maxIterations = 1000
-				for index in range( maxIterations ):
-					if not os.path.isdir( newFolder ):
-						break
-					newFolder = newFolderBaseName + '__{0}'.format( index + 1 )
-				if os.path.isdir( newFolder ):
-					raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( maxIterations ) )
-				try:
-					shutil.move( baseDir, newFolder )
-				except ( OSError, shutil.Error ) as o:
-					raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
-						.format( baseDir, newFolder, str( o ) ) )
-				mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
+				moveOldDirectories = mApp().getSettings().get( Settings.BuildMoveOldDirectories )
+				if moveOldDirectories:
+					mApp().debug( self, 'stale base directory exists, moving it.' )
+					stats = os.stat( baseDir )
+					mtime = time.localtime( stats[8] )
+					extension = time.strftime( "%Y-%m-%d-%H-%M-%S", mtime )
+					newFolderBaseName = '{0}-{1}'.format( baseDir, extension )
+					newFolder = newFolderBaseName
+					maxIterations = 1000
+					for index in range( maxIterations ):
+						if not os.path.isdir( newFolder ):
+							break
+						newFolder = newFolderBaseName + '__{0}'.format( index + 1 )
+					if os.path.isdir( newFolder ):
+						raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( maxIterations ) )
+					try:
+						shutil.move( baseDir, newFolder )
+					except ( OSError, shutil.Error ) as o:
+						raise ConfigurationError( 'Cannot move existing build folder at "{0}" to "{1}": {2}'
+							.format( baseDir, newFolder, str( o ) ) )
+					mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
+				else:
+					try:
+						shutil.rmtree( baseDir )
+					except ( OSError, shutil.Error ) as o:
+						raise ConfigurationError( 'Cannot remove existing build folder at "{0}": {1}'
+							.format( baseDir, str( o ) ) )
 			try:
 				os.makedirs( baseDir )
 				self._setBaseDir( baseDir )

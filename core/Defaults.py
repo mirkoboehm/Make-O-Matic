@@ -76,6 +76,8 @@ class Defaults( MObject ):
 	EnvironmentsExpansionModeMapping = 'environments.expansionmodes'
 	# ----- System path settings:
 	SystemExtraPaths = 'system.extrapaths'
+	# ----- Build settings:
+	BuildMoveOldDirectories = 'build.moveolddirectories'
 	# ----- Builder settings
 	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
 	# ----- CMake Builder settings
@@ -169,6 +171,8 @@ class Defaults( MObject ):
 		self.getSettings()[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
 		# ----- System path settings:
 		self.getSettings()[ Defaults.SystemExtraPaths ] = []
+		# ----- Build settings:
+		self.getSettings()[ Defaults.BuildMoveOldDirectories ] = True
 		# ----- EmailReporter settings:
 		self.getSettings()[ Defaults.EmailReporterEnableOnAllBuilds ] = False
 		self.getSettings()[ Defaults.EmailReporterMomErrorRecipients] = None
