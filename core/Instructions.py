@@ -199,9 +199,9 @@ class Instructions( MObject ):
 					plugin.shutDown()
 				except Exception as e:
 					text = '''\
-	An error occurred during shutdown: "{0}"
-	Offending module: "{1}" 
-	This error will not change the return code of the script!
-	{2}'''.format( str( e ), plugin.getName(), traceback.format_exc() )
+An error occurred during shutdown: "{0}"
+Offending module: "{1}" 
+This error will not change the return code of the script!
+{2}'''.format( str( e ), plugin.getName(), traceback.format_exc() )
 					mApp().message( self, text )
 

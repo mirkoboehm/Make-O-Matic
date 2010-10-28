@@ -97,47 +97,43 @@ class Step( MObject ):
 			mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
 
 	def execute( self, instructions ):
-		try:
-			self.__timeKeeper.start()
-			return self._executeTimed( instructions )
-		finally:
-			self.__timeKeeper.stop()
-			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
-
-	def _executeTimed( self, instructions ):
 		"""Execute the step"""
-		if not self.getName():
-			raise MomError( "Cannot execute a step with no name!" )
-		if not self.__enabled:
-			mApp().debugN( self, 2, 'step "{0}" disabled, skipping.'.format( self.getName() ) )
-			return True
-		if instructions.hasFailed() and not self.getExecuteOnFailure():
-			mApp().debugN( self, 4, 'aborting because of errors earlier in the build' )
-			return True
-		self._logEnvironment( instructions )
+		try:
+			with self.getTimeKeeper():
+				if not self.getName():
+					raise MomError( "Cannot execute a step with no name!" )
+				if not self.__enabled:
+					mApp().debugN( self, 2, 'step "{0}" disabled, skipping.'.format( self.getName() ) )
+					return True
+				if instructions.hasFailed() and not self.getExecuteOnFailure():
+					mApp().debugN( self, 4, 'aborting because of errors earlier in the build' )
+					return True
+				self._logEnvironment( instructions )
 
-		logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
-		logfileName = os.path.join( instructions._getLogDir(), logfileName )
-		self.setLogfileName( logfileName )
+				logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
+				logfileName = os.path.join( instructions._getLogDir(), logfileName )
+				self.setLogfileName( logfileName )
 
-		phases = [ [ 'preparatory actions', self.__preActions ],
-				[ 'main actions', self.__mainActions ],
-				[ 'post actions', self.__postActions ] ]
-		for phase, actions in phases:
-			if not actions:
-				mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
-			for action in actions:
-				if not self.__failed or action.getIgnorePreviousFailure():
-					result = action.executeAction( self, instructions )
-					resultText = 'successful'
-					if result != 0:
-						resultText = 'failed'
-					mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
-					if result != 0:
-						self.__failed = True
-				else:
-					resultText = 'skipped'
-		return not self.__failed
+				phases = [ [ 'preparatory actions', self.__preActions ],
+						[ 'main actions', self.__mainActions ],
+						[ 'post actions', self.__postActions ] ]
+				for phase, actions in phases:
+					if not actions:
+						mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
+					for action in actions:
+						if not self.__failed or action.getIgnorePreviousFailure():
+							result = action.executeAction( self, instructions )
+							resultText = 'successful'
+							if result != 0:
+								resultText = 'failed'
+							mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
+							if result != 0:
+								self.__failed = True
+						else:
+							resultText = 'skipped'
+				return not self.__failed
+		finally:
+			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
 	def describe( self, prefix ):
 		MObject.describe( self, prefix )

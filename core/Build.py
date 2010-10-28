@@ -26,6 +26,7 @@ from core.helpers.MachineInfo import machine_info
 from core.helpers.GlobalMApp import mApp
 import time
 import shutil
+import sys
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -123,6 +124,8 @@ class Build( MApplication ):
 				raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
 					.format( baseDir, self.getName(), e ) )
 			os.chdir( baseDir )
+		else: # run 	mode
+			self._setBaseDir( os.getcwd() )
 		MApplication.runPreFlightChecks( self )
 
 	def runSetups( self ):
@@ -136,6 +139,7 @@ class Build( MApplication ):
 	def run( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
 			self.describeRecursively()
+			os._exit( 0 )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
 			MApplication.run( self )
 		else:
