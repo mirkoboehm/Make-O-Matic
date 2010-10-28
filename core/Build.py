@@ -33,6 +33,7 @@ class Build( MApplication ):
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		MApplication.__init__( self, minimumMomVersion, name, parent )
+		mApp().getSettings().set( Settings.ScriptBuildName, name )
 		self.__project = None
 		self.__parameters = Parameters()
 

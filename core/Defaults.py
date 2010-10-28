@@ -47,6 +47,7 @@ class Defaults( MObject ):
 	ScriptClientName = 'script.clientname'
 	ScriptIgnoreCommitMessageCommands = 'script.ignorecommitmessagecommands'
 	ScriptRunMode = 'script.runmode'
+	ScriptBuildName = 'script.buildname'
 	# ----- internal settings
 	MomVersionNumber = 'mom.version.number'
 	MomDebugIndentVariable = 'mom.debug.indentvariable'

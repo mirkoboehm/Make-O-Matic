@@ -118,7 +118,7 @@ class SimpleCiBase( MApplication ):
 		for buildScript in buildScripts:
 			iface = BuildScriptInterface( buildScript )
 			try:
-				name = iface.querySetting( Settings.ProjectName )
+				name = iface.querySetting( Settings.ScriptBuildName )
 				if name:
 					goodScripts.append( buildScript )
 			except MomError:
@@ -131,7 +131,7 @@ class SimpleCiBase( MApplication ):
 		caughtException = False
 		for script in buildScripts:
 			iface = BuildScriptInterface( script )
-			name = iface.querySetting( Settings.ProjectName )
+			name = iface.querySetting( Settings.ScriptBuildName )
 			buildInfo = self.getBuildStatus().getBuildInfoForInitialRevision( script, name )
 			buildInfo.setBuildType( 's' )
 			try:
