@@ -23,6 +23,7 @@ from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
 import os
 from core.helpers.RunCommand import RunCommand
+from tests.helpers.DirectoryCompare import DirectoryCompare
 
 class RunModeDescribeTests( MomTestCase ):
 
@@ -38,10 +39,11 @@ class RunModeDescribeTests( MomTestCase ):
 		self.project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
 
 	def testDescribe( self ):
-		runner = RunCommand( [ self.BuildScriptName, '-t', 'M', 'describe' ] )
-		runner.run()
-		if runner.getReturnCode() != 0:
-			self.fail( 'The example charm build script fails to execute in describe mode' )
+		with DirectoryCompare( os.getcwd() ):
+			runner = RunCommand( [ self.BuildScriptName, '-t', 'M', 'describe' ] )
+			runner.run()
+			if runner.getReturnCode() != 0:
+				self.fail( 'The example charm build script fails to execute in describe mode' )
 
 if __name__ == "__main__":
 	unittest.main()
