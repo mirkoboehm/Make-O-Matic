@@ -17,15 +17,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.plugins.builders.maketools.MakeTool import MakeTool
+import sys
+import os
 
 class NMakeTool( MakeTool ):
 	'''NMakeTool implements a class for the Microsoft NMake makefile tool.'''
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-		searchPaths = [ "C:/Program Files/Microsoft Visual Studio 9.0/VC/bin" ]
-		searchPaths += "C:/Program Files\Microsoft Visual Studio 8/VC/BIN"
-		searchPaths += "C:/Program Files/Microsoft Visual Studio .NET 2003/VC/BIN"
+		searchPaths = []
+		if sys.platform == "win32":
+			from core.helpers.RegistryHelper import getPathFromRegistry
+			paths = []
+			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\InstallDir" )
+			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\9.0\InstallDir" )
+			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\9.0\InstallDir" )
+			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\InstallDir" )
+			for path in paths:
+				searchPaths += os.path.normpath( os.path.join( path, "..\..\VC\bin" ) )
 		self._setCommand( 'nmake', searchPaths )
 		self._setVersionParameter( '/?' )
 

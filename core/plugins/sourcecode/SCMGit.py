@@ -49,7 +49,11 @@ class SCMGit( SourceCodeProvider ):
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
-		searchPaths = [ "C:/Program Files/Git/bin" ]
+		searchPaths = []
+		if sys.platform == "win32":
+			from core.helpers.RegistryHelper import getPathFromRegistry
+			path = getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1\Inno Setup: App Path" )
+			searchPaths += os.path.join( path, "bin" )
 		self._setCommand( "git", searchPaths )
 		self.__cloneArmy = self._findCloneArmyDir()
 		self.__cachedCheckoutsDir = self._findCachedCheckoutsDir()

@@ -19,13 +19,19 @@
 from core.Plugin import Plugin
 from core.helpers.TypeCheckers import check_for_path
 from core.actions.ShellCommandAction import ShellCommandAction
+import sys
+import os
 
 class DoxygenGenerator( Plugin ):
 
 	def __init__( self, name = None ):
 		'''Constructor'''
 		Plugin.__init__( self, name )
-		searchPaths = [ "C:/Program Files/doxygen/bin" ]
+		searchPaths = []
+		if sys.platform == "win32":
+			from core.helpers.RegistryHelper import getPathFromRegistry
+			path = getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\doxygen_is1\Inno Setup: App Path" )
+			searchPaths += os.path.join( path, "bin" )
 		self._setCommand( "doxygen", searchPaths )
 		self.__doxygenFile = None
 		self.__docsDir = 'docs'
