@@ -43,7 +43,7 @@ class RunModeDescribeTests( MomTestCase ):
 			runner = RunCommand( [ self.BuildScriptName, '-t', 'M', 'describe' ] )
 			runner.run()
 			if runner.getReturnCode() != 0:
-				self.fail( 'The example charm build script fails to execute in describe mode' )
+				self.fail( 'The example charm build script fails to execute in describe mode: {0}'.format( runner.getStdOut() ) )
 
 if __name__ == "__main__":
 	unittest.main()

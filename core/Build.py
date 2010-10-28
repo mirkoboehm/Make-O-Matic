@@ -26,7 +26,6 @@ from core.helpers.MachineInfo import machine_info
 from core.helpers.GlobalMApp import mApp
 import time
 import shutil
-import sys
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -129,11 +128,13 @@ class Build( MApplication ):
 		MApplication.runPreFlightChecks( self )
 
 	def runSetups( self ):
-		try:
-			os.makedirs( self._getLogDir() )
-		except ( OSError, IOError )as e:
-			raise ConfigurationError( 'Cannot create build log directory "{0}" for {1}: {2}!'
-				.format( self._getLogDir(), self.getName(), e ) )
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode == Settings.RunMode_Build:
+			try:
+				os.makedirs( self._getLogDir() )
+			except ( OSError, IOError )as e:
+				raise ConfigurationError( 'Cannot create build log directory "{0}" for {1}: {2}!'
+					.format( self._getLogDir(), self.getName(), e ) )
 		MApplication.runSetups( self )
 
 	def run( self ):

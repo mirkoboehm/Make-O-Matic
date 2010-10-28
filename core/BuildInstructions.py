@@ -92,6 +92,10 @@ class BuildInstructions( Instructions ):
 
 	def _configureBaseDir( self ):
 		assert self.getParent()
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode != Settings.RunMode_Build:
+			self._setBaseDir( os.getcwd() )
+			return
 		parentBaseDir = self.getParent().getBaseDir()
 		assert os.path.isdir( parentBaseDir )
 		baseDirName = self._getBaseDirName()
@@ -107,6 +111,10 @@ class BuildInstructions( Instructions ):
 
 	def _configureLogDir( self ):
 		assert self.getParent()
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode != Settings.RunMode_Build:
+			self._setBaseDir( os.getcwd() )
+			return
 		logDirName = self._getBaseDirName()
 		parentLogDir = self.getParent()._getLogDir()
 		assert os.path.isdir( parentLogDir )
