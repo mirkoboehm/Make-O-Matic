@@ -24,6 +24,7 @@ from tests.helpers.MomTestCase import MomTestCase
 import os
 from core.helpers.RunCommand import RunCommand
 from tests.helpers.DirectoryCompare import DirectoryCompare
+import sys
 
 class RunModeDescribeTests( MomTestCase ):
 
@@ -40,10 +41,11 @@ class RunModeDescribeTests( MomTestCase ):
 
 	def testDescribe( self ):
 		with DirectoryCompare( os.getcwd() ):
-			runner = RunCommand( [ self.BuildScriptName, '-t', 'M', 'describe' ] )
+			runner = RunCommand( [ sys.executable, self.BuildScriptName, '-t', 'M', 'describe' ] )
 			runner.run()
 			if runner.getReturnCode() != 0:
-				self.fail( 'The example charm build script fails to execute in describe mode: {0}'.format( runner.getStdOut() ) )
+				self.fail( 'The example charm build script fails to execute in describe mode: {0} {1}'
+						.format( runner.getStdOut(), runner.getStdErr() ) )
 
 if __name__ == "__main__":
 	unittest.main()
