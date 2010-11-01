@@ -122,7 +122,7 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 		"""Generates a CPack configuration file if needed."""
 		config = os.path.join( self.getWorkingDirectory(), self._config )
 		if ( os.path.exists( config ) ):
-			return
+			return 0
 
 		with open( config, 'w' ) as configFile:
 			configFile.write( self._formattedConfiguration() )
