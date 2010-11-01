@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-from core.Exceptions import MomException
+from core.Exceptions import MomException, ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 
@@ -52,7 +52,7 @@ class Plugin( MObject ):
 			return
 		try:
 			self.preFlightCheck()
-		except MomException as e:
+		except ( MomException, ConfigurationError ) as e:
 			if self.getOptional():
 				mApp().message( self, 'pre flight check failed, disabling the plugin because it is marked as optional.' )
 				self.setEnabled( False )
