@@ -30,9 +30,9 @@ def getPathFromRegistry( key ):
 	hkeystring, _, key = key.partition( os.path.sep )
 	key, _, value = key.rpartition( os.path.sep )
 
-	if hkeystring is "HKEY_CURRENT_USER":
+	if hkeystring == "HKEY_CURRENT_USER":
 		hkey = winreg.HKEY_CURRENT_USER
-	elif hkeystring is "HKEY_LOCAL_MACHINE":
+	elif hkeystring == "HKEY_LOCAL_MACHINE":
 		hkey = winreg.HKEY_LOCAL_MACHINE
 	else:
 		raise ConfigurationError( "getPathFromRegistry currently only supports HKEY_CURRENT_USER and HKEY_LOCAL_MACHINE." )
