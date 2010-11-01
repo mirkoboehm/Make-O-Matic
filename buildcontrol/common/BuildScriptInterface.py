@@ -99,7 +99,9 @@ class BuildScriptInterface( MObject ):
 		'''Execute the build script. 
 		The method returns the RunCommand object used to execute the build script, through which the return code and the output 
 		can be retrieved.'''
-		cmd = [ sys.executable, os.path.abspath( self.getBuildScript() ), '-t', buildType ]
+		cmd = [ sys.executable, os.path.abspath( self.getBuildScript() ) ]
+		if buildType:
+			cmd.extend( [ '-t', buildType ] )
 		if url:
 			cmd.extend( [ '-u', url ] )
 		if revision:

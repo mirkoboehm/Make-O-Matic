@@ -70,6 +70,6 @@ class RemoteBuilder( MObject ):
 		path = self.fetchBuildScript()
 		iface = BuildScriptInterface( path )
 		# the build type would be specified in the arguments
-		runner = iface.execute( timeout = timeout, buildType = 'x', revision = self.getRevision(),
+		runner = iface.execute( timeout = timeout, buildType = None, revision = self.getRevision(),
 			url = self.getLocation(), args = args )
 		return runner
