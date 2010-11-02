@@ -55,5 +55,5 @@ def getPathsFromRegistry( keys, pathsSuffix = None ):
 		if path:
 			if pathsSuffix:
 				path = os.path.normpath( os.path.join( path, pathsSuffix ) )
-			paths += path
+			paths.append( path )
 	return paths
