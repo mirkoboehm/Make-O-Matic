@@ -42,7 +42,7 @@ def getPathFromRegistry( key ):
 	try:
 		with winreg.OpenKey( hkey, key ) as registrykey:
 			registryvalue, _ = winreg.QueryValueEx( registrykey, value )
-			return registryvalue
+			return str( registryvalue )
 	except WindowsError:
 		return None
 
