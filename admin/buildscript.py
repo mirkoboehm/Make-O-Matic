@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # This file is part of Make-O-Matic.
 # -*- coding: utf-8 -*-
@@ -23,12 +23,13 @@ from core.plugins.DoxygenGenerator import DoxygenGenerator
 from core.plugins.RSyncPublisher import RSyncPublisher
 from core.plugins.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
-from core.Configuration import Configuration
+from core.plugins.python.PythonConfiguration import PythonConfiguration
 from core.helpers.BoilerPlate import getBuildProject
+from core.plugins.python.PyUnitTester import PyUnitTester
+import os
 
-build, project = getBuildProject( projectName = 'Make-O-Matic', minimumMomVersion = "0.5.0",
-	projectVersionNumber = '0.5.0', projectVersionName = 'French Fries',
-	scmUrl = 'git://github.com/KDAB/Make-O-Matic.git' )
+build, project = getBuildProject( projectName = 'Make-O-Matic', projectVersionNumber = '0.5.0',
+								projectVersionName = 'French Fries', scmUrl = 'git://github.com/KDAB/Make-O-Matic.git' )
 
 # add a preprocessor that generates the Doxygen input file
 prep = Preprocessor( project, inputFilename = PathResolver( project.getSourceDir, 'doxygen.cfg.in' ),
@@ -42,8 +43,9 @@ dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 
 # set up configurations:
-python3 = Configuration( 'test with Python 3', project )
-python2 = Configuration( 'test with Python 2.6', project )
+# python3 = Configuration( 'Python 3', project )
+python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
+python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getDocsDir ) ) )

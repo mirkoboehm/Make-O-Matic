@@ -41,8 +41,9 @@ dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 
 # set up configurations:
-# python3 = Configuration( 'Python 3', project )
 python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
+# Hint: do not enable running the test suite here, because this script is part of the test suite :-)
+# python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getDocsDir ) ) )

@@ -21,7 +21,7 @@ import subprocess, time
 from threading import Thread
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_strings
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths
 import os.path
 import sys
 from core.Exceptions import ConfigurationError
@@ -96,7 +96,7 @@ class RunCommand( MObject ):
 
 	def __init__( self, cmd, timeoutSeconds = None, combineOutput = False, searchPaths = None, captureOutput = True ):
 		MObject.__init__( self )
-		check_for_list_of_strings( cmd, "The command must be a list of strings." )
+		check_for_list_of_paths( cmd, "The command must be a list of strings." )
 		self.__cmd = cmd
 		if timeoutSeconds:
 			check_for_positive_int( timeoutSeconds, "The timeout period must be a positive integer number! " )

@@ -18,6 +18,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Exceptions import ConfigurationError
 
+def check_for_list_of_paths( expression, description ):
+	if not isinstance( expression, list ):
+		raise ConfigurationError( description )
+	for obj in expression:
+		check_for_path( obj, description )
+
 def check_for_list_of_strings( expression, description ):
 	if not isinstance( expression, list ):
 		raise ConfigurationError( description )
@@ -53,7 +59,7 @@ def check_for_int( expression, description, lessThan = None ):
 		value = int( expression )
 		if lessThan != None and value < lessThan:
 			raise ConfigurationError( description )
-	except (ValueError, TypeError):
+	except ( ValueError, TypeError ):
 		raise ConfigurationError( description )
 
 def check_for_nonnegative_int( expression, description ):

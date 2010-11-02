@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_path_or_none
 from core.actions.ShellCommandAction import ShellCommandAction
 
 class TestProvider( Plugin ):
@@ -29,7 +29,7 @@ class TestProvider( Plugin ):
 		self.__testArgument = None
 
 	def _setTestArgument( self, testArgument ):
-		check_for_nonempty_string( testArgument, "The test argument needs to be a non-empty string" )
+		check_for_path_or_none( testArgument, "The test argument needs to be a non-empty string" )
 		self.__testArgument = testArgument
 
 	def _getTestArgument( self ):
@@ -37,10 +37,11 @@ class TestProvider( Plugin ):
 
 	def makeTestStep( self ):
 		"""Run tests for the project."""
-		if self._getTestArgument() == None:
-			raise NotImplementedError()
+		cmd = [ self.getCommand() ]
+		if self._getTestArgument():
+			cmd.append( str( self._getTestArgument() ) )
 		step = self.getInstructions().getStep( 'conf-make-test' )
-		makeTest = ShellCommandAction( [ self.getCommand(), self._getTestArgument() ] )
+		makeTest = ShellCommandAction( cmd )
 		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makeTest )
 
