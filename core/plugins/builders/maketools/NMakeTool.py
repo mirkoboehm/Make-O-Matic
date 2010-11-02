@@ -31,7 +31,7 @@ class NMakeTool( MakeTool ):
 				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\9.0\InstallDir",
 				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\9.0\InstallDir",
 				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\InstallDir" ]
-			searchPaths += getPathsFromRegistry( keys, "..\..\VC\bin" )
+			searchPaths += getPathsFromRegistry( keys, "../../VC/bin" )
 		self._setCommand( 'nmake', searchPaths )
 		self._setVersionParameter( '/?' )
 
