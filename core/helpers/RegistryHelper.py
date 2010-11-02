@@ -36,8 +36,8 @@ def getPathFromRegistry( key ):
 	elif hkeystring == "HKEY_LOCAL_MACHINE":
 		hkey = winreg.HKEY_LOCAL_MACHINE
 	else:
-		raise ConfigurationError( "getPathFromRegistry currently only supports"
-								 "HKEY_CURRENT_USER and HKEY_LOCAL_MACHINE but"
+		raise ConfigurationError( "getPathFromRegistry currently only supports "
+								 "HKEY_CURRENT_USER and HKEY_LOCAL_MACHINE but "
 								 "you requested {0}".format( hkeystring ) )
 	try:
 		with winreg.OpenKey( hkey, key ) as registrykey:
