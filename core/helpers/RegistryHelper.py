@@ -32,18 +32,18 @@ def getPathFromRegistry( key ):
 	key, _, value = key.rpartition( os.path.sep )
 
 	if hkeystring == "HKEY_CURRENT_USER":
-		hkey = winreg.HKEY_CURRENT_USER
+		hkey = winreg.HKEY_CURRENT_USER #@UndefinedVariable
 	elif hkeystring == "HKEY_LOCAL_MACHINE":
-		hkey = winreg.HKEY_LOCAL_MACHINE
+		hkey = winreg.HKEY_LOCAL_MACHINE #@UndefinedVariable
 	else:
 		raise ConfigurationError( "getPathFromRegistry currently only supports "
 								 "HKEY_CURRENT_USER and HKEY_LOCAL_MACHINE but "
 								 "you requested {0}".format( hkeystring ) )
 	try:
-		with winreg.OpenKey( hkey, key ) as registrykey:
-			registryvalue, _ = winreg.QueryValueEx( registrykey, value )
+		with winreg.OpenKey( hkey, key ) as registrykey: #@UndefinedVariable
+			registryvalue, _ = winreg.QueryValueEx( registrykey, value ) #@UndefinedVariable
 			return str( registryvalue )
-	except WindowsError:
+	except WindowsError: #@UndefinedVariable
 		return None
 
 def getPathsFromRegistry( keys, pathsSuffix = None ):
