@@ -20,6 +20,7 @@ from core.MObject import MObject
 from core.Exceptions import MomException, ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
+from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class Plugin( MObject ):
 
@@ -98,6 +99,7 @@ class Plugin( MObject ):
 		return self.__command
 
 	def _setCommand( self, command, searchPaths = None ):
+		check_for_nonempty_string( command, "The command needs to be a non-empty string." )
 		self.__command = RunCommand( [ command ], None, False, searchPaths ).getCommand()[0]
 
 	def setEnabled( self, onOff ):
