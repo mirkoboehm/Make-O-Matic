@@ -16,7 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string, \
+	check_for_list_of_strings, check_for_nonempty_string_or_none
 import os
 from core.Exceptions import ConfigurationError
 try:
@@ -42,3 +43,15 @@ def getPathFromRegistry( key ):
 			return registryvalue
 	except WindowsError:
 		return None
+
+def getPathsFromRegistry( keys, pathsSuffix = None ):
+	paths = []
+	check_for_list_of_strings( keys, "keys must be a list of strings" )
+	check_for_nonempty_string_or_none( pathsSuffix, "pathsSuffix must be a non-empty string or None" )
+	for key in keys:
+		path = getPathFromRegistry( key )
+		if path:
+			if pathsSuffix:
+				path = os.path.normpath( os.path.join( path, pathsSuffix ) )
+			paths += path
+	return paths

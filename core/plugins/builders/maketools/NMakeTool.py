@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.plugins.builders.maketools.MakeTool import MakeTool
 import sys
-import os
 
 class NMakeTool( MakeTool ):
 	'''NMakeTool implements a class for the Microsoft NMake makefile tool.'''
@@ -27,14 +26,13 @@ class NMakeTool( MakeTool ):
 		MakeTool.__init__( self )
 		searchPaths = []
 		if sys.platform == "win32":
-			from core.helpers.RegistryHelper import getPathFromRegistry
-			paths = []
-			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\InstallDir" )
-			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\9.0\InstallDir" )
-			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\9.0\InstallDir" )
-			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\InstallDir" )
-			for path in paths:
-				searchPaths += os.path.normpath( os.path.join( path, "..\..\VC\bin" ) )
+			from core.helpers.RegistryHelper import getPathsFromRegistry
+			keys = []
+			keys += "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\InstallDir"
+			keys += "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\9.0\InstallDir"
+			keys += "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\9.0\InstallDir"
+			keys += "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\InstallDir"
+			searchPaths += getPathsFromRegistry( keys, "..\..\VC\bin" )
 		self._setCommand( 'nmake', searchPaths )
 		self._setVersionParameter( '/?' )
 

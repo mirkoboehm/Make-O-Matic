@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.plugins.builders.maketools.MakeTool import MakeTool
 import sys
-import os
 
 class GNUMakeTool( MakeTool ):
 	'''GNUMakeTool implements a class for a the GNU Make makefile tool.'''
@@ -27,12 +26,11 @@ class GNUMakeTool( MakeTool ):
 		MakeTool.__init__( self )
 		searchPaths = []
 		if sys.platform == "win32":
-			from core.helpers.RegistryHelper import getPathFromRegistry
-			paths = []
-			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MinGW\InstallLocation" )
-			paths += getPathFromRegistry( "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MSYS-1.0_is1\Inno Setup: App Path" )
-			for path in paths:
-				searchPaths += os.path.join( path, "bin" )
+			from core.helpers.RegistryHelper import getPathsFromRegistry
+			keys = []
+			keys += "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MinGW\InstallLocation"
+			keys += "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MSYS-1.0_is1\Inno Setup: App Path"
+			searchPaths += getPathsFromRegistry( keys, "bin" )
 		self._setCommand( 'make' )
 
 	def getArguments( self ):
