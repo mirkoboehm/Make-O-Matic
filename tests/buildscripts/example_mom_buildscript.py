@@ -23,7 +23,7 @@ from core.plugins.DoxygenGenerator import DoxygenGenerator
 from core.plugins.RSyncPublisher import RSyncPublisher
 from core.plugins.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
-from core.Configuration import Configuration
+from core.plugins.python.PythonConfiguration import PythonConfiguration
 from core.helpers.BoilerPlate import getBuildProject
 
 build, project = getBuildProject( projectName = 'Make-O-Matic', projectVersionNumber = '0.5.0',
@@ -41,8 +41,8 @@ dox.setDoxygenFile( prep.getOutputFilename() )
 project.addPlugin( dox )
 
 # set up configurations:
-python3 = Configuration( 'test with Python 3', project )
-python2 = Configuration( 'test with Python 2.6', project )
+# python3 = Configuration( 'Python 3', project )
+python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getDocsDir ) ) )
