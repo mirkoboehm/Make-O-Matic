@@ -20,7 +20,8 @@ from core.MObject import MObject
 from core.Exceptions import MomException, ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string, \
+	check_for_list_of_strings
 
 class Plugin( MObject ):
 
@@ -31,7 +32,7 @@ class Plugin( MObject ):
 		self.setOptional( False )
 		self.setInstructions( None )
 		self.__command = None
-		self.__commandSearchPaths = None
+		self.__commandSearchPaths = []
 
 	def setInstructions( self, instructions ):
 		'''Assign this plugin to it's instruction object. 
@@ -68,7 +69,7 @@ class Plugin( MObject ):
 		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError 
 		exception."""
 		if self.getCommand():
-			RunCommand( [ self.getCommand() ] ).checkVersion()
+			RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths ).checkVersion()
 
 	def performSetup( self ):
 		'''This method handles the execution of the setup phase. Do not overload this method to adapt it, overload 
@@ -101,7 +102,11 @@ class Plugin( MObject ):
 
 	def _setCommand( self, command, searchPaths = None ):
 		check_for_nonempty_string( command, "The command needs to be a non-empty string." )
-		self.__command = RunCommand( [ command ], None, False, searchPaths ).getCommand()[0]
+		if searchPaths is None:
+			searchPaths = []
+		check_for_list_of_strings( searchPaths, "The search paths need to be a list of strings." )
+		self.__command = RunCommand( [ command ], searchPaths = searchPaths ).getCommand()[0]
+		self.__commandSearchPaths = searchPaths
 
 	def setEnabled( self, onOff ):
 		self.__enabled = onOff
