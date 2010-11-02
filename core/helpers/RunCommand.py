@@ -194,10 +194,12 @@ class RunCommand( MObject ):
 				self.__cmd[0] = executableFile
 				return
 			if sys.platform == "win32":
-				executableFile += ".exe"
-				if isExecutable( executableFile ):
-					self.__cmd[0] = executableFile
-					return
+				commandExtensions = os.environ["PATHEXT"].split( os.pathsep )
+				for extension in commandExtensions:
+					executableFileAndExtension = executableFile + extension
+					if isExecutable( executableFileAndExtension ):
+						self.__cmd[0] = executableFileAndExtension
+						return
 
 		raise ConfigurationError( 'Cannot find command "{0}" in PATH or supplied search paths'.format( command ) )
 
