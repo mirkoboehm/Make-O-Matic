@@ -51,14 +51,15 @@ class Plugin( MObject ):
 		if not self.isEnabled():
 			mApp().debugN( self, 2, 'this plugin is disabled, skipping pre flight check.' )
 			return
-		try:
-			self.preFlightCheck()
-		except ( MomException, ConfigurationError ) as e:
-			if self.getOptional():
+
+		if self.getOptional():
+			try:
+				self.preFlightCheck()
+			except ( MomException, ConfigurationError ):
 				mApp().message( self, 'pre flight check failed, disabling the plugin because it is marked as optional.' )
 				self.setEnabled( False )
-			else:
-				raise e
+
+		self.preFlightCheck()
 
 	def preFlightCheck( self ):
 		"""PreFlightCheck is called after the command line arguments have been passed, 
