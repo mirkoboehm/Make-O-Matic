@@ -17,9 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
-from core.helpers.TypeCheckers import check_for_path
+from core.helpers.TypeCheckers import check_for_path, check_for_path_or_none
 from core.actions.ShellCommandAction import ShellCommandAction
 import sys
+import os
+from core.actions.filesystem.RmDirAction import RmDirAction
+from core.actions.filesystem.MkDirAction import MkDirAction
 
 class DoxygenGenerator( Plugin ):
 
@@ -33,7 +36,14 @@ class DoxygenGenerator( Plugin ):
 			searchPaths += getPathsFromRegistry( keys, "bin" )
 		self._setCommand( "doxygen", searchPaths )
 		self.__doxygenFile = None
-		self.__docsDir = 'docs'
+		self.setDocsDir( None )
+
+	def setDocsDir( self, dir ):
+		check_for_path_or_none( dir , 'The docs directory must be a non-empty string or path!' )
+		self.__docsDir = dir
+
+	def getDocsDir( self ):
+		return self.__docsDir
 
 	def setDoxygenFile( self, doxygenFile ):
 		self.__doxygenFile = doxygenFile
@@ -43,9 +53,17 @@ class DoxygenGenerator( Plugin ):
 
 	def setup( self ):
 		check_for_path( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
+		docsDir = os.path.join( self.getInstructions().getBaseDir(), self.getDocsDir() or self.getInstructions().getDocsDir() )
+		# make docs folder
+		create = self.getInstructions().getStep( 'project-create-folders' )
+		create.addMainAction( MkDirAction( docsDir ) )
+		# run doxygen
 		step = self.getInstructions().getStep( 'project-create-docs' )
 		cmd = [ self.getCommand(), str( self.getDoxygenFile() ) ]
 		doxygenCall = ShellCommandAction( cmd )
-		doxygenCall.setWorkingDirectory( self.getInstructions().getScm().getSrcDir() )
+		doxygenCall.setWorkingDirectory( docsDir )
+		# cleanup
 		step.addMainAction( doxygenCall )
+		cleanup = self.getInstructions().getStep( 'project-cleanup' )
+		cleanup.addMainAction( RmDirAction( docsDir ) )
 
