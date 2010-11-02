@@ -224,7 +224,7 @@ class SCMGit( SourceCodeProvider ):
 				raise MomError( 'Error creating cached checkouts dir at {0}: {1}'.format( 
 					self.getCachedCheckoutsDir(), e ) )
 		if not self.getRevision():
-			self.setRevision( 'HEAD' )
+			self.setRevision( 'origin/HEAD' )
 		if os.path.exists( self._getCachedCheckoutPath() ):
 			# update an existing repository
 			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to revision {1}'.format( 
@@ -237,6 +237,7 @@ class SCMGit( SourceCodeProvider ):
 				mApp().debugN( self, 4, 'fetched revisions into the hidden clone' )
 			else:
 				raise MomError( 'error fetching revisions into the hidden clone' )
+			# FIXME we may not be on the master branch:
 		else:
 			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with revision {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getRevision() ) )

@@ -28,16 +28,17 @@ def check_for_list_of_strings( expression, description ):
 	if not isinstance( expression, list ):
 		raise ConfigurationError( description )
 	for obj in expression:
-		if not isinstance( obj, str ) and not isinstance( obj, unicode ):
-			raise ConfigurationError( description )
+		check_for_string( obj, expression )
 
 def check_for_string( expression, description ):
-	if not isinstance( expression, str ):
+	if not isinstance( expression, str ) and not isinstance( expression, unicode ):
 		raise ConfigurationError( description )
 
 def check_for_nonempty_string( expression, description ):
-	if not isinstance( expression, str ) or not expression:
+	if not expression:
 		raise ConfigurationError( description )
+	check_for_string( expression, description )
+
 
 def check_for_nonempty_string_or_none( expression, description ):
 	if expression == None:

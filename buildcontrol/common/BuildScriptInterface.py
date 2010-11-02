@@ -111,7 +111,7 @@ class BuildScriptInterface( MObject ):
 			revText = 'latest revision'
 		if args:
 			cmd.extend( args )
-		mApp().message( self, 'invoking remote build script "{0}" at revision {1}.'.format( self.getBuildScript(), revText ) )
+		mApp().message( self, 'invoking remote build script "{0}" at {1}.'.format( self.getBuildScript(), revText ) )
 		with EnvironmentSaver():
 			extend_debug_prefix( 'script>' )
 			runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
