@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Build import Build
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
@@ -24,7 +25,6 @@ from core.Exceptions import MomException
 import sys
 from core.Project import Project
 from core.plugins.reporters.ConsoleReporter import ConsoleReporter
-from core.plugins.reporters.EmailReporter import EmailReporter
 from core.plugins.reporters.XmlReportGenerator import XmlReportGenerator
 from core.Configuration import Configuration
 
@@ -37,11 +37,8 @@ def getBuild( buildName = "MOMBuild", minimumMomVersion = "0.5.0" ):
 		build.addLogger( logger )
 		build.addPlugin( XmlReportGenerator() )
 		build.addPlugin( ConsoleReporter() )
+
 		build.initialize()
-
-		if mApp().getSettings().get( Settings.EmailReporterEnableOnAllBuilds ):
-			build.addPlugin( EmailReporter() )
-
 		return build
 	except MomException as e:
 		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), sys.stderr )

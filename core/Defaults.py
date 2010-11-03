@@ -85,7 +85,6 @@ class Defaults( MObject ):
 	# ----- RSync publisher settings (should be set in .mom/config.py):
 	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
 	# ----- EmailReporter settings:
-	EmailReporterEnableOnAllBuilds = 'emailreporter.enableonallbuilds'
 	EmailReporterEnableHtml = 'emailreporter.enablehtml'
 	EmailReporterSender = 'emailreporter.sender'
 	EmailReporterDefaultRecipients = 'emailreporter.defaultrecipients'
@@ -174,7 +173,6 @@ class Defaults( MObject ):
 		# ----- Build settings:
 		self.getSettings()[ Defaults.BuildMoveOldDirectories ] = True
 		# ----- EmailReporter settings:
-		self.getSettings()[ Defaults.EmailReporterEnableOnAllBuilds ] = False
 		self.getSettings()[ Defaults.EmailReporterMomErrorRecipients] = None
 		self.getSettings()[ Defaults.EmailReporterEnableHtml ] = False
 		self.getSettings()[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
