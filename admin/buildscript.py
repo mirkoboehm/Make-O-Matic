@@ -55,9 +55,5 @@ uploader = RSyncPublisher( localDir = PathResolver( project.getDocsDir ) )
 uploader.setUploadLocation( 'docs.kdab.com:/home/klaralv-web/docs.kdab.net/make-o-matic' )
 project.addPlugin( uploader )
 
-# enable docs generation and upload by default: 
-build.getSettings().setBuildStepEnabled( 'project-create-docs', 'c', True )
-build.getSettings().setBuildStepEnabled( 'project-upload-docs', 'c', True )
-
 # run:
 build.build()
