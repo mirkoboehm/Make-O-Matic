@@ -122,7 +122,7 @@ class SimpleCiBase( MApplication ):
 				if name:
 					goodScripts.append( buildScript )
 			except MomError:
-				self.message( self, 'ERROR in build script "{0}": error querying the project name. Build script disregarded.'
+				self.message( self, 'ERROR in build script "{0}": error querying the build name. Build script disregarded.'
 					.format( buildScript ) )
 		return goodScripts
 
