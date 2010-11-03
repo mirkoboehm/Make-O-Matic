@@ -21,6 +21,7 @@ import os, sys
 from socket import gethostname
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
+from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class Settings( Defaults ):
 	"""Settings stores all configurable values for a build script run."""
@@ -89,3 +90,30 @@ class Settings( Defaults ):
 			return descriptions[buildType]
 		else:
 			return None
+
+	def setBuildStepEnabled( self, stepName, buildType, yesNo ):
+		'''Enable or disable the specified build step, for the specified build type, in the defaults.
+		This method needs to be called before the Instructions object set up the build sequence (e.g., before 
+		Instructions.setup() is called.'''
+		check_for_nonempty_string( stepName, 'The step name needs to be a non-empty string!' )
+		buildStepDescriptions = self.get( Settings.ProjectBuildSequence )
+		for buildStepDescription in buildStepDescriptions:
+			if buildStepDescription[0] == stepName:
+				modes = buildStepDescription[1]
+				modes = filter( lambda c: c not in buildType, modes )
+				if yesNo:
+					modes += buildType
+				buildStepDescription[1] = modes
+				mApp().debugN( self, 2, 'build step {0} is now enabled for the following build types: {1}'.format( stepName, modes ) )
+				return
+		raise ConfigurationError( 'The specified build type "{0}" is undefined!'.format( buildType ) )
+
+	def getBuildStepEnabled( self, stepName, buildType ):
+		'''Return whether a build step is enabled for a specified build type in the settings.'''
+		check_for_nonempty_string( stepName, 'The step name needs to be a non-empty string!' )
+		buildStepDescriptions = self.get( Settings.ProjectBuildSequence )
+		for buildStepDescription in buildStepDescriptions:
+			if buildStepDescription[0] == stepName:
+				modes = buildStepDescription[1]
+				return buildType in modes
+		raise ConfigurationError( 'The specified build type "{0}" is undefined!'.format( buildType ) )

@@ -50,5 +50,9 @@ python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceD
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getDocsDir ) ) )
 
+# enable docs generation and upload by default: 
+build.getSettings().setBuildStepEnabled( 'project-create-docs', 'c', True )
+build.getSettings().setBuildStepEnabled( 'project-upload-docs', 'c', True )
+
 # run:
 build.build()

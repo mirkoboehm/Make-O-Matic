@@ -37,6 +37,7 @@ from tests.cases.scm_modules_tests import ScmModulesTests
 from tests.cases.email_reporter_tests import EmailReporterTest
 from tests.cases.run_mode_describe_tests import RunModeDescribeTests
 #from tests.cases.emailer_tests import EmailerTest
+from tests.cases.settings_tests import SettingsTests
 
 CLASSES = [
 	BuildEnvironmentTests,
@@ -55,7 +56,8 @@ CLASSES = [
 	ScmModulesTests,
 	SimpleProjectTests,
 	SimpleCITests,
-	XmlReportTests
+	XmlReportTests,
+	SettingsTests
 ]
 
 def main():
