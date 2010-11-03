@@ -26,6 +26,7 @@ from core.Build import Build
 from core.Settings import Settings
 from core.Exceptions import MomError, BuildError, ConfigurationError
 from core.plugins.sourcecode.RevisionInfo import RevisionInfo
+from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
 
 class EmailReporter( Reporter ):
 
@@ -39,6 +40,17 @@ class EmailReporter( Reporter ):
 
 		# try to get info, may fail
 		self.__info = mApp().getProject().getScm().getRevisionInfo()
+
+		# check settings, may fail
+		settings = mApp().getSettings()
+		for setting in [
+					Settings.EmailReporterDefaultRecipients,
+					Settings.EmailReporterConfigurationErrorRecipients,
+					Settings.EmailReporterMomErrorRecipients
+					]:
+			check_for_list_of_strings_or_none( settings.get( setting, False ), "Must be a list of valid email addresses" )
+
+		check_for_string( settings.get( Settings.EmailReporterSender ), "EmailReporterSender Must be a valid email address" )
 
 	def shutDown( self ):
 		email = self.createEmail()

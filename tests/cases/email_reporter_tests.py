@@ -32,7 +32,7 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		mApp().getSettings().set( Settings.EmailReporterDefaultRecipients, ["DR"] )
 		mApp().getSettings().set( Settings.EmailReporterConfigurationErrorRecipients, ["CER"] )
 		mApp().getSettings().set( Settings.EmailReporterMomErrorRecipients, ["MER"] )
-		mApp().getSettings().set( Settings.EmailReporterSender, ["S"] )
+		mApp().getSettings().set( Settings.EmailReporterSender, "S" )
 
 		# add EmailReporter plugin
 		self.reporter = EmailReporter( "TestEmailReporter" )

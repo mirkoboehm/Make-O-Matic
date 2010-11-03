@@ -30,6 +30,11 @@ def check_for_list_of_strings( expression, description ):
 	for obj in expression:
 		check_for_string( obj, expression )
 
+def check_for_list_of_strings_or_none( expression, description ):
+	if expression == None:
+		return
+	check_for_list_of_strings( expression, description )
+
 def check_for_string( expression, description ):
 	if not isinstance( expression, str ) and not isinstance( expression, unicode ):
 		raise ConfigurationError( description )
