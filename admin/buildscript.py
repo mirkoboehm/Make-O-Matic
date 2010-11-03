@@ -56,5 +56,9 @@ project.addPlugin( uploader )
 build.getSettings().setBuildStepEnabled( 'project-create-docs', 'c', True )
 build.getSettings().setBuildStepEnabled( 'project-upload-docs', 'c', True )
 
+# enable docs generation and upload by default: 
+build.getSettings().setBuildStepEnabled( 'project-create-docs', 'c', True )
+build.getSettings().setBuildStepEnabled( 'project-upload-docs', 'c', True )
+
 # run:
 build.build()
