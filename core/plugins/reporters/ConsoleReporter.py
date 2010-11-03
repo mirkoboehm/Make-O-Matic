@@ -36,6 +36,7 @@ class ConsoleReporter( Reporter ):
 		report.prepare()
 		converter = XmlReportConverter( report )
 
+		print( " " )
 		print( converter.convertToText() )
 		print( " " ) # empty line
 

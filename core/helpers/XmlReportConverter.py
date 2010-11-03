@@ -179,7 +179,6 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrapMultiLine( element.text )
 
 		elif element.tag == "build":
-			out += " " # new line
 			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
 			out += " "
 			wrapper.indent()
