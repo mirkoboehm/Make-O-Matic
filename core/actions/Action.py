@@ -16,10 +16,11 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.MObject import MObject
 from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_path
 from core.Exceptions import MomError, MomException, BuildError
-import os
+import os, sys
 from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 from core.helpers.XmlUtils import create_child_node
@@ -149,7 +150,12 @@ class Action( MObject ):
 				try:
 					with open( step.getLogfileName(), 'a' ) as f:
 						if self.getStdOut():
-							f.writelines( self.getStdOut().decode() )
+							if sys.version_info < ( 3, 0 ):
+								f.writelines( str( self.getStdOut() ) )
+							else:
+								# TODO:decoding the byte array doesnt really work, why?
+								# See XML report output, no newlines with this here. At least do not error out for now.
+								f.writelines( self.getStdOut().decode() )
 						else:
 							f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
 				except Exception as e:

@@ -32,7 +32,7 @@ class DoxygenGenerator( Plugin ):
 		searchPaths = []
 		if sys.platform == "win32":
 			from core.helpers.RegistryHelper import getPathsFromRegistry
-			keys = [ "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\doxygen_is1\Inno Setup: App Path" ]
+			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\doxygen_is1\\Inno Setup: App Path" ]
 			searchPaths += getPathsFromRegistry( keys, "bin" )
 		self._setCommand( "doxygen", searchPaths )
 		self.__doxygenFile = None
