@@ -59,6 +59,7 @@ def getProject( build, projectName = "MOMProject",
 	url = build.getParameters().getScmLocation() or scmUrl
 	mApp().getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
 	mApp().getSettings().set( Settings.ProjectVersionName, projectVersionName )
+	mApp().getSettings().set( Settings.ProjectSourceLocation, url )
 	project.createScm( url )
 	build.setProject( project )
 	return project

@@ -94,6 +94,8 @@ class Parameters( MObject ):
 		assert isinstance( settings, Settings )
 		if self.getRevision():
 			settings.set( Settings.ProjectRevision, self.getRevision() )
+		else:
+			settings.set( Settings.ProjectRevision, 'latest (HEAD)' )
 		if self.getScmLocation():
 			settings.set( Settings.ProjectSourceLocation, self.getScmLocation() )
 		if self.getBuildType():
