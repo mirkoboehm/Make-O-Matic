@@ -69,7 +69,10 @@ class Plugin( MObject ):
 		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError 
 		exception."""
 		if self.getCommand():
-			RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths ).checkVersion()
+			runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
+			runCommand.checkVersion()
+			# Set the now resolved command
+			self.__command = runCommand.getCommand()[0]
 
 	def performSetup( self ):
 		'''This method handles the execution of the setup phase. Do not overload this method to adapt it, overload 
@@ -105,7 +108,7 @@ class Plugin( MObject ):
 		if searchPaths is None:
 			searchPaths = []
 		check_for_list_of_strings( searchPaths, "The search paths need to be a list of strings." )
-		self.__command = RunCommand( [ command ], searchPaths = searchPaths ).getCommand()[0]
+		self.__command = command
 		self.__commandSearchPaths = searchPaths
 
 	def setEnabled( self, onOff ):
