@@ -16,6 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from __future__ import with_statement
 from tests.helpers.MomTestCase import MomTestCase
 from core.helpers.GlobalMApp import mApp
@@ -23,6 +24,7 @@ import unittest
 from core.Exceptions import ConfigurationError
 
 class SettingsTests ( MomTestCase ):
+
 	def testSetBuildStepEnabled( self ):
 		step = 'project-upload-packages'
 		self.assertFalse( mApp().getSettings().getBuildStepEnabled( step, 'c' ) )

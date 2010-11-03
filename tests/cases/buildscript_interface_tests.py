@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
+
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from tests.helpers.MomTestCase import MomTestCase
 import os
@@ -31,6 +32,7 @@ class BuildScriptInterfaceTests( MomTestCase ):
 
 	def setUp( self ):
 		MomTestCase.setUp( self )
+
 		self.iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
 
 	def tearDown( self ):

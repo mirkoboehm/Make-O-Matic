@@ -26,16 +26,12 @@ from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
 from core.plugins.sourcecode import getScm
 from core.plugins.sourcecode.SCMSubversion import SCMSubversion
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
-class ScmFactoryTests( MomTestCase ):
+class ScmFactoryTests( MomBuildMockupTestCase ):
 
 	def setUp( self ):
-		MomTestCase.setUp( self, False )
-		self.build = Build()
-		self.project = Project( 'ScmFactoryTest' )
-		self.build.setProject( self.project )
-		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
+		MomBuildMockupTestCase.setUp( self )
 
 	def checkScm( self, url, type ):
 		scm = getScm( url )

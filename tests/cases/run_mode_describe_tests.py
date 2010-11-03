@@ -16,35 +16,35 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import unittest
 from core.Project import Project
 from core.Settings import Settings
 from core.Build import Build
-from tests.helpers.MomTestCase import MomTestCase
 import os
 from core.helpers.RunCommand import RunCommand
 from tests.helpers.DirectoryCompare import DirectoryCompare
 import sys
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
-class RunModeDescribeTests( MomTestCase ):
+class RunModeDescribeTests( MomBuildMockupTestCase ):
 
 	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
 	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_charm.py' )
 
 	def setUp( self ):
-		MomTestCase.setUp( self, False )
-		self.build = Build()
-		self.project = Project( 'ScmFactoryTest' )
-		self.build.setProject( self.project )
+		MomBuildMockupTestCase.setUp( self )
+
 		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
 
 	def testDescribe( self ):
 		with DirectoryCompare( os.getcwd() ):
 			runner = RunCommand( [ sys.executable, self.BuildScriptName, '-t', 'M', 'describe' ] )
 			runner.run()
-			if runner.getReturnCode() != 0:
-				self.fail( 'The example charm build script fails to execute in describe mode: {0} {1}'
+
+			self.assertTrue( len( runner.getStdOut() ) > 100, "Output is too short?" )
+			self.assertTrue( runner.getReturnCode() == 0,
+					'The example charm build script fails to execute in describe mode: {0} {1}'
 						.format( runner.getStdOut(), runner.getStdErr() ) )
 
 if __name__ == "__main__":

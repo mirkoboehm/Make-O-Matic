@@ -25,8 +25,7 @@ from tests.helpers.MomTestCase import MomTestCase
 class RunWithTimeoutTest( MomTestCase ):
 
 	def setUp( self ):
-		MomTestCase.setUp( self, False )
-		self.build = Build()
+		MomTestCase.setUp( self )
 		if sys.platform == 'win32':
 			self.sleepCommand = [ 'ping', '127.0.0.1', '-n', '2' ]
 		else:

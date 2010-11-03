@@ -24,22 +24,18 @@ import shutil
 import os
 from tests.helpers.MomTestCase import MomTestCase
 from datetime import datetime
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
-class ScmModulesTests ( MomTestCase ):
+class ScmModulesTests ( MomBuildMockupTestCase ):
 
 	GIT_EXAMPLE = 'git://github.com/KDAB/Make-O-Matic.git'
 	SVN_EXAMPLE = 'http://ratproxy.googlecode.com/svn/trunk/'
 
 	def setUp( self ):
-		MomTestCase.setUp( self, False )
-		self.build = Build()
-		self.project = Project( 'ScmFactoryTest' )
-		self.build.setProject( self.project )
+		MomBuildMockupTestCase.setUp( self )
 
 	def tearDown( self ):
-		MomTestCase.tearDown( self )
-		os.chdir( ".." )
-		shutil.rmtree( "None" )
+		MomBuildMockupTestCase.tearDown( self )
 
 	def _initialize( self, scmUrl ):
 		self.project.createScm( scmUrl )

@@ -16,7 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
-from tests.helpers.MomTestCase import MomTestCase
+
 import os, unittest
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
@@ -24,15 +24,17 @@ from core.environments.Environments import Environments
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.environments.Dependency import Dependency
 from core.helpers.EnvironmentSaver import EnvironmentSaver
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
-class BuildEnvironmentTests( MomTestCase ):
+class BuildEnvironmentTests( MomBuildMockupTestCase ):
 
 	myFilePath = os.path.realpath( __file__ )
 	myDirectory = os.path.split( myFilePath )[0]
 	testMomEnvironments = os.path.join( myDirectory , 'test-mom-environments' )
 
 	def setUp( self ):
-		MomTestCase.setUp( self )
+		MomBuildMockupTestCase.setUp( self, useEnvironments = True )
+
 		mApp().getSettings().set( Settings.ScriptLogLevel, 1 )
 		mApp().getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
 		mApp().addLogger( ConsoleLogger() )
