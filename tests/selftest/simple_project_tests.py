@@ -74,7 +74,7 @@ class SimpleProjectTests( MomTestCase ):
 		self.assertTrue( line )
 
 	def runTestBuild( self, buildType ):
-		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, '-v', '-t', buildType ]
+		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, '-v', '--ignore-configuration-files', '-t', buildType ]
 		self.runCommand( cmd, "Make-O-Matic buildscript: build type {0}".format( buildType ) )
 
 	def testEBuild( self ):

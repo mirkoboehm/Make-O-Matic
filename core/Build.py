@@ -50,7 +50,11 @@ class Build( MApplication ):
 		Logging and reporting is not available at this stage yet.'''
 
 		# first, parse configuration files:
-		self.getSettings().evalConfigurationFiles()
+		if not self.getParameters().getIgnoreConfigurationFiles():
+			self.getSettings().evalConfigurationFiles()
+		else:
+			self.debug( self, "Not loading configuration files as requested" )
+
 		# second, apply parameters:
 		self.getParameters().apply( self.getSettings() )
 		# third, apply commit message commands:

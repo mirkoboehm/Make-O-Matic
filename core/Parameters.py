@@ -49,6 +49,8 @@ class Parameters( MObject ):
 			help = 'selects the build type (for example manual, continuous, daily, snapshot, full)' )
 		parser.add_option( '-m', '--ignore-commit-message', action = 'store_true', dest = 'ignoreCommitMessage',
 			help = 'ignore commit message commands (like "MOM:BuildType=S")' )
+		parser.add_option( '--ignore-configuration-files', action = 'store_true', dest = "ignoreConfigurationFiles",
+			help = "Ignore settings" )
 		parser.add_option( '-s', '--build-steps', action = 'store', dest = 'buildSteps',
 			help = 'enable or disable individual builds steps on top of the defaults for the build type' )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
@@ -89,6 +91,9 @@ class Parameters( MObject ):
 
 	def getDebugLevel( self ):
 		return self._getOptions().verbosity
+
+	def getIgnoreConfigurationFiles( self ):
+		return self._getOptions().ignoreConfigurationFiles
 
 	def apply( self, settings ):
 		assert isinstance( settings, Settings )
