@@ -67,6 +67,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 		build.getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
 
 		self.build = build
+		self.project = project
 		self.cwd = os.getcwd()
 
 	def tearDown( self ):

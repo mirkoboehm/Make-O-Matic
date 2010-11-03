@@ -16,21 +16,17 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import unittest
 from core.Project import Project
 from core.Settings import Settings
 from core.Build import Build
-from tests.helpers.MomTestCase import MomTestCase
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
-class RunModePrintTests( MomTestCase ):
+class RunModePrintTests( MomBuildMockupTestCase ):
 
 	def setUp( self ):
-		MomTestCase.setUp( self, False )
-		self.build = Build()
-		self.project = Project( 'ScmFactoryTest' )
-		self.build.setProject( self.project )
-		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
-		self.project.createScm( 'git://github.com/KDAB/Make-O-Matic.git' )
+		MomBuildMockupTestCase.setUp( self, useScm = True )
 
 	def testPrintRevisionsSince( self ):
 		revision = '57307ee83930c089d0eb9b4e7342c87784257071'
