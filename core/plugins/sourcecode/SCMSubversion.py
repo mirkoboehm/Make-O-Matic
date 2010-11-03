@@ -27,14 +27,19 @@ from core.plugins.sourcecode.RevisionInfo import RevisionInfo
 import os
 import tempfile
 from core.helpers.FilesystemAccess import make_foldername_from_string
+import sys
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
 
 	def __init__( self, name = None ):
 		SourceCodeProvider.__init__( self, name )
-
-		self._setCommand( "svn" )
+		searchPaths = []
+		if sys.platform == "win32":
+			from core.helpers.RegistryHelper import getPathsFromRegistry
+			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\CollabNet Subversion Client\\Uninstall String" ]
+			searchPaths += getPathsFromRegistry( keys, ".." )
+		self._setCommand( "svn", searchPaths )
 		self.__revisionInfoCache = {} # key: revision, value: RevisionInfo instance
 
 
