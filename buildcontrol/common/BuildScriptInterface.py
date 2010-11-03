@@ -82,7 +82,7 @@ class BuildScriptInterface( MObject ):
 			raise MomError( msg )
 		output = runner.getStdOut()
 		if not output:
-			return None
+			return []
 		lines = output.decode().split( '\n' )
 		return lines
 
