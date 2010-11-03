@@ -48,7 +48,9 @@ python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent =
 python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
-project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getDocsDir ) ) )
+uploader = RSyncPublisher( localDir = PathResolver( project.getDocsDir ) )
+uploader.setUploadLocation( 'docs.kdab.com:/home/klaralv-web/docs.kdab.net/make-o-matic' )
+project.addPlugin( uploader )
 
 # enable docs generation and upload by default: 
 build.getSettings().setBuildStepEnabled( 'project-create-docs', 'c', True )
