@@ -39,7 +39,6 @@ def check_for_nonempty_string( expression, description ):
 		raise ConfigurationError( description )
 	check_for_string( expression, description )
 
-
 def check_for_nonempty_string_or_none( expression, description ):
 	if expression == None:
 		return
