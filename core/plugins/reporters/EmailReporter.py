@@ -82,6 +82,10 @@ class EmailReporter( Reporter ):
 		email.setSubject( '{0} {1} ({2}), {3}'.format( status, instructions.getName(), type, revision, ) )
 		email.setFromAddress( reporterSender )
 
+		# set custom headers
+		email.setCustomHeader( "MOM-Build-Name", mApp().getName() )
+		email.setCustomHeader( "MOM-Version", mApp().getMomVersion() )
+
 		# add recipients
 		if reporterDefaultRecipients:
 			email.setToAddresses( reporterDefaultRecipients )

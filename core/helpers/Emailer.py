@@ -42,6 +42,14 @@ class Email( MObject ):
 	def _getMessage( self ):
 		return self.__msg
 
+	def setCustomHeader( self, key, value ):
+		""" Set custom X-tag
+
+		Usage: setCustomHeader("MOM-Version", "0.1")
+		Result: X-MOM-Version: 0.1 in resulting E-Mail"""
+
+		self._getMessage()[ 'X-{0}'.format( key ) ] = value
+
 	def setFromAddress( self, address ):
 		self._getMessage()[ 'From' ] = address
 
