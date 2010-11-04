@@ -18,9 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Project import Project
 from core.Settings import Settings
-from core.Build import Build
 import os
 from core.helpers.RunCommand import RunCommand
 from tests.helpers.DirectoryCompare import DirectoryCompare
@@ -42,10 +40,10 @@ class RunModeDescribeTests( MomBuildMockupTestCase ):
 			runner = RunCommand( [ sys.executable, self.BuildScriptName, '-t', 'M', 'describe' ] )
 			runner.run()
 
-			self.assertTrue( len( runner.getStdOut() ) > 100, "Output is too short?" )
 			self.assertTrue( runner.getReturnCode() == 0,
 					'The example charm build script fails to execute in describe mode: {0} {1}'
 						.format( runner.getStdOut(), runner.getStdErr() ) )
+			self.assertTrue( len( runner.getStdErr() ) > 100, "Output is too short?" )
 
 if __name__ == "__main__":
 	unittest.main()
