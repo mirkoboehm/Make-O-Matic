@@ -187,6 +187,7 @@ class RunCommand( MObject ):
 				else:
 					raise ConfigurationError( "RunCommand::resolveCommand: Can't find extra PATH '{0}' appended in configuration.".format( extraPath ) )
 
+		#paths = []
 		for path in paths:
 			path = os.path.normpath( path )
 			executableFile = os.path.join( path, fname )

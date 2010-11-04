@@ -19,34 +19,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.DoxygenGenerator import DoxygenGenerator
-from core.plugins.RSyncPublisher import RSyncPublisher
-from core.plugins.Preprocessor import Preprocessor
-from core.helpers.PathResolver import PathResolver
 from core.plugins.python.PythonConfiguration import PythonConfiguration
 from core.helpers.BoilerPlate import getBuildProject
 
 build, project = getBuildProject( projectName = 'Make-O-Matic', projectVersionNumber = '0.5.0',
 								projectVersionName = 'French Fries', scmUrl = 'git://github.com/KDAB/Make-O-Matic.git' )
 
-# add a preprocessor that generates the Doxygen input file
-prep = Preprocessor( project, inputFilename = PathResolver( project.getSourceDir, 'doxygen.cfg.in' ),
-					 outputFilename = PathResolver( project.getTempDir, 'doxygen.cfg' ) )
-project.addPlugin( prep )
-
-# add a doxygen generator
-dox = DoxygenGenerator()
-dox.setOptional( True )
-dox.setDoxygenFile( prep.getOutputFilename() )
-project.addPlugin( dox )
-
 # set up configurations:
 python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
 # Hint: do not enable running the test suite here, because this script is part of the test suite :-)
 # python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
-
-# add a RSync publisher (remember to set the default upload location in the configuration file!):
-project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getDocsDir ) ) )
 
 # run:
 build.build()
