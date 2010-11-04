@@ -24,9 +24,19 @@ from core.helpers.TypeCheckers import check_for_nonempty_string, \
 	check_for_list_of_strings
 
 class Plugin( MObject ):
+	"""
+	Plugins implement specific functionality, for example to integrate a tool like Doxygen into the build script run.
+	They encapsulate all the integration code for a specific purpose,
+	so that build scripts are modular and only check for the tools that are required for the build.
+	
+	Plugins are added to instruction objects. Some plugins are specific to Build, Project, or Configuration instructions objects.
+	
+	The execution during a build run is split into several phases, see Build documentation
+	"""
 
 	def __init__( self, name = None ):
 		"""Constructor"""
+
 		MObject.__init__( self, name )
 		self.setEnabled( True )
 		self.setOptional( False )
@@ -36,6 +46,7 @@ class Plugin( MObject ):
 
 	def setInstructions( self, instructions ):
 		'''Assign this plugin to it's instruction object. 
+
 		This method is called automatically during addPlugin.'''
 
 		self.__instructions = instructions
@@ -47,8 +58,10 @@ class Plugin( MObject ):
 		return "plugin"
 
 	def performPreFlightCheck( self ):
-		'''This method handles the execution of the pre flight check. Do not overload this method to adapt it, overload 
-		preFlightCheck instead!'''
+		'''This method handles the execution of the pre flight check.
+		
+		Do not overload this method to adapt it, overload preFlightCheck instead!'''
+
 		if not self.isEnabled():
 			mApp().debugN( self, 2, 'this plugin is disabled, skipping pre flight check.' )
 			return
@@ -65,9 +78,12 @@ class Plugin( MObject ):
 	def preFlightCheck( self ):
 		"""PreFlightCheck is called after the command line arguments have been passed, 
 		but before the build steps are generated.
+
 		Modules should check the setup of the tools they use in this phase.
+
 		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError 
 		exception."""
+
 		if self.getCommand():
 			runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
 			runCommand.checkVersion()
@@ -75,8 +91,10 @@ class Plugin( MObject ):
 			self.__command = runCommand.getCommand()[0]
 
 	def performSetup( self ):
-		'''This method handles the execution of the setup phase. Do not overload this method to adapt it, overload 
-		setup instead!'''
+		'''This method handles the execution of the setup phase.
+		
+		Do not overload this method to adapt it, overload setup instead!'''
+
 		if self.isEnabled():
 			self.setup()
 		else:
@@ -84,20 +102,27 @@ class Plugin( MObject ):
 
 	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 
-		options have been applied to them. It can be used to insert actions into the build
-		steps, for example."""
+		options have been applied to them.
+		
+		It can be used to insert actions into the build steps, for example."""
+
 		pass
 
 	def wrapUp( self ):
-		"""WrapUp is called when the last step has finished. It could be used to publish 
-		the reports, for example."""
+		"""WrapUp is called when the last step has finished.
+		
+		It could be used to publish the reports, for example."""
+
 		pass
 
 	def shutDown( self ):
-		"""Shutdown is called right before the build ends. It could be used to close
-		files or network connections.
-		ShutDown is called from the finally block of the build method, so in all normal cases, it will be called 
+		"""Shutdown is called right before the build ends.
+		
+		It could be used to close files or network connections.
+		
+		@note shutDown() is called from the finally block of the build method, so in all normal cases, it will be called 
 		before the build script ends."""
+
 		pass
 
 	def getCommand( self ):

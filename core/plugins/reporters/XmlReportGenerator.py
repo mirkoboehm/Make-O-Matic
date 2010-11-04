@@ -23,6 +23,12 @@ import os.path
 from core.Exceptions import ConfigurationError
 
 class XmlReportGenerator( Plugin ):
+	"""
+	This plugins saves a instructions report in XML format.
+	Attach to a Build object to get build-report.xml (recommended) in the toplevel build directory.
+	
+	Note: Attached to a random instructions object it will produce "INSTRUCTIONSNAME-log.xml" in the corresponding directory.
+	"""
 
 	def __init__( self ):
 		Plugin.__init__( self, self.__class__.__name__ )

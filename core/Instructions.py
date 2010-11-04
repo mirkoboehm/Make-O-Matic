@@ -29,11 +29,24 @@ from core.Settings import Settings
 import traceback
 
 class Instructions( MObject ):
-	'''Instructions is the base class for anything that can be built by make-o-matic. 
-	Projects are Instructions to build a Project.
-	Configurations are Instructions to build a configuration of a Project.
-	Instructions implement the phased approach to executing the build script, and the 
-	idea of plug-ins that implement certain functionality.'''
+	"""
+	Instructions is the base class for anything that can be built by make-o-matic. 
+	* The Build object is a singleton that represents the build script run.
+	* Projects are Instructions to build a Project.
+	* Configurations are Instructions to build a configuration of a Project.
+	* Instructions implement the phased approach to executing the build script, and the 
+	idea of plug-ins that implement certain functionality.
+
+	The idea is to have a hierarchical structure like this:
+
+	- Build
+	  - Project
+	    - Configuration1 (a set of dependencies)
+	      - Instruction1.1 (a set of steps including actions, e.g. "./configure")
+	      - Instruction1.2
+	    - Configuration2
+	      - Instruction2.1
+	"""
 
 	def __init__( self, name = None, parent = None ):
 		MObject.__init__( self, name )

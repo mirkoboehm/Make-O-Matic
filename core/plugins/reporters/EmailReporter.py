@@ -29,6 +29,28 @@ from core.plugins.sourcecode.RevisionInfo import RevisionInfo
 from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
 
 class EmailReporter( Reporter ):
+	"""
+	This plugin enables reporting build reports to a list of email recipients specified in the settings.
+	EmailReporter allows you to specify multiple recipients list, which are notified on special cases.
+	
+	@warning Valid Emailer settings are required, see Emailer plugin for documentation
+	
+	Available settings:
+	* EmailReporterEnableHtml
+		  o This enables reporting in HTML instead of plain text
+	* EmailReporterSender (*)
+		  o This specifies the email address of the sender
+	* EmailReporterDefaultRecipients
+		  o This is a list of email addresses that get notified on every build (Example usage: Build report mailing list)
+	* EmailReporterConfigurationErrorRecipients
+		  o This is a list of email addresses that get notified when a build errors out with a ConfigurationError, e.g. "svn" not found in PATH
+	* EmailReporterMomErrorRecipients
+		  o This is a list of email addresses that get notified when a build errors out with a MomError, e.g. missing python packages
+	* EmailReporterNotifyCommitterOnFailure
+		  o This enables sending email reports to the committer who broke the last build. (Email is extracted from the VCS history)
+		  
+	@note Settings marked with a (*) are required
+	"""
 
 	def __init__( self, name = None ):
 		Reporter.__init__( self, name )
