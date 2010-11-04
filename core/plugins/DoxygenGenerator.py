@@ -28,7 +28,6 @@ from core.actions.filesystem.MkDirAction import MkDirAction
 class DoxygenGenerator( Plugin ):
 
 	def __init__( self, name = None ):
-		'''Constructor'''
 		Plugin.__init__( self, name )
 		searchPaths = []
 		if sys.platform == "win32":

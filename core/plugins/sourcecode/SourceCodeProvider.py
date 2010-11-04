@@ -25,7 +25,6 @@ from core.helpers.XmlUtils import create_child_node
 class SourceCodeProvider( Plugin ):
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		Plugin.__init__( self, name )
 		self.__url = None
 		self.__revision = None

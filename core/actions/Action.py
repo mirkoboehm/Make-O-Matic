@@ -43,7 +43,6 @@ class Action( MObject ):
 		raise NotImplementedError()
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		MObject.__init__( self, name, "action" )
 		self.__timeKeeper = TimeKeeper()
 		self.__workingDir = None

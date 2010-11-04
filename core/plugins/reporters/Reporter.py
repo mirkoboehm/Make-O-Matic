@@ -21,5 +21,4 @@ from core.Plugin import Plugin
 class Reporter( Plugin ):
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		Plugin.__init__( self, name )

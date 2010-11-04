@@ -23,7 +23,6 @@ from core.plugins.builders import maketools
 class MakeTester( TestProvider ):
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		TestProvider.__init__( self, name )
 		self.__makeTool = maketools.getMakeTool()
 		self._setCommand( self.__makeTool.getCommand() )

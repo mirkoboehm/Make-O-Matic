@@ -21,8 +21,6 @@ class MObject( object ):
 	"""MObject is the base class for objects used during a MoM script run."""
 
 	def __init__( self, name = None, command = None ):
-		"""Constructor"""
-
 		if name == None:
 			name = self.__class__.__name__
 

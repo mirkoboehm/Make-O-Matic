@@ -27,7 +27,6 @@ class RSyncPublisher( Plugin ):
 	'''A publisher that uses RSync to send results to a remote site.'''
 
 	def __init__( self, name = None, uploadLocation = None, localDir = None ):
-		"""Constructor"""
 		Plugin.__init__( self, name )
 		searchPaths = [ "C:/Program Files/cwRsync/bin" ]
 		self._setCommand( "rsync", searchPaths )

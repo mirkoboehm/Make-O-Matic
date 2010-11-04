@@ -62,7 +62,6 @@ class TimeKeeper( object ):
 	'''TimeKeeper records the time an operation took.'''
 
 	def __init__( self ):
-		'''	Constructor'''
 		self.__startTime = None
 		self.__stopTime = None
 

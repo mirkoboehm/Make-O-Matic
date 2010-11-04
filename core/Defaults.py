@@ -103,7 +103,6 @@ class Defaults( MObject ):
 	SimpleCIBuildJobCap = 'simple_ci.build.cap'
 
 	def __init__( self ):
-		'''Constructor'''
 		MObject.__init__( self )
 
 		self.__settings = {}

@@ -24,7 +24,6 @@ from core.actions.ShellCommandAction import ShellCommandAction
 class PackageProvider( Plugin ):
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		Plugin.__init__( self, name )
 		self.__packageArguments = None
 

@@ -27,7 +27,6 @@ class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
 
 	def __init__( self ):
-		"""Constructor"""
 		Logger.__init__( self, self.__class__.__name__ )
 
 	def __getLevel( self, mapp ):

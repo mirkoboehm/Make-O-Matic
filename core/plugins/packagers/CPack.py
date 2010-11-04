@@ -70,7 +70,6 @@ SET(CPACK_PACKAGE_DESCRIPTION "")
 
 class _CPackMovePackageAction( FilesMoveAction ):
 	def __init__( self, cpackAction, destination ):
-		"""Constructor"""
 		FilesMoveAction.__init__( self )
 		self.__action = cpackAction
 		self.setDestination( destination )
@@ -133,7 +132,6 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 class CPack( PackageProvider ):
 
 	def __init__( self, sourcePackage = False, name = None ):
-		"""Constructor"""
 		PackageProvider.__init__( self, name )
 		self._setCommand( "cpack", CMakeSearchPaths )
 		if sourcePackage:

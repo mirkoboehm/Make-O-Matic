@@ -24,7 +24,6 @@ from core.plugins.builders import maketools
 class MakePackager( PackageProvider ):
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		PackageProvider.__init__( self, name )
 		self.__makeTool = maketools.getMakeTool()
 		self._setCommand( self.__makeTool.getCommand() )

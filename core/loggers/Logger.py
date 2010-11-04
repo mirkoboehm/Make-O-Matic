@@ -25,7 +25,6 @@ class Logger( Plugin ):
 	"""Logger is the base class for Logger objects."""
 
 	def __init__( self, name ):
-		"""Constructor"""
 		Plugin.__init__( self, name )
 
 	def message( self, mapp, mobject, msg ):

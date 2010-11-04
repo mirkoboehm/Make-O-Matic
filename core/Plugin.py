@@ -35,7 +35,6 @@ class Plugin( MObject ):
 	"""
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 
 		MObject.__init__( self, name )
 		self.setEnabled( True )

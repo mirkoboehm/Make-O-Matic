@@ -27,7 +27,6 @@ class Settings( Defaults ):
 	"""Settings stores all configurable values for a build script run."""
 
 	def __init__( self ):
-		'''Constructor'''
 		# this applies the defaults:
 		Defaults.__init__( self )
 		if sys.platform == 'darwin' or sys.platform == 'win32':

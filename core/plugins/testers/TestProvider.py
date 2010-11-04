@@ -24,7 +24,6 @@ from core.actions.ShellCommandAction import ShellCommandAction
 class TestProvider( Plugin ):
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		Plugin.__init__( self, name )
 		self.__testArgument = None
 

@@ -23,7 +23,6 @@ from core.plugins.builders.generators.CMakeBuilder import CMakeSearchPaths
 class CTest( TestProvider ):
 
 	def __init__( self, name = None ):
-		"""Constructor"""
 		TestProvider.__init__( self, name )
 		self._setCommand( "ctest", CMakeSearchPaths )
 		self._setTestArgument( "--verbose" )
