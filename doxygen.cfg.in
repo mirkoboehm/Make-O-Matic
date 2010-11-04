@@ -18,3 +18,7 @@ QUIET            = YES
 JAVADOC_AUTOBRIEF = YES
 HTML_FOOTER      = @@(project.folders.tmp)/doxygen-footer.html
 # IMAGE_PATH	 = pics
+
+# doxygen tags support
+FILTER_SOURCE_FILES = YES
+INPUT_FILTER = "python @@(project.folders.src)/3rdparty/doxygen-support/doxypy.py"
