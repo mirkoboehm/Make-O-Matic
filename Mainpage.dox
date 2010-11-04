@@ -1,0 +1,38 @@
+/* doxygen index page */
+/** @mainpage Make-O-Matic Documentation
+
+\section concept Make-O-Matic Concept
+
+Make-O-Matic is a tool to write build scripts that automate routine activities of the development process. The build scripts are stand-alone Python programs that can be invoked by the developer, or hooked into a CI system.
+
+\section elements Elements of a Build Script
+
+\subsection introduction Instructions
+
+A build script consists of a hierarchical structure of instructions that describe how the build should be executed. The basic elements are:
+
+\li The Build object: The Build object is a singleton that represents the build script run.
+\li Project objects: Usually one, but potentially multiple in a single build script. A Project object is always a child of the Build object, and represents one project to be built. Projects can not be nested.
+\li Configurations: Configurations are children of Project objects, and describe different ways of how the Project can be built. The simplest examples are debug and release configurations, but there are more possibilities. For example, configurations could set environment variables and then invoke child configurations. Configurations can be nested, and all direct or indirect children of Project objects are some kind of Configuration.
+
+\subsection plugins Plugins
+
+Plugins implement specific functionality, for example to integrate a tool like Doxygen into the build script run. They encapsulate all the integration code for a specific purpose, so that build scripts are modular and only check for the tools that are required for the build. Plugins are added to instruction objects. Some plugins are specific to Build, Project, or Configuration instructions objects.
+
+\section sequence Build Sequence
+
+Plugins need to create actions for the build, and those actions need to be executed in the right order. Error handling needs to be performed in a generic way to make reporting feasible. To achieve that, the build process was broken down into a build sequence, represented by steps. Steps are assigned to the instructions objects. Plugins can retrieve them by name to add actions to them. The build sequence is defined for the project, and is identical for all configurations of the project.
+
+\subsection execution Execution of a Build Script
+
+The build script execution is split into phases. The phases allow the instructions to execute in a controlled way, and for the plugins to hook their functionality into the build script run. The phases are:
+
+\li pre-flight check: During the pre-flight check phase, instructions and plugins check their requirements, and perform early setup. If an object cannot be initialized, for example because a required tool can be found, the build script is aborted already in this phase, before the actual build started.
+\li setup: The setup phase is where all actions are created and registered that are executed during the build. This happens before the actions are executed, so that all kinds of plugins can generate actions that are then executed in the right order. The actual build is split up into steps that are named, and the plugins are adding their actions to these steps.
+\li execution: When the build is executed, the Project objects iterate over the build sequence, and execute every individual step recursively, depth first, all through the tree of instructions objects.
+\li wrap-up: After execution, reports need to be sent out, for example. Every instructions object and every plugin can contain code that is executed after the end of the build.
+\li shutdown: The shutdown phase is special in that it is always called at the end of the build script run, even in the case of an exception. It is similar to a destructor call, and should be used for closing file and other cleanup activity
+
+*/
+
+// vim:ts=4:sw=4:expandtab:filetype=doxygen
