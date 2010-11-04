@@ -164,7 +164,9 @@ class Build( MApplication ):
 		if self.getSettings().get( Settings.ScriptRunMode ) in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
 			MApplication._buildAndReturn( self ) # use base class implementation
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
-			self.runPreFlightChecks()
+			# TODO Do we need to run the preflightchecks here?
+			# Regardless, we should catch exceptions here and print a backtrace
+			#self.runPreFlightChecks()
 			# filter script name, 'query'
 			self.querySettings( self.getParameters().getArgs()[2:] )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:
