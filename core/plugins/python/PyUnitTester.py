@@ -22,6 +22,7 @@ from core.Exceptions import MomError, ConfigurationError
 from core.helpers.TypeCheckers import check_for_path
 
 class PyUnitTester( TestProvider ):
+
 	def __init__( self, testprogram = None, name = None ):
 		TestProvider.__init__( self, name )
 		self.setTestProgram( testprogram )
@@ -32,6 +33,17 @@ class PyUnitTester( TestProvider ):
 
 	def getTestProgram( self ):
 		return self.__program
+
+	def getReport( self ):
+		stdout = self.getAction().getStdOut()
+		if not stdout:
+			return None
+
+		for line in stdout.splitlines():
+			if "tests in" in line:
+				return line
+
+		return None
 
 	def performPreFlightCheck( self ):
 		pyConf = self.getInstructions()
