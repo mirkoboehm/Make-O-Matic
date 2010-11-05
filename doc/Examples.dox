@@ -1,0 +1,17 @@
+/** \page examples Examples Documentation
+
+\section mom-example Make-O-Matic Buildscript
+
+\include example_mom_buildscript.py
+
+\section jom-example Jom Buildscript
+
+\include example_jom.py
+
+\section charm-example Charm Buildscript
+
+\include example_charm.py
+
+*/
+
+// vim:ts=4:sw=4:expandtab:filetype=doxygen
