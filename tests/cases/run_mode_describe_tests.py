@@ -43,7 +43,9 @@ class RunModeDescribeTests( MomBuildMockupTestCase ):
 			self.assertTrue( runner.getReturnCode() == 0,
 					'The example charm build script fails to execute in describe mode: {0} {1}'
 						.format( runner.getStdOut(), runner.getStdErr() ) )
-			self.assertTrue( len( runner.getStdErr() ) > 100, "Output is too short?" )
+
+			# describe output should be somewhat lengthy, check this
+			self.assertTrue( len( runner.getStdOut() ) > 100, "Output is too short" )
 
 if __name__ == "__main__":
 	unittest.main()
