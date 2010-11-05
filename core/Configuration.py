@@ -45,6 +45,9 @@ class Configuration( ConfigurationBase ):
 	def getBuildDir( self ):
 		return self._getNormPath( Settings.ConfigurationBuildDir )
 
+	def getTagName( self ):
+		return "configuration" # prevent subclasses to get individual names
+
 	def getTargetDir( self ):
 		return self._getNormPath( Settings.ConfigurationTargetDir )
 
