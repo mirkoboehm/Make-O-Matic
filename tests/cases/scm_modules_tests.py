@@ -18,11 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Project import Project
-from core.Build import Build
-import shutil
-import os
-from tests.helpers.MomTestCase import MomTestCase
 from datetime import datetime
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 

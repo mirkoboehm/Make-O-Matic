@@ -38,12 +38,19 @@ from tests.cases.email_reporter_tests import EmailReporterTest
 from tests.cases.run_mode_describe_tests import RunModeDescribeTests
 #from tests.cases.emailer_tests import EmailerTest
 from tests.cases.settings_tests import SettingsTests
+from tests.selftest.environment_setup_tests import EnvironmentSetupTests
 
 CLASSES = [
+	# self tests first
+	CharmBuildTests,
+	EnvironmentSetupTests,
+	SimpleProjectTests,
+	SimpleCITests,
+
+	# others
 	BuildEnvironmentTests,
 	BuildScriptInterfaceTests,
 	BuildStatusPersistenceTests,
-	CharmBuildTests,
 #	EmailerTest,
 	EmailReporterTest,
 	EnvironmentSaverTest,
@@ -54,8 +61,6 @@ CLASSES = [
 	RunWithTimeoutTest,
 	ScmFactoryTests,
 	ScmModulesTests,
-	SimpleProjectTests,
-	SimpleCITests,
 	XmlReportTests,
 	SettingsTests
 ]

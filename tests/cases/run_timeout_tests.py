@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Build import Build
 import sys
 from tests.helpers.MomTestCase import MomTestCase
 
