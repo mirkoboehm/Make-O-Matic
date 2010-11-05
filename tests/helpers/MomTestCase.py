@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+import os
 from core.Build import Build
 from core.MApplication import MApplication
 from datetime import datetime
@@ -24,7 +25,18 @@ import unittest
 from core.helpers.RunCommand import RunCommand
 
 class MomTestCase( unittest.TestCase ):
-	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
+	'''MomTestCase is a base test case class that sets up and tears down the Build object.
+
+	\note Tests do not load user configured settings!
+	You may enable this by setting the environment variable MOM_TESTS_RUNNING to 0 '''
+
+	ENV_KEY = "MOM_TESTS_RUNNING"
+
+	def __init__( self, methodName = 'runTest' ):
+		unittest.TestCase.__init__( self, methodName )
+
+		if not os.getenv( self.ENV_KEY ):
+			os.environ[ self.ENV_KEY ] = "1"
 
 	def setUp( self, createBuild = True ):
 		self.startTime = datetime.utcnow()

@@ -50,10 +50,12 @@ class Build( MApplication ):
 		Logging and reporting is not available at this stage yet.'''
 
 		# first, parse configuration files:
-		if not self.getParameters().getIgnoreConfigurationFiles():
-			self.getSettings().evalConfigurationFiles()
+		if os.getenv( "MOM_TESTS_RUNNING" ) == "1":
+			self.debug( self, "Not loading configuration files, tests are running" )
+		elif self.getParameters().getIgnoreConfigurationFiles():
+			self.debug( self, "Not loading configuration files, requested per command switch" )
 		else:
-			self.debug( self, "Not loading configuration files as requested" )
+			self.getSettings().evalConfigurationFiles()
 
 		# second, apply parameters:
 		self.getParameters().apply( self.getSettings() )
