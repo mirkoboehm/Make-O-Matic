@@ -24,6 +24,11 @@ def check_for_list_of_paths( expression, description ):
 	for obj in expression:
 		check_for_path( obj, description )
 
+def check_for_list_of_paths_or_none( expression, description ):
+	if expression == None:
+		return
+	check_for_list_of_paths( expression, description )
+
 def check_for_list_of_strings( expression, description ):
 	if not isinstance( expression, list ):
 		raise ConfigurationError( description )

@@ -27,6 +27,7 @@ from core.plugins.python.PythonConfiguration import PythonConfiguration
 from core.helpers.BoilerPlate import getBuildProject
 from core.plugins.python.PyUnitTester import PyUnitTester
 import os
+from core.plugins.python.PyLintChecker import PyLintChecker
 
 build, project = getBuildProject( projectName = 'Make-O-Matic', projectVersionNumber = '0.5.0',
 								projectVersionName = 'French Fries', scmUrl = 'git://github.com/KDAB/Make-O-Matic.git' )
@@ -49,6 +50,8 @@ project.addPlugin( dox )
 # python3 = Configuration( 'Python 3', project )
 python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
 python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
+python26.addPlugin( PyLintChecker( pyLintTool = 'pylint-2.6', pyLintRcFile = PathResolver( project.getSourceDir, 'pylintrc' ),
+					modules = [ 'core', 'buildcontrol', 'tools', 'tests' ] ) )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 uploader = RSyncPublisher( localDir = PathResolver( project.getDocsDir ) )

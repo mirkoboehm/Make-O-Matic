@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Plugin import Plugin
+from core.plugins.testers.Analyser import Analyser
 from core.helpers.TypeCheckers import check_for_path_or_none
 from core.actions.ShellCommandAction import ShellCommandAction
 from core.helpers.XmlUtils import create_child_node
 
-class TestProvider( Plugin ):
+class TestProvider( Analyser ):
 
 	def __init__( self, name = None ):
-		Plugin.__init__( self, name )
+		Analyser.__init__( self, name )
 		self.__testArgument = None
 		self.__action = None
 
