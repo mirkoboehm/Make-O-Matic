@@ -1,11 +1,26 @@
-/* doxygen index page */
+/*
+Doxygen index page
+
+Command reference: http://www.stack.nl/~dimitri/doxygen/commands.html#cmdpage
+*/
+
 /** @mainpage Make-O-Matic Documentation
 
 \section concept Make-O-Matic Concept
 
 Make-O-Matic is a tool to write build scripts that automate routine activities of the development process. The build scripts are stand-alone Python programs that can be invoked by the developer, or hooked into a CI system.
 
+\note See <a href="pages.html">Related Pages</a> for more info.
+
 \section elements Elements of a Build Script
+
+\subsection central-objects Central Objects in Build Scripts
+
+Some things have to be defined about the build scripts to make them work. Here is a list of assumptions:
+
+\li A single build object: The Build object is the application. It is required, and a singleton.&nbsp;
+\li A master Project: While build scripts could potentially contain multiple projects, one of them is the master project.&nbsp;
+\li A master SCM: The master SCM decides which changes have been made to the master project. It is assigned to the master Project.
 
 \subsection introduction Instructions
 

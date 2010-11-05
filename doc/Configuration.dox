@@ -1,0 +1,68 @@
+/** \page configuration Configuration Documentation
+
+\section config Configuration files
+
+
+\subsection order Evaluation order
+
+MOM tries to load user specific settings from several places. The  order of the loading is as follows (note: paths are Linux-specific):
+\code
+# /etc/mom/config.py
+# /etc/mom/$YOUR_HOSTNAME.py
+# ~/.mom/config.py
+# ~/.mom/$YOUR_HOSTNAME.py
+\endcode
+
+\note Replace "$YOUR_HOSTNAME" with your machine's hostname.
+
+As you can see, these files have the .py extension. These  configuration  files are eval()'ed at runtime and contain application  code.
+
+\subsection mappings Platform specific mappings
+
+\code
+Windows:
+- /etc \-> %ALLUSERSPROFILE%
+- $HOME \-> %APPDATA%
+OSX:
+- /etc \-> /Library/Application Support
+- $HOME \-> \~/Library/Application Support
+\endcode
+
+\subsection example-script Example script
+
+Here an example of a simple configuration script:
+
+\code
+# /home/kevin/.mom/config.py
+
+from core.Settings import Settings
+
+settings = application.getSettings()
+settings.set( Settings.EmailerSmtpServer, 'mail.kdab.com' )
+settings.set( Settings.EmailerUsername, 'kevin.funk@kdab.com' )
+settings.set( Settings.EmailerPassword, 'secret' )
+\endcode
+
+\section default-options List of default options
+
+\subsection emailer Emailer\\
+
+This is only required if you're using a plugin that requires a valid E-Mail account.
+
+\code
+EmailerSmtpServer (*)
+EmailerServerPort (*)
+EmailerTimeout
+EmailerUseTls
+EmailerDoLogin
+EmailerUsername (*)
+EmailerPassword (*)
+\endcode
+
+\subsection footnotes Footnotes
+
+\note Settings marked with a (*) are required
+
+*/
+
+// vim:ts=4:sw=4:expandtab:filetype=doxygen
