@@ -28,7 +28,7 @@ def check_for_list_of_strings( expression, description ):
 	if not isinstance( expression, list ):
 		raise ConfigurationError( description )
 	for obj in expression:
-		check_for_string( obj, expression )
+		check_for_string( obj, description )
 
 def check_for_list_of_strings_or_none( expression, description ):
 	if expression == None:
