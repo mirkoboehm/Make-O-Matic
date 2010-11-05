@@ -129,9 +129,11 @@ class PyLintChecker( Analyzer ):
 		pyConf = self.getInstructions()
 		if not isinstance( pyConf, PythonConfiguration ):
 			raise MomError( 'A PyUnitTester can only be assigned to a PythonConfiguration!' )
+		return Analyzer.performPreFlightCheck( self )
 
 	def setup( self ):
 		action = _PyLintCheckerAction( self )
 		action.setWorkingDirectory( self.getInstructions().getProject().getSourceDir() )
 		step = self.getInstructions().getStep( 'conf-make-test' )
 		step.addMainAction( action )
+		return Analyzer.setup( self )
