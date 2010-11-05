@@ -18,13 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
 
-class Analyser( Plugin ):
+class Analyzer( Plugin ):
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
 
 	def getScore( self ):
-		'''Return a pair of integers representing a score, e.g. "9 out of 10". 
-		If it returns None, the specific Analyser does not calculate a score.'''
+		'''Return a pair of floats representing a score, e.g. "9.29 out of 10". 
+		If it returns None, the specific Analyzer does not calculate a score.'''
 		return None
 
 	def getDescription( self ):
