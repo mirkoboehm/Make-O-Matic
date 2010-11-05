@@ -63,6 +63,6 @@ class TestProvider( Analyzer ):
 		return wrapper.wrap( "Report: {0}".format( element.find( "report" ).text ) )
 
 	def createXmlNode( self, document ):
-		node = Plugin.createXmlNode( self, document )
+		node = Analyzer.createXmlNode( self, document )
 		create_child_node( document, node, "report", self.getReport() )
 		return node
