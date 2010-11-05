@@ -8,9 +8,11 @@ Command reference: http://www.stack.nl/~dimitri/doxygen/commands.html#cmdpage
 
 \section concept Make-O-Matic Concept
 
-Make-O-Matic is a tool to write build scripts that automate routine activities of the development process. The build scripts are stand-alone Python programs that can be invoked by the developer, or hooked into a CI system.
+Make-O-Matic is a tool to write build scripts that automate routine activities of the development process. The build scripts are stand-alone Python programs that can be invoked by the developer, or hooked into a CI system (see <a href="tools-simpleci.html">documentation</a>).
 
-\note See <a href="pages.html">Related Pages</a> for more info.
+If you're impatient, you can have a look at the <a href="quickstart.html">Quick start guide</a>.
+
+\note Also see <a href="pages.html">Related Pages</a> for more info.
 
 \section elements Elements of a Build Script
 

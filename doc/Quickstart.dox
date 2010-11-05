@@ -1,0 +1,32 @@
+/** \page quickstart Quick Start Documentation
+
+\section instructions Instructions
+
+For a quick start and to get an overview over Make-O-Matic do the following.
+This will do the basic setup of Make-O-Matic.
+\code
+# git clone git@github.com:KDAB/Make-O-Matic.git
+# cd Make-O-Matic
+# export PYTHONPATH=$PWD
+\endcode
+
+Now we would like to run our very own buildscript provided in the admin/ directory
+Just run
+\code
+# ./admin/buildscript.py
+\endcode
+
+This script automatically checks out Make-O-Matic, builds it, runs the tests and prints out a report about all that.
+Of course this also works for C++ based projects and can be extended to work with other systems.
+
+\section why So why do we want a buildscript?
+
+A buildscript is independent of platform and the buildsystem and can be hooked in to a continuous integration service that controls a certain set of buildscripts.
+This CI can send out emails on each commit and notify the committer or sysadmin about failures in build or setup respectively.
+
+\li For a simple continuous integration service, see <a href="tools-simpleci.html">Simple CI</a>.
+\li For your own project's buildscript, please have a look at the <a href="examples.html">Examples</a>.
+
+*/
+
+// vim:ts=4:sw=4:expandtab:filetype=doxygen
