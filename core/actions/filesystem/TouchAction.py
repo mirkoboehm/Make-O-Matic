@@ -24,7 +24,7 @@ class TouchAction( Action ):
 	It is mostly used internally, but can be of general use as well."""
 	def __init__( self, file ):
 		Action.__init__( self )
-		self._file = file;
+		self._file = file
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""

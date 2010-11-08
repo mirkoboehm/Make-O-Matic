@@ -47,7 +47,7 @@ class DirectoryTreeCopyAction( Action ):
 			# This will only remove it if the directory is empty. Needed for copytree to work.
 			os.rmdir( self.__destination )
 			shutil.copytree( self.__source, self.__destination,
-							shutil.ignore_patterns( self.__ignorePatterns ) );
+							shutil.ignore_patterns( self.__ignorePatterns ) )
 		except ( OSError, shutil.Error ) as o:
 			raise ConfigurationError( 'Cannot copy directory tree "{0}" to "{1}": {2}'
 					.format( self.__source, self.__destination, str( o ) ) )
