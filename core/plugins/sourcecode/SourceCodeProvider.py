@@ -21,6 +21,7 @@ from core.Exceptions import MomError
 from core.helpers.TypeCheckers import check_for_path
 from core.Plugin import Plugin
 from core.helpers.XmlUtils import create_child_node
+from core.helpers.XmlReportConverter import ReportFormat
 
 class SourceCodeProvider( Plugin ):
 
@@ -107,7 +108,7 @@ class SourceCodeProvider( Plugin ):
 		# self.makeExportStep( project )
 
 	def getXslTemplates( self ):
-		return { "html":
+		return { ReportFormat.HTML:
 			"""
 			Revision: <xsl:value-of select="@revision"/><br/>
 			Committer: <xsl:value-of select="@committerName"/> &lt;<xsl:value-of select="@committerEmail"/>&gt;<br/>

@@ -28,7 +28,16 @@ try:
 except ImportError:
 	raise MomError( "Fatal: lxml package missing, required for Xml transformations" )
 
-class MyTextWrapper( TextWrapper ):
+
+class ReportFormat:
+	"""Enum-like structure for output format"""
+
+	XML = 0 # no conversion, default
+	TEXT = 1
+	HTML = 2
+
+
+class _MyTextWrapper( TextWrapper ):
 	"""TextWrapper Wrapper class ;)
 	
 	Provides easy access to indent and dedent methods"""
@@ -51,7 +60,7 @@ class XmlReportConverter( MObject ):
 	"""Converts a XmlReport instance to HTML, plain text and maybe others"""
 
 	XSL_STYLESHEETS = {
-		"html" : "xmlreport2html.xsl",
+		ReportFormat.HTML : "xmlreport2html.xsl",
 	}
 
 	def __init__( self, xmlReport ):
@@ -66,11 +75,16 @@ class XmlReportConverter( MObject ):
 		self._initializeXslTemplates()
 		self._fetchTemplates( mApp() )
 
-	def _convertTo( self, destinationFormat ):
+	def convertTo( self, destinationReportFormat ):
 		"""Converts the report to destinationFormat, which is one of the keys in XSL_STYLESHEETS"""
 
-		transform = etree.XSLT( self.__xslTemplateSnippets[destinationFormat] )
-		return str( transform( self.__xml ) )
+		if destinationReportFormat == ReportFormat.XML:
+			return etree.tostring( self.__xml )
+		elif destinationReportFormat == ReportFormat.HTML:
+			transform = etree.XSLT( self.__xslTemplateSnippets[destinationReportFormat] )
+			return str( transform( self.__xml ) )
+		elif destinationReportFormat == ReportFormat.TEXT:
+			return self.convertToText()
 
 	def _initializeXslTemplates( self ):
 		"""Load stylesheets from XSL_STYLESHEETS into memory"""
@@ -141,12 +155,12 @@ class XmlReportConverter( MObject ):
 	def convertToHtml( self ):
 		"""Convenience method for converting the report to HTML using the protected _convertTo() method"""
 
-		return self._convertTo( "html" )
+		return self.convertTo( ReportFormat.HTML )
 
 	def convertToText( self, short = False ):
 		"""Convenience method for converting the report to plain text using the recursive _toText() method"""
 
-		wrapper = MyTextWrapper( drop_whitespace = False, width = 80 )
+		wrapper = _MyTextWrapper( drop_whitespace = False, width = 80 )
 
 		if short:
 			ignoredTags = ["traceback"]

@@ -21,20 +21,23 @@ from core.Plugin import Plugin
 from core.plugins.reporters.XmlReport import XmlReport
 import os.path
 from core.Exceptions import ConfigurationError
+from core.helpers.XmlReportConverter import ReportFormat, XmlReportConverter
 
 class XmlReportGenerator( Plugin ):
 	"""
-	This plugins saves a instructions report in XML format.
+	This plugin saves a instructions report in XML format.
 	Attach to a Build object to get build-report.xml (recommended) in the toplevel build directory.
 	
-	Note: Attached to a random instructions object it will produce "INSTRUCTIONSNAME-log.xml" in the corresponding directory.
+	\note Attached to a random instructions object it will produce "INSTRUCTIONSNAME-log.xml" in the corresponding directory.
 	"""
 
-	def __init__( self ):
-		Plugin.__init__( self, self.__class__.__name__ )
+	def __init__( self, reportFormat = ReportFormat.XML ):
+		Plugin.__init__( self )
 
 		self.__fileHandle = None
 		self.__reportFile = None
+		self.__reportFormat = reportFormat
+
 		self.__finished = False
 
 	def shutDown( self ):
@@ -55,7 +58,7 @@ class XmlReportGenerator( Plugin ):
 
 	def _openReportFile( self ):
 		baseDirectory = self.getInstructions().getBaseDir()
-		reportFileName = "{0}-report.xml".format( self.getInstructions().getTagName() )
+		reportFileName = "{0}-report.{1}".format( self.getInstructions().getTagName(), self.getFileSuffix() )
 
 		if not os.path.isdir( baseDirectory ):
 			raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( baseDirectory ) ) )
@@ -63,13 +66,28 @@ class XmlReportGenerator( Plugin ):
 		try:
 			self.__reportFile = baseDirectory + os.sep + reportFileName
 			self.__fileHandle = open( self.__reportFile, 'w' )
-		except:
+		except IOError:
 			raise ConfigurationError( 'Cannot open log file at "{0}"'.format( reportFileName ) )
 
 	def _writeReport( self, report ):
 		if self.__fileHandle and report:
-			self.__fileHandle.write( report.getReport() )
+			convertedText = self.convert( report )
+			self.__fileHandle.write( convertedText )
 
 	def _saveReportFile( self ):
 		if self.__fileHandle:
 			self.__fileHandle.close()
+
+	def convert( self, report ):
+		converter = XmlReportConverter( report )
+		return converter.convertTo( self.__reportFormat )
+
+	def getFileSuffix( self ):
+		reportFormat = self.__reportFormat
+
+		if reportFormat == ReportFormat.XML:
+			return "xml"
+		elif reportFormat == ReportFormat.HTML:
+			return "html"
+		elif reportFormat == ReportFormat.TEXT:
+			return "txt"
