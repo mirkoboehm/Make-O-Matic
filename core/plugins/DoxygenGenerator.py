@@ -55,9 +55,15 @@ class DoxygenGenerator( Plugin ):
 		check_for_path( self.getDoxygenFile(), 'The doxygen configuration file name needs to be a nonempty string!' )
 		docsDir = os.path.join( self.getInstructions().getBaseDir(), self.getDocsDir() or self.getInstructions().getDocsDir() )
 
-		# make docs folder
-		step = self.getInstructions().getStep( 'project-create-folders' )
-		step.addMainAction( MkDirAction( docsDir ) )
+		# create folders if necessary
+		if self.getDocsDir():
+			# make docs folder
+			step = self.getInstructions().getStep( 'project-create-folders' )
+			step.addMainAction( MkDirAction( docsDir ) )
+
+			# cleanup
+			step = self.getInstructions().getStep( 'project-cleanup' )
+			step.addMainAction( RmDirAction( docsDir ) )
 
 		# run doxygen
 		step = self.getInstructions().getStep( 'project-create-docs' )
@@ -65,8 +71,4 @@ class DoxygenGenerator( Plugin ):
 		doxygenCall = ShellCommandAction( cmd )
 		doxygenCall.setWorkingDirectory( docsDir )
 		step.addMainAction( doxygenCall )
-
-		# cleanup
-		step = self.getInstructions().getStep( 'project-cleanup' )
-		step.addMainAction( RmDirAction( docsDir ) )
 
