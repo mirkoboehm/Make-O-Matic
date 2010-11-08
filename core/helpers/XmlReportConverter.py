@@ -79,10 +79,9 @@ class XmlReportConverter( MObject ):
 		"""Converts the report to destinationFormat, which is one of the keys in XSL_STYLESHEETS"""
 
 		if destinationReportFormat == ReportFormat.XML:
-			return etree.tostring( self.__xml )
+			return etree.tostring( self.__xml ) # no conversion
 		elif destinationReportFormat == ReportFormat.HTML:
-			transform = etree.XSLT( self.__xslTemplateSnippets[destinationReportFormat] )
-			return str( transform( self.__xml ) )
+			return self.convertToHtml()
 		elif destinationReportFormat == ReportFormat.TEXT:
 			return self.convertToText()
 
@@ -144,21 +143,17 @@ class XmlReportConverter( MObject ):
 		Adds function pointers to the Plugin.getXmlTemplate() methods so that their parameter list can be evaluated when actually 
 		parsing the tree"""
 
-		# check if this plugin overwrites the getXmlTemplate method
-		#classMembers = plugin.__class__.__dict__.keys()
-		#if 'getXmlTemplate' not in classMembers:
-		#	return # getXmlTemplate has not been overwritten, do not add function pointer
-
 		functionPointer = plugin.getXmlTemplate
 		self.__xmlTemplateFunctions[plugin.getName()] = functionPointer
 
 	def convertToHtml( self ):
-		"""Convenience method for converting the report to HTML using the protected _convertTo() method"""
+		"""Converts the report to HTML using the XSL stylesheet for HTML"""
 
-		return self.convertTo( ReportFormat.HTML )
+		transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
+		return str( transform( self.__xml ) )
 
 	def convertToText( self, short = False ):
-		"""Convenience method for converting the report to plain text using the recursive _toText() method"""
+		"""Converts the report to plain text using the recursive _toText() method"""
 
 		wrapper = _MyTextWrapper( drop_whitespace = False, width = 80 )
 
@@ -184,12 +179,6 @@ class XmlReportConverter( MObject ):
 		elif element.tag == "description":
 			out += wrapper.wrapMultiLine( "Description: {0}".format( element.text ) )
 		elif element.tag == "traceback":
-			out += wrapper.wrapMultiLine( element.text )
-
-#		elif element.tag == "traceback":
-#			out += wrapper.wrapMultiLine( element.text )
-
-		elif element.tag == "description":
 			out += wrapper.wrapMultiLine( element.text )
 
 		elif element.tag == "build":
@@ -276,20 +265,6 @@ class XmlReportConverter( MObject ):
 
 			if element.attrib["failed"] == "False":
 				return out # do not show children
-
-#		elif element.tag == "action":
-#			wrapper.subsequent_indent += " " * 10
-#			out += wrapper.wrap( "Action: {0}".format( element.find( "logdescription" ).text ) )
-#			out += wrapper.wrap( "  Code: {0}".format( element.attrib["returncode"] ) )
-
-#		elif element.tag == "stderr":
-#			if element.text:
-#				originalIndent = wrapper.initial_indent
-#				wrapper.initial_indent = wrapper.subsequent_indent = "> "
-#				out += wrapper.wrap( "--- stderr output ---" )
-#				out += wrapper.wrap( element.text )
-#				out += wrapper.wrap( "--- end of stderr output ---" )
-#				wrapper.initial_indent = wrapper.subsequent_indent = originalIndent # reset
 
 		wrapper.indent()
 		for childElement in element.getchildren():

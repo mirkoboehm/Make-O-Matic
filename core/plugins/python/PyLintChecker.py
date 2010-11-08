@@ -112,7 +112,7 @@ class PyLintChecker( Analyzer ):
 		if matches and len( matches.groups() ) == 3:
 			score = float( matches.groups()[0] )
 			top = float( matches.groups()[1] )
-			report = "Score okay" if score > self.getMinimumScore() else "Score NOT okay!"
+			report = "score okay." if score > self.getMinimumScore() else "score NOT okay!"
 
 			self._setScore( score, top )
 			self._setReport( report )
