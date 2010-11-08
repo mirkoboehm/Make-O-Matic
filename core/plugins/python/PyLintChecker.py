@@ -78,12 +78,19 @@ class _PyLintCheckerAction( Action ):
 
 class PyLintChecker( Analyzer ):
 
-	def __init__( self, pyLintTool = None, pyLintRcFile = None, htmlOutputPath = None, modules = None, name = None ):
+	def __init__( self, pyLintTool = None, pyLintRcFile = None, htmlOutputPath = None, modules = None, name = None, minimumScore = 0.0 ):
 		Analyzer.__init__( self, name )
 		self._setCommand( pyLintTool )
 		self.setModules( modules )
 		self.setPyLintRcFile( pyLintRcFile )
 		self.setHtmlOutputPath( htmlOutputPath )
+		self.setMinimumScore( minimumScore )
+
+	def setMinimumScore( self, minimumScore ):
+		self.__minimumScore = minimumScore
+
+	def getMinimumScore( self ):
+		return self.__minimumScore
 
 	def setModules( self, modules ):
 		check_for_list_of_paths_or_none( modules, 'The PyLint modules must be a list of paths!' )
@@ -105,7 +112,7 @@ class PyLintChecker( Analyzer ):
 		if matches and len( matches.groups() ) == 3:
 			score = float( matches.groups()[0] )
 			top = float( matches.groups()[1] )
-			report = re.sub( '\s+', ' ', matches.groups()[2].strip() )
+			report = "Score okay" if score > self.getMinimumScore() else "Score NOT okay!"
 
 			self._setScore( score, top )
 			self._setReport( report )
