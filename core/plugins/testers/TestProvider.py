@@ -20,6 +20,7 @@
 from core.plugins.testers.Analyzer import Analyzer
 from core.helpers.TypeCheckers import check_for_path_or_none
 from core.actions.ShellCommandAction import ShellCommandAction
+from core.actions.CallbackAction import CallbackAction
 
 class TestProvider( Analyzer ):
 
@@ -58,3 +59,9 @@ class TestProvider( Analyzer ):
 		steps, for example."""
 
 		self.makeTestStep()
+
+		# "self.__class__": Use most specialized version of saveReport, "TestProvider" won't work
+		action = CallbackAction( self, self.__class__.saveReport )
+		action.setIgnorePreviousFailure( True )
+		step = self.getInstructions().getStep( 'conf-make-test' )
+		step.addPostAction( action )

@@ -45,11 +45,3 @@ class CTest( TestProvider ):
 			total = int( matches.groups()[2] )
 			self._setReport( report )
 			self._setScore( total - failed, total )
-
-	def setup( self ):
-		TestProvider.setup( self )
-
-		# set savereport callback
-		action = CallbackAction( self, CTest.saveReport )
-		step = self.getInstructions().getStep( 'conf-make-test' )
-		step.addPostAction( action )

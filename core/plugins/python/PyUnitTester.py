@@ -79,11 +79,3 @@ class PyUnitTester( TestProvider ):
 		# set runners
 		self._setCommand( pyConf.getExecutable() )
 		self._setTestArgument( self.getTestProgram() )
-
-	def setup( self ):
-		TestProvider.setup( self )
-
-		# set savereport callback
-		action = CallbackAction( self, PyUnitTester.saveReport )
-		step = self.getInstructions().getStep( 'conf-make-test' )
-		step.addPostAction( action )
