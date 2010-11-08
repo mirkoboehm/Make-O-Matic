@@ -46,7 +46,6 @@ class PyUnitTester( TestProvider ):
 		if not stdout:
 			return
 
-		description = None
 		top = 0
 		score = 0
 
@@ -56,17 +55,17 @@ class PyUnitTester( TestProvider ):
 		if matches:
 			top = int( matches.groups()[0] )
 
-		# get description and number of failed tests
+		# get report and number of failed tests
 		rx = re.compile( 'FAILED \(failures=(\d+)\)', re.MULTILINE | re.DOTALL )
 		matches = rx.search( stdout )
 		if matches:
-			description = "Make test FAILED."
+			report = "tests FAILED."
 			score = top - int( matches.groups()[0] )
 		else:
-			description = "Make test succeeded."
+			report = "tests succeeded."
 			score = top
 
-		self._setDescription( description )
+		self._setReport( report )
 		self._setScore( score, top )
 
 	def performPreFlightCheck( self ):

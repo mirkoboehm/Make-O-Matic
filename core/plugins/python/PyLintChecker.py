@@ -83,8 +83,6 @@ class PyLintChecker( Analyzer ):
 		self._setCommand( pyLintTool )
 		self.setModules( modules )
 		self.setPyLintRcFile( pyLintRcFile )
-		self._setScore( 0.0, 0.0 )
-		self._setDescription( None )
 		self.setHtmlOutputPath( htmlOutputPath )
 
 	def setModules( self, modules ):
@@ -107,11 +105,11 @@ class PyLintChecker( Analyzer ):
 		if matches and len( matches.groups() ) == 3:
 			score = float( matches.groups()[0] )
 			top = float( matches.groups()[1] )
-			description = re.sub( '\s+', ' ', matches.groups()[2].strip() )
+			report = re.sub( '\s+', ' ', matches.groups()[2].strip() )
 
 			self._setScore( score, top )
-			self._setDescription( description )
-			mApp().debugN( self, 2, 'pylint score is {0}/{1}: {2}.'.format( score, top, description ) )
+			self._setReport( report )
+			mApp().debugN( self, 2, 'pylint score is {0}/{1}: {2}.'.format( score, top, report ) )
 
 	def setHtmlOutputPath( self, path ):
 		check_for_path_or_none( path, 'The HTML output path must be a file system path!' )

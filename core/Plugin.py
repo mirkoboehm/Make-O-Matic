@@ -22,6 +22,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, \
 	check_for_list_of_strings
+from core.helpers.XmlUtils import create_child_node
 
 class Plugin( MObject ):
 	"""
@@ -146,6 +147,17 @@ class Plugin( MObject ):
 
 	def getOptional( self ):
 		return self.__optional
+
+	def getDescription( self ):
+		'''Describe the results in human readable text. 
+		Returns None if the result cannot be described.'''
+
+		return ""
+
+	def createXmlNode( self, document ):
+		node = MObject.createXmlNode( self, document )
+		create_child_node( document, node, "pluginDescription", str( self.getDescription() ) )
+		return node
 
 	def getXmlTemplate( self, element, wrapper ):
 		"""Returns a string representing the information about this plugin

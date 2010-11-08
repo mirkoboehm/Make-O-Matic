@@ -209,8 +209,12 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "plugin":
 			name = element.attrib["name"]
+			description = element.find( "pluginDescription" ).text
 
-			out += wrapper.wrap( "Plugin: {0}".format( name ) )
+			if description is not None:
+				out += wrapper.wrap( "{0}: {1}".format( name, description ) )
+			else:
+				out += wrapper.wrap( name )
 
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()

@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys, re
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
@@ -64,15 +65,6 @@ class ConsoleLogger( Logger ):
 		if level > 0:
 			mApp().debug( self, 'debug level is {0}'.format( level ) )
 
-	def getXslTemplates( self ):
-		return { "html": """Debug level: <xsl:value-of select="@debuglevel"/>""" }
-
-	def getXmlTemplate( self, element, wrapper ):
-		return wrapper.wrap( "Debug level: {0}".format( element.attrib["debuglevel"] ) )
-
-	def createXmlNode( self, document ):
-		node = Logger.createXmlNode( self, document )
-		node.attributes["debuglevel"] = str( mApp().getSettings().get( Settings.ScriptLogLevel, True ) )
-		return node
-
-
+	def getDescription( self ):
+		debugLevel = mApp().getSettings().get( Settings.ScriptLogLevel, True )
+		return "Debug level: {0}".format( debugLevel )
