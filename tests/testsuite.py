@@ -39,6 +39,7 @@ from tests.cases.run_mode_describe_tests import RunModeDescribeTests
 #from tests.cases.emailer_tests import EmailerTest
 from tests.cases.settings_tests import SettingsTests
 from tests.selftest.environment_setup_tests import EnvironmentSetupTests
+import sys
 
 CLASSES = [
 	# self tests first
@@ -67,7 +68,9 @@ CLASSES = [
 
 def main():
 	suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
-	unittest.TextTestRunner( verbosity = 2 ).run( suite )
+	result = unittest.TextTestRunner( verbosity = 2 ).run( suite )
+	print result.wasSuccessful()
+	sys.exit( int ( not result.wasSuccessful() ) )
 
 if __name__ == "__main__":
 	main()
