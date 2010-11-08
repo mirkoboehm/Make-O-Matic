@@ -16,15 +16,20 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.plugins.testers.TestProvider import TestProvider
 from core.plugins.python.PythonConfiguration import PythonConfiguration
 from core.Exceptions import MomError, ConfigurationError
 from core.helpers.TypeCheckers import check_for_path
+import re
+from core.actions.CallbackAction import CallbackAction
+from core.helpers.GlobalMApp import mApp
 
 class PyUnitTester( TestProvider ):
 
 	def __init__( self, testprogram = None, name = None ):
 		TestProvider.__init__( self, name )
+
 		self.setTestProgram( testprogram )
 
 	def setTestProgram( self, program ):
@@ -34,24 +39,52 @@ class PyUnitTester( TestProvider ):
 	def getTestProgram( self ):
 		return self.__program
 
-	def getReport( self ):
+	def saveReport( self ):
+		mApp().debug( self, "Saving unit test report" )
+
 		stdout = self.getAction().getStdOut()
 		if not stdout:
-			return None
+			return
 
-		for line in stdout.splitlines():
-			if "tests in" in line:
-				return line
+		description = None
+		top = 0
+		score = 0
 
-		return None
+		# get total number of tests
+		rx = re.compile( 'Ran (\d+) test(s|) in.*', re.MULTILINE | re.DOTALL )
+		matches = rx.search( stdout )
+		if matches:
+			top = int( matches.groups()[0] )
+
+		# get description and number of failed tests
+		rx = re.compile( 'FAILED \(failures=(\d+)\)', re.MULTILINE | re.DOTALL )
+		matches = rx.search( stdout )
+		if matches:
+			description = "Make test FAILED."
+			score = top - int( matches.groups()[0] )
+		else:
+			description = "Make test succeeded."
+			score = top
+
+		self._setDescription( description )
+		self._setScore( score, top )
 
 	def performPreFlightCheck( self ):
+		# check if instructions object is of correct type
 		pyConf = self.getInstructions()
 		if not isinstance( pyConf, PythonConfiguration ):
 			raise MomError( 'A PyUnitTester can only be assigned to a PythonConfiguration!' )
 		if not self.getTestProgram():
 			raise ConfigurationError( 'A Python test program needs to be specified (setTestProgram)!' )
+
+		# set runners
 		self._setCommand( pyConf.getExecutable() )
 		self._setTestArgument( self.getTestProgram() )
 
+	def setup( self ):
+		TestProvider.setup( self )
 
+		# set savereport callback
+		action = CallbackAction( self, PyUnitTester.saveReport )
+		step = self.getInstructions().getStep( 'conf-make-test' )
+		step.addPostAction( action )

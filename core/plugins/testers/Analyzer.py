@@ -16,18 +16,38 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Plugin import Plugin
+from core.helpers.XmlUtils import create_child_node
 
 class Analyzer( Plugin ):
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
 
+		self.__score = None
+		self.__description = None
+
+	def _setScore( self, score, top ):
+		self.__score = [ score, top ]
+
+	def _setDescription( self, txt ):
+		self.__description = txt
+
 	def getScore( self ):
 		'''Return a pair of floats representing a score, e.g. "9.29 out of 10". 
 		If it returns None, the specific Analyzer does not calculate a score.'''
-		return None
+		return self.__score
 
 	def getDescription( self ):
 		'''Describe the results in human readable text. 
 		Returns None if the result cannot be described.'''
-		return None
+		return self.__description
+
+	def getXmlTemplate( self, element, wrapper ):
+		return wrapper.wrap( "Report: {0}".format( element.find( "report" ).text ) )
+
+	def createXmlNode( self, document ):
+		node = Plugin.createXmlNode( self, document )
+		scoreText = " out of ".join( [str( x ) for x in self.getScore()] ) if self.getScore() else "N/A"
+		create_child_node( document, node, "report", "Score: {0}, {1}".format( scoreText, self.getDescription() ) )
+		return node

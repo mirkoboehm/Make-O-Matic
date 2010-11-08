@@ -20,7 +20,6 @@
 from core.plugins.testers.Analyzer import Analyzer
 from core.helpers.TypeCheckers import check_for_path_or_none
 from core.actions.ShellCommandAction import ShellCommandAction
-from core.helpers.XmlUtils import create_child_node
 
 class TestProvider( Analyzer ):
 
@@ -39,8 +38,8 @@ class TestProvider( Analyzer ):
 	def getAction( self ):
 		return self.__action
 
-	def getReport( self ):
-		return None
+	def saveReport( self ):
+		raise NotImplementedError
 
 	def makeTestStep( self ):
 		"""Run tests for the project."""
@@ -57,12 +56,5 @@ class TestProvider( Analyzer ):
 		"""Setup is called after the test steps have been generated, and the command line 
 		options have been applied to them. It can be used to insert actions into the build
 		steps, for example."""
+
 		self.makeTestStep()
-
-	def getXmlTemplate( self, element, wrapper ):
-		return wrapper.wrap( "Report: {0}".format( element.find( "report" ).text ) )
-
-	def createXmlNode( self, document ):
-		node = Analyzer.createXmlNode( self, document )
-		create_child_node( document, node, "report", self.getReport() )
-		return node

@@ -83,6 +83,7 @@ class _PyLintCheckerAction( Action ):
 		return 0
 
 class PyLintChecker( Analyzer ):
+
 	def __init__( self, pyLintTool = None, pyLintRcFile = None, htmlOutputPath = None, modules = None, name = None ):
 		Analyzer.__init__( self, name )
 		self._setCommand( pyLintTool )
@@ -105,18 +106,6 @@ class PyLintChecker( Analyzer ):
 
 	def getPyLintRcFile( self ):
 		return self.__rcFile
-
-	def _setScore( self, score, top ):
-		self.__score = [ score, top ]
-
-	def getScore( self ):
-		return self.__score[0], self.__score[1]
-
-	def _setDescription( self, txt ):
-		self.__description = txt
-
-	def getDescription( self ):
-		return self.__description
 
 	def setHtmlOutputPath( self, path ):
 		check_for_path_or_none( path, 'The HTML output path must be a file system path!' )
