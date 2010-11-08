@@ -50,9 +50,13 @@ project.addPlugin( dox )
 # python3 = Configuration( 'Python 3', project )
 python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
 python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
-pylint = PyLintChecker( pyLintTool = 'pylint-2.6', pyLintRcFile = PathResolver( project.getSourceDir, 'pylintrc' ),
+
+pylint = PyLintChecker( pyLintTool = 'pylint-2.6',
+	pyLintRcFile = PathResolver( project.getSourceDir, 'pylintrc' ),
 	htmlOutputPath = PathResolver( project.getDocsDir, 'pylint.html' ),
-	modules = [ 'core', 'buildcontrol', 'tools', 'tests' ] )
+	modules = [ 'core', 'buildcontrol', 'tools', 'tests' ],
+	minimumScore = 7.5
+	)
 python26.addPlugin( pylint )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
