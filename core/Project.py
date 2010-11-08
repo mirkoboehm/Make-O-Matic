@@ -91,7 +91,7 @@ class Project( BuildInstructions ):
 		BuildInstructions.runSetups( self )
 		create = self.getStep( 'project-create-folders' )
 		delete = self.getStep( 'project-cleanup' )
-		for folder in ( self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
+		for folder in ( self.getDocsDir(), self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
 
