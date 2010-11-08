@@ -54,16 +54,10 @@ class _PyLintCheckerAction( Action ):
 		if runner1.getReturnCode() >= 32:
 			mApp().debugN( self, 2, 'error running pylint to produce the parseable report' )
 			return 1
-		lines = runner1.getStdOut()
-		rx = re.compile( 'rated at (.+?)/([\d.]+)(.*)', re.MULTILINE | re.DOTALL )
-		matches = rx.search( lines )
-		if matches and len( matches.groups() ) == 3:
-			score = float( matches.groups()[0] )
-			top = float( matches.groups()[1] )
-			description = re.sub( '\s+', ' ', matches.groups()[2].strip() )
-			self._getPyLintChecker()._setScore( score, top )
-			self._getPyLintChecker()._setDescription( description )
-			mApp().debugN( self, 2, 'pylint score is {0}/{1}: {2}.'.format( score, top, description ) )
+
+		# parse output
+		self._getPyLintChecker().parsePyLintOutput( runner1.getStdOut() )
+
 		# Second step, run pylint again, to produce the full HTML report:
 		if self._getPyLintChecker().getHtmlOutputPath():
 			htmlCommand = cmd + [ '--output-format=html' ] + args + self._getPyLintChecker().getModules()
@@ -106,6 +100,18 @@ class PyLintChecker( Analyzer ):
 
 	def getPyLintRcFile( self ):
 		return self.__rcFile
+
+	def parsePyLintOutput( self, output ):
+		rx = re.compile( 'rated at (.+?)/([\d.]+)(.*)', re.MULTILINE | re.DOTALL )
+		matches = rx.search( output )
+		if matches and len( matches.groups() ) == 3:
+			score = float( matches.groups()[0] )
+			top = float( matches.groups()[1] )
+			description = re.sub( '\s+', ' ', matches.groups()[2].strip() )
+
+			self._setScore( score, top )
+			self._setDescription( description )
+			mApp().debugN( self, 2, 'pylint score is {0}/{1}: {2}.'.format( score, top, description ) )
 
 	def setHtmlOutputPath( self, path ):
 		check_for_path_or_none( path, 'The HTML output path must be a file system path!' )
