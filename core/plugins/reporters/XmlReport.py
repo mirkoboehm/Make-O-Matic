@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import xml.dom.minidom
 from core.Instructions import Instructions
 import traceback
 from core.helpers.XmlUtils import create_exception_xml_node
 from core.helpers.GlobalMApp import mApp
+import xml.dom.minidom
 
 class XmlReport( object ):
 
@@ -31,7 +31,7 @@ class XmlReport( object ):
 		self.__doc = xml.dom.minidom.Document()
 
 	def getReport( self ):
-		return self.__doc.toxml()
+		return self.__doc.toxml( encoding = "utf-8" )
 
 	def prepare( self ):
 		# fetch exception if any from mApp

@@ -80,7 +80,7 @@ class XmlReportConverter( MObject ):
 		"""Converts the report to destinationFormat, which is one of the keys in XSL_STYLESHEETS"""
 
 		if destinationReportFormat == ReportFormat.XML:
-			return etree.tostring( self.__xml ) # no conversion
+			return etree.tostring( self.__xml, xml_declaration = True, encoding = "utf-8" ) # no conversion
 		elif destinationReportFormat == ReportFormat.HTML:
 			return self.convertToHtml()
 		elif destinationReportFormat == ReportFormat.TEXT:

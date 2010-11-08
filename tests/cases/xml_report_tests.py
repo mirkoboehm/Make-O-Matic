@@ -26,6 +26,7 @@ from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
+import os.path
 
 try:
 	from lxml import etree
@@ -97,6 +98,15 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		# TODO: Add more _useful_ tests
 		self.assertTrue( len( text ) > 1000 )
 
+	def testConvertXmlReportToTextSummary( self ):
+		MomBuildMockupTestCase.setUp( self, useScm = True ) # enable SCM
+		self._build()
+		converter = XmlReportConverter( self.getXmlReport() )
+		text = converter.convertToTextSummary()
+
+		# TODO: Add more useful tests
+		self.assertTrue( len( text ) > 100 )
+
 	def testXmlReportGenerator( self ):
 		generator = XmlReportGenerator()
 		self.build.addPlugin( generator )
@@ -105,7 +115,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		reportContent = self.getXmlReport().getReport()
 		filePath = generator.getReportFile()
 
-		self.assertNotEquals( filePath, None, "Log file does not exist" )
+		self.assertTrue( os.path.exists( filePath ), "Log file does not exist" )
 
 		# check file content
 		file = open( filePath )
