@@ -39,3 +39,15 @@ def create_exception_xml_node( document, exception, traceback ):
 		node.attributes["returncode"] = str( None )
 
 	return node
+
+def string_from_node_attribute( element, node, attribute ):
+	try:
+		return element.find( ".//{0}[@{1}]".format( node, attribute ) ).attrib[attribute]
+	except AttributeError:
+		return "N/A"
+
+def string_from_node( element, node ):
+	try:
+		return element.find( ".//{0}".format( node ) ).text
+	except AttributeError:
+		return "N/A"
