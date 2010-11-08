@@ -19,6 +19,9 @@
 
 from core.plugins.testers.TestProvider import TestProvider
 from core.plugins.builders.generators.CMakeBuilder import CMakeSearchPaths
+from core.actions.CallbackAction import CallbackAction
+from core.helpers.GlobalMApp import mApp
+import re
 
 class CTest( TestProvider ):
 
@@ -26,3 +29,27 @@ class CTest( TestProvider ):
 		TestProvider.__init__( self, name )
 		self._setCommand( "ctest", CMakeSearchPaths )
 		self._setTestArgument( "--verbose" )
+
+	def saveReport( self ):
+		mApp().debug( self, "Saving unit test report" )
+
+		stdout = self.getAction().getStdOut()
+		if not stdout:
+			return
+
+		rx = re.compile( "^(\d+\%) tests passed, (\d+) tests failed out of (\d+).*", re.MULTILINE | re.DOTALL )
+		matches = rx.search( stdout )
+		if matches:
+			report = "{0} tests passed".format( matches.groups()[0] )
+			failed = int ( matches.groups()[1] )
+			total = int( matches.groups()[2] )
+			self._setReport( report )
+			self._setScore( total - failed, total )
+
+	def setup( self ):
+		TestProvider.setup( self )
+
+		# set savereport callback
+		action = CallbackAction( self, CTest.saveReport )
+		step = self.getInstructions().getStep( 'conf-make-test' )
+		step.addPostAction( action )
