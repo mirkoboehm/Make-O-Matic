@@ -18,12 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Project import Project
 from core.plugins.sourcecode.SCMGit import SCMGit
-from core.Settings import Settings
 from core.Exceptions import ConfigurationError
-from core.Build import Build
-from tests.helpers.MomTestCase import MomTestCase
 from core.plugins.sourcecode import getScm
 from core.plugins.sourcecode.SCMSubversion import SCMSubversion
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase

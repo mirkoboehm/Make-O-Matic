@@ -18,9 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Project import Project
-from core.Settings import Settings
-from core.Build import Build
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
 class RunModePrintTests( MomBuildMockupTestCase ):
