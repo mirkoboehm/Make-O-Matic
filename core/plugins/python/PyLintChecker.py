@@ -91,7 +91,8 @@ class _PyLintCheckerAction( Action ):
 
 class PyLintChecker( Analyzer ):
 
-	def __init__( self, pyLintTool = None, pyLintRcFile = None, htmlOutputPath = None, modules = None, name = None, minimumScore = 0.0 ):
+	def __init__( self, pyLintTool = None, pyLintRcFile = None, htmlOutputPath = None,
+				modules = None, name = None, minimumScore = 0.0 ):
 		Analyzer.__init__( self, name )
 		self._setCommand( pyLintTool )
 		self.setModules( modules )

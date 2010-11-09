@@ -37,7 +37,8 @@ class SCMSubversion( SourceCodeProvider ):
 		searchPaths = []
 		if sys.platform == "win32":
 			from core.helpers.RegistryHelper import getPathsFromRegistry
-			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\CollabNet Subversion Client\\UninstallString" ]
+			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
+				+ "\\Uninstall\\CollabNet Subversion Client\\UninstallString" ]
 			searchPaths += getPathsFromRegistry( keys, ".." )
 		self._setCommand( "svn", searchPaths )
 		self.__revisionInfoCache = {} # key: revision, value: RevisionInfo instance

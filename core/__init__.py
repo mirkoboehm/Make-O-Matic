@@ -32,7 +32,8 @@ def check_python_version():
 		if detectedMajor == requiredMajor and detectedMinor >= requiredMinor:
 			return
 	# use old syntax :-) :
-	print( 'This Python interpreter is too old. Despite the beautiful plumage, it is almost deceased. Required version: ' + str( requiredMajor )
+	print( 'This Python interpreter is too old. Despite the beautiful plumage, it is almost deceased. ' +
+			'Required version: ' + str( requiredMajor )
 			+ '.' + str( requiredMinor )
 			+ '. Detected version: ' + str( detectedMajor )
 			+ '.' + str( detectedMinor )

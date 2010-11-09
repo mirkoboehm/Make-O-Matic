@@ -37,7 +37,8 @@ class PreprocessorTest( MomTestCase ):
 	def testinputStringWithoutPlaceholders( self ):
 		inputString = 'hello world'
 		outputString = inputString
-		self._runTest( inputString, outputString, 'A line without any replacement place holders should return the input string unchanged' )
+		self._runTest( inputString, outputString,
+			'A line without any replacement place holders should return the input string unchanged' )
 
 	def testEscapePattern( self ):
 		inputString = '@@(@@)'

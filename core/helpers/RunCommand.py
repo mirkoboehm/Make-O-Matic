@@ -185,7 +185,8 @@ class RunCommand( MObject ):
 				if os.path.exists( extraPath ):
 					paths.append( extraPath )
 				else:
-					raise ConfigurationError( "RunCommand::resolveCommand: Can't find extra PATH '{0}' appended in configuration.".format( extraPath ) )
+					raise ConfigurationError( "RunCommand::resolveCommand: Can't find extra PATH '{0}' appended in configuration."
+											.format( extraPath ) )
 
 		#paths = []
 		for path in paths:
@@ -250,7 +251,8 @@ class RunCommand( MObject ):
 		combinedOutputString = 'and separate output for stdout and stderr'
 		if self.getCombineOutput():
 			combinedOutputString = 'and combined stdout and stderr output'
-		mApp().debugN( self, 4, 'executing "{0}" {1} {2}'.format( ' '.join( self.getCommand() ), timeoutString, combinedOutputString ) )
+		mApp().debugN( self, 4, 'executing "{0}" {1} {2}'.format( ' '.join( self.getCommand() ),
+			timeoutString, combinedOutputString ) )
 		runner = _CommandRunner ( self )
 		runner.setCombineOutput( self.getCombineOutput() )
 		runner.start()
@@ -266,5 +268,6 @@ class RunCommand( MObject ):
 			runner.join( 5 )
 			self.__timedOut = True
 		timeoutString = "timed out" if self.getTimedOut() else "completed"
-		mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( ' '.join( self.getCommand() ), timeoutString, str( self.getReturnCode() ) ) )
+		mApp().debugN( self, 3, '"{0}" {1}, return code is {2}'.format( ' '.join( self.getCommand() ),
+			timeoutString, str( self.getReturnCode() ) ) )
 		return self.getReturnCode()
