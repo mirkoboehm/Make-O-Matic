@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.w3.org/1999/xhtml">
 
@@ -70,7 +70,7 @@ th {
 					Build Status:
 					<xsl:choose>
 						<xsl:when test="@returncode = 0">
-							<span class="neutral">SUCCESS</span>
+							<span class="success">SUCCESS</span>
 						</xsl:when>
 						<xsl:when test="@returncode = 1">
 							<span class="fail">Build error</span>
@@ -135,13 +135,10 @@ th {
 
 	<xsl:template match="plugin">
 		<h4>Plugin: <xsl:value-of select="@name" /></h4>
+		<xsl:value-of select="pluginDescription"/>
 		<xsl:choose>
 			<!-- Plugin templates are inserted here -->
 			<xsl:when test="@name = 'placeholder'" />
-
-			<xsl:otherwise>
-				No information about this plugin
-			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
 

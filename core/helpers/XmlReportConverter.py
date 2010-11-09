@@ -90,8 +90,11 @@ class XmlReportConverter( MObject ):
 		"""Load stylesheets from XSL_STYLESHEETS into memory"""
 
 		for key, value in self.XSL_STYLESHEETS.items():
-			f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
-			self.__xslTemplateSnippets[key] = etree.XML( f.read() )
+			try:
+				f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
+				self.__xslTemplateSnippets[key] = etree.XML( f.read() )
+			except:
+				raise MomError( "XSL Stylesheet missing: {0}".format( value ) )
 
 	def _fetchTemplates( self, instructions ):
 		"""Fetches templates from all registered plugins in the Instruction object
