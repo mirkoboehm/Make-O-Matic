@@ -121,12 +121,12 @@ class XmlReportConverter( MObject ):
 		Merges templates from plugins into the stylesheets provided by XSL_STYLESHEETS."""
 
 		# iterate trough the dict from getXslTemplates(), add each template to the corresponding stylesheet
-		for conversionType, markup in plugin.getXslTemplates().items():
-			if not conversionType in self.__xslTemplateSnippets.keys():
+		for destinationReportFormat, markup in plugin.getXslTemplates().items():
+			if not destinationReportFormat in self.__xslTemplateSnippets.keys():
 				continue # invalid key, no stylesheet registered for that type of XSL
 
 			# search for place to register new plugin templates
-			stylesheet = self.__xslTemplateSnippets[conversionType]
+			stylesheet = self.__xslTemplateSnippets[destinationReportFormat]
 			pluginTemplate = stylesheet.find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
 			placeholder = pluginTemplate.find( "{http://www.w3.org/1999/XSL/Transform}choose" )
 
@@ -149,6 +149,19 @@ class XmlReportConverter( MObject ):
 
 		functionPointer = plugin.getXmlTemplate
 		self.__xmlTemplateFunctions[plugin.getName()] = functionPointer
+
+	def getXslTemplate( self, destinationReportFormat ):
+		"""Get the current (modified) XSL stylesheet for the requested format
+
+		\return A etree.Element object or None
+
+		\note May return None if format has no XSL stylesheet associated"""
+
+		# text and XML report format do not have a XSL stylesheet, return None
+		if not destinationReportFormat in self.__xslTemplateSnippets:
+			return None
+
+		return self.__xslTemplateSnippets[destinationReportFormat]
 
 	def convertToHtml( self ):
 		"""Converts the report to HTML using the XSL stylesheet for HTML"""
