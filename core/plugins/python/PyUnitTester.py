@@ -22,7 +22,6 @@ from core.plugins.python.PythonConfiguration import PythonConfiguration
 from core.Exceptions import MomError, ConfigurationError
 from core.helpers.TypeCheckers import check_for_path
 import re
-from core.actions.CallbackAction import CallbackAction
 from core.helpers.GlobalMApp import mApp
 
 class PyUnitTester( TestProvider ):
