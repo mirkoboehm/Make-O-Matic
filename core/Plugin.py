@@ -156,7 +156,7 @@ class Plugin( MObject ):
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
-		create_child_node( document, node, "pluginDescription", str( self.getDescription() ) )
+		create_child_node( document, node, "plugindescription", str( self.getDescription() ) )
 		return node
 
 	def getXmlTemplate( self, element, wrapper ):

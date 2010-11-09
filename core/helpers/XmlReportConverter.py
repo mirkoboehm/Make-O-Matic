@@ -236,7 +236,7 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "plugin":
 			name = element.attrib["name"]
-			description = element.find( "pluginDescription" ).text
+			description = element.find( "plugindescription" ).text
 
 			if description is not None:
 				out += wrapper.wrap( "{0}: {1}".format( name, description ) )
