@@ -27,6 +27,7 @@ from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 import os.path
+from core.helpers.XmlUtils import xml_compare
 
 try:
 	from lxml import etree
@@ -122,7 +123,15 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		fileContent = file.read()
 		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
 
-		self.assertEqual( fileContent, reportContent, "Report file content not written correctly" )
+#		f1 = open( "/tmp/workfile1", 'w' )
+#		f2 = open( "/tmp/workfile2", 'w' )
+#		f1.write( reportContent )
+#		f2.write( fileContent )
+
+		doc1 = etree.XML( reportContent )
+		doc2 = etree.XML( fileContent )
+
+		self.assertTrue( xml_compare( doc1, doc2 ), "Report file content differs from report output" )
 
 	def testXmlReportOnException( self ):
 		# Covers runSetups phase
