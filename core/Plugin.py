@@ -29,11 +29,23 @@ class Plugin( MObject ):
 	Plugins implement specific functionality, for example to integrate a tool like Doxygen into the build script run.
 	They encapsulate all the integration code for a specific purpose,
 	so that build scripts are modular and only check for the tools that are required for the build.
-	
+
+	\section additional Additional information
 	Plugins are added to instruction objects. Some plugins are specific to Build, Project, or Configuration instructions objects.
-	
+
 	The execution during a build run is split into several phases, see Build documentation
-	"""
+
+	\section reports Reporting functionality
+	Each plugin can provide a short textual description which is shown in all report formats
+	\see getDescription
+
+	\subsection plain-text Plain text
+	Each plugin can register its own templating function which will be shown in the plain text output
+	\see getXmlTemplate
+
+	\subsection others Others
+	Each plugin can register its own XSL templates using the following functions
+	\see getXslTemplates"""
 
 	def __init__( self, name = None ):
 
@@ -120,7 +132,7 @@ class Plugin( MObject ):
 		
 		It could be used to close files or network connections.
 		
-		@note shutDown() is called from the finally block of the build method, so in all normal cases, it will be called 
+		\note shutDown() is called from the finally block of the build method, so in all normal cases, it will be called 
 		before the build script ends."""
 
 		pass
@@ -149,8 +161,9 @@ class Plugin( MObject ):
 		return self.__optional
 
 	def getDescription( self ):
-		'''Describe the results in human readable text. 
-		Returns None if the result cannot be described.'''
+		'''Returns the plugin results in human readable text.
+
+		\return A string representing the plugin's short description. May be empty if not implemented.'''
 
 		return ""
 
@@ -162,10 +175,10 @@ class Plugin( MObject ):
 	def getXmlTemplate( self, element, wrapper ):
 		"""Returns a string representing the information about this plugin
 		
-		Parameter element is an instance of Element,
-		parameter wrapper an instance of textwrap.TextWrapper
+		\param element is an instance of Element,
+		\param wrapper an instance of textwrap.TextWrapper
 		
-		Overwrite if necessary, returns None by default"""
+		\note Overwrite if necessary, returns None by default"""
 
 		# pylint: disable-msg=W0613
 
@@ -174,7 +187,7 @@ class Plugin( MObject ):
 	def getXslTemplates( self ):
 		"""Returns a dict of XML templates for this plugin. See ConsoleLogger method overwrite for example.
 		
-		Overwrite if necessary, returns an empty dict by default"""
+		\note Overwrite if necessary, returns an empty dict by default"""
 
 		return {}
 

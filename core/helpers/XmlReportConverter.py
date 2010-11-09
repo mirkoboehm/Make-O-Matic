@@ -58,9 +58,15 @@ class _MyTextWrapper( TextWrapper ):
 		return out
 
 class XmlReportConverter( MObject ):
-	"""Converts a XmlReport instance to HTML, plain text and maybe others"""
+	"""Converts a XmlReport instance to HTML, plain text and maybe others
 
-	XSL_STYLESHEETS = {
+	This is done in multiple ways at the moment
+	\li XML: No actions required
+	\li Plain text: Deserialize the XML content, generate text output using the lxml classes
+	\li others: Use XSL stylesheets to convert XML to the desired format.
+	"""
+
+	_XSL_STYLESHEETS = {
 		ReportFormat.HTML : "xmlreport2html.xsl",
 	}
 
@@ -77,7 +83,7 @@ class XmlReportConverter( MObject ):
 		self._fetchTemplates( mApp() )
 
 	def convertTo( self, destinationReportFormat ):
-		"""Converts the report to destinationFormat, which is one of the keys in XSL_STYLESHEETS"""
+		"""Converts the report to destinationFormat, which is one of the keys in _XSL_STYLESHEETS"""
 
 		if destinationReportFormat == ReportFormat.XML:
 			return etree.tostring( self.__xml, xml_declaration = True, encoding = "utf-8" ) # no conversion
@@ -87,9 +93,9 @@ class XmlReportConverter( MObject ):
 			return self.convertToText()
 
 	def _initializeXslTemplates( self ):
-		"""Load stylesheets from XSL_STYLESHEETS into memory"""
+		"""Load stylesheets from _XSL_STYLESHEETS into memory"""
 
-		for key, value in self.XSL_STYLESHEETS.items():
+		for key, value in self._XSL_STYLESHEETS.items():
 			try:
 				f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
 				self.__xslTemplateSnippets[key] = etree.XML( f.read() )

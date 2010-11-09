@@ -24,6 +24,9 @@ from core.helpers.GlobalMApp import mApp
 import xml.dom.minidom
 
 class XmlReport( object ):
+	"""Represents an report of the current build
+
+	\see Plugin for more information about extending the default report output"""
 
 	def __init__( self, instructions ):
 		assert isinstance( instructions, Instructions )
