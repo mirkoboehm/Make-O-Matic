@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 from core.MApplication import MApplication
 from core.Project import Project
@@ -26,6 +27,7 @@ from core.helpers.MachineInfo import machine_info
 from core.helpers.GlobalMApp import mApp
 import time
 import shutil
+import sys
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -155,6 +157,7 @@ class Build( MApplication ):
 	def run( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
 			self.describeRecursively()
+			sys.stdout.flush() # required, do not remove
 			os._exit( 0 )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
 			MApplication.run( self )
