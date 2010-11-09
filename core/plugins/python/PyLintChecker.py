@@ -25,6 +25,7 @@ from core.actions.Action import Action
 from core.helpers.RunCommand import RunCommand
 import re
 from core.helpers.GlobalMApp import mApp
+import os
 
 class _PyLintCheckerAction( Action ):
 	'''_PyLintCheckerAction executes PyLint and parses it's output'''
@@ -32,6 +33,7 @@ class _PyLintCheckerAction( Action ):
 	def __init__( self, pyLintChecker ):
 		Action.__init__( self )
 		self.__pyLintChecker = pyLintChecker
+		self.setIgnorePreviousFailure( True )
 
 	def getLogDescription( self ):
 		return '{0}'.format( self.getName() )
@@ -47,6 +49,13 @@ class _PyLintCheckerAction( Action ):
 		if self._getPyLintChecker().getPyLintRcFile():
 			args.append( '--rcfile={0}'.format( self._getPyLintChecker().getPyLintRcFile() ) )
 
+		# Check if the source and output path exist, since this action will be executed even if there was an error before (since 
+		# the source code can be checked even if, for example, a unit test failed)
+		targetPath = os.path.dirname( str( self._getPyLintChecker().getHtmlOutputPath() ) )
+		if not os.path.isdir( targetPath ) \
+			or not os.path.isdir( str( self.getWorkingDirectory() ) ):
+			self._getPyLintChecker().setReport( 'not executed because of previous failures' )
+			return 0
 		# First, run PyLint with parseable output, and retrieve the score and comment:
 		parseableCommand = cmd + [ '--output-format=parseable' ] + args + self._getPyLintChecker().getModules()
 		runner1 = RunCommand( parseableCommand, 1800 )
