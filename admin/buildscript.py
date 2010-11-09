@@ -49,7 +49,7 @@ project.addPlugin( dox )
 # set up configurations:
 # python3 = Configuration( 'Python 3', project )
 python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
-python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
+python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite_selftest.py' ) ) ) )
 
 pylint = PyLintChecker( pyLintTool = 'pylint-2.6',
 	pyLintRcFile = PathResolver( project.getSourceDir, 'pylintrc' ),
