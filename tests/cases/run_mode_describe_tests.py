@@ -19,10 +19,10 @@
 
 import unittest
 import os
-from core.helpers.RunCommand import RunCommand
 from tests.helpers.DirectoryCompare import DirectoryCompare
 import sys
 from tests.helpers.MomTestCase import MomTestCase
+from subprocess import Popen, PIPE
 
 class RunModeDescribeTests( MomTestCase ):
 
@@ -31,15 +31,16 @@ class RunModeDescribeTests( MomTestCase ):
 
 	def testDescribe( self ):
 		with DirectoryCompare( os.getcwd() ):
-			runner = RunCommand( [ sys.executable, self._BUILDSCRIPT, '-t', 'M', 'describe' ] )
-			runner.run()
+			process = Popen( [ sys.executable, self._BUILDSCRIPT, '-t', 'M', 'describe' ], stdout = PIPE, stderr = PIPE )
+			stdout, stderr = process.communicate()
+			returncode = process.wait()
 
-			self.assertTrue( runner.getReturnCode() == 0,
+			self.assertTrue( returncode == 0,
 					'The example charm build script fails to execute in describe mode: {0} {1}'
-						.format( runner.getStdOut(), runner.getStdErr() ) )
+						.format( stdout, stderr ) )
 
 			# describe output should be somewhat lengthy, check this
-			self.assertTrue( len( runner.getStdOut() ) > 100, "Output is too short" )
+			self.assertTrue( len( stdout ) > 100, "Output is too short" )
 
 if __name__ == "__main__":
 	unittest.main()
