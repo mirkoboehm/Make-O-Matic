@@ -18,26 +18,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.Settings import Settings
 import os
 from core.helpers.RunCommand import RunCommand
 from tests.helpers.DirectoryCompare import DirectoryCompare
 import sys
-from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
+from tests.helpers.MomTestCase import MomTestCase
 
-class RunModeDescribeTests( MomBuildMockupTestCase ):
+class RunModeDescribeTests( MomTestCase ):
 
-	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
-	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_charm.py' )
-
-	def setUp( self ):
-		MomBuildMockupTestCase.setUp( self )
-
-		self.build.getSettings().set( Settings.ScriptLogLevel, 3 )
+	_THISFILEPATH = os.path.realpath( os.path.dirname( __file__ ) )
+	_BUILDSCRIPT = os.path.join( _THISFILEPATH, '..', 'buildscripts', 'example_charm.py' )
 
 	def testDescribe( self ):
 		with DirectoryCompare( os.getcwd() ):
-			runner = RunCommand( [ sys.executable, self.BuildScriptName, '-t', 'M', 'describe' ] )
+			runner = RunCommand( [ sys.executable, self._BUILDSCRIPT, '-t', 'M', 'describe' ] )
 			runner.run()
 
 			self.assertTrue( runner.getReturnCode() == 0,
@@ -49,4 +43,3 @@ class RunModeDescribeTests( MomBuildMockupTestCase ):
 
 if __name__ == "__main__":
 	unittest.main()
-
