@@ -42,7 +42,10 @@ class _PyLintCheckerAction( Action ):
 		return self.__pyLintChecker
 
 	def run( self ):
-		"""Executes the shell command. Needs a command to be set."""
+		"""Executes the shell command. Needs a command to be set.
+
+		\return 0 if minimum score is met, otherwise 1"""
+
 		cmd = [ self._getPyLintChecker().getCommand() ]
 
 		args = [ ]
@@ -83,7 +86,8 @@ class _PyLintCheckerAction( Action ):
 			except IOError as e:
 				mApp().debug( self, 'ERROR saving pylint html report to "{0}": {1}'.format( path, e ) )
 				return 1
-		return 0
+
+		return ( 0 if self._getPyLintChecker().isScoreOkay() else 1 )
 
 class PyLintChecker( Analyzer ):
 
@@ -116,16 +120,22 @@ class PyLintChecker( Analyzer ):
 		return self.__rcFile
 
 	def parsePyLintOutput( self, output ):
+		"""Parse PyLint output, save score and description"""
+
 		rx = re.compile( 'rated at (.+?)/([\d.]+)(.*)', re.MULTILINE | re.DOTALL )
 		matches = rx.search( output )
 		if matches and len( matches.groups() ) == 3:
 			score = float( matches.groups()[0] )
 			top = float( matches.groups()[1] )
-			report = "score okay." if score > self.getMinimumScore() else "score NOT okay!"
-
 			self._setScore( score, top )
+
+			report = "score okay." if self.isScoreOkay() else "score NOT okay!"
 			self._setReport( report )
+
 			mApp().debugN( self, 2, 'pylint score is {0}/{1}: {2}.'.format( score, top, report ) )
+
+	def isScoreOkay( self ):
+		return ( self.getScore()[0] >= self.getMinimumScore() )
 
 	def setHtmlOutputPath( self, path ):
 		check_for_path_or_none( path, 'The HTML output path must be a file system path!' )
