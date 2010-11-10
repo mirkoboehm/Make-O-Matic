@@ -133,6 +133,20 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		self.assertTrue( xml_compare( doc1, doc2 ), "Report file content differs from report output" )
 
+	def testXmlReportOnStepFailure( self ):
+		self._build()
+
+		def failed_new():
+			return True
+
+		step = self.project.getStep( 'project-cleanup' )
+		step.failed = failed_new
+
+		converter = XmlReportConverter( self.getXmlReport() )
+		logText = converter.convertToFailedStepsLog()
+
+		self.assertTrue( "project-cleanup" in logText )
+
 	def testXmlReportOnException( self ):
 		# Covers runSetups phase
 

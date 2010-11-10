@@ -151,8 +151,11 @@ class EmailReporter( Reporter ):
 			email.addTextPart( converter.convertToTextSummary() )
 			email.addTextPart( converter.convertToText( short = True ) )
 
+		# attachments
 		exception = mApp().getException()
 		if exception:
 			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], exception[1] ), "build.log" )
+		elif returnCode != 0:
+			email.addTextAttachment( converter.convertToFailedStepsLog(), "failed-steps.log" )
 
 		return email

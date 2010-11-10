@@ -207,6 +207,31 @@ class XmlReportConverter( MObject ):
 
 		return "\n".join( out )
 
+	def convertToFailedStepsLog( self ):
+		# no wrapper needed
+
+		out = []
+		element = self.__xml
+
+		failedSteps = element.findall( './/step[@failed="True"]' )
+		for step in failedSteps:
+			out += ["*** Step failed: {0} ***".format( step.attrib["name"] )]
+
+			failedActions = step.findall( 'action' )
+			for action in failedActions:
+				if action.attrib["returncode"] == "0":
+					continue # do not show successful actions
+
+				out += ["* Action: {0} *".format( action.find( "logdescription" ).text )]
+				out += ["STDOUT:"]
+				out += [action.find( "stdout" ).text]
+				out += ["STDERR:"]
+				out += [action.find( "stderr" ).text]
+				out += " "
+			out += " "
+
+		return "\n".join( out )
+
 	def _toText( self, element, wrapper, ignoredTags ):
 		"""Recursive method for parsing an ElementTree and converting it to plain text"""
 
