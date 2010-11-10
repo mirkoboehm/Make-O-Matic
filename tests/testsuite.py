@@ -40,6 +40,7 @@ from tests.cases.run_mode_describe_tests import RunModeDescribeTests
 from tests.cases.settings_tests import SettingsTests
 from tests.selftest.environment_setup_tests import EnvironmentSetupTests
 import sys
+from tests.cases.pyunittester_tests import PyUnitTesterTest
 
 CLASSES = [
 	# self tests first
@@ -57,6 +58,7 @@ CLASSES = [
 	EnvironmentSaverTest,
 	PathResolverTest,
 	PreprocessorTest,
+	PyUnitTesterTest,
 	RunModePrintTests,
 	RunModeDescribeTests,
 	RunWithTimeoutTest,

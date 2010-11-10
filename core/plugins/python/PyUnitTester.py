@@ -41,7 +41,9 @@ class PyUnitTester( TestProvider ):
 	def saveReport( self ):
 		mApp().debug( self, "Saving unit test report" )
 
-		stdout = self.getAction().getStdOut()
+		self.parseOutput( self.getAction().getStdOut() )
+
+	def parseOutput( self, stdout ):
 		if not stdout:
 			return
 
@@ -52,20 +54,24 @@ class PyUnitTester( TestProvider ):
 		rx = re.compile( 'Ran (\d+) test(s|) in.*', re.MULTILINE | re.DOTALL )
 		matches = rx.search( stdout )
 		if matches:
-			top = int( matches.groups()[0] )
+			total = int( matches.groups()[0] )
 
 		# get report and number of failed tests
-		rx = re.compile( 'FAILED \(failures=(\d+)\)', re.MULTILINE | re.DOTALL )
+		rx = re.compile( 'FAILED \(\w+=(\d+)(.+=(\d+)|)\)', re.MULTILINE | re.DOTALL )
 		matches = rx.search( stdout )
 		if matches:
+			failedTests = int( matches.groups()[0] )
+			if matches.groups()[2] != None: # ",errors" is suffixed, add value
+				failedTests += int( matches.groups()[2] )
+
 			report = "tests FAILED."
-			score = top - int( matches.groups()[0] )
+			score = total - failedTests
 		else:
 			report = "tests succeeded."
-			score = top
+			score = total
 
 		self._setReport( report )
-		self._setScore( score, top )
+		self._setScore( score, total )
 
 	def performPreFlightCheck( self ):
 		# check if instructions object is of correct type
