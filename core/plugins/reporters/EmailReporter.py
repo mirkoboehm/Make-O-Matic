@@ -148,8 +148,10 @@ class EmailReporter( Reporter ):
 		if reporterEnableHtml:
 			email.addHtmlPart( converter.convertToHtml() )
 		else:
-			email.addTextPart( converter.convertToTextSummary() )
-			email.addTextPart( converter.convertToText( short = True ) )
+			email.addTextPart( "{0}\n{1}".format( 
+				converter.convertToTextSummary(),
+				converter.convertToText( short = True ) )
+			)
 
 		# attachments
 		exception = mApp().getException()
