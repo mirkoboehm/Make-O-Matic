@@ -154,8 +154,8 @@ class EmailReporter( Reporter ):
 		# attachments
 		exception = mApp().getException()
 		if exception:
-			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], exception[1] ), "build.log" )
+			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], exception[1] ), "build.log", useCompression = True )
 		elif returnCode != 0:
-			email.addTextAttachment( converter.convertToFailedStepsLog(), "failed-steps.log" )
+			email.addTextAttachment( converter.convertToFailedStepsLog(), "failed-steps.log", useCompression = True )
 
 		return email

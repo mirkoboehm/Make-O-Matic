@@ -26,6 +26,9 @@ from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
 from email.utils import COMMASPACE
 from email.header import Header
+from email.mime.base import MIMEBase
+import bz2
+from email import Encoders
 
 class Email( MObject ):
 	""" Convenience class for sending Emails
@@ -76,9 +79,15 @@ class Email( MObject ):
 	def getSubject( self ):
 		return str( self._getMessage()['Subject'] )
 
-	def addTextAttachment( self, text, filename ):
-		part = MIMEText( 'plain' )
-		part.set_payload( text )
+	def addTextAttachment( self, text, filename, useCompression = False ):
+		if useCompression:
+			part = MIMEBase( 'application', 'bzip2' )
+			part.set_payload( bz2.compress( text ) )
+			Encoders.encode_base64( part )
+			filename += ".bz2"
+		else:
+			part = MIMEText( 'plain' )
+			part.set_payload( text )
 		part.add_header( 'Content-Disposition', 'attachment; filename={0}'.format( filename ) )
 		self._getMessage().attach( part )
 

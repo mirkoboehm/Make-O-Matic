@@ -22,20 +22,28 @@ from tests.helpers.MomTestCase import MomTestCase
 import unittest
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
+import os
+import sys
 
 class EmailerTest( MomTestCase ):
 	'''This test is not part of the test suite, because it will only succeed if an email server is configured properly.'''
 
+
 	def testSendEmail( self ):
-		mApp().getSettings().set( Settings.EmailerSmtpServer, 'mail.kdab.com' )
+		# force loading settings from configuration files
+		mApp().getSettings().evalConfigurationFiles()
+
 		email = Email()
-		email.setFromAddress( 'mirko@kdab.com' )
-		email.setToAddresses( 'mirko@kdab.com' )
-		email.setSubject( 'Build report for {0}, revision {1}'.format( '<Project>', '<4711>' ) )
+		email.setToAddresses( ['kevin.funk@kdab.com'] )
+		email.setFromAddress( mApp().getSettings().get( Settings.EmailReporterSender ) )
+
+		email.setSubject( 'EmailerTest email' )
+
 		email.addTextPart( '''\
 This is a test email sent by Make-O-Matic.
 Check it out at http://github.com/KDAB/Make-O-Matic
 ''' )
+
 		email.addHtmlPart( """\
 		<html>
 			<head>Make-O-Matic Test Email</head>
@@ -46,6 +54,11 @@ Check it out at http://github.com/KDAB/Make-O-Matic
 			</body>
 		</html>
 		""" )
+
+		attachmentText = "TEST:\n" + "\n".join( sys.path )
+		email.addTextAttachment( attachmentText, "testfile1.txt", False )
+		email.addTextAttachment( attachmentText, "testfile2.txt", True )
+
 		e = Emailer( 'Emailer' )
 		try:
 			e.setup()
