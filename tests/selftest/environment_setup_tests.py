@@ -21,11 +21,13 @@ import os
 import unittest
 from tests.helpers.MomTestCase import MomTestCase
 from core.MomSetup import mom_root_dir
+import sys
 
 class EnvironmentSetupTests( MomTestCase ):
 
 	def _getPathPosition( self, path ):
-		normalizedPathList = [os.path.abspath( x ) for x in os.environ["PYTHONPATH"].split( ':' )]
+		normalizedPathList = [os.path.abspath( x ) for x in sys.path]
+
 		return normalizedPathList.index( path )
 
 	def testIfTestEnvironmentVariableIsSet( self ):
@@ -37,7 +39,7 @@ class EnvironmentSetupTests( MomTestCase ):
 
 		pos1 = self._getPathPosition( momDirectory )
 		pos2 = self._getPathPosition( mom_root_dir() )
-		self.assertTrue( pos1 <= pos2, "We are using the wrong MOM modules! PYTHONPATH: {0}".format( os.environ["PYTHONPATH"] ) )
+		self.assertTrue( pos1 <= pos2, "We are using the wrong MOM modules! sys.path returns: {0}".format( sys.path ) )
 
 if __name__ == "__main__":
 	unittest.main()

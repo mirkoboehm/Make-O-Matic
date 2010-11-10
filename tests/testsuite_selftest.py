@@ -20,14 +20,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import sys
 
 def main():
 	filePath = os.path.realpath( os.path.dirname( __file__ ) )
 	momDirectory = os.path.abspath( os.path.join( filePath, '..' ) )
 
-	os.environ["PYTHONPATH"] = momDirectory
-	print "Using PYTHONPATH: {0}".format( os.environ["PYTHONPATH"] )
+	sys.path.insert( 0, momDirectory )
+	print "Using sys.path: {0}".format( sys.path )
 
+	# important: import testsuite after modifing sys.path to load the correct module!
 	import testsuite
 	testsuite.main()
 
