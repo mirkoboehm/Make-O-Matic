@@ -69,8 +69,12 @@ CLASSES = [
 def main():
 	suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
 	result = unittest.TextTestRunner( verbosity = 2 ).run( suite )
-	print result.wasSuccessful()
-	sys.exit( 0 if result.wasSuccessful() else 1 )
+	if result.wasSuccessful():
+		print( 'Tests completed successfully.' )
+		sys.exit( 0 )
+	else:
+		print( 'Tests failed.' )
+		sys.exit( 1 )
 
 if __name__ == "__main__":
 	main()
