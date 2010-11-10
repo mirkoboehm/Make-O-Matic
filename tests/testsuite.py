@@ -69,6 +69,8 @@ CLASSES = [
 def main():
 	suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
 	result = unittest.TextTestRunner( verbosity = 2 ).run( suite )
+	sys.stderr.flush()
+	sys.stdout.flush()
 	if result.wasSuccessful():
 		print( 'Tests completed successfully.' )
 		sys.exit( 0 )
