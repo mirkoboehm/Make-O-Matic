@@ -19,9 +19,23 @@
 
 from datetime import datetime
 
+def time_format():
+	return "%a, %d %b %Y %H:%M:%S +0000"
+
+def string_to_datetime( dateString ):
+	try:
+		datetimeObj = datetime.strptime( dateString, time_format() )
+	except ValueError:
+		return None
+
+	if datetimeObj < datetime.min:
+		return None
+
+	return datetimeObj
+
 def formatted_time( datetimeObj ):
 	try:
-		text = datetimeObj.strftime( "%a, %d %b %Y %H:%M:%S +0000" )
+		text = datetimeObj.strftime( time_format() )
 	except Exception:
 		text = datetimeObj
 	return text

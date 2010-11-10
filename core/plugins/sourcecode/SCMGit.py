@@ -93,7 +93,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def getRevisionInfo( self ):
 		sep = chr( 0x0A ) + chr( 0x03 ) # use some ASCII codes as separator, to avoid clashes in commit messages
-		formatStr = "%cn{0}%ce{0}%s{0}%ci{0}%H{0}%h".format( sep )
+		formatStr = "%cn{0}%ce{0}%s{0}%ct{0}%ci{0}%H{0}%h".format( sep )
 
 		revision = self.getRevision() or 'HEAD'
 		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), '{0}^..{0}'.format( revision )]
@@ -109,8 +109,9 @@ class SCMGit( SourceCodeProvider ):
 			info.committerEmail = infos[1]
 			info.commitMessage = infos[2]
 			info.commitTime = infos[3]
-			info.revision = infos[4]
-			info.shortRevision = infos[5]
+			info.commitTimeReadable = infos[4]
+			info.revision = infos[5]
+			info.shortRevision = infos[6]
 		else:
 			raise ConfigurationError( 'Cannot get log for the clone of "{0}" at "{1}"'
 				.format( self.getUrl(), self._getHiddenClonePath() ) )

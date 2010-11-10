@@ -32,5 +32,6 @@ class RevisionInfo( MObject ):
 		self.committerName = None
 		self.committerEmail = None
 		self.commitTime = None
+		self.commitTimeReadable = None
 		self.commitMessage = None
 

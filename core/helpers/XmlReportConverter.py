@@ -22,7 +22,9 @@ from core.Exceptions import ConfigurationError, MomError, returncode_to_descript
 from core.helpers.GlobalMApp import mApp
 from core.MObject import MObject
 from textwrap import TextWrapper
-from core.helpers.XmlUtils import string_from_node_attribute, string_from_node
+from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute
+from core.helpers.TimeKeeper import formatted_time, string_to_datetime, formatted_time_delta
+from datetime import datetime
 
 try:
 	from lxml import etree
@@ -192,12 +194,20 @@ class XmlReportConverter( MObject ):
 
 		element = self.__xml
 
+		# calculate round trip time from commit to report
+		startTime = float_from_node_attribute( element, "plugin", "commitTime" )
+		if startTime > 0:
+			roundTripTime = formatted_time_delta( datetime.utcnow() - datetime.utcfromtimestamp( startTime ) )
+		else:
+			roundTripTime = "N/A"
+
 		out = []
 		out += wrapper.wrap( "*" * wrapper.width )
 		out += wrapper.wrap( "Summary of the {0} Build Report".format( self.__xml.attrib["name"] ) )
 		out += " "
 		out += wrapper.wrap( "  Build status:   {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
 		out += wrapper.wrap( "  Build time:     {0}".format( string_from_node_attribute( element, "project", "timing" ) ) )
+		out += wrapper.wrap( "  Report delay:   {0} after commit".format( roundTripTime ) )
 		out += " "
 		out += wrapper.wrap( "  Revision:       {0}".format( string_from_node_attribute( element, "plugin", "revision" ) ) )
 		out += wrapper.wrap( "  Commit message: {0}".format( string_from_node( element, "commitMessage" ) ) )

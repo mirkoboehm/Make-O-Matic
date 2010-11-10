@@ -28,6 +28,7 @@ import os
 import tempfile
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import sys
+from core.helpers.TimeKeeper import formatted_time
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -65,7 +66,7 @@ class SCMSubversion( SourceCodeProvider ):
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			assert len( logentries ) == 1
 			results = parse_log_entry( logentries[0] )
-			( info.committerName, info.commitMessage, info.revision, info.commitTime ) = results
+			( info.committerName, info.commitMessage, info.revision, info.commitTime, info.commitTimeReadable ) = results
 		else:
 			raise ConfigurationError( 'cannot get log for "{0}"'
 				.format( self.getUrl() ) )
@@ -168,9 +169,9 @@ def parse_log_entry( logentry ):
 			pass
 
 	# now turn commiTime into a Python datetime:
-	commitTime = commitTime.split( '.' )[0] # strip microseconds
-	commitTime = time.strptime( commitTime, '%Y-%m-%dT%H:%M:%S' )
-	return ( committer, message, revision, time.strftime( "%Y-%m-%dT%H:%M", commitTime ) )
+	timeString = commitTime.split( '.' )[0] # strip microseconds
+	timeTuple = time.strptime( timeString, '%Y-%m-%dT%H:%M:%S' )
+	return ( committer, message, revision, time.mktime( timeTuple ), formatted_time( time ) )
 
 def get_node_text( node ):
 	text = ''

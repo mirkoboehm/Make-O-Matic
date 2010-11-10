@@ -46,6 +46,12 @@ def string_from_node_attribute( element, node, attribute ):
 	except AttributeError:
 		return "N/A"
 
+def float_from_node_attribute( element, node, attribute ):
+	try:
+		return float( element.find( ".//{0}[@{1}]".format( node, attribute ) ).attrib[attribute] )
+	except AttributeError, ValueError:
+		return - 1
+
 def string_from_node( element, node ):
 	try:
 		return element.find( ".//{0}".format( node ) ).text

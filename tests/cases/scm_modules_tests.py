@@ -45,6 +45,7 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertNotEquals( info.committerName, None )
 		self.assertNotEquals( info.commitMessage, None )
 		self.assertNotEquals( info.commitTime, None )
+		self.assertNotEquals( info.commitTimeReadable, None )
 		self.assertNotEquals( info.revision, None )
 
 	def testScmGit( self ):
@@ -79,8 +80,8 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertEqual( info1.committerName, info2.committerName )
 		self.assertEqual( info1.commitMessage, info2.commitMessage )
 		self.assertEqual( info1.commitTime, info2.commitTime )
+		self.assertEqual( info1.commitTimeReadable, info2.commitTimeReadable )
 		self.assertEqual( info1.revision, info2.revision )
-
 
 if __name__ == "__main__":
 	unittest.main()
