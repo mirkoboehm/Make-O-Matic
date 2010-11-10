@@ -19,7 +19,7 @@
 
 import unittest
 from core.Exceptions import MomError, ConfigurationError, BuildError
-from core.plugins.reporters.XmlReport import XmlReport
+from core.helpers.XmlReport import XmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.plugins.reporters.XmlReportGenerator import XmlReportGenerator
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase

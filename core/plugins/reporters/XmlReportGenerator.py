@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
-from core.plugins.reporters.XmlReport import XmlReport
+from core.helpers.XmlReport import XmlReport
 import os.path
 from core.Exceptions import ConfigurationError
 from core.helpers.XmlReportConverter import ReportFormat, XmlReportConverter

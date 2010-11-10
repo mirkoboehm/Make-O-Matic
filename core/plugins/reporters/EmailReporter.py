@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.reporters.Reporter import Reporter
-from core.plugins.reporters.XmlReport import XmlReport
+from core.helpers.XmlReport import XmlReport
 from core.helpers.GlobalMApp import mApp
 from core.helpers.Emailer import Email, Emailer
 from core.helpers.XmlReportConverter import XmlReportConverter
