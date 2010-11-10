@@ -116,14 +116,22 @@ class SourceCodeProvider( Plugin ):
 			Revision: <xsl:value-of select="@revision"/><br/>
 			Committer: <xsl:value-of select="@committerName"/> &lt;<xsl:value-of select="@committerEmail"/>&gt;<br/>
 			Time: <xsl:value-of select="@commitTimeReadable"/><br/>
-			Message: <xsl:value-of select="commitMessage"/>
+			Message: <pre><xsl:value-of select="commitMessage"/></pre>
 			""" }
 
 	def getXmlTemplate( self, element, wrapper ):
-		return wrapper.wrap( "Revision: {0}".format( element.attrib["revision"] ) ) + \
-			wrapper.wrap( "Committer: {0} <{1}>".format( element.attrib["committerName"], element.attrib["committerEmail"] ) ) + \
-			wrapper.wrap( "Time: {0}".format( element.attrib["commitTimeReadable"] ) ) + \
-			wrapper.wrap( "Message: {0}".format( element.find( "commitMessage" ).text ) )
+		out = []
+
+		out += wrapper.wrap( "Revision: {0}".format( element.attrib["revision"] ) )
+		out += wrapper.wrap( "Committer: {0} <{1}>".format( element.attrib["committerName"], element.attrib["committerEmail"] ) )
+		out += wrapper.wrap( "Time: {0}".format( element.attrib["commitTimeReadable"] ) )
+		out += wrapper.wrap( "Commit message following:" )
+
+		wrapper.indent()
+		out += wrapper.wrapMultiLine( element.find( "commitMessage" ).text )
+		wrapper.dedent()
+
+		return out
 
 	def createXmlNode( self, document ):
 		node = Plugin.createXmlNode( self, document )

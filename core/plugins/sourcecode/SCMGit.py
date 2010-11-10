@@ -93,7 +93,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def getRevisionInfo( self ):
 		sep = chr( 0x0A ) + chr( 0x03 ) # use some ASCII codes as separator, to avoid clashes in commit messages
-		formatStr = "%cn{0}%ce{0}%s\n%b{0}%ct{0}%ci{0}%H{0}%h".format( sep )
+		formatStr = "%cn{0}%ce{0}%s\n\n%b{0}%ct{0}%ci{0}%H{0}%h".format( sep )
 
 		revision = self.getRevision() or 'HEAD'
 		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), '{0}^..{0}'.format( revision )]

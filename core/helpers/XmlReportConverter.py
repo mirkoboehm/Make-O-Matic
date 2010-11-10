@@ -23,8 +23,8 @@ from core.helpers.GlobalMApp import mApp
 from core.MObject import MObject
 from textwrap import TextWrapper
 from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute
-from core.helpers.TimeKeeper import formatted_time, string_to_datetime, formatted_time_delta
 from datetime import datetime
+from core.helpers.TimeKeeper import formatted_time_delta
 
 try:
 	from lxml import etree
@@ -45,18 +45,19 @@ class _MyTextWrapper( TextWrapper ):
 	
 	Provides easy access to indent and dedent methods"""
 
-	MY_INDENT = " "
+	def indent( self, level = 1, indentString = " " ):
+		self.initial_indent = self.subsequent_indent = self.initial_indent + indentString * level
 
-	def indent( self ):
-		self.initial_indent = self.subsequent_indent = self.initial_indent + self.MY_INDENT
+	def dedent( self, level = 1, indentString = " " ):
+		self.initial_indent = self.subsequent_indent = self.initial_indent[:-len( indentString ) * level]
 
-	def dedent( self ):
-		self.initial_indent = self.subsequent_indent = self.initial_indent[:-len( self.MY_INDENT )]
-
-	def wrapMultiLine( self, text ):
+	def wrapMultiLine( self, text, drop_empty_lines = True ):
 		out = []
 		for line in text.splitlines():
+			if not drop_empty_lines and len( line ) == 0:
+				out += self.wrap( " " ) # newline
 			out += self.wrap( line )
+
 		return out
 
 class XmlReportConverter( MObject ):
@@ -180,7 +181,7 @@ class XmlReportConverter( MObject ):
 	def convertToText( self, short = False ):
 		"""Converts the report to plain text using the recursive _toText() method"""
 
-		wrapper = _MyTextWrapper( drop_whitespace = False, width = 80 )
+		wrapper = _MyTextWrapper( width = 80 )
 
 		if short:
 			ignoredTags = ["traceback"]
@@ -190,7 +191,7 @@ class XmlReportConverter( MObject ):
 		return "\n".join( self._toText( self.__xml, wrapper, ignoredTags ) )
 
 	def convertToTextSummary( self ):
-		wrapper = _MyTextWrapper( drop_whitespace = False, width = 80 )
+		wrapper = _MyTextWrapper( replace_whitespace = False, drop_whitespace = False, width = 80 )
 
 		element = self.__xml
 
@@ -205,13 +206,26 @@ class XmlReportConverter( MObject ):
 		out += wrapper.wrap( "*" * wrapper.width )
 		out += wrapper.wrap( "Summary of the {0} Build Report".format( self.__xml.attrib["name"] ) )
 		out += " "
-		out += wrapper.wrap( "  Build status:   {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
-		out += wrapper.wrap( "  Build time:     {0}".format( string_from_node_attribute( element, "project", "timing" ) ) )
-		out += wrapper.wrap( "  Report delay:   {0} after commit".format( roundTripTime ) )
+		wrapper.indent()
+		out += wrapper.wrap( "Build status:   {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
+		out += wrapper.wrap( "Build time:     {0}".format( string_from_node_attribute( element, "project", "timing" ) ) )
+		out += wrapper.wrap( "Report delay:   {0} after commit".format( roundTripTime ) )
 		out += " "
-		out += wrapper.wrap( "  Revision:       {0}".format( string_from_node_attribute( element, "plugin", "revision" ) ) )
-		out += wrapper.wrap( "  Commit message: {0}".format( string_from_node( element, "commitMessage" ) ) )
-		out += wrapper.wrap( "  Committer:      {0}".format( string_from_node_attribute( element, "plugin", "committerName" ) ) )
+		out += wrapper.wrap( "Revision:       {0}".format( string_from_node_attribute( element, "plugin", "revision" ) ) )
+		out += wrapper.wrap( "Committer:      {0}".format( string_from_node_attribute( element, "plugin", "committerName" ) ) )
+		out += wrapper.wrap( "Time:           {0}".format( string_from_node_attribute( element, "plugin", "commitTimeReadable" ) ) )
+
+		out += " "
+		out += wrapper.wrap( "--- Commit message following ---" )
+		out += " "
+		wrapper.indent( indentString = " " )
+		out += wrapper.wrapMultiLine( string_from_node( element, "commitMessage" ), drop_empty_lines = False )
+		wrapper.dedent( indentString = " " )
+		out += " "
+		out += wrapper.wrap( "--- End of commit message ---" )
+		out += " "
+
+		wrapper.dedent()
 		out += wrapper.wrap( "*" * wrapper.width )
 		out += " "
 
