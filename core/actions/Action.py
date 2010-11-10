@@ -24,6 +24,7 @@ import os, sys
 from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 from core.helpers.XmlUtils import create_child_node
+from core.helpers.EnvironmentSaver import EnvironmentSaver
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -115,55 +116,44 @@ class Action( MObject ):
 
 	def executeAction( self, step, instructions ):
 		try:
-			self.__timeKeeper.start()
-			return self._executeActionTimed( instructions, step )
+			with self.__timeKeeper:
+				with EnvironmentSaver():
+					if self.getWorkingDirectory():
+						mApp().debugN( self, 3, 'changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
+						try:
+							os.chdir( str( self.getWorkingDirectory() ) )
+						except ( OSError, IOError ) as e:
+							raise BuildError( str( e ) )
+					self._aboutToStart()
+					mApp().debugN( self, 3, 'executing action {0}'.format( self.getLogDescription() ) )
+					try:
+						result = self.run()
+						if result == None or not isinstance( result, int ):
+							raise MomError( 'Action {0} ({1}) did not return a valid non-negative integer return value from run()!'
+										.format( self.getName(), self.getLogDescription() ) )
+						self._setResult( int( result ) )
+						self._finished()
+					except MomException as e:
+						self._aborted()
+						mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
+						self._setResult( e.getReturnCode() )
+					if step.getLogfileName():
+						try:
+							with open( step.getLogfileName(), 'a' ) as f:
+								if self.getStdOut():
+									if sys.version_info < ( 3, 0 ):
+										f.writelines( str( self.getStdOut() ) )
+									else:
+										# TODO:decoding the byte array doesnt really work, why?
+										# See XML report output, no newlines with this here. At least do not error out for now.
+										f.writelines( self.getStdOut().decode() )
+								else:
+									f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
+						except Exception as e:
+							raise MomError( 'cannot write to log file "{0}": {1}'.format( step.getLogfileName(), str( e ) ) )
+					return self.getResult()
 		finally:
-			self.__timeKeeper.stop()
 			mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
-
-	def _executeActionTimed( self, instructions, step ):
-		oldPwd = None
-		try:
-			if self.getWorkingDirectory():
-				# FIXME is this correct sequence of things?
-				oldPwd = os.getcwd()
-				mApp().debugN( self, 3, '# changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
-				try:
-					os.chdir( str( self.getWorkingDirectory() ) )
-				except ( OSError, IOError ) as e:
-					raise BuildError( str( e ) )
-			self._aboutToStart()
-			mApp().debugN( self, 3, 'executing action {0}'.format( self.getLogDescription() ) )
-			try:
-				result = self.run()
-				if result == None or not isinstance( result, int ):
-					raise MomError( 'Action {0} ({1}) did not return a valid non-negative integer return value from run()!'
-								.format( self.getName(), self.getLogDescription() ) )
-				self._setResult( int( result ) )
-				self._finished()
-			except MomException as e:
-				self._aborted()
-				mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
-				self._setResult( e.getReturnCode() )
-			if step.getLogfileName():
-				try:
-					with open( step.getLogfileName(), 'a' ) as f:
-						if self.getStdOut():
-							if sys.version_info < ( 3, 0 ):
-								f.writelines( str( self.getStdOut() ) )
-							else:
-								# TODO:decoding the byte array doesnt really work, why?
-								# See XML report output, no newlines with this here. At least do not error out for now.
-								f.writelines( self.getStdOut().decode() )
-						else:
-							f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
-				except Exception as e:
-					raise MomError( 'cannot write to log file "{0}": {1}'.format( step.getLogfileName(), str( e ) ) )
-			return self.getResult()
-		finally:
-			if oldPwd:
-				mApp().debugN( self, 3, 'changing back to "{0}"'.format( oldPwd ) )
-				os.chdir( oldPwd )
 
 	def getTagName( self ):
 		return "action"
