@@ -53,12 +53,15 @@ class XmlReportGenerator( Plugin ):
 
 		self.__finished = True
 
+	def getDescription( self ):
+		return "Report saved to: {0}".format( self.getFileName() )
+
 	def getReportFile( self ):
 		return self.__reportFile
 
 	def _openReportFile( self ):
 		baseDirectory = self.getInstructions().getBaseDir()
-		reportFileName = "{0}-report.{1}".format( self.getInstructions().getTagName(), self.getFileSuffix() )
+		reportFileName = self.getFileName()
 
 		if not os.path.isdir( baseDirectory ):
 			raise ConfigurationError( 'Log directory at "{0}" does not exist.'.format( str( baseDirectory ) ) )
@@ -81,6 +84,9 @@ class XmlReportGenerator( Plugin ):
 	def convert( self, report ):
 		converter = XmlReportConverter( report )
 		return converter.convertTo( self.__reportFormat )
+
+	def getFileName( self ):
+		return "{0}-report.{1}".format( self.getInstructions().getTagName(), self.getFileSuffix() )
 
 	def getFileSuffix( self ):
 		reportFormat = self.__reportFormat

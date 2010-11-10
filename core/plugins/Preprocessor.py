@@ -176,6 +176,10 @@ class Preprocessor( Plugin ):
 		self.setStep( step )
 		self.setProject( project )
 
+	def getDescription( self ):
+		return "{0} -> {1}".format( os.path.basename( str( self.getInputFilename() ) ),
+								os.path.basename( str( self.getOutputFilename() ) ) )
+
 	def setInputFilename( self, name ):
 		check_for_path_or_none( name, 'The input filename must be a non-empty string, or None.' )
 		self.__inputFilename = name

@@ -134,8 +134,12 @@ th {
 	</xsl:template>
 
 	<xsl:template match="plugin">
-		<h4>Plugin: <xsl:value-of select="@name" /></h4>
-		<xsl:value-of select="plugindescription"/>
+		<h4>
+			Plugin: <xsl:value-of select="@name" />
+			<xsl:if test="string-length(plugindescription) > 0">
+				(<xsl:value-of select="plugindescription"/>)
+			</xsl:if>
+		</h4>
 		<xsl:choose>
 			<!-- Plugin templates are inserted here -->
 			<xsl:when test="@name = 'placeholder'" />

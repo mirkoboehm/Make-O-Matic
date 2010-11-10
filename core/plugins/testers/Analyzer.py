@@ -43,5 +43,8 @@ class Analyzer( Plugin ):
 		return self.__report
 
 	def getDescription( self ):
+		if not self.getInstructions().getStep( "conf-make-test" ).isEnabled():
+			return "Step disabled"
+
 		scoreText = " out of ".join( [str( x ) for x in self.getScore()] ) if self.getScore() else "N/A"
 		return "Score: {0}, {1}".format( scoreText, self.getReport() )

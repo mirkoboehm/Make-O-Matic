@@ -31,6 +31,9 @@ class SourceCodeProvider( Plugin ):
 		self.__revision = None
 		self.__srcDir = None
 
+	def getDescription( self ):
+		return self.getUrl()
+
 	def getIdentifier( self ):
 		raise NotImplementedError
 
