@@ -52,7 +52,8 @@ class Parameters( MObject ):
 		parser.add_option( '--ignore-configuration-files', action = 'store_true', dest = "ignoreConfigurationFiles",
 			help = "Ignore settings" )
 		parser.add_option( '-s', '--build-steps', action = 'store', dest = 'buildSteps',
-			help = 'enable or disable individual builds steps on top of the defaults for the build type' )
+			help = """enable or disable individual builds steps on top of the defaults for the build type,
+			e.g.: -s disable-project-cleanup,enable-conf-cleanup""" )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
 			help = 'level of debug output' )
 		return parser
