@@ -40,14 +40,20 @@ class PyUnitTester( TestProvider ):
 
 	def saveReport( self ):
 		mApp().debug( self, "Saving unit test report" )
-		self.parseOutput( self.getAction()._getRunner().getStdOut() )
+
+		score, total = self.parseOutput( self.getAction()._getRunner().getStdOut() )
+		self._setScore( score, total )
+
+		runner = self.getAction()._getRunner()
+		report = "tests succeeded." if runner.getReturnCode() == 0 else "tests FAILED."
+		self._setReport( report )
 
 	def parseOutput( self, stdout ):
 		if not stdout:
 			return
 
+		total = 0
 		score = 0
-		runner = self.getAction()._getRunner()
 		# get total number of tests
 		rx = re.compile( 'Ran (\d+) test(s|) in.*', re.MULTILINE | re.DOTALL )
 		matches = rx.search( stdout )
@@ -57,7 +63,6 @@ class PyUnitTester( TestProvider ):
 		# get report and number of failed tests
 		rx = re.compile( 'FAILED \(\w+=(\d+)(.+=(\d+)|)\)', re.MULTILINE | re.DOTALL )
 		matches = rx.search( stdout )
-		report = "tests succeeded." if runner.getReturnCode() == 0 else "tests FAILED."
 		if matches:
 			failedTests = int( matches.groups()[0] )
 			if matches.groups()[2] != None: # ",errors" is suffixed, add value
@@ -65,9 +70,7 @@ class PyUnitTester( TestProvider ):
 			score = total - failedTests
 		else:
 			score = total
-
-		self._setReport( report )
-		self._setScore( score, total )
+		return score, total
 
 	def performPreFlightCheck( self ):
 		# check if instructions object is of correct type

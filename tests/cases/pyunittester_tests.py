@@ -49,24 +49,24 @@ class PyUnitTesterTest( MomTestCase ):
 #		raise MomError( "" )
 
 	def testParseStr1( self ):
-		self.tester.parseOutput( self.STR1 )
-		self.assertEquals( self.tester.getScore()[0], 0 ) # means: 0 test succeeded
-		self.assertEquals( self.tester.getScore()[1], 3 ) # means: 3 tests in total
+		score, total = self.tester.parseOutput( self.STR1 )
+		self.assertEquals( score, 0 ) # means: 0 test succeeded
+		self.assertEquals( total, 3 ) # means: 3 tests in total
 
 	def testParseStr2( self ):
-		self.tester.parseOutput( self.STR2 )
-		self.assertEquals( self.tester.getScore()[0], 1 )
-		self.assertEquals( self.tester.getScore()[1], 3 ) # means: 3 tests in total
+		score, total = self.tester.parseOutput( self.STR2 )
+		self.assertEquals( score, 1 )
+		self.assertEquals( total, 3 ) # means: 3 tests in total
 
 	def testParseStr3( self ):
-		self.tester.parseOutput( self.STR3 )
-		self.assertEquals( self.tester.getScore()[0], 2 )
-		self.assertEquals( self.tester.getScore()[1], 3 ) # means: 3 tests in total
+		score, total = self.tester.parseOutput( self.STR3 )
+		self.assertEquals( score, 2 )
+		self.assertEquals( total, 3 ) # means: 3 tests in total
 
 	def testParseStr4( self ):
-		self.tester.parseOutput( self.STR4 )
-		self.assertEquals( self.tester.getScore()[0], 3 )
-		self.assertEquals( self.tester.getScore()[1], 3 ) # means: 3 tests in total
+		score, total = self.tester.parseOutput( self.STR4 )
+		self.assertEquals( score, 3 )
+		self.assertEquals( total, 3 ) # means: 3 tests in total
 
 if __name__ == "__main__":
 	unittest.main()
