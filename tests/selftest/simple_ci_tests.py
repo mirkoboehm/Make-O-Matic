@@ -27,7 +27,7 @@ class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
 
 	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
-	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
+	BuildScriptName = o.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
 	SyntaxErrorBuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'syntax-error.py' )
 	ToolName = os.path.join( ThisFilePath, '..', '..', 'tools', 'simple_ci.py' )
 	CurrentDirectory = os.getcwd()
