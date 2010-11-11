@@ -47,7 +47,7 @@ class PyUnitTester( TestProvider ):
 			return
 
 		score = 0
-
+		runner = self.getAction()._getRunner()
 		# get total number of tests
 		rx = re.compile( 'Ran (\d+) test(s|) in.*', re.MULTILINE | re.DOTALL )
 		matches = rx.search( stdout )
@@ -57,15 +57,13 @@ class PyUnitTester( TestProvider ):
 		# get report and number of failed tests
 		rx = re.compile( 'FAILED \(\w+=(\d+)(.+=(\d+)|)\)', re.MULTILINE | re.DOTALL )
 		matches = rx.search( stdout )
+		report = "tests succeeded." if runner.getReturnCode() == 0 else "tests FAILED."
 		if matches:
 			failedTests = int( matches.groups()[0] )
 			if matches.groups()[2] != None: # ",errors" is suffixed, add value
 				failedTests += int( matches.groups()[2] )
-
-			report = "tests FAILED."
 			score = total - failedTests
 		else:
-			report = "tests succeeded."
 			score = total
 
 		self._setReport( report )
