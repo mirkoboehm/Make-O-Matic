@@ -47,6 +47,7 @@ class Slave( SimpleCiBase ):
 			buildScripts += folderScripts
 		if not buildScripts:
 			mApp().message( self, 'FYI: no build scripts specified.' )
+		buildScripts = map( lambda x: os.path.normpath( os.path.abspath( x ) ), buildScripts )
 		buildScripts = self.checkBuildScripts( buildScripts )
 		# do the stuff
 		sleepPeriod = 5 * 60 # if there was nothing to do, wait a little before retrying, to not hog the remote side

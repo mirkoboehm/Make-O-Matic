@@ -26,7 +26,8 @@ def extend_debug_prefix( token ):
 	oldIndent = None
 	if indentVar in os.environ:
 		oldIndent = os.environ[ indentVar ]
-	os.environ[ indentVar ] = '{0}{1}{2} '.format( oldIndent or '', ' ' if oldIndent else '', token )
+	elements = filter( lambda x: x, [ oldIndent, token ] )
+	os.environ[ indentVar ] = ' '.join( elements )
 	return oldIndent
 
 def restore_debug_prefix( content ):

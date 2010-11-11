@@ -45,7 +45,10 @@ class ConsoleLogger( Logger ):
 			pass # no base directory set yet		
 		if not text.endswith( '\n' ):
 			text = text + '\n'
-		fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
+		pieces = [ self.timeStampPrefix(), self.messagePrefix() or None, '[{0}]'.format( mobject.getName() ), text ]
+		pieces = filter( lambda x: x, pieces )
+		fulltext = ' '.join( pieces )
+		# fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
 		sys.stderr.write( fulltext )
 
 	def debug( self, mapp, mobject, msg ):

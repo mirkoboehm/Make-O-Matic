@@ -210,20 +210,18 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			raise ConfigurationError( 'Cannot create required build directory "{0}"!'.format( directory ) )
 		mApp().message( self, 'starting build job for project "{0}" at revision {1}.'
 					.format( buildInfo.getProjectName(), rev ) )
-		runner = None
-		try:
-			with EnvironmentSaver():
-				os.chdir( directory )
-				extend_debug_prefix( buildInfo.getProjectName() )
-				iface = BuildScriptInterface( os.path.abspath( buildInfo.getBuildScript() ) )
-				runner = iface.execute( revision = rev, url = buildInfo.getUrl(), buildType = buildType )
-				try:
-					with open( 'buildscript.log', 'w' ) as f:
-						text = runner.getStdOut() or b''
-						f.write( text.decode() )
-				except Exception as e:
-					mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
-						.format( e ) )
+		with EnvironmentSaver():
+			os.chdir( directory )
+			extend_debug_prefix( buildInfo.getProjectName() )
+			iface = BuildScriptInterface( os.path.abspath( buildInfo.getBuildScript() ) )
+			runner = iface.execute( revision = rev, url = buildInfo.getUrl(), buildType = buildType )
+			try:
+				with open( 'buildscript.log', 'w' ) as f:
+					text = runner.getStdOut() or b''
+					f.write( text.decode() )
+			except Exception as e:
+				mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'
+					.format( e ) )
 			if runner.getReturnCode() != 0:
 				mApp().message( self, 'build failed for project "{0}" at revision {1}'.format( buildInfo.getProjectName(), rev ) )
 				# FIXME send out email reports on configuration or MOM errors
@@ -247,13 +245,6 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 --> 
 """ )
 				return True
-		finally:
-			try:
-				buildInfo.setBuildStatus( BuildInfo.Status.Completed )
-				self.updateBuildInfo( buildInfo )
-			except Exception as e:
-				mApp().message( self, 'Problem! updating the build status failed during handling an exception! {0}1'
-					.format( e ) )
 
 	def getNewestBuildInfo( self, buildScript ):
 		connection = self.getConnection()
@@ -313,7 +304,7 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 			buildInfos = self._loadBuildInfo( conn, BuildInfo.Status.NewRevision )
 			for build in buildInfos:
 				# the list is ordered by priority
-				if build.getBuildScript() in buildScripts:
+				if os.path.normpath( os.path.abspath( build.getBuildScript() ) ) in buildScripts:
 					build.setBuildStatus( BuildInfo.Status.Pending )
 					self._updateBuildInfo( conn, build )
 					buildInfo = build
