@@ -20,7 +20,17 @@
 from core.plugins.testers.Analyzer import Analyzer
 from core.helpers.TypeCheckers import check_for_path_or_none
 from core.actions.ShellCommandAction import ShellCommandAction
-from core.actions.CallbackAction import CallbackAction
+
+class TestProviderAction( ShellCommandAction ):
+	def __init__( self, tester, command = None, timeout = None ):
+		ShellCommandAction.__init__( self, command, timeout )
+		self.__tester = tester
+
+	def run( self ):
+		try:
+			return ShellCommandAction.run( self )
+		finally:
+			self.__tester.saveReport()
 
 class TestProvider( Analyzer ):
 
@@ -42,13 +52,22 @@ class TestProvider( Analyzer ):
 	def saveReport( self ):
 		raise NotImplementedError
 
+	def createAction( self, cmd ):
+		'''Factory method to generate the action that executes the test tool, and processes it's output. 
+		To implement custom behavior of the action for a specific test tool, implement an action class that 
+		inherits TestProviderAction, and implement a specific run method. Then, overload this method to return an action 
+		of the customized type.
+		@see TestProviderAction
+		'''
+		return TestProviderAction( self, cmd )
+
 	def makeTestStep( self ):
 		"""Run tests for the project."""
 		cmd = [ self.getCommand() ]
 		if self._getTestArgument():
 			cmd.append( str( self._getTestArgument() ) )
 		step = self.getInstructions().getStep( 'conf-make-test' )
-		makeTest = ShellCommandAction( cmd )
+		makeTest = self.createAction( cmd )
 		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makeTest )
 		self.__action = makeTest # save
@@ -57,11 +76,4 @@ class TestProvider( Analyzer ):
 		"""Setup is called after the test steps have been generated, and the command line 
 		options have been applied to them. It can be used to insert actions into the build
 		steps, for example."""
-
 		self.makeTestStep()
-
-		# "self.__class__": Use most specialized version of saveReport, "TestProvider" won't work
-		action = CallbackAction( self, self.__class__.saveReport )
-		action.setIgnorePreviousFailure( True )
-		step = self.getInstructions().getStep( 'conf-make-test' )
-		step.addPostAction( action )

@@ -19,7 +19,6 @@
 
 from core.plugins.testers.TestProvider import TestProvider
 from core.plugins.builders.generators.CMakeBuilder import CMakeSearchPaths
-from core.actions.CallbackAction import CallbackAction
 from core.helpers.GlobalMApp import mApp
 import re
 
@@ -33,7 +32,7 @@ class CTest( TestProvider ):
 	def saveReport( self ):
 		mApp().debug( self, "Saving unit test report" )
 
-		stdout = self.getAction().getStdOut()
+		stdout = self.getAction()._getRunner().getStdOut()
 		if not stdout:
 			return
 

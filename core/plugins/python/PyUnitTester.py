@@ -40,14 +40,12 @@ class PyUnitTester( TestProvider ):
 
 	def saveReport( self ):
 		mApp().debug( self, "Saving unit test report" )
-
-		self.parseOutput( self.getAction().getStdOut() )
+		self.parseOutput( self.getAction()._getRunner().getStdOut() )
 
 	def parseOutput( self, stdout ):
 		if not stdout:
 			return
 
-		top = 0
 		score = 0
 
 		# get total number of tests
