@@ -22,7 +22,6 @@ from tests.helpers.MomTestCase import MomTestCase
 import unittest
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
-import os
 import sys
 
 class EmailerTest( MomTestCase ):
@@ -39,12 +38,12 @@ class EmailerTest( MomTestCase ):
 
 		email.setSubject( 'EmailerTest email' )
 
-		email.addTextPart( '''\
+		email.setTextPart( '''\
 This is a test email sent by Make-O-Matic.
 Check it out at http://github.com/KDAB/Make-O-Matic
 ''' )
 
-		email.addHtmlPart( """\
+		email.setHtmlPart( """\
 		<html>
 			<head>Make-O-Matic Test Email</head>
 			<body>

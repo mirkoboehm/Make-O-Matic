@@ -38,12 +38,16 @@ class Email( MObject ):
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
 
-		self.__msg = MIMEMultipart( 'alternative' )
-		self.__msg.set_charset( "utf-8" )
+		self.__mixedPart = MIMEMultipart( 'mixed' )
+		self.__mixedPart.set_charset( "utf-8" )
+
+		self.__alternativePart = MIMEMultipart( 'alternative' )
+		self.__mixedPart.attach( self.__alternativePart )
+
 		self.__recipients = []
 
 	def _getMessage( self ):
-		return self.__msg
+		return self.__mixedPart
 
 	def setCustomHeader( self, key, value ):
 		""" Set custom X-tag
@@ -70,9 +74,10 @@ class Email( MObject ):
 		return self.__recipients
 
 	def setSubject( self, subject ):
+		"""\warning Can only be set once!"""
+
 		# Need to use Header class to use UTF-8 encoded text
 		# see http://docs.python.org/library/email.header.html
-
 		h = Header( subject, 'utf-8' )
 		self._getMessage()['Subject'] = h
 
@@ -89,13 +94,19 @@ class Email( MObject ):
 			part = MIMEText( 'plain' )
 			part.set_payload( text )
 		part.add_header( 'Content-Disposition', 'attachment; filename={0}'.format( filename ) )
-		self._getMessage().attach( part )
+		self.__mixedPart.attach( part )
 
-	def addTextPart( self, text ):
-		self._getMessage().attach( MIMEText( text.encode( "utf-8" ), 'plain', _charset = 'utf-8' ) )
+	def setTextPart( self, text ):
+		"""\warning Can only be set once!"""
 
-	def addHtmlPart( self, html ):
-		self._getMessage().attach( MIMEText( html.encode( "utf-8" ), 'html', _charset = 'utf-8' ) )
+		part = MIMEText( text.encode( "utf-8" ), 'plain', _charset = 'utf-8' )
+		self.__alternativePart.attach( part )
+
+	def setHtmlPart( self, html ):
+		"""\warning Can only be set once!"""
+
+		part = MIMEText( html.encode( "utf-8" ), 'html', _charset = 'utf-8' )
+		self.__alternativePart.attach( part )
 
 	def getMessageText( self ):
 		# finalize Email at the end, the 'To'-field can only be set once

@@ -146,9 +146,9 @@ class EmailReporter( Reporter ):
 		report.prepare()
 		converter = XmlReportConverter( report )
 		if reporterEnableHtml:
-			email.addHtmlPart( converter.convertToHtml() )
+			email.setHtmlPart( converter.convertToHtml() )
 		else:
-			email.addTextPart( "{0}\n{1}".format( 
+			email.setTextPart( "{0}\n{1}".format( 
 				converter.convertToTextSummary(),
 				converter.convertToText( short = True ) )
 			)
