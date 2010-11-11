@@ -38,10 +38,6 @@ class BuildScriptInterface( MObject ):
 	def _initializeParameters( self ):
 		self.__parameters = []
 
-		# FIXME This is broken
-		# if mApp().getParameters().getDebugLevel() > 5:
-		#	self.__parameters.append( "-" + ( mApp().getParameters().getDebugLevel() - 5 ) * "v" )
-
 	def getParameters( self ):
 		return self.__parameters
 
@@ -62,7 +58,7 @@ class BuildScriptInterface( MObject ):
 		output = runner.getStdOut()
 		if not output:
 			stderr = runner.getStdErr().decode()
-			raise MomError( 'The build script "{0}" did not specify a project name! It said: {1}'
+			raise MomError( 'The build script "{0}" did not return a value! It said: {1}'
 				.format( self.getBuildScript(), stderr ) )
 		line = output.decode().strip()
 		groups = re.search( '^(.+?): (.+)$', line )
