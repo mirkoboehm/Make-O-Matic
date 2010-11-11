@@ -28,6 +28,7 @@ class SimpleCITests( MomTestCase ):
 
 	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
 	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
+	SyntaxErrorBuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'syntax-error.py' )
 	ToolName = os.path.join( ThisFilePath, '..', '..', 'tools', 'simple_ci.py' )
 	CurrentDirectory = os.getcwd()
 
@@ -53,6 +54,14 @@ class SimpleCITests( MomTestCase ):
 		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
 			'--pause', '1', '-f', SimpleCITests.BuildScriptName ]
 		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
+		self.assertEquals( runner.getReturnCode(), 0 )
+
+	def testSlaveRunFindRevisionsSyntaxError( self ):
+		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
+			'--pause', '1', '-b', SimpleCITests.SyntaxErrorBuildScriptName ]
+		runner = self.runCommand( cmd, 'simple_ci slave find revisions, build script syntax error' )
+		# simple_ci is supposed to work with broken build scripts
+		# more tests in buildscript_interface_tests
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 if __name__ == "__main__":
