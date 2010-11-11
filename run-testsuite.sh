@@ -1,3 +1,2 @@
 #!/bin/sh
-
-cd tests && python testsuite.py
+cd tests && python testsuite_selftest.py

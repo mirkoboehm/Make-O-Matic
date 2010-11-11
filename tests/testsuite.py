@@ -41,8 +41,10 @@ from tests.cases.settings_tests import SettingsTests
 from tests.selftest.environment_setup_tests import EnvironmentSetupTests
 import sys
 from tests.cases.pyunittester_tests import PyUnitTesterTest
+from tests.selftest.testsuite_test import TestSuiteTest
 
 CLASSES = [
+	TestSuiteTest,
 	# self tests first
 	CharmBuildTests,
 	EnvironmentSetupTests,
