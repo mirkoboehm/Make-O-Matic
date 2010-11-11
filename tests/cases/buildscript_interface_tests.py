@@ -24,15 +24,16 @@ from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
 import shutil
+from core.Exceptions import MomError
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
 	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
 	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
+	SyntaxErrorBuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'syntax-error.py' )
 
 	def setUp( self ):
 		MomTestCase.setUp( self )
-
 		self.iface = BuildScriptInterface( BuildScriptInterfaceTests.BuildScriptName )
 
 	def tearDown( self ):
@@ -55,6 +56,30 @@ class BuildScriptInterfaceTests( MomTestCase ):
 	def testExecuteBuildScript( self ):
 		runner = self.iface.execute( buildType = 'c', revision = 'HEAD', captureOutput = True )
 		self.assertEqual( 0, runner.getReturnCode() )
+
+	def testQueryBuildNameSyntaxError( self ):
+		iface = BuildScriptInterface( BuildScriptInterfaceTests.SyntaxErrorBuildScriptName )
+		try:
+			iface.querySetting( Settings.ScriptBuildName )
+			self.fail( 'The syntax error build script should throw an exception when printing the build name.' )
+		except MomError:
+			pass
+
+	def testPrintRevisionsSinceSyntaxError( self ):
+		iface = BuildScriptInterface( BuildScriptInterfaceTests.SyntaxErrorBuildScriptName )
+		try:
+			iface.queryRevisionsSince( '8c758c1f1de2bcc19bda516f1acadf869ba28ee4' )
+			self.fail( 'The syntax error build script should throw an exception when querying recent revisions.' )
+		except MomError:
+			pass
+
+	def testPrintCurrentRevisionSyntaxError( self ):
+		iface = BuildScriptInterface( BuildScriptInterfaceTests.SyntaxErrorBuildScriptName )
+		try:
+			iface.queryCurrentRevision()
+			self.fail( 'The syntax error build script should throw an exception when querying the current revision.' )
+		except MomError:
+			pass
 
 if __name__ == "__main__":
 	unittest.main()
