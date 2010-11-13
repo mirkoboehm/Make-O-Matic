@@ -21,10 +21,12 @@
 
 from core.plugins.python.PythonConfiguration import PythonConfiguration
 from core.helpers.BoilerPlate import getBuildProject
+from tests.helpers.CrashMePlugin import CrashMePlugin
 
 build, project = getBuildProject( projectName = 'Make-O-Matic', projectVersionNumber = '0.5.0',
 								projectVersionName = 'French Fries', scmUrl = 'git://github.com/KDAB/Make-O-Matic.git' )
 
+build.addPlugin( CrashMePlugin() )
 # set up configurations:
 python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
 # Hint: do not enable running the test suite here, because this script is part of the test suite :-)
