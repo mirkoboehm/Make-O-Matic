@@ -19,9 +19,9 @@
 from core.MApplication import MApplication
 from buildcontrol.mom.Remotebuilder import RemoteBuilder
 from core.Parameters import Parameters
-import sys
 from core.loggers.ConsoleLogger import ConsoleLogger
 from core.Settings import Settings
+import sys
 
 class ProxyBuilder( MApplication ):
 	'''ProxyBuilder takes a few arguments that describe a remote build script, 

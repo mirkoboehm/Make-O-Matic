@@ -95,22 +95,28 @@ class BuildScriptInterface( MObject ):
 		'''Execute the build script. 
 		The method returns the RunCommand object used to execute the build script, through which the return code and the output 
 		can be retrieved.'''
-		cmd = [ sys.executable, os.path.abspath( self.getBuildScript() ) ]
+		params = []
 		if buildType:
-			cmd.extend( [ '-t', buildType ] )
+			params.extend( [ '-t', buildType ] )
 		if url:
-			cmd.extend( [ '-u', url ] )
+			params.extend( [ '-u', url ] )
 		if revision:
-			cmd.extend( [ '-r', str( revision ) ] )
+			params.extend( [ '-r', str( revision ) ] )
 			revText = 'revision ' + str( revision )
 		else:
 			revText = 'latest revision'
 		if args:
+			params.extend( args )
+		mApp().message( self, 'invoking build script "{0}" at {1}.'.format( self.getBuildScript(), revText ) )
+		return self.executeWithArgs( timeout, params, captureOutput )
+
+	def executeWithArgs( self, timeout = 24 * 60 * 60, args = None, captureOutput = False ):
+		cmd = [ sys.executable, os.path.abspath( self.getBuildScript() ) ]
+		if args:
 			cmd.extend( args )
-		mApp().message( self, 'invoking remote build script "{0}" at {1}.'.format( self.getBuildScript(), revText ) )
+		runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
 		with EnvironmentSaver():
 			extend_debug_prefix( 'script>' )
-			runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
 			runner.run()
 		mApp().debugN( self, 2, 'build script finished, return code is {0}.'.format( runner.getReturnCode() ) )
 		return runner
