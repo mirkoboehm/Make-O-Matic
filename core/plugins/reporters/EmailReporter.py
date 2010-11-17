@@ -100,7 +100,6 @@ class EmailReporter( Reporter ):
 		reporterConfigurationErrorRecipients = mApp().getSettings().get( Settings.EmailReporterConfigurationErrorRecipients, False )
 		reporterMomErrorRecipients = mApp().getSettings().get( Settings.EmailReporterMomErrorRecipients, False )
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
-		reporterEnableHtml = mApp().getSettings().get( Settings.EmailReporterEnableHtml )
 
 		# get revision info, do not crash here
 		info = self.__info or RevisionInfo()
@@ -145,13 +144,13 @@ class EmailReporter( Reporter ):
 		report = XmlReport( instructions )
 		report.prepare()
 		converter = XmlReportConverter( report )
-		if reporterEnableHtml:
-			email.setHtmlPart( converter.convertToHtml() )
-		else:
-			email.setTextPart( "{0}\n{1}".format( 
-				converter.convertToTextSummary(),
-				converter.convertToText( short = True ) )
-			)
+
+		# text and html part
+		email.setHtmlPart( converter.convertToHtml() )
+		email.setTextPart( "{0}\n{1}".format( 
+			converter.convertToTextSummary(),
+			converter.convertToText( short = True ) )
+		)
 
 		# attachments
 		exception = mApp().getException()
