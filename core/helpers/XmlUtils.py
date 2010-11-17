@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-# Author: Kevin Funk <krf@electrostorm.net>
+# Author: Kevin Funk <kevin.funk@kdab.com>
 # 
 # make-o-matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
