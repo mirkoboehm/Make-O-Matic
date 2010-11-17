@@ -22,6 +22,7 @@ from core.actions.filesystem.FilesMoveAction import FilesMoveAction
 from core.plugins.builders.generators.CMakeBuilder import CMakeSearchPaths
 import os
 from core.helpers.GlobalMApp import mApp
+from core.Exceptions import ConfigurationError
 from core.Settings import Settings
 
 _CPackConfig = '''SET(CPACK_PACKAGE_NAME "@CPACK_PACKAGE_NAME@")
@@ -154,7 +155,7 @@ class CPack( PackageProvider ):
 
 		if licenseFile == None and not sourcePackage:
 			raise ConfigurationError( 'CPack requires a license file for binary packages!' )
-		elif len( licenseFile ) > 0 and sourcePackage:
+		elif licenseFile != None and sourcePackage:
 			raise ConfigurationError( 'You must not set a license file for source packages!' )
 
 		if sourcePackage:
