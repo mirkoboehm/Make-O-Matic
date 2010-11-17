@@ -8,11 +8,17 @@
 		<html>
 			<head>
 				<style type="text/css">
-body,table {
+/*** default tags ***/
+body, table {
 	font-family: monospace;
 	font-size: 9pt;
 	width: 1000px;
 }
+
+div#build-report div {
+	margin-left: 1%;
+}
+
 pre {
 	font-size: 8pt;
 	margin-top: 10px;
@@ -29,12 +35,30 @@ pre {
 	white-space: -o-pre-wrap; /* Opera 7 */
 	word-wrap:
 	break-word; /* Internet Explorer 5.5+ */
-
 }
+
 th {
 	text-align: left;
 }
 
+/* headings */
+h1 {
+	font-size: 120%;
+	margin: 0px;
+	padding: 0px;
+}
+h2 {
+	font-size: 115%;
+	margin: 0px;
+}
+h3 {
+	font-size: 110%;
+}
+h4 {
+	font-size: 105%;
+}
+
+/*** classes ***/
 .success {
 	color: green;
 }
@@ -60,77 +84,96 @@ th {
 				<title>Build Report</title>
 			</head>
 			<body>
-				<h1>Build Report for: <xsl:value-of select="@name" /></h1>
-				<p>
-					Platform: <xsl:value-of select="@sys-platform" /> (<xsl:value-of select="@sys-version" />)<br />
-					Architecture: <xsl:value-of select="@sys-architecture" /><br />
-					Node name: <xsl:value-of select="@sys-nodename" />
-				</p>
-				<p class="build-status">
-					Build Status:
-					<xsl:choose>
-						<xsl:when test="@returncode = 0">
-							<span class="success">SUCCESS</span>
-						</xsl:when>
-						<xsl:when test="@returncode = 1">
-							<span class="fail">Build error</span>
-						</xsl:when>
-						<xsl:when test="@returncode = 2">
-							<span class="fail">Configuration error</span>
-						</xsl:when>
-						<xsl:otherwise>
-							<span class="fail">Make-O-Matic error</span>
-						</xsl:otherwise>
-					</xsl:choose>
-				</p>
-				<xsl:apply-templates />
+				<div id="build-report">
+					<h1>Build Report for: <xsl:value-of select="@name" /></h1>
+					<div class="tag-build">
+						<p>
+							Platform: <xsl:value-of select="@sys-platform" /> (<xsl:value-of select="@sys-version" />)<br />
+							Architecture: <xsl:value-of select="@sys-architecture" /><br />
+							Node name: <xsl:value-of select="@sys-nodename" />
+						</p>
+						<p class="build-status">
+							Build Status:
+							<xsl:choose>
+								<xsl:when test="@returncode = 0">
+									<span class="success">SUCCESS</span>
+								</xsl:when>
+								<xsl:when test="@returncode = 1">
+									<span class="fail">Build error</span>
+								</xsl:when>
+								<xsl:when test="@returncode = 2">
+									<span class="fail">Configuration error</span>
+								</xsl:when>
+								<xsl:otherwise>
+									<span class="fail">Make-O-Matic error</span>
+								</xsl:otherwise>
+							</xsl:choose>
+						</p>
+						<xsl:apply-templates />
+					</div>
+				</div>
 			</body>
 		</html>
 	</xsl:template>
 
 	<xsl:template match="project">
 		<h2>Project: <xsl:value-of select="@name" /></h2>
-		<!--
-		<p>
-			Base directory: <xsl:value-of select="@basedir" />
-		</p>
-		-->
-		<p>
-			Start time: <xsl:value-of select="@starttime" /><br />
-			Stop time : <xsl:value-of select="@stoptime" />
-		</p>
-		<p>
-			Build time:<xsl:value-of select="@timing" />
-		</p>
-		<xsl:apply-templates />
+		<div class="tag-project">
+			<!--
+			<p>
+				Base directory: <xsl:value-of select="@basedir" />
+			</p>
+			-->
+			<p>
+				Start time: <xsl:value-of select="@starttime" /><br />
+				Stop time : <xsl:value-of select="@stoptime" />
+			</p>
+			<p>
+				Build time: <xsl:value-of select="@timing" />
+			</p>
+			<xsl:apply-templates />
+		</div>
 	</xsl:template>
 
 	<xsl:template match="environment">
 		<h2>Environment: <xsl:value-of select="@name" /></h2>
-		<xsl:apply-templates />
+		<div class="tag-environment">
+			<xsl:apply-templates />
+		</div>
 	</xsl:template>
 
 	<xsl:template match="configuration">
 		<h3>Configuration: <xsl:value-of select="@name" /></h3>
-		<xsl:apply-templates />
+		<div class="tag-configuration">
+			<xsl:apply-templates />
+		</div>
 	</xsl:template>
 
 	<xsl:template match="steps">
-		<h4>Steps: <xsl:value-of select="@name" /></h4>
 		<xsl:if test="count(./step) > 0">
-			<table>
-				<thead>
-					<tr>
-						<th width="700px">Instruction</th>
-						<th width="200px">Timing</th>
-						<th width="300px">Status</th>
-					</tr>
-				</thead>
-				<tbody>
-					<xsl:apply-templates />
-				</tbody>
-			</table>
+			<h4>Steps: <xsl:value-of select="@name" /></h4>
+			<div class="tag-steps">
+				<table>
+					<thead>
+						<tr>
+							<th width="700px">Instruction</th>
+							<th width="200px">Timing</th>
+							<th width="300px">Status</th>
+						</tr>
+					</thead>
+					<tbody>
+						<xsl:apply-templates />
+					</tbody>
+				</table>
+			</div>
 		</xsl:if>
+	</xsl:template>
+
+	<xsl:template match="plugins">
+		<h4>Plugins:</h4>
+		<div class="tag-plugins">
+			<xsl:apply-templates/>
+		</div>
 	</xsl:template>
 
 	<xsl:template match="plugin">
@@ -140,45 +183,51 @@ th {
 				(<xsl:value-of select="plugindescription"/>)
 			</xsl:if>
 		</h4>
+		<!-- TODO: Doesn't work for some reason, why?
+		<div class="tag-plugin">
+		 -->
 		<xsl:choose>
 			<!-- Plugin templates are inserted here -->
 			<xsl:when test="@name = 'placeholder'" />
 		</xsl:choose>
-	</xsl:template>
+		<!--</div>-->
+		</xsl:template>
 
 	<xsl:template match="step">
-		<!-- Hide if no actions registered -->
-		<xsl:if test="@isEmpty = 'False'">
-			<tr>
-				<td>
-					<xsl:value-of select="@name" />
-				</td>
-				<td>
-					<xsl:value-of select="@timing" />
-				</td>
-				<td class="step-status">
-					<xsl:choose>
-						<xsl:when test="@isEnabled = 'False'">
-							<span class="neutral">DISABLED</span>
-						</xsl:when>
-						<xsl:when test="@isEmpty = 'True'">
-							<span class="neutral">NO ACTIONS REGISTERED</span>
-						</xsl:when>
-						<xsl:when test="@failed = 'True'">
-							<span class="fail">FAILED</span>
-						</xsl:when>
-						<xsl:otherwise>
-							<span class="success">SUCCESS</span>
-						</xsl:otherwise>
-					</xsl:choose>
-				</td>
-			</tr>
-
-			<!-- Only show actions if step has failed -->
-			<xsl:if test="@failed = 'True'">
-				<xsl:apply-templates />
+		<div class="tag-step">
+			<!-- Hide if no actions registered -->
+			<xsl:if test="@isEmpty = 'False'">
+				<tr>
+					<td>
+						<xsl:value-of select="@name" />
+					</td>
+					<td>
+						<xsl:value-of select="@timing" />
+					</td>
+					<td class="step-status">
+						<xsl:choose>
+							<xsl:when test="@isEnabled = 'False'">
+								<span class="neutral">DISABLED</span>
+							</xsl:when>
+							<xsl:when test="@isEmpty = 'True'">
+								<span class="neutral">NO ACTIONS REGISTERED</span>
+							</xsl:when>
+							<xsl:when test="@failed = 'True'">
+								<span class="fail">FAILED</span>
+							</xsl:when>
+							<xsl:otherwise>
+								<span class="success">SUCCESS</span>
+							</xsl:otherwise>
+						</xsl:choose>
+					</td>
+				</tr>
+	
+				<!-- Only show actions if step has failed -->
+				<xsl:if test="@failed = 'True'">
+					<xsl:apply-templates />
+				</xsl:if>
 			</xsl:if>
-		</xsl:if>
+		</div>
 	</xsl:template>
 
 	<xsl:template match="step/action">
