@@ -38,12 +38,12 @@ class EmailerTest( MomTestCase ):
 
 		email.setSubject( 'EmailerTest email' )
 
-		email.setTextPart( '''\
-This is a test email sent by Make-O-Matic.
-Check it out at http://github.com/KDAB/Make-O-Matic
-''' )
-
-		email.setHtmlPart( """\
+		email.attachAlternativeTextPart( 
+		'''\
+		This is a test email sent by Make-O-Matic.
+		Check it out at http://github.com/KDAB/Make-O-Matic
+		''',
+		"""\
 		<html>
 			<head>Make-O-Matic Test Email</head>
 			<body>

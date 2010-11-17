@@ -123,7 +123,6 @@ class EmailReporter( Reporter ):
 		if reporterDefaultRecipients:
 			email.setToAddresses( reporterDefaultRecipients )
 
-
 		if returnCode == ConfigurationError.getReturnCode() or ( info.revision is None ):
 			if reporterConfigurationErrorRecipients:
 				email.addToAddresses( reporterConfigurationErrorRecipients )
@@ -146,11 +145,8 @@ class EmailReporter( Reporter ):
 		converter = XmlReportConverter( report )
 
 		# text and html part
-		email.setHtmlPart( converter.convertToHtml() )
-		email.setTextPart( "{0}\n{1}".format( 
-			converter.convertToTextSummary(),
-			converter.convertToText( short = True ) )
-		)
+		email.attachTextPart( converter.convertToTextSummary() )
+		email.attachAlternativeTextPart( converter.convertToText( short = True ), converter.convertToHtml() )
 
 		# attachments
 		exception = mApp().getException()

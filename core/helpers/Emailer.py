@@ -41,9 +41,6 @@ class Email( MObject ):
 		self.__mixedPart = MIMEMultipart( 'mixed' )
 		self.__mixedPart.set_charset( "utf-8" )
 
-		self.__alternativePart = MIMEMultipart( 'alternative' )
-		self.__mixedPart.attach( self.__alternativePart )
-
 		self.__recipients = []
 
 	def _getMessage( self ):
@@ -96,17 +93,19 @@ class Email( MObject ):
 		part.add_header( 'Content-Disposition', 'attachment; filename={0}'.format( filename ) )
 		self.__mixedPart.attach( part )
 
-	def setTextPart( self, text ):
-		"""\warning Can only be set once!"""
-
+	def attachTextPart( self, text ):
 		part = MIMEText( text.encode( "utf-8" ), 'plain', _charset = 'utf-8' )
-		self.__alternativePart.attach( part )
+		self.__mixedPart.attach( part )
 
-	def setHtmlPart( self, html ):
+	def attachAlternativeTextPart( self, textString, htmlString ):
 		"""\warning Can only be set once!"""
 
-		part = MIMEText( html.encode( "utf-8" ), 'html', _charset = 'utf-8' )
-		self.__alternativePart.attach( part )
+		part1 = MIMEText( textString.encode( "utf-8" ), 'plain', _charset = 'utf-8' )
+		part2 = MIMEText( htmlString.encode( "utf-8" ), 'html', _charset = 'utf-8' )
+		alternativePart = MIMEMultipart( 'alternative' )
+		alternativePart.attach( part1 )
+		alternativePart.attach( part2 )
+		self.__mixedPart.attach( alternativePart )
 
 	def getMessageText( self ):
 		# finalize Email at the end, the 'To'-field can only be set once
