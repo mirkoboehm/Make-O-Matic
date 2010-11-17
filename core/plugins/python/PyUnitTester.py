@@ -82,4 +82,4 @@ class PyUnitTester( TestProvider ):
 
 		# set runners
 		self._setCommand( pyConf.getExecutable() )
-		self._setTestArgument( self.getTestProgram() )
+		self._setCommandArguments( [self.getTestProgram()] )

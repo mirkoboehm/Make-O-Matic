@@ -21,7 +21,7 @@ from core.Exceptions import MomException, ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, \
-	check_for_list_of_strings
+	check_for_list_of_strings, check_for_list_of_paths
 from core.helpers.XmlUtils import create_child_node
 
 class Plugin( MObject ):
@@ -54,6 +54,7 @@ class Plugin( MObject ):
 		self.setOptional( False )
 		self.setInstructions( None )
 		self.__command = None
+		self.__commandArguments = []
 		self.__commandSearchPaths = []
 
 	def setInstructions( self, instructions ):
@@ -136,6 +137,18 @@ class Plugin( MObject ):
 		before the build script ends."""
 
 		pass
+
+	def _setCommandArguments( self, commandArguments ):
+		check_for_list_of_paths( commandArguments, "Must be a list of strings or PathResolver objects" )
+		self.__commandArguments = commandArguments
+
+	def getCommandArguments( self ):
+		return self.__commandArguments
+
+	def getCommandWithArguments( self ):
+		cmd = [ self.getCommand() ]
+		cmd += [str( x ) for x in self.getCommandArguments()] # str() evaluates the PathResolver objects
+		return cmd
 
 	def getCommand( self ):
 		return self.__command

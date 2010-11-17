@@ -27,7 +27,7 @@ class CTest( TestProvider ):
 	def __init__( self, name = None ):
 		TestProvider.__init__( self, name )
 		self._setCommand( "ctest", CMakeSearchPaths )
-		self._setTestArgument( "--verbose" )
+		self._setCommandArguments( ["--verbose"] )
 
 	def saveReport( self ):
 		mApp().debug( self, "Saving unit test report" )

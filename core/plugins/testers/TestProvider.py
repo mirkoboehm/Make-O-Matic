@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.testers.Analyzer import Analyzer
-from core.helpers.TypeCheckers import check_for_path_or_none
 from core.actions.ShellCommandAction import ShellCommandAction
 
 class TestProviderAction( ShellCommandAction ):
@@ -39,13 +38,6 @@ class TestProvider( Analyzer ):
 		self.__testArgument = None
 		self.__action = None
 
-	def _setTestArgument( self, testArgument ):
-		check_for_path_or_none( testArgument, "The test argument needs to be a non-empty string" )
-		self.__testArgument = testArgument
-
-	def _getTestArgument( self ):
-		return self.__testArgument
-
 	def getAction( self ):
 		return self.__action
 
@@ -63,11 +55,8 @@ class TestProvider( Analyzer ):
 
 	def makeTestStep( self ):
 		"""Run tests for the project."""
-		cmd = [ self.getCommand() ]
-		if self._getTestArgument():
-			cmd.append( str( self._getTestArgument() ) )
 		step = self.getInstructions().getStep( 'conf-make-test' )
-		makeTest = self.createAction( cmd )
+		makeTest = self.createAction( self.getCommandWithArguments() )
 		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makeTest )
 		self.__action = makeTest # save
