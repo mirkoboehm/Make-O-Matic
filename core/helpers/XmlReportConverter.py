@@ -39,6 +39,17 @@ class ReportFormat:
 	TEXT = 1
 	HTML = 2
 
+	@staticmethod
+	def toString( reportFormat ):
+		if reportFormat == 0:
+			return "XML"
+		elif reportFormat == 1:
+			return "Plain text"
+		elif reportFormat == 2:
+			return "HTML"
+		else:
+			return "Unknown format"
+
 
 class _MyTextWrapper( TextWrapper ):
 	"""TextWrapper Wrapper class ;)
@@ -102,8 +113,10 @@ class XmlReportConverter( MObject ):
 			try:
 				f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
 				self.__xslTemplateSnippets[key] = etree.XML( f.read() )
-			except:
+			except KeyError:
 				raise MomError( "XSL Stylesheet missing: {0}".format( value ) )
+			except etree.XMLSyntaxError, e:
+				raise MomError( "XSL Stylesheet for {0} is malformed: {1}".format( ReportFormat.toString( key ), e ) )
 
 	def _fetchTemplates( self, instructions ):
 		"""Fetches templates from all registered plugins in the Instruction object
@@ -137,7 +150,7 @@ class XmlReportConverter( MObject ):
 			# search for place to register new plugin templates
 			stylesheet = self.__xslTemplateSnippets[destinationReportFormat]
 			pluginTemplate = stylesheet.find( ".//{http://www.w3.org/1999/XSL/Transform}template[@match='plugin']" )
-			placeholder = pluginTemplate.find( "{http://www.w3.org/1999/XSL/Transform}choose" )
+			placeholder = pluginTemplate.find( ".//{http://www.w3.org/1999/XSL/Transform}choose" )
 
 			# create new element with markup provided from plugin
 			try:
