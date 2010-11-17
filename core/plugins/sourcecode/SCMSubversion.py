@@ -163,7 +163,7 @@ def parse_log_entry( logentry ):
 		elif child.localName == 'date':
 			commitTime = get_node_text( child )
 		elif child.localName == 'msg':
-			message = get_node_text( child )
+			message = get_node_text( child ).rstrip()
 		else:
 			# this might be indentation whitespace
 			pass

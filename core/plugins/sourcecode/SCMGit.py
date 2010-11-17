@@ -107,7 +107,7 @@ class SCMGit( SourceCodeProvider ):
 			infos = runner.getStdOut().decode().split( sep )
 			info.committerName = infos[0]
 			info.committerEmail = infos[1]
-			info.commitMessage = infos[2]
+			info.commitMessage = infos[2].rstrip()
 			info.commitTime = infos[3]
 			info.commitTimeReadable = infos[4]
 			info.revision = infos[5]
