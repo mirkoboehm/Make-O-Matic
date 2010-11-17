@@ -41,7 +41,7 @@ IF(WIN32)
 	ELSE()
 		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME} ${CPACK_PACKAGE_VERSION}")
 	ENDIF()
-	SET(CPACK_GENERATOR "NSIS;ZIP")
+	SET(CPACK_GENERATOR "@CPACK_GENERATOR_WINDOWS@")
 	SET(CPACK_NSIS_DISPLAY_NAME "${CPACK_PACKAGE_FILE_NAME}")
 	SET(CPACK_NSIS_PACKAGE_NAME "${CPACK_PACKAGE_FILE_NAME}")
 	SET(CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${CPACK_PACKAGE_FILE_NAME}")
@@ -51,7 +51,7 @@ ELSEIF(APPLE)
 	ELSE()
 		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 	ENDIF()
-	SET(CPACK_GENERATOR "DragNDrop;TBZ2")
+	SET(CPACK_GENERATOR "@CPACK_GENERATOR_APPLE@")
 	SET(CPACK_SYSTEM_NAME "OSX")
 ELSE()
 	IF(CPACK_PACKAGE_SOURCE)
@@ -59,7 +59,7 @@ ELSE()
 	ELSE()
 		SET(CPACK_PACKAGE_FILE_NAME "${CPACK_PACKAGE_NAME}-${CPACK_PACKAGE_VERSION}")
 	ENDIF()
-	SET(CPACK_GENERATOR "STGZ;TBZ2")
+	SET(CPACK_GENERATOR "@CPACK_GENERATOR_ELSE@")
 ENDIF()
 
 SET(CPACK_TOPLEVEL_TAG "${CPACK_SYSTEM_NAME}")
@@ -110,6 +110,17 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 		config = config.replace( "@CPACK_PACKAGE_VERSION_MINOR@", versionList[1] or 0, 1 )
 		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
 		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", self._directory, 1 )
+
+		generators = { ('WINDOWS',True): 'ZIP',
+					   ('WINDOWS',False): 'NSIS;ZIP',
+					   ('APPLE', True): 'TBZ2',
+					   ('APPLE', False): 'DragNDrop;TBZ2',
+					   ('ELSE', True): 'TBZ2',
+					   ('ELSE', False): 'STGZ;TBZ2' }
+
+		for i in ('WINDOWS', 'APPLE', 'ELSE'):
+			config = config.replace( "@CPACK_GENERATOR_%s@" % i, generators[(i, self._sourcePackage)] )
+
 		if self._sourcePackage:
 			cpackSource = "TRUE"
 		else:
