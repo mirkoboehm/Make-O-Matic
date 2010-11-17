@@ -46,7 +46,7 @@ cmakeRelease = CMakeBuilder()
 cmakeRelease.addCMakeVariable( enableCharmTools )
 release.addPlugin( cmakeRelease )
 release.addPlugin( CTest() )
-release.addPlugin( CPack() )
+release.addPlugin( CPack( licenseFile='License.txt' ) )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 project.addPlugin( RSyncPublisher( localDir = PathResolver( project.getPackagesDir ) ) )

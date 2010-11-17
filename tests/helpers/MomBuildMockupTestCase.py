@@ -62,7 +62,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 		cmakeRelease = CMakeBuilder()
 		release.addPlugin( cmakeRelease )
 		release.addPlugin( CTest() )
-		release.addPlugin( CPack() )
+		release.addPlugin( CPack( sourcePackage=True ) )
 
 		build.getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
 
