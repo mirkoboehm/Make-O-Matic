@@ -1,29 +1,67 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
-	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://www.w3.org/1999/xhtml">
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns="http://www.w3.org/1999/xhtml">
 
 	<xsl:output method="xml" indent="yes" encoding="UTF-8" />
 
-	<xsl:template match="build">
+	<xsl:template name="showBuildStatus">
+		<xsl:param name="returncode"/>
+		<span class="build-status">
+			<xsl:choose>
+				<xsl:when test="$returncode = 0">
+					<span class="success">SUCCESS</span>
+				</xsl:when>
+				<xsl:when test="$returncode = 1">
+					<span class="fail">Build error</span>
+				</xsl:when>
+				<xsl:when test="$returncode = 2">
+					<span class="fail">Configuration error</span>
+				</xsl:when>
+				<xsl:otherwise>
+					<span class="fail">Make-O-Matic error</span>
+				</xsl:otherwise>
+			</xsl:choose>
+		</span>
+	</xsl:template>
+
+	<xsl:template name="showStepStatus">
+		<xsl:choose>
+			<xsl:when test="@isEnabled = 'False'">
+				<span class="neutral">DISABLED</span>
+			</xsl:when>
+			<xsl:when test="@isEmpty = 'True'">
+				<span class="neutral">NO ACTIONS REGISTERED</span>
+			</xsl:when>
+			<xsl:when test="@failed = 'True'">
+				<span class="fail">FAILED</span>
+			</xsl:when>
+			<xsl:otherwise>
+				<span class="success">SUCCESS</span>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template match="/">
 		<html>
 			<head>
 				<style type="text/css">
 /*** default tags ***/
 body, table {
-	font-family: monospace;
-	font-size: 9pt;
-	width: 1000px;
+	font-family: Arial;
+	width: 800px;
 }
 
 div#build-report div {
 	margin-left: 1%;
 }
 
+
 pre {
 	font-size: 8pt;
 	margin-top: 10px;
 	margin-bottom: 10px;
-	width: 1000px;
+	width: 800px;
 	background-color: #EEEEEE;
 
 	/* line wrap hack */
@@ -49,7 +87,6 @@ h1 {
 }
 h2 {
 	font-size: 115%;
-	margin: 0px;
 }
 h3 {
 	font-size: 110%;
@@ -85,35 +122,28 @@ h4 {
 			</head>
 			<body>
 				<div id="build-report">
-					<h1>Build Report for: <xsl:value-of select="@name" /></h1>
-					<div class="tag-build">
-						<p>
-							Platform: <xsl:value-of select="@sys-platform" /> (<xsl:value-of select="@sys-version" />)<br />
-							Architecture: <xsl:value-of select="@sys-architecture" /><br />
-							Node name: <xsl:value-of select="@sys-nodename" />
-						</p>
-						<p class="build-status">
-							Build Status:
-							<xsl:choose>
-								<xsl:when test="@returncode = 0">
-									<span class="success">SUCCESS</span>
-								</xsl:when>
-								<xsl:when test="@returncode = 1">
-									<span class="fail">Build error</span>
-								</xsl:when>
-								<xsl:when test="@returncode = 2">
-									<span class="fail">Configuration error</span>
-								</xsl:when>
-								<xsl:otherwise>
-									<span class="fail">Make-O-Matic error</span>
-								</xsl:otherwise>
-							</xsl:choose>
-						</p>
-						<xsl:apply-templates />
-					</div>
+					<xsl:apply-templates/>
 				</div>
 			</body>
 		</html>
+	</xsl:template>
+	
+	<xsl:template match="build">
+		<h1>Build Report for: <xsl:value-of select="@name" /></h1>
+		<div class="tag-build">
+			<p>
+				Platform: <xsl:value-of select="@sys-platform" /> (<xsl:value-of select="@sys-version" />)<br />
+				Architecture: <xsl:value-of select="@sys-architecture" /><br />
+				Node name: <xsl:value-of select="@sys-nodename" />
+			</p>
+			<p class="build-status">
+				Build Status:
+				<xsl:call-template name="showBuildStatus">
+					<xsl:with-param name="returncode" select="@returncode"/>
+				</xsl:call-template>
+			</p>
+			<xsl:apply-templates />
+		</div>
 	</xsl:template>
 
 	<xsl:template match="project">
@@ -156,7 +186,7 @@ h4 {
 				<table>
 					<thead>
 						<tr>
-							<th width="700px">Instruction</th>
+							<th width="500px">Instruction</th>
 							<th width="200px">Timing</th>
 							<th width="300px">Status</th>
 						</tr>
@@ -205,20 +235,7 @@ h4 {
 						<xsl:value-of select="@timing" />
 					</td>
 					<td class="step-status">
-						<xsl:choose>
-							<xsl:when test="@isEnabled = 'False'">
-								<span class="neutral">DISABLED</span>
-							</xsl:when>
-							<xsl:when test="@isEmpty = 'True'">
-								<span class="neutral">NO ACTIONS REGISTERED</span>
-							</xsl:when>
-							<xsl:when test="@failed = 'True'">
-								<span class="fail">FAILED</span>
-							</xsl:when>
-							<xsl:otherwise>
-								<span class="success">SUCCESS</span>
-							</xsl:otherwise>
-						</xsl:choose>
+						<xsl:call-template name="showStepStatus" />
 					</td>
 				</tr>
 	
