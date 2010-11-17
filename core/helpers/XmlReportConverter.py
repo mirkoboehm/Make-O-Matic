@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os.path
-from core.Exceptions import ConfigurationError, MomError, returncode_to_description
+from core.Exceptions import ConfigurationError, MomError, returncode_to_description, BuildError
 from core.helpers.GlobalMApp import mApp
 from core.MObject import MObject
 from textwrap import TextWrapper
@@ -219,26 +219,31 @@ class XmlReportConverter( MObject ):
 		out += wrapper.wrap( "*" * wrapper.width )
 		out += wrapper.wrap( "Summary of the {0} Build Report".format( self.__xml.attrib["name"] ) )
 		out += " "
+
 		wrapper.indent()
 		out += wrapper.wrap( "Build status:   {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
-		out += wrapper.wrap( "Build time:     {0}".format( string_from_node_attribute( element, "project", "timing" ) ) )
-		out += wrapper.wrap( "Report delay:   {0} after commit".format( roundTripTime ) )
-		out += " "
-		out += wrapper.wrap( "Revision:       {0}".format( string_from_node_attribute( element, "plugin", "revision" ) ) )
-		out += wrapper.wrap( "Committer:      {0}".format( string_from_node_attribute( element, "plugin", "committerName" ) ) )
-		out += wrapper.wrap( "Time:           {0}".format( string_from_node_attribute( element, "plugin", "commitTimeReadable" ) ) )
 
-		out += " "
-		out += wrapper.wrap( "--- Commit message following ---" )
-		out += " "
-		wrapper.indent( indentString = " " )
-		out += wrapper.wrapMultiLine( string_from_node( element, "commitMessage" ), drop_empty_lines = False )
-		wrapper.dedent( indentString = " " )
-		out += " "
-		out += wrapper.wrap( "--- End of commit message ---" )
-		out += " "
+		# only show detailed summary on success or build error
+		if int( element.attrib["returncode"] ) in ( 0, BuildError.getReturnCode() ):
+			out += wrapper.wrap( "Build time:     {0}".format( string_from_node_attribute( element, "project", "timing" ) ) )
+			out += wrapper.wrap( "Report delay:   {0} after commit".format( roundTripTime ) )
+			out += " "
+			out += wrapper.wrap( "Revision:       {0}".format( string_from_node_attribute( element, "plugin", "revision" ) ) )
+			out += wrapper.wrap( "Committer:      {0}".format( string_from_node_attribute( element, "plugin", "committerName" ) ) )
+			out += wrapper.wrap( "Time:           {0}".format( string_from_node_attribute( element, "plugin", "commitTimeReadable" ) ) )
+
+			out += " "
+			out += wrapper.wrap( "--- Commit message following ---" )
+			out += " "
+			wrapper.indent( indentString = " " )
+			out += wrapper.wrapMultiLine( string_from_node( element, "commitMessage" ), drop_empty_lines = False )
+			wrapper.dedent( indentString = " " )
+			out += " "
+			out += wrapper.wrap( "--- End of commit message ---" )
 
 		wrapper.dedent()
+
+		out += " "
 		out += wrapper.wrap( "*" * wrapper.width )
 		out += " "
 
