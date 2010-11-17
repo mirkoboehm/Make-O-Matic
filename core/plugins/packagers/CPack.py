@@ -64,6 +64,7 @@ ENDIF()
 
 SET(CPACK_TOPLEVEL_TAG "${CPACK_SYSTEM_NAME}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_FILE_NAME}")
+SET(CPACK_RESOURCE_FILE_LICENSE "@CPACK_RESOURCE_FILE_LICENSE@")
 SET(CPACK_IGNORE_FILES "/\\\\.svn/;/\\\\.git/")
 SET(CPACK_PACKAGE_DESCRIPTION "")
 '''
@@ -111,6 +112,10 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
 		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", self._directory, 1 )
 
+		licenseFile = self._licenseFile if self._licenseFile != None else ""
+
+		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
+
 		generators = { ('WINDOWS',True): 'ZIP',
 					   ('WINDOWS',False): 'NSIS;ZIP',
 					   ('APPLE', True): 'TBZ2',
@@ -142,9 +147,16 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 
 class CPack( PackageProvider ):
 
-	def __init__( self, sourcePackage = False, name = None ):
+	def __init__( self, sourcePackage = False, licenseFile = None, name = None ):
 		PackageProvider.__init__( self, name )
+		self._licenseFile = licenseFile
 		self._setCommand( "cpack", CMakeSearchPaths )
+
+		if licenseFile == None and not sourcePackage:
+			raise ConfigurationError( 'CPack requires a license file for binary packages!' )
+		elif len( licenseFile ) > 0 and sourcePackage:
+			raise ConfigurationError( 'You must not set a license file for source packages!' )
+
 		if sourcePackage:
 			self.__configFile = "CPackSourceConfig.cmake"
 		else:
