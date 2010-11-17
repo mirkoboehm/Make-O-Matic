@@ -128,6 +128,13 @@ h4 {
 		</html>
 	</xsl:template>
 	
+	<xsl:template match="exception">
+		<div class="tag-exception">
+			Description: <xsl:value-of select="description"/><br/>
+			<pre><xsl:value-of select="traceback"/></pre>
+		</div>
+	</xsl:template>
+	
 	<xsl:template match="build">
 		<h1>Build Report for: <xsl:value-of select="@name" /></h1>
 		<div class="tag-build">
