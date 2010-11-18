@@ -81,7 +81,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEquals( doc.find( './/step' ), None )
 		self.assertNotEquals( doc.find( './/action' ), None )
 
-		self.assertNotEquals( doc.find( './/plugin[@name="CMakeBuilder"]' ), None )
+		if etree.__name__ == "lxml.etree":
+			self.assertNotEquals( doc.find( './/plugin[@name="CMakeBuilder"]' ), None )
 
 	def testEnvironmentExpand( self ):
 		self._build( 'c' )
@@ -194,8 +195,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		self.assertTrue( "self.runSetups()" in doc.find( "{0}/traceback".format( e ) ).text )
 
-		self.assertNotEquals( doc.find( '{0}[@returncode="{1}"]'.format( e, MomError.getReturnCode() ) )
-							, None, "Wrong returncode in exception" )
+		if etree.__name__ == "lxml.etree":
+			self.assertNotEquals( doc.find( '{0}[@returncode="{1}"]'.format( e, MomError.getReturnCode() ) )
+								, None, "Wrong returncode in exception" )
 
 	def testXmlReportOnException1( self ):
 		# Covers runPreflightChecks phase
@@ -217,8 +219,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		self.assertTrue( "self.runPreFlightChecks()" in doc.find( "{0}/traceback".format( e ) ).text )
 
-		self.assertNotEquals( doc.find( '{0}[@returncode="{1}"]'.format( e, ConfigurationError.getReturnCode() ) )
-							, None, "Wrong returncode in exception" )
+		if etree.__name__ == "lxml.etree":
+			self.assertNotEquals( doc.find( '{0}[@returncode="{1}"]'.format( e, ConfigurationError.getReturnCode() ) )
+								, None, "Wrong returncode in exception" )
 
 	def testXmlReportOnException2( self ):
 		# Covers run phase
