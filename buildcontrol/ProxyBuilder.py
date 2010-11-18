@@ -49,5 +49,6 @@ class ProxyBuilder( MApplication ):
 		if self.getParameters().getScmLocation():
 			builder.setLocation( self.getParameters().getScmLocation() )
 		options = sys.argv[1:]
-		rc = builder.invokeBuild( options ).getReturnCode()
+		runner = builder.invokeBuild( options )
+		rc = runner.getReturnCode()
 		self.registerReturnCode( rc )
