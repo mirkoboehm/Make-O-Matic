@@ -33,8 +33,9 @@ class TestProviderAction( ShellCommandAction ):
 
 class TestProvider( Analyzer ):
 
-	def __init__( self, name = None ):
-		Analyzer.__init__( self, name )
+	# Tests should have 100% success rate => minimum = 1.0
+	def __init__( self, name = None, minimumScore = 1.0 ):
+		Analyzer.__init__( self, name, minimumScore )
 		self.__testArgument = None
 		self.__action = None
 

@@ -93,18 +93,11 @@ class PyLintChecker( Analyzer ):
 
 	def __init__( self, pyLintTool = None, pyLintRcFile = None, htmlOutputPath = None,
 				modules = None, name = None, minimumScore = 0.0 ):
-		Analyzer.__init__( self, name )
+		Analyzer.__init__( self, name, minimumScore )
 		self._setCommand( pyLintTool )
 		self.setModules( modules )
 		self.setPyLintRcFile( pyLintRcFile )
 		self.setHtmlOutputPath( htmlOutputPath )
-		self.setMinimumScore( minimumScore )
-
-	def setMinimumScore( self, minimumScore ):
-		self.__minimumScore = minimumScore
-
-	def getMinimumScore( self ):
-		return self.__minimumScore
 
 	def setModules( self, modules ):
 		check_for_list_of_paths_or_none( modules, 'The PyLint modules must be a list of paths!' )
@@ -134,9 +127,6 @@ class PyLintChecker( Analyzer ):
 			self._setReport( report )
 
 			mApp().debugN( self, 2, 'pylint score is {0}/{1}: {2}.'.format( score, top, report ) )
-
-	def isScoreOkay( self ):
-		return ( self.getScore()[0] >= self.getMinimumScore() )
 
 	def setHtmlOutputPath( self, path ):
 		check_for_path_or_none( path, 'The HTML output path must be a file system path!' )
