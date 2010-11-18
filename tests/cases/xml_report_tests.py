@@ -107,6 +107,17 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ), None )
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ), None )
 
+	def testConvertXmlReportToHtmlWithoutLxml( self ):
+		# write a new method implementation
+		def hasXsltSupport_new():
+			return False
+
+		converter = XmlReportConverter( self.getXmlReport() )
+		converter.hasXsltSupport = hasXsltSupport_new # replace method
+
+		xmlString = converter.convertToHtml()
+		self.assertTrue( xmlString == None, "If no XSLT support is available, converting to HTML should not work" )
+
 	def testConvertXmlReportToText( self ):
 		self._build()
 		converter = XmlReportConverter( self.getXmlReport() )
