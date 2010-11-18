@@ -110,6 +110,7 @@ class Step( MObject ):
 					mApp().debugN( self, 2, 'step "{0}" disabled, skipping.'.format( self.getName() ) )
 					return True
 				if instructions.hasFailed() and not self.getExecuteOnFailure():
+					self.__skipped = True
 					mApp().debugN( self, 4, 'aborting because of errors earlier in the build' )
 					return True
 				self._logEnvironment( instructions )
