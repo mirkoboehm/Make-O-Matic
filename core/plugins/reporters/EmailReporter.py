@@ -146,7 +146,12 @@ class EmailReporter( Reporter ):
 
 		# text and html part
 		email.attachTextPart( converter.convertToTextSummary() )
-		email.attachAlternativeTextPart( converter.convertToText( short = True ), converter.convertToHtml() )
+		textReport = converter.convertToText( short = True )
+		htmlReport = converter.convertToHtml()
+		if htmlReport:
+			email.attachAlternativeTextPart( textReport, htmlReport )
+		else:
+			email.attachTextPart( textReport )
 
 		# attachments
 		exception = mApp().getException()

@@ -22,15 +22,18 @@ from core.Exceptions import ConfigurationError, MomError, returncode_to_descript
 from core.helpers.GlobalMApp import mApp
 from core.MObject import MObject
 from textwrap import TextWrapper
-from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute
+from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute, \
+	find_nodes_with_attribute_and_value
 from datetime import datetime
 from core.helpers.TimeKeeper import formatted_time_delta
+import xml.etree.ElementTree
+from StringIO import StringIO
 
 try:
-	from lxml import etree
+	import lxml.etree
+	HAVE_LXML = True
 except ImportError:
-	raise MomError( "Fatal: lxml package missing, required for Xml transformations" )
-
+	HAVE_LXML = False
 
 class ReportFormat:
 	"""Enum-like structure for output format"""
@@ -87,20 +90,22 @@ class XmlReportConverter( MObject ):
 	def __init__( self, xmlReport ):
 		MObject.__init__( self )
 
-		self.__xml = etree.fromstring( xmlReport.getReport() )
+		self.__xmlReport = xmlReport
+		self.__elementTree = xml.etree.ElementTree.parse( StringIO( xmlReport.getReport() ) ) # cache ElementTree object
 
 		self.__xslTemplateSnippets = {}
 		self.__xmlTemplateFunctions = {}
 		self.__registeredPlugins = []
 
-		self._initializeXslTemplates()
+		if HAVE_LXML:
+			self._initializeXslTemplates()
 		self._fetchTemplates( mApp() )
 
 	def convertTo( self, destinationReportFormat ):
 		"""Converts the report to destinationFormat, which is one of the keys in _XSL_STYLESHEETS"""
 
 		if destinationReportFormat == ReportFormat.XML:
-			return etree.tostring( self.__xml, xml_declaration = True, encoding = "utf-8" ) # no conversion
+			return self.__xmlReport.getReport()
 		elif destinationReportFormat == ReportFormat.HTML:
 			return self.convertToHtml()
 		elif destinationReportFormat == ReportFormat.TEXT:
@@ -112,10 +117,10 @@ class XmlReportConverter( MObject ):
 		for key, value in self._XSL_STYLESHEETS.items():
 			try:
 				f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
-				self.__xslTemplateSnippets[key] = etree.XML( f.read() )
+				self.__xslTemplateSnippets[key] = lxml.etree.XML( f.read() )
 			except KeyError:
 				raise MomError( "XSL Stylesheet missing: {0}".format( value ) )
-			except etree.XMLSyntaxError, e:
+			except lxml.etree.XMLSyntaxError, e:
 				raise MomError( "XSL Stylesheet for {0} is malformed: {1}".format( ReportFormat.toString( key ), e ) )
 
 	def _fetchTemplates( self, instructions ):
@@ -154,10 +159,10 @@ class XmlReportConverter( MObject ):
 
 			# create new element with markup provided from plugin
 			try:
-				element = etree.XML( """<xsl:when xmlns:xsl="http://www.w3.org/1999/XSL/Transform"	
+				element = lxml.etree.XML( """<xsl:when xmlns:xsl="http://www.w3.org/1999/XSL/Transform"	
 					 xmlns="http://www.w3.org/1999/xhtml"
 					 test="@name = '{0}'">{1}</xsl:when>""".format( plugin.getName(), markup ) )
-			except etree.XMLSyntaxError:
+			except lxml.etree.XMLSyntaxError:
 				raise ConfigurationError( "XSL template of {0} plugin malformed.".format( plugin.getName() ) )
 
 			# insert new element in the placeholder from the stylesheet
@@ -185,11 +190,18 @@ class XmlReportConverter( MObject ):
 
 		return self.__xslTemplateSnippets[destinationReportFormat]
 
+	def hasXsltSupport( self ):
+		return HAVE_LXML
+
 	def convertToHtml( self ):
 		"""Converts the report to HTML using the XSL stylesheet for HTML"""
 
-		transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
-		return str( transform( self.__xml ) )
+		if not self.hasXsltSupport():
+			mApp().debug( self, "Cannot convert to HTML. Lacking support for XSLT transformations. Please install the python-lxml package." )
+			return None
+
+		transform = lxml.etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
+		return str( transform( lxml.etree.XML( self.__xmlReport.getReport() ) ) )
 
 	def convertToText( self, short = False ):
 		"""Converts the report to plain text using the recursive _toText() method"""
@@ -201,12 +213,12 @@ class XmlReportConverter( MObject ):
 		else:
 			ignoredTags = []
 
-		return "\n".join( self._toText( self.__xml, wrapper, ignoredTags ) )
+		return "\n".join( self._toText( self.__elementTree.getroot(), wrapper, ignoredTags ) )
 
 	def convertToTextSummary( self ):
 		wrapper = _MyTextWrapper( replace_whitespace = False, drop_whitespace = False, width = 80 )
 
-		element = self.__xml
+		element = self.__elementTree.getroot()
 
 		# calculate round trip time from commit to report
 		startTime = float_from_node_attribute( element, "plugin", "commitTime" )
@@ -217,7 +229,7 @@ class XmlReportConverter( MObject ):
 
 		out = []
 		out += wrapper.wrap( "*" * wrapper.width )
-		out += wrapper.wrap( "Summary of the {0} Build Report".format( self.__xml.attrib["name"] ) )
+		out += wrapper.wrap( "Summary of the {0} Build Report".format( element.attrib["name"] ) )
 		out += " "
 
 		wrapper.indent()
@@ -253,9 +265,9 @@ class XmlReportConverter( MObject ):
 		# no wrapper needed
 
 		out = []
-		element = self.__xml
+		element = self.__elementTree.getroot()
 
-		failedSteps = element.findall( './/step[@failed="True"]' )
+		failedSteps = find_nodes_with_attribute_and_value( element, "step", "failed", "True" )
 		for step in failedSteps:
 			out += ["*** Step failed: {0} ***".format( step.attrib["name"] )]
 

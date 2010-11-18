@@ -39,6 +39,7 @@ class XmlReportGenerator( Plugin ):
 		self.__reportFormat = reportFormat
 
 		self.__finished = False
+		self.__failed = False
 
 	def shutDown( self ):
 		if self.__finished:
@@ -51,10 +52,11 @@ class XmlReportGenerator( Plugin ):
 		self._writeReport( report )
 		self._saveReportFile()
 
-		self.__finished = True
-
 	def getDescription( self ):
-		return "Report saved to: {0}".format( self.getFileName() )
+		if not self.__failed:
+			return "Report saved to: {0}".format( self.getFileName() )
+		else:
+			return "Could not save {0}".format( self.getFileName() )
 
 	def getReportFile( self ):
 		return self.__reportFile
@@ -75,7 +77,11 @@ class XmlReportGenerator( Plugin ):
 	def _writeReport( self, report ):
 		if self.__fileHandle and report:
 			convertedText = self.convert( report )
-			self.__fileHandle.write( convertedText )
+
+			if convertedText:
+				self.__fileHandle.write( convertedText )
+			else:
+				self.__failed = True
 
 	def _saveReportFile( self ):
 		if self.__fileHandle:

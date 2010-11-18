@@ -19,6 +19,9 @@
 
 from core.Exceptions import MomException, returncode_to_description
 
+# *** Note ***
+# This module should only use stuff from Python's xml.* package, do not depend on external packages for now 
+
 def create_child_node( document, parentNode, tagName, text ):
 	elementNode = document.createElement( tagName )
 	textNode = document.createTextNode( str( text ) )
@@ -41,16 +44,39 @@ def create_exception_xml_node( document, exception, traceback ):
 	return node
 
 def string_from_node_attribute( element, node, attribute ):
-	try:
-		return element.find( ".//{0}[@{1}]".format( node, attribute ) ).attrib[attribute]
-	except AttributeError:
-		return "N/A"
+	for el in element.getiterator( node ):
+		if attribute in el.attrib:
+			return str( el.attrib[attribute] )
+	return "N/A"
+
+#	# lxml compatible code
+#	try:
+#		return element.find( ".//{0}[@{1}]".format( node, attribute ) ).attrib[attribute]
+#	except AttributeError:
+#		return "N/A"
 
 def float_from_node_attribute( element, node, attribute ):
-	try:
-		return float( element.find( ".//{0}[@{1}]".format( node, attribute ) ).attrib[attribute] )
-	except AttributeError, ValueError:
-		return - 1
+	for el in element.getiterator( node ):
+		if attribute in el.attrib:
+			try:
+				return float( el.attrib[attribute] )
+			except ValueError:
+				return - 1
+	return - 1
+
+#	# lxml compatible code
+#	try:
+#		return float( element.find( ".//{0}[@{1}]".format( node, attribute ) ).attrib[attribute] )
+#	except AttributeError, ValueError:
+#		return - 1
+
+def find_nodes_with_attribute_and_value( element, node, attribute, value ):
+	nodes = []
+	for el in element.getiterator( node ):
+		if attribute in el.attrib:
+			if el.attrib[attribute] == value:
+				nodes.append( el )
+	return nodes
 
 def string_from_node( element, node ):
 	try:
