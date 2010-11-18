@@ -30,10 +30,25 @@ import xml.etree.ElementTree
 from StringIO import StringIO
 
 try:
-	import lxml.etree
-	HAVE_LXML = True
+	from lxml import etree
 except ImportError:
-	HAVE_LXML = False
+	try:
+		# Python 2.5
+		import xml.etree.cElementTree as etree
+	except ImportError:
+		try:
+			# Python 2.5
+			import xml.etree.ElementTree as etree
+		except ImportError:
+			try:
+				# normal cElementTree install
+				import cElementTree as etree
+			except ImportError:
+				try:
+					# normal ElementTree install
+					import elementtree.ElementTree as etree
+				except ImportError, e:
+					raise MomError( "Could not find a suitable XML module: {0}".format( e ) )
 
 class ReportFormat:
 	"""Enum-like structure for output format"""
@@ -90,6 +105,8 @@ class XmlReportConverter( MObject ):
 	def __init__( self, xmlReport ):
 		MObject.__init__( self )
 
+		mApp().debugN( self, 4, "Using following etree implementation: {0}. XSLT support: {1}".format( etree.__name__, self.hasXsltSupport() ) )
+
 		self.__xmlReport = xmlReport
 		self.__elementTree = xml.etree.ElementTree.parse( StringIO( xmlReport.getReport() ) ) # cache ElementTree object
 
@@ -97,8 +114,7 @@ class XmlReportConverter( MObject ):
 		self.__xmlTemplateFunctions = {}
 		self.__registeredPlugins = []
 
-		if HAVE_LXML:
-			self._initializeXslTemplates()
+		self._initializeXslTemplates()
 		self._fetchTemplates( mApp() )
 
 	def convertTo( self, destinationReportFormat ):
@@ -117,10 +133,10 @@ class XmlReportConverter( MObject ):
 		for key, value in self._XSL_STYLESHEETS.items():
 			try:
 				f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
-				self.__xslTemplateSnippets[key] = lxml.etree.XML( f.read() )
+				self.__xslTemplateSnippets[key] = etree.XML( f.read() )
 			except KeyError:
 				raise MomError( "XSL Stylesheet missing: {0}".format( value ) )
-			except lxml.etree.XMLSyntaxError, e:
+			except etree.XMLSyntaxError, e:
 				raise MomError( "XSL Stylesheet for {0} is malformed: {1}".format( ReportFormat.toString( key ), e ) )
 
 	def _fetchTemplates( self, instructions ):
@@ -159,10 +175,10 @@ class XmlReportConverter( MObject ):
 
 			# create new element with markup provided from plugin
 			try:
-				element = lxml.etree.XML( """<xsl:when xmlns:xsl="http://www.w3.org/1999/XSL/Transform"	
+				element = etree.XML( """<xsl:when xmlns:xsl="http://www.w3.org/1999/XSL/Transform"	
 					 xmlns="http://www.w3.org/1999/xhtml"
 					 test="@name = '{0}'">{1}</xsl:when>""".format( plugin.getName(), markup ) )
-			except lxml.etree.XMLSyntaxError:
+			except etree.XMLSyntaxError:
 				raise ConfigurationError( "XSL template of {0} plugin malformed.".format( plugin.getName() ) )
 
 			# insert new element in the placeholder from the stylesheet
@@ -191,7 +207,7 @@ class XmlReportConverter( MObject ):
 		return self.__xslTemplateSnippets[destinationReportFormat]
 
 	def hasXsltSupport( self ):
-		return HAVE_LXML
+		return ( etree.__name__ == "lxml.etree" )
 
 	def convertToHtml( self ):
 		"""Converts the report to HTML using the XSL stylesheet for HTML"""
@@ -200,8 +216,8 @@ class XmlReportConverter( MObject ):
 			mApp().debug( self, "Cannot convert to HTML. Lacking support for XSLT transformations. Please install the python-lxml package." )
 			return None
 
-		transform = lxml.etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
-		return str( transform( lxml.etree.XML( self.__xmlReport.getReport() ) ) )
+		transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
+		return str( transform( etree.XML( self.__xmlReport.getReport() ) ) )
 
 	def convertToText( self, short = False ):
 		"""Converts the report to plain text using the recursive _toText() method"""
