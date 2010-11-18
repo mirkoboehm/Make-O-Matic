@@ -95,9 +95,10 @@ class _CPackMovePackageAction( FilesMoveAction ):
 
 
 class _CPackGenerateConfigurationAction( FilesMoveAction ):
-	def __init__( self, sourcePackage, config, directory ):
+	def __init__( self, sourcePackage, licenseFile, config, directory ):
 		FilesMoveAction.__init__( self )
 		self._sourcePackage = sourcePackage
+		self._licenseFile = licenseFile
 		self._directory = directory
 		self._config = config
 
@@ -174,7 +175,7 @@ class CPack( PackageProvider ):
 			packagedDirectory = os.path.join( project.getSourceDir(), configuration.getSourcePrefix() )
 		else:
 			packagedDirectory = configuration.getTargetDir()
-		generateConfig = _CPackGenerateConfigurationAction( self._sourcePackage, self.__configFile, packagedDirectory )
+		generateConfig = _CPackGenerateConfigurationAction( self._sourcePackage, self._licenseFile, self.__configFile, packagedDirectory )
 		generateConfig.setWorkingDirectory( configuration.getBuildDir() )
 		step.addMainAction( generateConfig )
 		makePackage = PackageProvider.makePackageStep( self )
