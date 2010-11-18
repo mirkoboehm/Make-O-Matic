@@ -36,6 +36,9 @@
 			<xsl:when test="@failed = 'True'">
 				<span class="fail">FAILED</span>
 			</xsl:when>
+			<xsl:when test="@skipped = 'True'">
+				<span class="neutral">SKIPPED</span>
+			</xsl:when>
 			<xsl:otherwise>
 				<span class="success">SUCCESS</span>
 			</xsl:otherwise>

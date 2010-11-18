@@ -37,6 +37,7 @@ class Step( MObject ):
 		self.__postActions = [] # list of post actions
 		self.__logfileName = None
 		self.__failed = False
+		self.__skipped = False
 
 	def failed( self ):
 		return self.__failed
@@ -46,6 +47,9 @@ class Step( MObject ):
 
 	def isEnabled( self ):
 		return self.__enabled
+
+	def wasSkipped( self ):
+		return self.__skipped
 
 	def setIgnorePreviousFailure( self, doIt ):
 		"""Set execute-on-failure. If true, the command will be executed, even if a previous command of the same sequence failed."""
@@ -131,6 +135,7 @@ class Step( MObject ):
 								self.__failed = True
 						else:
 							resultText = 'skipped'
+							self.__skipped = True
 				return not self.__failed
 		finally:
 			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
@@ -156,6 +161,7 @@ class Step( MObject ):
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
 		node.attributes["failed"] = str( self.failed() )
+		node.attributes["skipped"] = str( self.wasSkipped() )
 
 		if self.getPreActions():
 			for action in self.getPreActions():

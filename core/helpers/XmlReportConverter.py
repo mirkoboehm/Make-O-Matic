@@ -392,6 +392,8 @@ class XmlReportConverter( MObject ):
 				status = "noaction"
 			elif element.attrib["failed"] == "True":
 				status = "!failed!"
+			elif element.attrib["skipped"] == "True":
+				status = "skipped "
 			else:
 				status = "success "
 

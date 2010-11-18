@@ -162,6 +162,7 @@ class Action( MObject ):
 		node = MObject.createXmlNode( self, document )
 
 		node.attributes["finished"] = str( self.didFinish() )
+		node.attributes["started"] = str( self.wasStarted() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
 		node.attributes["returncode"] = str( self.getResult() )
 
