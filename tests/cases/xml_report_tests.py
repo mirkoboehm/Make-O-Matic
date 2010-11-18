@@ -32,7 +32,23 @@ from core.helpers.XmlUtils import xml_compare
 try:
 	from lxml import etree
 except ImportError:
-	raise MomError( "Fatal: lxml package missing, required for Xml transformations" )
+	try:
+		# Python 2.5
+		import xml.etree.cElementTree as etree
+	except ImportError:
+		try:
+			# Python 2.5
+			import xml.etree.ElementTree as etree
+		except ImportError:
+			try:
+				# normal cElementTree install
+				import cElementTree as etree
+			except ImportError:
+				try:
+					# normal ElementTree install
+					import elementtree.ElementTree as etree
+				except ImportError, e:
+					raise MomError( "Could not find a suitable XML module: {0}".format( e ) )
 
 class XmlReportTests( MomBuildMockupTestCase ):
 
