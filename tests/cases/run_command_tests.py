@@ -21,8 +21,13 @@ import unittest
 from core.helpers.RunCommand import RunCommand
 from core.Exceptions import ConfigurationError
 from tests.helpers.MomTestCase import MomTestCase
+import os
+import sys
 
 class RunCommandTests( MomTestCase ):
+	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
+	Helper = os.path.join( ThisFilePath, '..', 'helpers', 'check_return_value_helper.py' )
+
 	# these are not a windows friendly tests, i guess
 
 	def testCheckQMakeVersion( self ):
@@ -40,6 +45,16 @@ class RunCommandTests( MomTestCase ):
 
 		version = cmakeCommand.checkVersion( expectedReturnCode = 0 )
 		self.assertTrue( "cmake version" in version )
+
+	def testCheckReturnCodes( self ):
+		'''Check that RunCommand returns the actual return value of the called process.'''
+		for timeout in [ None, 60 ]:
+			for captureOutput in [ False, True ]:
+				for code in range( 16 ):
+					cmd = [ sys.executable, RunCommandTests.Helper, str( code ) ]
+					runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
+					runner.run()
+					self.assertEquals( runner.getReturnCode(), code )
 
 if __name__ == "__main__":
 	unittest.main()
