@@ -26,9 +26,10 @@ class ShellCommandAction( Action ):
 	"""ShellCommandAction encapsulates the execution of one command in the Step class. 
 	It is mostly used internally, but can be of general use as well."""
 
-	def __init__( self, command = None, timeout = None ):
+	def __init__( self, command = None, timeout = None, combineOutput = True ):
 		Action.__init__( self )
 		self.setCommand( command, timeout )
+		self.__combineOutput = combineOutput
 		self.__runner = None
 
 	def getLogDescription( self ):
@@ -54,7 +55,7 @@ class ShellCommandAction( Action ):
 
 	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
-		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, True )
+		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, combineOutput = self.__combineOutput )
 		if self.getWorkingDirectory() != None:
 			self.__runner.setWorkingDir( self.getWorkingDirectory() )
 		self._getRunner().run()
