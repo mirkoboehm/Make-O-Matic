@@ -18,6 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.actions.Action import Action
+from core.Plugin import Plugin
+from core.Exceptions import ConfigurationError
 
 class CallbackAction( Action ):
 	"""CallbackAction provides a mechanism to call a method in a specific step
@@ -25,6 +27,9 @@ class CallbackAction( Action ):
 	Just initialize CallbackAction with an object and a method pointer and add the action to some step."""
 
 	def __init__( self, obj, func ):
+		if not isinstance( obj, Plugin ):
+			raise ConfigurationError( "Can only call methods on Plugin instances" )
+
 		Action.__init__( self )
 
 		self.__obj = obj
