@@ -181,6 +181,15 @@ class Plugin( MObject ):
 		return ""
 
 	@classmethod
+	def setDefaultSetting( cls, name, value ):
+		"""Call this to set a default settings of a plugin, does nothing if name already exists in settings"""
+
+		try:
+			cls.getSetting( name, True )
+		except ConfigurationError:
+			cls.setSetting( name, value )
+
+	@classmethod
 	def setSetting( cls, name, value ):
 		"""Call this to save settings of a plugin, do not use Settings class directly!"""
 
@@ -215,4 +224,3 @@ class Plugin( MObject ):
 		\note Overwrite if necessary, returns an empty dict by default"""
 
 		return {}
-
