@@ -46,7 +46,7 @@ class Parameters( MObject ):
 		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
 			help = 'Full SCM URL' )
 		parser.add_option( '-t', '--type', action = 'store', dest = 'buildType',
-			help = 'selects the build type (for example manual, continuous, daily, snapshot, full)' )
+			help = 'selects the build type (for example "M" (manual), "C" (continuous), "D" (daily), "S" (snapshot), "F" (full))' )
 		parser.add_option( '-m', '--ignore-commit-message', action = 'store_true', dest = 'ignoreCommitMessage',
 			help = 'ignore commit message commands (like "MOM:BuildType=S")' )
 		parser.add_option( '--ignore-configuration-files', action = 'store_true', dest = "ignoreConfigurationFiles",
