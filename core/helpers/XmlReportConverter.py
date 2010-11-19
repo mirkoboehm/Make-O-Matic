@@ -352,11 +352,22 @@ class XmlReportConverter( MObject ):
 			name = element.attrib["name"]
 			description = element.find( "plugindescription" ).text
 
+			# show plugin info like optional or disabled status
+			pluginState = []
+			if element.attrib["isEnabled"] == "False":
+				pluginState.append( "disabled" )
+			if element.attrib["isOptional"] == "True":
+				pluginState.append( "optional" )
+			if len( pluginState ) > 0:
+				name = "{0} ({1})".format( name, ", ".join( pluginState ) )
+
+			# show description if any
 			if description is not None:
 				out += wrapper.wrap( "{0}: {1}".format( name, description ) )
 			else:
 				out += wrapper.wrap( name )
 
+			# evaluate plugin specific getXmlTemplate method here to show extra information
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()
 				try:

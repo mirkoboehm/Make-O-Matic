@@ -79,7 +79,7 @@ class Plugin( MObject ):
 			mApp().debugN( self, 2, 'this plugin is disabled, skipping pre flight check.' )
 			return
 
-		if self.getOptional():
+		if self.isOptional():
 			try:
 				self.preFlightCheck()
 			except ( MomException, ConfigurationError ):
@@ -170,7 +170,7 @@ class Plugin( MObject ):
 	def setOptional( self, onOff ):
 		self.__optional = onOff
 
-	def getOptional( self ):
+	def isOptional( self ):
 		return self.__optional
 
 	def getDescription( self ):
@@ -203,6 +203,8 @@ class Plugin( MObject ):
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
+		node.attributes["isEnabled"] = str( self.isEnabled() )
+		node.attributes["isOptional"] = str( self.isOptional() )
 		create_child_node( document, node, "plugindescription", str( self.getDescription() ) )
 		return node
 

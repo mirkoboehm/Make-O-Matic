@@ -218,7 +218,13 @@ h4 {
 
 	<xsl:template match="plugin">
 		<h4>
-			Plugin: <xsl:value-of select="@name" />
+			<xsl:value-of select="@name" />
+			<xsl:if test="@isEnabled = 'False'">
+				[Disabled]
+			</xsl:if>
+			<xsl:if test="@isOptional = 'True'">
+				[Optional]
+			</xsl:if>
 			<xsl:if test="string-length(plugindescription) > 0">
 				(<xsl:value-of select="plugindescription"/>)
 			</xsl:if>
