@@ -72,6 +72,9 @@ class KrazyChecker( Analyzer ):
 	def preFlightCheck( self ):
 		assert isinstance( self.getInstructions(), Project )
 
+		# check settings
+		self.getSetting( KrazyChecker.DefaultConfiguration, True )
+
 	def setup( self ):
 		self._setCommand( "krazy2all" )
 		argv = ["--verbose", "--export", "xml"]
