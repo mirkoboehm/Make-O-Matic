@@ -101,26 +101,23 @@ class Defaults( MObject ):
 	# ----- simple_ci settings: 
 	SimpleCIBuildJobCap = 'simple_ci.build.cap'
 
-	def __init__( self ):
-		MObject.__init__( self )
-
-		self.__settings = {}
+	def getDefaultSettings( self ):
 		home = os.path.expanduser( "~" )
 
-		# store defaults:
+		defaultSettings = {}
 		# ----- store the make-o-matic version these scripts use:
-		self.getSettings()[ Defaults.MomVersionNumber ] = '0.5.0'
+		defaultSettings[ Defaults.MomVersionNumber ] = '0.5.0'
 		# ----- script settings:
-		self.getSettings()[ Defaults.ScriptLogLevel ] = 0
-		self.getSettings()[ Defaults.ScriptClientName ] = gethostname()
-		self.getSettings()[ Defaults.ScriptRunMode ] = Defaults.RunMode_Build
-		self.getSettings()[ Defaults.ScriptIgnoreCommitMessageCommands ] = False
+		defaultSettings[ Defaults.ScriptLogLevel ] = 0
+		defaultSettings[ Defaults.ScriptClientName ] = gethostname()
+		defaultSettings[ Defaults.ScriptRunMode ] = Defaults.RunMode_Build
+		defaultSettings[ Defaults.ScriptIgnoreCommitMessageCommands ] = False
 		# ----- internal settings
-		self.getSettings()[ Defaults.MomDebugIndentVariable ] = 'MOM_INTERNAL_DEBUG_INDENT'
+		defaultSettings[ Defaults.MomDebugIndentVariable ] = 'MOM_INTERNAL_DEBUG_INDENT'
 		# ----- project settings:
-		self.getSettings()[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
-		self.getSettings()[ Defaults.ProjectBuildType ] = 'm'
-		self.getSettings()[ Defaults.ProjectBuildSequence] = [ # name, modes, execute-on-failure
+		defaultSettings[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
+		defaultSettings[ Defaults.ProjectBuildType ] = 'm'
+		defaultSettings[ Defaults.ProjectBuildSequence] = [ # name, modes, execute-on-failure
 			[ 'project-create-folders', 'mcdhpsf', False ],
 			[ 'project-checkout', 'mcdhpsf', False ],
 			[ 'conf-create-folders', 'mcdhpsf', False ],
@@ -138,7 +135,7 @@ class Defaults( MObject ):
 			[ 'project-cleanup-docs', 'cdsf', True ],
 			[ 'project-cleanup-packages', 'cdsf', True ],
 			[ 'project-cleanup', 'mcdsf', True ] ]
-		self.getSettings()[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
+		defaultSettings[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
 			'e' : 'Empty build. All build steps are disabled. Useful for debugging build scripts.',
 			'm' : 'Manual build. Does not modify environment variables. Deletes temporary folders.',
 			'c' : 'Continuous build. Builds configurations against the best scoring matching environment. Deletes temporary folders.',
@@ -148,49 +145,32 @@ class Defaults( MObject ):
 			's' : 'Snapshot build. Similar to daily builds. Creates and uploads packages and documentation.',
 			'f' : 'Full build. All build steps are enabled. Useful for debugging build scripts.'
 		}
-		self.getSettings()[ Defaults.ProjectSourceDir ] = 'src'
-		self.getSettings()[ Defaults.ProjectPackagesDir ] = 'packages'
-		self.getSettings()[ Defaults.ProjectDocsDir ] = 'docs'
-		self.getSettings()[ Defaults.ProjectTempDir ] = 'tmp'
-		self.getSettings()[ Defaults.ProjectLogDir ] = 'log'
+		defaultSettings[ Defaults.ProjectSourceDir ] = 'src'
+		defaultSettings[ Defaults.ProjectPackagesDir ] = 'packages'
+		defaultSettings[ Defaults.ProjectDocsDir ] = 'docs'
+		defaultSettings[ Defaults.ProjectTempDir ] = 'tmp'
+		defaultSettings[ Defaults.ProjectLogDir ] = 'log'
 		# ----- configuration settings:
-		self.getSettings()[ Defaults.ConfigurationBuildDir ] = 'build'
-		self.getSettings()[ Defaults.ConfigurationTargetDir ] = 'install'
-		self.getSettings()[ Defaults.MakeBuilderInstallTarget ] = 'install'
-		self.getSettings()[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
-		self.getSettings()[ Defaults.EnvironmentsExpansionModeMapping ] = {
+		defaultSettings[ Defaults.ConfigurationBuildDir ] = 'build'
+		defaultSettings[ Defaults.ConfigurationTargetDir ] = 'install'
+		defaultSettings[ Defaults.MakeBuilderInstallTarget ] = 'install'
+		defaultSettings[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
+		defaultSettings[ Defaults.EnvironmentsExpansionModeMapping ] = {
 			'c' : Defaults.EnvironmentExpansionMode_BuildHighestScoring,
 			'd' : Defaults.EnvironmentExpansionMode_BuildAll,
 			's' : Defaults.EnvironmentExpansionMode_BuildAll,
 			'p' : Defaults.EnvironmentExpansionMode_BuildAll,
 			'f' : Defaults.EnvironmentExpansionMode_BuildAll
 		}
-		self.getSettings()[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
+		defaultSettings[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
 		# ----- System path settings:
-		self.getSettings()[ Defaults.SystemExtraPaths ] = []
+		defaultSettings[ Defaults.SystemExtraPaths ] = []
 		# ----- Build settings:
-		self.getSettings()[ Defaults.BuildMoveOldDirectories ] = True
+		defaultSettings[ Defaults.BuildMoveOldDirectories ] = True
 		# ----- EmailReporter settings:
-		self.getSettings()[ Defaults.EmailReporterMomErrorRecipients] = None
-		self.getSettings()[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
+		defaultSettings[ Defaults.EmailReporterMomErrorRecipients] = None
+		defaultSettings[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
 		# ----- simple_ci settings:
-		self.getSettings()[ Defaults.SimpleCIBuildJobCap ] = 8
+		defaultSettings[ Defaults.SimpleCIBuildJobCap ] = 8
 
-	def getSettings( self ):
-		return self.__settings
-
-	# FIXME type checking
-	def get( self, name, required = True ):
-		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
-		try:
-			return self.getSettings()[ name ]
-		except KeyError:
-			if required:
-				raise ConfigurationError( 'The required setting "{0}" is undefined!'.format( name ) )
-			else:
-				return None
-
-	def set( self, name, value ):
-		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
-		self.getSettings()[ name ] = value
-
+		return defaultSettings

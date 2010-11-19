@@ -27,8 +27,10 @@ class Settings( Defaults ):
 	"""Settings stores all configurable values for a build script run."""
 
 	def __init__( self ):
-		# this applies the defaults:
 		Defaults.__init__( self )
+
+		self.__settings = self.getDefaultSettings()
+
 		if sys.platform == 'darwin' or sys.platform == 'win32':
 			self.__momFolder = "Make-O-Matic"
 		else:
@@ -116,3 +118,20 @@ class Settings( Defaults ):
 				modes = buildStepDescription[1]
 				return buildType in modes
 		raise ConfigurationError( 'The specified build type "{0}" is undefined!'.format( buildType ) )
+
+	def get( self, name, required = True ):
+		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
+		try:
+			return self.getSettings()[ name ]
+		except KeyError:
+			if required:
+				raise ConfigurationError( 'The required setting "{0}" is undefined!'.format( name ) )
+			else:
+				return None
+
+	def set( self, name, value ):
+		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
+		self.getSettings()[ name ] = value
+
+	def getSettings( self ):
+		return self.__settings
