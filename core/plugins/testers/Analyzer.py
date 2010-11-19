@@ -61,5 +61,5 @@ class Analyzer( Plugin ):
 			return "Step disabled"
 
 		scoreText = " out of ".join( [str( x ) for x in self.getScore()] ) if self.getScore() else "N/A"
-		scoreOkayText = "passed" if self.isScoreOkay() else "FAILED"
+		scoreOkayText = "skipped" if not self.getScore() else ( "passed" if self.isScoreOkay() else "FAILED" )
 		return "Score: {0} -> {1}. Report: {2}".format( scoreText, scoreOkayText, self.getReport() )
