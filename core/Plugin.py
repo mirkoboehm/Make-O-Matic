@@ -180,6 +180,18 @@ class Plugin( MObject ):
 
 		return ""
 
+	@classmethod
+	def setSetting( cls, name, value ):
+		"""Call this to save settings of a plugin, do not use Settings class directly!"""
+
+		mApp().getSettings().set( "plugin.{0}.{1}".format( cls.__name__ , name ), value )
+
+	@classmethod
+	def getSetting( cls, name, required = True ):
+		"""Call this to load settings from a plugin, do not use Settings class directly!"""
+
+		return mApp().getSettings().get( "plugin.{0}.{1}".format( cls.__name__ , name ), required )
+
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
 		create_child_node( document, node, "plugindescription", str( self.getDescription() ) )
