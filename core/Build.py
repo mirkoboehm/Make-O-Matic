@@ -93,6 +93,11 @@ class Build( MApplication ):
 				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
 			raise ConfigurationError( text )
 
+	def runPrepare( self ):
+		'''Execute the prepare phase for builds.'''
+		mApp().message( self, 'FIXME CHECK FOR SCM HERE' )
+		return MApplication.runPrepare( self )
+
 	def runPreFlightChecks( self ):
 		assert not self.getParent()
 		mode = self.getSettings().get( Settings.ScriptRunMode )
@@ -150,34 +155,42 @@ class Build( MApplication ):
 					.format( self._getLogDir(), self.getName(), e ) )
 		MApplication.runSetups( self )
 
-	def run( self ):
+	def execute( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
 			self.describeRecursively()
 			sys.stdout.flush() # required, do not remove
-			os._exit( 0 )
+			return None
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
-			MApplication.run( self )
-		else:
-			raise MomError( 'run can only be called in describe and build run modes' )
-
-	def _buildAndReturn( self ):
-		'''Overloaded method that implements the run modes.'''
-		if self.getSettings().get( Settings.ScriptRunMode ) in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
-			MApplication._buildAndReturn( self ) # use base class implementation
+			return MApplication.execute( self )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
-			# TODO Do we need to run the preflightchecks here?
-			# Regardless, we should catch exceptions here and print a backtrace
-			#self.runPreFlightChecks()
-			# filter script name, 'query'
 			self.querySettings( self.getParameters().getArgs()[2:] )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:
-			self.runPreFlightChecks()
 			self.printAndExit()
 		else:
-			assert self.getSettings().get( Settings.ScriptRunMode ) not in Settings.RunModes
+			pass
+		return None
+
+	def runWrapups( self ):
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode == Settings.RunMode_Build:
+			return MApplication.runWrapups( self )
+		else:
+			return None
+
+	def runShutDowns( self ):
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode == Settings.RunMode_Build:
+			return MApplication.runShutDowns( self )
+		else:
+			return None
+
+	def _buildAndReturn( self ):
+		'''Overloaded method that verifies the run mode.'''
+		if self.getSettings().get( Settings.ScriptRunMode ) not in  Settings.RunModes:
 			raise MomError( 'Unknown run mode "{0}". Known run modes are: {1}'.format( 
 					self.getSettings().get( Settings.ScriptRunMode ),
 					', '.join( Settings.RunModes ) ) )
+		return MApplication._buildAndReturn( self )
 
 	def createXmlNode( self, document, recursive = True ):
 		node = MApplication.createXmlNode( self, document, recursive )

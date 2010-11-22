@@ -114,14 +114,6 @@ class MApplication( Instructions ):
 	def debugN( self, mobject, level, text ):
 		[ logger.debugN( self, mobject, level, text ) for logger in self.getLoggers() ]
 
-	def run( self ):
-		self.debugN( self, 2, 'executing' )
-		try:
-			self.execute()
-			[ child.execute() for child in self.getChildren() ]
-		finally:
-			self.runWrapups()
-
 	def querySettings( self, names = None ):
 		try:
 			settings = self.getSettings().getSettings()
@@ -145,7 +137,10 @@ class MApplication( Instructions ):
 			self.runPrepare()
 			self.runPreFlightChecks()
 			self.runSetups()
-			self.run()
+			self.debugN( self, 2, 'executing' )
+			self.execute()
+			[ child.execute() for child in self.getChildren() ]
+			self.runWrapups()
 		except Exception as e:
 			if isinstance( e, MomException ):
 				self.registerReturnCode( e.getReturnCode() )
