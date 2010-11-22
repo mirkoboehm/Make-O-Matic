@@ -70,23 +70,43 @@ class Plugin( MObject ):
 	def getTagName( self ):
 		return "plugin"
 
+	def performPrepare( self ):
+		'''This message controls the execution of the prepare phase.
+		It should not be overloaded. Overload prepare() instead.'''
+		self.prepare()
+
+	def prepare( self ):
+		'''Perform the prepare phase. 
+		In the prepare phase, plug-ins are allowed to manipulate settings, and apply changes to the 
+		build tree. The pre-flight check is performed after this phase, so plugins should be prepared
+		that setup errors can happen.'''
+		pass
+
 	def performPreFlightCheck( self ):
 		'''This method handles the execution of the pre flight check.
-		
-		Do not overload this method to adapt it, overload preFlightCheck instead!'''
+
+		Do not overload this method to adapt it, overload preFlightCheck instead ! '''
 
 		if not self.isEnabled():
 			mApp().debugN( self, 2, 'this plugin is disabled, skipping pre flight check.' )
 			return
 
+		def findCommandAndPreFlightCheck():
+			if self.getCommand():
+				runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
+				runCommand.checkVersion()
+				# Set the now resolved command
+				self.__command = runCommand.getCommand()[0]
+			self.preFlightCheck()
+
 		if self.isOptional():
 			try:
-				self.preFlightCheck()
+				findCommandAndPreFlightCheck()
 			except ( MomException, ConfigurationError ):
 				mApp().message( self, 'pre flight check failed, disabling the plugin because it is marked as optional.' )
 				self.setEnabled( False )
 		else:
-			self.preFlightCheck()
+			findCommandAndPreFlightCheck()
 
 	def preFlightCheck( self ):
 		"""PreFlightCheck is called after the command line arguments have been passed, 
@@ -96,17 +116,12 @@ class Plugin( MObject ):
 
 		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError 
 		exception."""
-
-		if self.getCommand():
-			runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
-			runCommand.checkVersion()
-			# Set the now resolved command
-			self.__command = runCommand.getCommand()[0]
+		pass
 
 	def performSetup( self ):
 		'''This method handles the execution of the setup phase.
-		
-		Do not overload this method to adapt it, overload setup instead!'''
+
+		Do not overload this method to adapt it, overload setup instead ! '''
 
 		if self.isEnabled():
 			self.setup()

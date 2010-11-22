@@ -142,6 +142,7 @@ class MApplication( Instructions ):
 	def _buildAndReturn( self ):
 		'''Helper method that can be overloaded.'''
 		try:
+			self.runPrepare()
 			self.runPreFlightChecks()
 			self.runSetups()
 			self.run()

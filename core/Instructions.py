@@ -182,6 +182,13 @@ class Instructions( MObject ):
 			baseDirName = '{0}{1}{2}'.format( index, spacer, make_foldername_from_string( self.getName() ) )
 		return baseDirName
 
+	def runPrepare( self ):
+		with EnvironmentSaver():
+			mApp().debugN( self, 2, 'preparing' )
+			[ plugin.performPrepare() for plugin in self.getPlugins() ]
+			[ child.runPrepare() for child in self.getChildren() ]
+
+
 	def runPreFlightChecks( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'performing pre-flight checks' )
