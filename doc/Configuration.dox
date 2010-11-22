@@ -51,7 +51,7 @@ settings.set( Settings.EmailerPassword, 'secret' )
 
 \section default-options List of default options
 
-\subsection emailer Emailer\\
+\subsection emailer Emailer
 
 This is only required if you're using a plugin that requires a valid E-Mail account.
 

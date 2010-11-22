@@ -1,0 +1,81 @@
+/** \page environments Automatic Environment Setup
+
+\section Automatic Environment Setup
+
+\subsection Concept
+The build process needs to find referenced libraries during the build script run.
+Which libraries or tools are found sometimes needs to change dynamically as the
+build progresses. For example, to build the same code against two different
+versions of Qt with qmake, the PATH variable needs to be changed so that the
+correct qmake is found in the PATH. Since these requirements are quite common,
+Make-O-Matic provides a built-in way to dynamically set up the environment in
+which a configuration is built.
+
+\subsection External Environment vs. Configuration Specific Environment
+The external environment is the configuration of the shell that the build script
+is started in. It usually contains a multitude of settings that are considered to
+not have an influence on the expected outcome of the build. Sometimes this is not
+the case, but to fix such an issue is an administrators task, and outside of the 
+scope of the build script.
+
+To add a library or tool to the PATH variable while building a specific configuration
+can be taken care of by the build script. This is sometimes referred to as the 
+dynamic environment. Dynamic environments are implemented by a declaration of which
+packages a configuration depends on, a description of the available packages, and
+an algorithm that matches the dependencies against the available packages. Multiple
+of these matches can be expanded, so that the same configuration might get built
+as many times as matches are found, using, for example, different Qt versions. The
+packages provide a scoring mechanism, which allows to select the newest or best
+version of a library. If all matches, or the best scoring one are built, or the
+environment requirements are ignored completely, is determined by the 
+\tt{environments.expansionmodes} setting.
+
+\subsection Dependencies, Packages
+A dependency is a (software) package that needs to be available to build a 
+configuration. A package provides such software, with a description of how it can be 
+applied.
+
+\subsection Adding Dynamic Environments to a Project
+Build scripts prepare the dynamic environment setup by adding an Environments 
+object between the project and the configuration. The arguments to the Environments 
+constructor are a shell glob pattern of the name of the package folder, the literal 
+name of the dependency, and the project object that the Configuration is associated
+with:
+\code
+build, project = getBuildProject( buildName = 'Charm Build', projectName = 'Charm',
+	projectVersionNumber = '1.4.0', scmUrl = 'git://gitorious.org/charm/charm.git' )
+
+sharedDebug = Environments( [ 'Qt-4.[67].?-Shared-Debug' ], 'Qt 4 Shared Debug', project )
+debug = Configuration( 'Debug', sharedDebug, )
+\endcode
+During execution, the Environments object examines the folder \tt{environments.basedir}
+for subdirectories matching the shell pattern. The subdirectory needs to contain a file 
+named \tt{MOM_PACKAGE_CONFIGURATION}. This is an example package configuration file:
+\code
+MOM_PACKAGE_ENABLED true
+MOM_ADD_PATH PATH PREPEND /your-qt-path/Qt-4.6.3-Shared-Debug/bin
+MOM_PACKAGE_DESCRIPTION Example MOM Package
+# MOM_PACKAGE_SCORE 120
+# MOM_EXPORT EXAMPLE_VARIABLE example_variable
+\endcode
+Only a few commands are supported in these files. If the \tt{MOM_PACKAGE_ENABLED} is
+missing or set to \tt{false}, the package will be ignored. \tt{MOM_ADD_PATH} adds a 
+path to a PATH-like variable. The arguments to it are the variable name (PATH, most of
+the time), PREPEND if the new entry should be made at the beginning of the variable, and
+APPEND to add it at the end, and the entry to be added (a path). \tt{MOM_PACKAGE_DESCRIPTION}
+adds a description that is used in the log files. \tt{MOM_PACKAGE_SCORE} defines a score
+for the package that is used to rank matches against each other. \tt{MOM_EXPORT} simply
+defines an environment variable with the specified value.
+
+The actual library required for the build does not need to be installed in the same 
+folder. Instead, it is usually kept separately, and the package configuration file only
+specifies the path to it. The structure of package configurations is part of the build
+machine setup, and usually maintained in a repository.
+
+
+
+
+
+
+
+*/
