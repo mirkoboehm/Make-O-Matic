@@ -45,12 +45,10 @@ class Build( MApplication ):
 	def initialize( self ):
 		'''Determine the script run settings. 
 		In the constructor, defaults will be applied. 
-		First, configuration files will be parsed.
-		Second, command line arguments will be applied. 
-		Third, commit message commands will be applied. This can be disabled by a parameter (step three).
+		First, the configuration files will be parsed.
+		Second, the command line arguments will be applied. 
 		On error, a subclass of MomException is thrown.
 		Logging and reporting is not available at this stage yet.'''
-
 		# first, parse configuration files:
 		if os.getenv( "MOM_TESTS_RUNNING" ) == "1":
 			self.debug( self, "Not loading configuration files, tests are running" )
@@ -61,8 +59,6 @@ class Build( MApplication ):
 
 		# second, apply parameters:
 		self.getParameters().apply( self.getSettings() )
-		# third, apply commit message commands:
-		# FIXME
 
 	def setProject( self, project ):
 		'''Every build has one master project. This method sets the master project.'''
