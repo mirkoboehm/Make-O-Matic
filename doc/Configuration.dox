@@ -2,7 +2,6 @@
 
 \section config Configuration files
 
-
 \subsection order Evaluation order
 
 MOM tries to load user specific settings from several places. The  order of the loading is as follows (note: paths are Linux-specific):
@@ -13,7 +12,14 @@ MOM tries to load user specific settings from several places. The  order of the 
 # ~/.mom/$YOUR_HOSTNAME.py
 \endcode
 
-\note Replace "$YOUR_HOSTNAME" with your machine's hostname.
+Replace "$YOUR_HOSTNAME" with your machine's host name. It is important to use the host name that Python detects. One way to
+be sure is to execute
+\code
+import socket
+socket.gethostname()
+\endcode
+in a Python shell. It is recommended to set a fixed host name. If the name changes, for example due to DHCP network configuration,
+the configuration files for the old host name will not be loaded.
 
 As you can see, these files have the .py extension. These  configuration  files are eval()'ed at runtime and contain application  code.
 
