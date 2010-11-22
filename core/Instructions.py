@@ -30,7 +30,7 @@ import traceback
 
 class Instructions( MObject ):
 	"""
-	Instructions is the base class for anything that can be built by make-o-matic. 
+	Instructions is the base class for anything that can be built by Make-O-Matic.
 	* The Build object is a singleton that represents the build script run.
 	* Projects are Instructions to build a Project.
 	* Configurations are Instructions to build a configuration of a Project.

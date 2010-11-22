@@ -8,6 +8,7 @@ GENERATE_MAN     = NO
 GENERATE_RTF     = NO
 HIDE_SCOPE_NAMES = YES
 OPTIMIZE_OUTPUT_JAVA = YES
+INPUT            += @@(project.folders.src)/buildcontrol
 INPUT            += @@(project.folders.src)/core
 INPUT            += @@(project.folders.src)/doc
 INPUT            += @@(project.folders.src)/tools

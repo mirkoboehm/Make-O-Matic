@@ -29,7 +29,7 @@ from core.plugins.testers.CTest import CTest
 from core.environments.Environments import Environments
 
 build, project = getBuildProject( buildName = 'Charm Build', projectName = 'Charm',
-								projectVersionNumber = '1.4.0', scmUrl = 'git://gitorious.org/charm/charm.git' )
+								projectVersionNumber = '1.4.0', scmUrl = 'git@github.com:KDAB/Make-O-Matic.git' )
 
 # helper variable to set a CMake parameter
 enableCharmTools = CMakeVariable( 'CHARM_ENABLE_TOOLS_BUILD', 'TRUE', 'BOOL' )
