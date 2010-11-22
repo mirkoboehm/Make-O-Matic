@@ -40,7 +40,21 @@ class Parameters( MObject ):
 		return self.__args
 
 	def _getOptionParser( self ):
-		parser = optparse.OptionParser()
+		usage = "usage: %prog [options] build|describe|query <setting>|print"
+		version = 'Make-O-Matic {0}'.format( mApp().getMomVersion() )
+		description = '''\
+This is a Make-O-Matic build script. Build scripts can be executed in the following run modes 
+(if no run mode is specified, build is used): "build", to execute a build.
+"query" to query a Make-O-Matic setting by name (e.g. "query script.buildname"). "print", to 
+print information about the project's main repository. Use "describe" to get an human readable
+description of the build process.
+'''
+		epilog = '''\
+https://github.com/KDAB/Make-O-Matic
+http://docs.kdab.com/make-o-matic/0.5.0/html
+
+'''
+		parser = optparse.OptionParser( usage = usage, version = version, description = description, epilog = epilog )
 		parser.add_option( '-r', '--revision', action = 'store', dest = 'revision',
 			help = 'repository revision to be built' )
 		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
@@ -55,7 +69,7 @@ class Parameters( MObject ):
 			help = """enable or disable individual builds steps on top of the defaults for the build type,
 			e.g.: -s disable-project-cleanup,enable-conf-cleanup""" )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
-			help = 'level of debug output' )
+			help = 'set the level of debug output (-v, -vv, -vvv...)' )
 		return parser
 
 	def parse( self ):
