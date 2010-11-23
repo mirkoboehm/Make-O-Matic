@@ -54,14 +54,14 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 
 		info = self.project.getScm().getRevisionInfo()
 		self._validateRevisionInfoContent( info )
-		self.assertNotEquals( info.shortRevision, None, "Git should short revision" )
+		self.assertNotEquals( info.shortRevision, None, "Git should have a short revision" )
 
 	def testScmSvn( self ):
 		self._initialize( self.SVN_EXAMPLE )
 
 		info = self.project.getScm().getRevisionInfo()
 		self._validateRevisionInfoContent( info )
-		self.assertEquals( info.shortRevision, None, "Svn should not have short revision" )
+		self.assertEquals( info.shortRevision, None, "Subversion should not have a short revision" )
 
 	def testScmSvnRevisionInfoCache( self ):
 		self._initialize( self.SVN_EXAMPLE )
