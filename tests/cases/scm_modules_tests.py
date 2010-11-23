@@ -24,7 +24,7 @@ from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 class ScmModulesTests ( MomBuildMockupTestCase ):
 
 	GIT_EXAMPLE = 'git://github.com/KDAB/Make-O-Matic.git'
-	SVN_EXAMPLE = 'http://ratproxy.googlecode.com/svn/trunk/'
+	SVN_EXAMPLE = 'http://svn.github.com/KDAB/Make-O-Matic'
 
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self )

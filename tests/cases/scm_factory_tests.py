@@ -39,8 +39,8 @@ class ScmFactoryTests( MomBuildMockupTestCase ):
 		self.checkScm( 'git://github.com/KDAB/Make-O-Matic.git', SCMGit )
 
 	def testCreateSvnScm( self ):
-		self.checkScm( 'svn:http://ratproxy.googlecode.com/svn/trunk/', SCMSubversion )
-		self.checkScm( 'http://ratproxy.googlecode.com/svn/trunk/', SCMSubversion )
+		self.checkScm( 'svn:http://svn.github.com/KDAB/Make-O-Matic', SCMSubversion )
+		self.checkScm( 'http://svn.github.com/KDAB/Make-O-Matic', SCMSubversion )
 
 	def testCreateUnknownScm( self ):
 		try:
