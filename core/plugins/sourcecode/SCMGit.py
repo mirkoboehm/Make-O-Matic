@@ -95,8 +95,7 @@ class SCMGit( SourceCodeProvider ):
 		sep = chr( 0x0A ) + chr( 0x03 ) # use some ASCII codes as separator, to avoid clashes in commit messages
 		formatStr = "%cn{0}%ce{0}%s\n\n%b{0}%ct{0}%ci{0}%H{0}%h".format( sep )
 
-		revision = self.getRevision() or 'HEAD'
-		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), '{0}^..{0}'.format( revision )]
+		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), '{0}^..{0}'.format( self.getTreeish() )]
 		runner = RunCommand( cmd, 3600 )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
@@ -171,10 +170,20 @@ class SCMGit( SourceCodeProvider ):
 		updateClone = ShellCommandAction( [ self.getCommand(), 'clone', '--local', '--depth', '1', self._getHiddenClonePath(), "." ] )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
-		revision = self.getRevision() or 'HEAD'
-		checkout = ShellCommandAction( [ self.getCommand(), 'checkout', revision ] )
+		checkout = ShellCommandAction( [ self.getCommand(), 'checkout', self.getTreeish() ] )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
+
+	def getTreeish( self, remote = None ):
+		# TODO Work out sensible ordering here or fail if we have more than one of these parameters
+		treeish = self.getRevision()
+		if treeish:
+			return treeish
+
+		treeish = self.getTag() or self.getBranch() or 'HEAD'
+		if remote:
+			treeish = '{0}/{1}'.format( remote, treeish )
+		return treeish
 
 	def __getTempRepoName( self ):
 		tempName = make_foldername_from_string( self.getUrl() )
@@ -224,12 +233,10 @@ class SCMGit( SourceCodeProvider ):
 			except ( IOError, OSError ) as e:
 				raise MomError( 'Error creating cached checkouts dir at {0}: {1}'.format( 
 					self.getCachedCheckoutsDir(), e ) )
-		if not self.getRevision():
-			self.setRevision( 'origin/HEAD' )
 		if os.path.exists( self._getCachedCheckoutPath() ):
 			# update an existing repository
-			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to revision {1}'.format( 
-				self.getCachedCheckoutsDir(), self.getRevision() ) )
+			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to treeish {1}'.format(
+				self.getCachedCheckoutsDir(), self.getTreeish( 'origin' ) ) )
 			# reset the hidden clone to a branch
 			resetRunner = RunCommand( [ self.getCommand(), 'fetch', '--all' ] )
 			resetRunner.setWorkingDir( self._getCachedCheckoutPath() )
@@ -240,8 +247,8 @@ class SCMGit( SourceCodeProvider ):
 				raise MomError( 'error fetching revisions into the hidden clone' )
 			# FIXME we may not be on the master branch:
 		else:
-			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with revision {1}'.format( 
-				self.getCachedCheckoutsDir(), self.getRevision() ) )
+			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with treeish {1}'.format(
+				self.getCachedCheckoutsDir(), self.getTreeish() ) )
 			# create the clone
 			cloneCmd = [ self.getCommand(), 'clone', self._getHiddenClonePath(), self.__getTempRepoName() ]
 			cloneRunner = RunCommand( cloneCmd )
@@ -250,15 +257,15 @@ class SCMGit( SourceCodeProvider ):
 			if cloneRunner.getReturnCode() != 0:
 				raise ConfigurationError( 'Cannot create the cached checkout at {0}'.format( 
 					self.getCachedCheckoutsDir() ) )
-		# now checkout the requested revision
-		checkoutCmd = [ self.getCommand(), 'checkout', self.getRevision() ]
+		# now checkout the requested treeish
+		checkoutCmd = [ self.getCommand(), 'checkout', self.getTreeish() ]
 		checkoutRunner = RunCommand( checkoutCmd )
 		checkoutRunner.setWorkingDir( self._getCachedCheckoutPath() )
 		checkoutRunner.run()
 		if checkoutRunner.getReturnCode() != 0:
 			# FIXME delete, continue with regular checkout
-			raise ConfigurationError( 'Cannot update the checkout at {0} to revision {1}'.format( 
-				self.getCachedCheckoutsDir(), self.getRevision() ) )
+			raise ConfigurationError( 'Cannot update the checkout at {0} to treeish {1}'.format(
+				self.getCachedCheckoutsDir(), self.getTreeish() ) )
 
 	def fetchRepositoryFolder( self, remotePath ):
 		self.updateHiddenClone()
@@ -267,5 +274,5 @@ class SCMGit( SourceCodeProvider ):
 		if os.path.exists( hiddenCheckoutPath ):
 			return hiddenCheckoutPath
 		else:
-			raise ConfigurationError( 'The remote path {0} was not found in the repository at revision {1}'.format( 
-					remotePath, self.getRevision() ) )
+			raise ConfigurationError( 'The remote path {0} was not found in the repository at treeish {1}'.format(
+					remotePath, self.getTreeish() ) )
