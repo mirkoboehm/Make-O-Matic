@@ -40,7 +40,7 @@ class SourceCodeProvider( Plugin ):
 		raise NotImplementedError
 
 	def setUrl( self, url ):
-		self.__url = url
+		self.__url = url.rstrip( '/' )
 
 	def getUrl( self ):
 		return self.__url
