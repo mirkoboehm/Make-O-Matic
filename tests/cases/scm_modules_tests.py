@@ -37,6 +37,7 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 
 		self.build.getParameters().parse()
 		self.build.initialize()
+		self.build.runPrepare()
 		self.build.runPreFlightChecks()
 		self.build.runSetups()
 
