@@ -89,8 +89,8 @@ class Project( BuildInstructions ):
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		BuildInstructions.runSetups( self )
-		create = self.getStep( 'project-create-folders' )
-		delete = self.getStep( 'project-cleanup' )
+		create = self.getStep( 'build-create-folders' )
+		delete = self.getStep( 'build-cleanup' )
 		for folder in ( self.getDocsDir(), self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.addMainAction( RmDirAction( folder ) )
@@ -102,4 +102,4 @@ class Project( BuildInstructions ):
 	def execute( self ):
 		with self.getTimeKeeper():
 			self.executeSteps()
-			BuildInstructions.execute( self )
+			super( Project, self ).execute()

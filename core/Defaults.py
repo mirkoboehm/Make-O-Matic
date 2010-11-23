@@ -117,23 +117,21 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		defaultSettings[ Defaults.ProjectBuildType ] = 'm'
 		defaultSettings[ Defaults.ProjectBuildSequence] = [ # name, modes, execute-on-failure
-			[ 'project-create-folders', 'mcdhpsf', False ],
+			[ 'build-create-folders', 'mcdhpsf', False ],
 			[ 'project-checkout', 'mcdhpsf', False ],
-			[ 'conf-create-folders', 'mcdhpsf', False ],
 			[ 'conf-export-sources', 'mcdhpsf', False ],
 			[ 'conf-configure', 'mcdhpsf', False ],
 			[ 'conf-make', 'mcdhpsf', False ],
 			[ 'conf-make-test', 'mcdhpsf', False ],
 			[ 'conf-make-install', 'mcdhpsf', False ],
 			[ 'conf-package', 'dsfp', False ],
-			[ 'conf-cleanup', 'cdsf', False ],
 			[ 'project-create-docs', 'mcdhpsf', False ],
 			[ 'project-package', 'dsf', False ],
 			[ 'project-upload-docs', 'dsf', False ],
 			[ 'project-upload-packages', 'dsf', False ],
 			[ 'project-cleanup-docs', 'cdsf', True ],
 			[ 'project-cleanup-packages', 'cdsf', True ],
-			[ 'project-cleanup', 'mcdsf', True ] ]
+			[ 'build-cleanup', 'mcdsf', True ] ]
 		defaultSettings[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
 			'e' : 'Empty build. All build steps are disabled. Useful for debugging build scripts.',
 			'm' : 'Manual build. Does not modify environment variables. Deletes temporary folders.',

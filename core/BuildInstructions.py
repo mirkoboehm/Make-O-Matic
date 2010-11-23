@@ -19,11 +19,13 @@
 from core.Instructions import Instructions
 import os
 from core.helpers.GlobalMApp import mApp
-from core.Exceptions import MomError, ConfigurationError, BuildError
+from core.Exceptions import MomError, BuildError, ConfigurationError
 from core.helpers.TimeKeeper import formatted_time, TimeKeeper
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_nonempty_string
 from core.executomat.Step import Step
+from core.actions.filesystem.MkDirAction import MkDirAction
+from core.actions.filesystem.RmDirAction import RmDirAction
 
 class BuildInstructions( Instructions ):
 	def __init__( self, name = None, parent = None ):
@@ -90,33 +92,6 @@ class BuildInstructions( Instructions ):
 
 		return node
 
-	def _configureBaseDir( self ):
-		# FIXME move to an action
-		assert self.getParent()
-		mode = mApp().getSettings().get( Settings.ScriptRunMode )
-		if mode == Settings.RunMode_Build:
-			parentBaseDir = self.getParent().getBaseDir()
-			assert os.path.isdir( parentBaseDir )
-			baseDir = self.getBaseDir()
-			if os.path.isdir( baseDir ):
-				raise MomError( 'Base directory for a build instructions object exists!' )
-			try:
-				os.makedirs( baseDir )
-				self._setBaseDir( baseDir )
-			except ( OSError, IOError ) as e:
-				raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
-					.format( baseDir, self.getName(), e ) )
-
-	def _configureLogDir( self ):
-		assert self.getParent()
-		mode = mApp().getSettings().get( Settings.ScriptRunMode )
-		if mode == Settings.RunMode_Build:
-			try:
-				os.makedirs( self._getLogDir() )
-			except ( OSError, IOError )as e:
-				raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
-					.format( self._getLogDir(), self.getName(), e ) )
-
 	def runPrepare( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
@@ -138,9 +113,21 @@ class BuildInstructions( Instructions ):
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():
 			self.addStep( step )
-		self._configureBaseDir()
-		self._configureLogDir()
-		Instructions.runSetups( self )
+		# add actions to create the base directory:
+		createStep = self.getStep( 'build-create-folders' )
+		createStep.addMainAction( MkDirAction( self.getBaseDir() ) )
+		# add action to delete the base directory (but not the log directory):
+		cleanupStep = self.getStep( 'build-cleanup' )
+		cleanupStep.prependMainAction( RmDirAction( self.getBaseDir() ) )
+		# create the log directory
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode == Settings.RunMode_Build:
+			try:
+				os.makedirs( self._getLogDir() )
+			except ( OSError, IOError )as e:
+				raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
+										.format( self._getLogDir(), self.getName(), e ) )
+		super( BuildInstructions, self ).runSetups()
 
 	def calculateBuildSequence( self ):
 		buildSteps = self._setupBuildSteps( Settings.ProjectBuildSequence )

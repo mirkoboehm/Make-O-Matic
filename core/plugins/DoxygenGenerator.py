@@ -58,11 +58,11 @@ class DoxygenGenerator( Plugin ):
 		# create folders if necessary
 		if self.getDocsDir():
 			# make docs folder
-			step = self.getInstructions().getStep( 'project-create-folders' )
+			step = self.getInstructions().getStep( 'build-create-folders' )
 			step.addMainAction( MkDirAction( docsDir ) )
 
 			# cleanup
-			step = self.getInstructions().getStep( 'project-cleanup' )
+			step = self.getInstructions().getStep( 'build-cleanup' )
 			step.addMainAction( RmDirAction( docsDir ) )
 
 		# run doxygen

@@ -81,19 +81,34 @@ class Step( MObject ):
 		"""Add one precommand."""
 		self.__addAction( self.getPreActions(), action )
 
+	def prependPreAction( self, action ):
+		"""Prepend one precommand."""
+		self.__addAction( self.getPreActions(), action, True )
+
 	def addMainAction( self, action ):
 		"""Add a main command."""
 		self.__addAction( self.getMainActions(), action )
+
+	def prependMainAction( self, action ):
+		"""Prepend a main command."""
+		self.__addAction( self.getMainActions(), action, True )
 
 	def addPostAction( self, action ):
 		"""Add a post command"""
 		self.__addAction( self.getPostActions(), action )
 
+	def prependPostAction( self, action ):
+		"""Prepend a post command"""
+		self.__addAction( self.getPostActions(), action, True )
+
 	def getTimeKeeper( self ):
 		return self.__timeKeeper
 
-	def __addAction( self, container, action ):
-		container.append( action )
+	def __addAction( self, container, action, prepend = False ):
+		if prepend:
+			container.insert( 0, action )
+		else:
+			container.append( action )
 
 	def _logEnvironment( self, executomat ):
 		mApp().debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )

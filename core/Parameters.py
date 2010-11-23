@@ -67,7 +67,7 @@ http://docs.kdab.com/make-o-matic/0.5.0/html
 			help = "Ignore settings" )
 		parser.add_option( '-s', '--build-steps', action = 'store', dest = 'buildSteps',
 			help = """enable or disable individual builds steps on top of the defaults for the build type,
-			e.g.: -s disable-project-cleanup,enable-conf-cleanup""" )
+			e.g.: -s disable-build-cleanup,enable-conf-package""" )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
 			help = 'set the level of debug output (-v, -vv, -vvv...)' )
 		return parser

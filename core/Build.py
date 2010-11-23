@@ -152,14 +152,14 @@ class Build( MApplication ):
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create build log directory "{0}" for {1}: {2}!'
 					.format( self._getLogDir(), self.getName(), e ) )
-		MApplication.runSetups( self )
+		super( Build, self ).runSetups()
 
-	def execute( self ):
+	def runExecute( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
 			self.describeRecursively()
 			sys.stdout.flush() # required, do not remove
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
-			return MApplication.execute( self )
+			return super( Build, self ).runExecute()
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
 			self._queryAndPrintSettings( self.getParameters().getArgs()[2:] )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:

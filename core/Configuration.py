@@ -62,8 +62,8 @@ class Configuration( ConfigurationBase ):
 		ConfigurationBase.runSetups( self )
 		settings = mApp().getSettings()
 		folders = [ settings.get( Settings.ConfigurationBuildDir ), settings.get( Settings.ConfigurationTargetDir ) ]
-		create = self.getStep( 'conf-create-folders' )
-		cleanup = self.getStep( 'conf-cleanup' )
+		create = self.getStep( 'build-create-folders' )
+		cleanup = self.getStep( 'build-cleanup' )
 		for folder in folders:
 			create.addMainAction( MkDirAction( PathResolver( self.getBaseDir, folder ) ) )
 		folders.reverse()
