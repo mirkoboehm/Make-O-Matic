@@ -28,20 +28,28 @@ def getScm( url, name = None ):
 	'svn:svn+ssh://svn.kde.org/home/kde/abcde' describes a Subversion repository.
 	'git://github.com/KDAB/Make-O-Matic.git' auto-detects a GIT repository.
 	'''
-	scmProviders = [ SCMGit( name ), SCMSubversion( name ) ]
+	scmProviders = {}
+	for scm in [ SCMGit( name ), SCMSubversion( name ) ]:
+		scmProviders[scm.getIdentifier()] = scm
 
+	scmRegex = '(' + '|'.join( scmProviders ) + ')'
+	scmIdentifierRegex = scmRegex + ':(?!//)'
 	# Check for manually specified identifier first
-	for scm in scmProviders:
-		id = "{0}:".format( scm.getIdentifier() )
-		urlOnly = url.replace( id, '', 1 )
-		if url.startswith( id ) and not urlOnly.startswith( "//" ):
-			scm.setUrl( urlOnly )
-			return scm
+	# Don't match e.g. git://
+	match = re.match( scmIdentifierRegex, url )
+	if match:
+		# Get out the URL without the identifier prefix
+		_, _, url = url.partition( match.group( 0 ) )
+	else:
+		# If we can't find the identifier, look for it anywhere in the URL
+		match = re.search( scmRegex , url )
 
-	# If we can't find the identifier, look for it anywhere in the URL
-	for scm in scmProviders:
-		if scm.getIdentifier() in url:
+	if match:
+		try:
+			scm = scmProviders[ match.group( 1 ) ]
 			scm.setUrl( url )
 			return scm
+		except IndexError, KeyError:
+			pass
 
 	raise ConfigurationError( 'Cannot create source code provider for URL "{0}", unknown implementation'.format( url ) )
