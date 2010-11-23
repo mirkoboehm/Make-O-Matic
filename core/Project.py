@@ -51,6 +51,8 @@ class Project( BuildInstructions ):
 		scm = getScm( url )
 		scm.setSrcDir( PathResolver( self.getSourceDir ) )
 		scm.setRevision( mApp().getParameters().getRevision() )
+		scm.setRevision( mApp().getParameters().getBranch() )
+		scm.setRevision( mApp().getParameters().getTag() )
 		self.setScm( scm )
 
 	def setScm( self, scm ):
