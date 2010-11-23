@@ -114,7 +114,7 @@ class MApplication( Instructions ):
 	def debugN( self, mobject, level, text ):
 		[ logger.debugN( self, mobject, level, text ) for logger in self.getLoggers() ]
 
-	def querySettings( self, names = None ):
+	def _queryAndPrintSettings( self, names = None ):
 		try:
 			settings = self.getSettings().getSettings()
 			if names:
@@ -137,9 +137,7 @@ class MApplication( Instructions ):
 			self.runPrepare()
 			self.runPreFlightChecks()
 			self.runSetups()
-			self.debugN( self, 2, 'executing' )
-			self.execute()
-			[ child.execute() for child in self.getChildren() ]
+			self.runExecute()
 			self.runWrapups()
 		except Exception as e:
 			if isinstance( e, MomException ):
@@ -147,7 +145,7 @@ class MApplication( Instructions ):
 			else:
 				self.registerReturnCode( 42 )
 			self.setException( ( e, traceback.format_exc() ) )
-			raise # rethrow exception
+			raise # re-throw exception
 		finally:
 			self.runShutDowns()
 
@@ -156,7 +154,7 @@ class MApplication( Instructions ):
 		It is useful for scripts that need to perform other code after the build method.
 		build wraps this function and exits with the error code.
 		The method does always return, though, if a MomException is caught. Any exception
-		that does not inherit MomException will pass. '''
+		that does not inherit MomException will pass.'''
 		try:
 			self._buildAndReturn()
 			self.message( self, 'Returning, return code {0}'.format( self.getReturnCode() ) )

@@ -61,7 +61,11 @@ class EmailReporter( Reporter ):
 		self.__info = None
 
 		# try to get info, may fail
-		self.__info = mApp().getProject().getScm().getRevisionInfo()
+		try:
+			self.__info = mApp().getProject().getScm().getRevisionInfo()
+		except Exception as e:
+			# FIXME Kevin, we need to rethink this:
+			mApp().message( self, 'Querying the revision info during pre-flight check failed: {0}'.format ( e ) )
 
 		# check settings, may fail
 		settings = mApp().getSettings()

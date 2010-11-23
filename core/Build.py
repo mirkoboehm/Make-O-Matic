@@ -74,7 +74,7 @@ class Build( MApplication ):
 			raise ConfigurationError( 'The project variable needs to be an instance of the Project class!' )
 		self.addChild( project )
 
-	def printAndExit( self ):
+	def _printSettings( self ):
 		# program name, "print", argument, [options] 
 		if len( self.getParameters().getArgs() ) < 3:
 			raise MomError( 'Please specify parameter to print!' )
@@ -96,16 +96,25 @@ class Build( MApplication ):
 	def runPrepare( self ):
 		'''Execute the prepare phase for builds.'''
 		mApp().message( self, 'FIXME CHECK FOR SCM HERE' )
-		return MApplication.runPrepare( self )
+		# set folder names
+		# the build object does not have a parent, and defines the build base dir:
+		mode = self.getSettings().get( Settings.ScriptRunMode )
+		if mode in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
+			parentBaseDir = os.getcwd()
+			baseDirName = self._getBaseDirName()
+			baseDir = os.path.join( parentBaseDir, baseDirName )
+			self._setBaseDir( baseDir )
+		else:
+			self._setBaseDir( os.getcwd() )
+		assert self.getBaseDir()
+		return super( Build, self ).runPrepare()
 
 	def runPreFlightChecks( self ):
 		assert not self.getParent()
 		mode = self.getSettings().get( Settings.ScriptRunMode )
 		if mode == Settings.RunMode_Build:
-			parentBaseDir = os.getcwd()
-			assert os.path.isdir( parentBaseDir )
-			baseDirName = self._getBaseDirName()
-			baseDir = os.path.join( parentBaseDir, baseDirName )
+			# FIXME move this to the first action of the build
+			baseDir = self.getBaseDir()
 			if os.path.isdir( baseDir ):
 				moveOldDirectories = mApp().getSettings().get( Settings.BuildMoveOldDirectories )
 				if moveOldDirectories:
@@ -121,7 +130,7 @@ class Build( MApplication ):
 							break
 						newFolder = newFolderBaseName + '__{0}'.format( index + 1 )
 					if os.path.isdir( newFolder ):
-						raise MomError( '{0} old build dirs exist, this can\'t be happening :-('.format( maxIterations ) )
+						raise MomError( "{0} old build directories exist, this can't be happening :-(".format( maxIterations ) )
 					try:
 						shutil.move( baseDir, newFolder )
 					except ( OSError, shutil.Error ) as o:
@@ -136,13 +145,10 @@ class Build( MApplication ):
 							.format( baseDir, str( o ) ) )
 			try:
 				os.makedirs( baseDir )
-				self._setBaseDir( baseDir )
 			except ( OSError, IOError ) as e:
 				raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
 					.format( baseDir, self.getName(), e ) )
 			os.chdir( baseDir )
-		else: # run 	mode
-			self._setBaseDir( os.getcwd() )
 		MApplication.runPreFlightChecks( self )
 
 	def runSetups( self ):
@@ -159,13 +165,12 @@ class Build( MApplication ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
 			self.describeRecursively()
 			sys.stdout.flush() # required, do not remove
-			return None
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Build:
 			return MApplication.execute( self )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Query:
-			self.querySettings( self.getParameters().getArgs()[2:] )
+			self._queryAndPrintSettings( self.getParameters().getArgs()[2:] )
 		elif self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Print:
-			self.printAndExit()
+			self._printSettings()
 		else:
 			pass
 		return None

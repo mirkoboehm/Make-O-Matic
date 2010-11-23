@@ -31,11 +31,12 @@ import traceback
 class Instructions( MObject ):
 	"""
 	Instructions is the base class for anything that can be built by Make-O-Matic.
-	* The Build object is a singleton that represents the build script run.
-	* Projects are Instructions to build a Project.
-	* Configurations are Instructions to build a configuration of a Project.
-	* Instructions implement the phased approach to executing the build script, and the 
-	idea of plug-ins that implement certain functionality.
+	
+	- The Build object is a singleton that represents the build script run.
+	- Projects are Instructions to build a Project.
+	- Configurations are Instructions to build a configuration of a Project.
+	- Instructions implement the phased approach to executing the build script, and the\n
+      idea of plug-ins that implement certain functionality.
 
 	The idea is to have a hierarchical structure like this:
 
@@ -199,8 +200,13 @@ class Instructions( MObject ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'setting up' )
 			[ plugin.performSetup() for plugin in self.getPlugins() ]
-			for child in self.getChildren():
-				child.runSetups()
+			[ child.runSetups() for child in self.getChildren() ]
+
+	def runExecute( self ):
+		with EnvironmentSaver():
+			self.debugN( self, 2, 'executing' )
+			self.execute()
+			[ child.execute() for child in self.getChildren() ]
 
 	def runWrapups( self ):
 		with EnvironmentSaver():

@@ -91,40 +91,49 @@ class BuildInstructions( Instructions ):
 		return node
 
 	def _configureBaseDir( self ):
+		# FIXME move to an action
 		assert self.getParent()
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
-		if mode != Settings.RunMode_Build:
-			self._setBaseDir( os.getcwd() )
-			return
-		parentBaseDir = self.getParent().getBaseDir()
-		assert os.path.isdir( parentBaseDir )
-		baseDirName = self._getBaseDirName()
-		baseDir = os.path.join( parentBaseDir, baseDirName )
-		if os.path.isdir( baseDir ):
-			raise MomError( 'Base directory for a build instructions object exists!' )
-		try:
-			os.makedirs( baseDir )
-			self._setBaseDir( baseDir )
-		except ( OSError, IOError ) as e:
-			raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
-				.format( baseDir, self.getName(), e ) )
+		if mode == Settings.RunMode_Build:
+			parentBaseDir = self.getParent().getBaseDir()
+			assert os.path.isdir( parentBaseDir )
+			baseDir = self.getBaseDir()
+			if os.path.isdir( baseDir ):
+				raise MomError( 'Base directory for a build instructions object exists!' )
+			try:
+				os.makedirs( baseDir )
+				self._setBaseDir( baseDir )
+			except ( OSError, IOError ) as e:
+				raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
+					.format( baseDir, self.getName(), e ) )
 
 	def _configureLogDir( self ):
 		assert self.getParent()
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
-		if mode != Settings.RunMode_Build:
-			self._setBaseDir( os.getcwd() )
-			return
-		logDirName = self._getBaseDirName()
-		parentLogDir = self.getParent()._getLogDir()
-		assert os.path.isdir( parentLogDir )
-		logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
-		try:
-			os.makedirs( logDir )
+		if mode == Settings.RunMode_Build:
+			try:
+				os.makedirs( self._getLogDir() )
+			except ( OSError, IOError )as e:
+				raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
+					.format( self._getLogDir(), self.getName(), e ) )
+
+	def runPrepare( self ):
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
+			# set base dir
+			parentBaseDir = self.getParent().getBaseDir()
+			baseDirName = self._getBaseDirName()
+			baseDir = os.path.join( parentBaseDir, baseDirName )
+			self._setBaseDir( baseDir )
+			# set log dir
+			logDirName = self._getBaseDirName()
+			parentLogDir = self.getParent()._getLogDir()
+			logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
 			self.setLogDir( logDir )
-		except ( OSError, IOError )as e:
-			raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
-				.format( logDir, self.getName(), e ) )
+		else:
+			self._setBaseDir( os.getcwd() )
+			self._setLogDir( os.getcwd() )
+		return super( BuildInstructions, self ).runPrepare()
 
 	def runSetups( self ):
 		for step in self.calculateBuildSequence():
