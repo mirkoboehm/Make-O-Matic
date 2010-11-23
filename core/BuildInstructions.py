@@ -107,7 +107,7 @@ class BuildInstructions( Instructions ):
 			self.setLogDir( logDir )
 		else:
 			self._setBaseDir( os.getcwd() )
-			self._setLogDir( os.getcwd() )
+			self.setLogDir( os.getcwd() )
 		return super( BuildInstructions, self ).runPrepare()
 
 	def runSetups( self ):

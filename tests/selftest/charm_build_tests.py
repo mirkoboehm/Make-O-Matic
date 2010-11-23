@@ -32,6 +32,9 @@ class CharmBuildTests( MomTestCase ):
 		MomTestCase.tearDown( self )
 
 	def testQueryCharmProjectName( self ):
+		buildDirectory = "charm_build"
+		if os.path.isdir( buildDirectory ):
+			self.fail( "Stale directory exists before the test starts: {0}".format( buildDirectory ) )
 		iface = BuildScriptInterface( CharmBuildTests.BuildScriptName )
 		projectNameQueryResult = iface.querySetting( Settings.ProjectName )
 		self.assertTrue( projectNameQueryResult )
