@@ -109,11 +109,9 @@ class Build( MApplication ):
 		assert self.getBaseDir()
 		return super( Build, self ).runPrepare()
 
-	def runPreFlightChecks( self ):
-		assert not self.getParent()
-		mode = self.getSettings().get( Settings.ScriptRunMode )
+	def runSetups( self ):
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode == Settings.RunMode_Build:
-			# FIXME move this to the first action of the build
 			baseDir = self.getBaseDir()
 			if os.path.isdir( baseDir ):
 				moveOldDirectories = mApp().getSettings().get( Settings.BuildMoveOldDirectories )
@@ -147,13 +145,8 @@ class Build( MApplication ):
 				os.makedirs( baseDir )
 			except ( OSError, IOError ) as e:
 				raise ConfigurationError( 'Cannot create required base directory "{0}" for {1}: {2}!'
-					.format( baseDir, self.getName(), e ) )
+										.format( baseDir, self.getName(), e ) )
 			os.chdir( baseDir )
-		MApplication.runPreFlightChecks( self )
-
-	def runSetups( self ):
-		mode = mApp().getSettings().get( Settings.ScriptRunMode )
-		if mode == Settings.RunMode_Build:
 			try:
 				os.makedirs( self._getLogDir() )
 			except ( OSError, IOError )as e:

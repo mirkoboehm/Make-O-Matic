@@ -38,7 +38,6 @@ class MObject( object ):
 
 	def describe( self, prefix ):
 		"""Describe this object
-		
 		Print out information like class name"""
 
 		name = self.getName()
