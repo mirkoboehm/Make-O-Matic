@@ -57,6 +57,10 @@ http://docs.kdab.com/make-o-matic/0.5.0/html
 		parser = optparse.OptionParser( usage = usage, version = version, description = description, epilog = epilog )
 		parser.add_option( '-r', '--revision', action = 'store', dest = 'revision',
 			help = 'repository revision to be built' )
+		parser.add_option( '--tag', action = 'store', dest = 'tag',
+			help = 'repository tag to be built' )
+		parser.add_option( '-b', '--branch', action = 'store', dest = 'branch',
+			help = 'repository branch to be built' )
 		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
 			help = 'Full SCM URL' )
 		parser.add_option( '-t', '--type', action = 'store', dest = 'buildType',
@@ -85,6 +89,12 @@ http://docs.kdab.com/make-o-matic/0.5.0/html
 
 	def getRevision( self ):
 		return self._getOptions().revision
+
+	def getTag( self ):
+		return self._getOptions().tag
+
+	def getBranch( self ):
+		return self._getOptions().branch
 
 	def getScmLocation( self ):
 		return self._getOptions().url
@@ -116,6 +126,10 @@ http://docs.kdab.com/make-o-matic/0.5.0/html
 			settings.set( Settings.ProjectRevision, self.getRevision() )
 		else:
 			settings.set( Settings.ProjectRevision, 'latest (HEAD)' )
+		if self.getTag():
+			settings.set( Settings.ProjectTag, self.getTag() )
+		if self.getBranch():
+			settings.set( Settings.ProjectBranch, self.getBranch() )
 		if self.getScmLocation():
 			settings.set( Settings.ProjectSourceLocation, self.getScmLocation() )
 		if self.getBuildType():
