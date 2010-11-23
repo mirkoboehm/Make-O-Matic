@@ -108,11 +108,11 @@ class BuildInstructions( Instructions ):
 		else:
 			self._setBaseDir( os.getcwd() )
 			self.setLogDir( os.getcwd() )
+		for step in self.calculateBuildSequence():
+			self.addStep( step )
 		return super( BuildInstructions, self ).runPrepare()
 
 	def runSetups( self ):
-		for step in self.calculateBuildSequence():
-			self.addStep( step )
 		# add actions to create the base directory:
 		createStep = self.getStep( 'build-create-folders' )
 		createStep.addMainAction( MkDirAction( self.getBaseDir() ) )
