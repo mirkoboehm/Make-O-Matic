@@ -58,14 +58,13 @@ class Configuration( ConfigurationBase ):
 	def getSourcePrefix( self ):
 		return self.__sourcePrefix
 
-	def runSetups( self ):
-		ConfigurationBase.runSetups( self )
+	def setup( self ):
+		super( Configuration, self ).setup()
 		settings = mApp().getSettings()
 		folders = [ settings.get( Settings.ConfigurationBuildDir ), settings.get( Settings.ConfigurationTargetDir ) ]
 		create = self.getStep( 'build-create-folders' )
 		cleanup = self.getStep( 'build-cleanup' )
 		for folder in folders:
 			create.addMainAction( MkDirAction( PathResolver( self.getBaseDir, folder ) ) )
-		folders.reverse()
 		for folder in folders:
-			cleanup.addMainAction( RmDirAction( PathResolver( self.getBaseDir, folder ) ) )
+			cleanup.prependMainAction( RmDirAction( PathResolver( self.getBaseDir, folder ) ) )

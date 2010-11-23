@@ -33,8 +33,8 @@ class PythonConfiguration( Configuration ):
 	def getExecutable( self ):
 		return self.__executable
 
-	def runPreFlightChecks( self ):
+	def preFlightCheck( self ):
 		'''Check that the configured Python executable exists and can be called.'''
 		RunCommand( [self.getExecutable() ] ).checkVersion()
-		return Configuration.runPreFlightChecks( self )
+		super( PythonConfiguration, self ).preFlightCheck()
 

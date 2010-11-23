@@ -92,7 +92,8 @@ class BuildInstructions( Instructions ):
 
 		return node
 
-	def runPrepare( self ):
+	def prepare( self ):
+		super( BuildInstructions, self ).prepare()
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
 			# set base dir
@@ -110,9 +111,9 @@ class BuildInstructions( Instructions ):
 			self.setLogDir( os.getcwd() )
 		for step in self.calculateBuildSequence():
 			self.addStep( step )
-		return super( BuildInstructions, self ).runPrepare()
 
-	def runSetups( self ):
+	def setup( self ):
+		super( BuildInstructions, self ).setup()
 		# add actions to create the base directory:
 		createStep = self.getStep( 'build-create-folders' )
 		createStep.addMainAction( MkDirAction( self.getBaseDir() ) )
@@ -127,7 +128,6 @@ class BuildInstructions( Instructions ):
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
 										.format( self._getLogDir(), self.getName(), e ) )
-		super( BuildInstructions, self ).runSetups()
 
 	def calculateBuildSequence( self ):
 		buildSteps = self._setupBuildSteps( Settings.ProjectBuildSequence )

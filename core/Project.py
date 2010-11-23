@@ -83,17 +83,17 @@ class Project( BuildInstructions ):
 	def getLogDir( self ):
 		return self.__getNormPath( Settings.ProjectLogDir )
 
-	def runSetups( self ):
+	def setup( self ):
+		super( Project, self ).setup()
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
 		assert len( buildType ) == 1
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
-		BuildInstructions.runSetups( self )
 		create = self.getStep( 'build-create-folders' )
 		delete = self.getStep( 'build-cleanup' )
 		for folder in ( self.getDocsDir(), self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
-			delete.addMainAction( RmDirAction( folder ) )
+			delete.prependMainAction( RmDirAction( folder ) )
 
 	def executeSteps( self ):
 		for step in self.getSteps():

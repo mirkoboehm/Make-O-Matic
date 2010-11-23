@@ -21,11 +21,11 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.Exceptions import ConfigurationError, MomError
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
-from core.helpers.EnvironmentSaver import EnvironmentSaver
 from core.Defaults import Defaults
 import os
 from core.executomat.Step import Step
 from core.Settings import Settings
+from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
 
 class Instructions( MObject ):
@@ -103,12 +103,6 @@ class Instructions( MObject ):
 			raise MomError( 'Cannot remove child {0}, I am not it\'s parent {1}!'
 				.format( instructions.getName(), self.getName() ) )
 
-	def execute( self ):
-		'''If execute is implemented, it is supposed to execute the pay load of the instructions. 
-		Execute is not required, many modules only need to act during the different phases.
-		To implement specific operations between setup and wrap-up, re-implement execute.'''
-		pass
-
 	def describe( self, prefix ):
 		MObject.describe( self, prefix )
 		basedir = '(not set)'
@@ -183,9 +177,11 @@ class Instructions( MObject ):
 			baseDirName = '{0}{1}{2}'.format( index, spacer, make_foldername_from_string( self.getName() ) )
 		return baseDirName
 
+
 	def runPrepare( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'preparing' )
+			self.prepare()
 			[ plugin.performPrepare() for plugin in self.getPlugins() ]
 			[ child.runPrepare() for child in self.getChildren() ]
 
@@ -193,18 +189,20 @@ class Instructions( MObject ):
 	def runPreFlightChecks( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'performing pre-flight checks' )
+			self.preFlightCheck()
 			[ plugin.performPreFlightCheck() for plugin in self.getPlugins() ]
 			[ child.runPreFlightChecks() for child in self.getChildren() ]
 
 	def runSetups( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'setting up' )
+			self.setup()
 			[ plugin.performSetup() for plugin in self.getPlugins() ]
 			[ child.runSetups() for child in self.getChildren() ]
 
 	def runExecute( self ):
 		with EnvironmentSaver():
-			self.debugN( self, 2, 'executing' )
+			mApp().debugN( self, 2, 'executing' )
 			self.execute()
 			[ child.execute() for child in self.getChildren() ]
 
@@ -217,6 +215,7 @@ class Instructions( MObject ):
 
 	def runShutDowns( self ):
 		with EnvironmentSaver():
+			self.shutDown()
 			for child in self.getChildren():
 				child.runShutDowns()
 			mApp().debugN( self, 2, 'shutting down' )
@@ -231,3 +230,30 @@ This error will not change the return code of the script!
 {2}'''.format( str( e ), plugin.getName(), traceback.format_exc() )
 					mApp().message( self, text )
 
+
+	def prepare( self ):
+		'''Execute the prepare phase for this object.'''
+		pass
+
+	def preFlightCheck( self ):
+		'''Execute the pre-flight check phase for this object.'''
+		pass
+
+	def setup( self ):
+		'''Execute the setup phase for this object.'''
+		pass
+
+	def execute( self ):
+		'''Execute the execute phase for this object.
+		If execute is implemented, it is supposed to execute the pay load of the instructions. 
+		Execute is not required, many modules only need to act during the different phases.
+		To implement specific operations between setup and wrap-up, re-implement execute.'''
+		pass
+
+	def wrapup( self ):
+		'''Execute the wrapup phase for this object.'''
+		pass
+
+	def shutDown( self ):
+		'''Execute the shut down phase for this object.'''
+		pass

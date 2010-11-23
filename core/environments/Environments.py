@@ -83,7 +83,7 @@ class Environments( ConfigurationBase ):
 			environment.setName( environment.makeDescription() )
 			environment.cloneConfigurations( configs )
 
-	def runPreFlightChecks( self ):
+	def preFlightCheck( self ):
 		# discover matching environments:
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
 		# FIXME (Kevin, what do you think?) this may have to be a property, so that the expansion mode can be added to the build report 
@@ -110,7 +110,7 @@ class Environments( ConfigurationBase ):
 		else:
 			# should not happen
 			raise MomError( 'The environment mode {0} is undefined!'.format( mode ) )
-		ConfigurationBase.runPreFlightChecks( self )
+		super( Environments, self ).preFlightCheck()
 
 	def _findMomDependencies( self, folder ):
 		"""recursively find leaf nodes within folder"""

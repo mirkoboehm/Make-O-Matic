@@ -93,8 +93,9 @@ class Build( MApplication ):
 				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
 			raise ConfigurationError( text )
 
-	def runPrepare( self ):
+	def prepare( self ):
 		'''Execute the prepare phase for builds.'''
+		super( Build, self ).prepare()
 		mApp().message( self, 'FIXME CHECK FOR SCM HERE' )
 		# set folder names
 		# the build object does not have a parent, and defines the build base dir:
@@ -107,9 +108,8 @@ class Build( MApplication ):
 		else:
 			self._setBaseDir( os.getcwd() )
 		assert self.getBaseDir()
-		return super( Build, self ).runPrepare()
 
-	def runSetups( self ):
+	def setup( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode == Settings.RunMode_Build:
 			baseDir = self.getBaseDir()
@@ -152,7 +152,7 @@ class Build( MApplication ):
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create build log directory "{0}" for {1}: {2}!'
 					.format( self._getLogDir(), self.getName(), e ) )
-		super( Build, self ).runSetups()
+		super( Build, self ).setup()
 
 	def runExecute( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:

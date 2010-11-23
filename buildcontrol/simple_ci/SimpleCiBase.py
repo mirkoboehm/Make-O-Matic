@@ -35,9 +35,9 @@ class SimpleCiBase( MApplication ):
 		self.__params = params
 		self.__buildStatus = BuildStatus()
 
-	def runPreFlightChecks( self ):
+	def preFlightCheck( self ):
 		self._setBaseDir( os.getcwd() )
-		MApplication.runPreFlightChecks( self )
+		super( SimpleCiBase, self ).preFlightCheck()
 
 	def getParameters( self ):
 		return self.__params
