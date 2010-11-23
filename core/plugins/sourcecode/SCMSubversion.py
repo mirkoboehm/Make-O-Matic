@@ -44,6 +44,14 @@ class SCMSubversion( SourceCodeProvider ):
 		self._setCommand( "svn", searchPaths )
 		self.__revisionInfoCache = {} # key: revision, value: RevisionInfo instance
 
+	def getUrl( self ):
+		# TODO Work out sensible ordering here or fail if we have more than one of these parameters
+		url = SourceCodeProvider.getUrl( self )
+		if self.getTag():
+			url = url + '/tags/' + self.getTag()
+		elif self.getBranch():
+			url = url + '/branches/' + self.getBranch()
+		return url
 
 	def getIdentifier( self ):
 		return 'svn'

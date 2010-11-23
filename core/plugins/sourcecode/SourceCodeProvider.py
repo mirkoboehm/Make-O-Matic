@@ -29,6 +29,8 @@ class SourceCodeProvider( Plugin ):
 		Plugin.__init__( self, name )
 		self.__url = None
 		self.__revision = None
+		self.__branch = None
+		self.__tag = None
 		self.__srcDir = None
 
 	def getDescription( self ):
@@ -38,7 +40,7 @@ class SourceCodeProvider( Plugin ):
 		raise NotImplementedError
 
 	def setUrl( self, url ):
-		self.__url = url
+		self.__url = url.rstrip( '/' )
 
 	def getUrl( self ):
 		return self.__url
@@ -55,6 +57,18 @@ class SourceCodeProvider( Plugin ):
 
 	def getRevision( self ):
 		return self.__revision
+
+	def setBranch( self, branch ):
+		self.__branch = branch
+
+	def getBranch( self ):
+		return self.__branch
+
+	def setTag( self, tag ):
+		self.__tag = __branch
+
+	def getTag( self ):
+		return self.__tag
 
 	def getRevisionInfo( self ):
 		"""Returns a RevisionInfo object"""

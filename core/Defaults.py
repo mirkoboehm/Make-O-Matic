@@ -60,6 +60,8 @@ class Defaults( MObject ):
 	ProjectBuildSequence = 'project.buildsequence'
 	ProjectSourceLocation = 'project.sourcelocation'
 	ProjectRevision = 'project.revision'
+	ProjectTag = 'project.tag'
+	ProjectBranch = 'project.branch'
 	ProjectSourceDir = 'project.srcdir'
 	ProjectPackagesDir = 'project.packagesdir'
 	ProjectDocsDir = 'project.docsdir'
