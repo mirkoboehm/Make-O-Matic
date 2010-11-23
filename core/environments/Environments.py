@@ -50,19 +50,6 @@ class Environments( ConfigurationBase ):
 	def _getInstalledDependencies( self ):
 		return self.__installedDeps
 
-	# FIXME I think this is not used anymore.
-#	def buildConfiguration( self ):
-#		'''For every child found during setup, apply the child, and build the configuration.'''
-#		error = False
-#		for child in self.getChildren():
-#			assert isinstance( child, ConfigurationBase )
-#			if child.buildConfiguration() != 0:
-#				error = True
-#		if error:
-#			return 1
-#		else:
-#			return 0
-
 	def __selectBestScoringEnvironment( self, environments ):
 		assert len( environments ) > 0
 		decoratedTuples = []
@@ -83,7 +70,7 @@ class Environments( ConfigurationBase ):
 			environment.setName( environment.makeDescription() )
 			environment.cloneConfigurations( configs )
 
-	def preFlightCheck( self ):
+	def prepare( self ):
 		# discover matching environments:
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
 		# FIXME (Kevin, what do you think?) this may have to be a property, so that the expansion mode can be added to the build report 
@@ -110,7 +97,7 @@ class Environments( ConfigurationBase ):
 		else:
 			# should not happen
 			raise MomError( 'The environment mode {0} is undefined!'.format( mode ) )
-		super( Environments, self ).preFlightCheck()
+		super( Environments, self ).prepare()
 
 	def _findMomDependencies( self, folder ):
 		"""recursively find leaf nodes within folder"""
