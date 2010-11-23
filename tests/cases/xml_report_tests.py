@@ -226,11 +226,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportOnException2( self ):
 		# Covers run phase
 
-		def run_new():
+		def runExecute_new():
 			raise BuildError( "Test Error" )
 
 		# inject erroneous method
-		self.build.run = run_new
+		self.build.runExecute = runExecute_new
 
 		self._build()
 		doc = etree.XML( self.getXmlReport().getReport() )
@@ -240,7 +240,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertEqual( doc.tag, "build" ) # root
 		self.assertNotEquals( doc.find( e ), None )
 
-		self.assertTrue( "self.run()" in doc.find( "{0}/traceback".format( e ) ).text )
+		self.assertTrue( "self.runExecute()" in doc.find( "{0}/traceback".format( e ) ).text )
 
 	def testXmlReportOnExceptionInXmlReportGeneration( self ):
 		def command_new( arg1, arg2 ):
