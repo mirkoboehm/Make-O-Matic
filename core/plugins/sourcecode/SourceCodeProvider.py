@@ -65,7 +65,7 @@ class SourceCodeProvider( Plugin ):
 		return self.__branch
 
 	def setTag( self, tag ):
-		self.__tag = __branch
+		self.__tag = tag
 
 	def getTag( self ):
 		return self.__tag
