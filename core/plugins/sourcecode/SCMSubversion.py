@@ -56,7 +56,6 @@ class SCMSubversion( SourceCodeProvider ):
 	def getIdentifier( self ):
 		return 'svn'
 
-	# TODO: Add support for fetching committer's email address from some lookup table
 	def getRevisionInfo( self ):
 		# check if specified revision is in cache. do not check for 'HEAD'
 		if self.getRevision() in self.__revisionInfoCache:
@@ -75,6 +74,9 @@ class SCMSubversion( SourceCodeProvider ):
 			assert len( logentries ) == 1
 			results = parse_log_entry( logentries[0] )
 			( info.committerName, info.commitMessage, info.revision, info.commitTime, info.commitTimeReadable ) = results
+
+			if self.getSCMUidMapper():
+				info.committerEmail = self.getSCMUidMapper().getEmail( info.committerName )
 		else:
 			raise ConfigurationError( 'cannot get log for "{0}"'
 				.format( self.getUrl() ) )

@@ -22,8 +22,11 @@ from core.helpers.TypeCheckers import check_for_path
 from core.Plugin import Plugin
 from core.helpers.XmlUtils import create_child_node
 from core.helpers.XmlReportConverter import ReportFormat
+from core.helpers.SCMUidMapper import SCMUidMapper
 
 class SourceCodeProvider( Plugin ):
+
+	DefaultUidMappings = "defaultuidmappings"
 
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
@@ -32,6 +35,7 @@ class SourceCodeProvider( Plugin ):
 		self.__branch = None
 		self.__tag = None
 		self.__srcDir = None
+		self.__mapper = SCMUidMapper( self )
 
 	def getDescription( self ):
 		return self.getUrl()
@@ -63,6 +67,9 @@ class SourceCodeProvider( Plugin ):
 
 	def getBranch( self ):
 		return self.__branch
+
+	def getSCMUidMapper( self ):
+		return self.__mapper
 
 	def setTag( self, tag ):
 		self.__tag = tag
@@ -115,6 +122,10 @@ class SourceCodeProvider( Plugin ):
 	def makeExportStep( self, targetDir ):
 		"""Create a Step that will export the source code to the target directory."""
 		raise NotImplementedError()
+
+	def prepare( self ):
+		for mapping in self.getSetting( self.DefaultUidMappings, False ) or []:
+			self.getSCMUidMapper().addMapping( mapping )
 
 	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 
