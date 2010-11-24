@@ -28,6 +28,7 @@ from core.Settings import Settings
 from core.loggers.ConsoleLogger import ConsoleLogger
 import os.path
 from core.helpers.XmlUtils import xml_compare
+from tests.helpers.TestUtils import replace_bound_method
 
 try:
 	from lxml import etree
@@ -110,11 +111,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 	def testConvertXmlReportToHtmlWithoutLxml( self ):
 		# write a new method implementation
-		def hasXsltSupport_new():
+		def hasXsltSupport_new( self ):
 			return False
 
 		converter = XmlReportConverter( self.getXmlReport() )
-		converter.hasXsltSupport = hasXsltSupport_new # replace method
+		replace_bound_method( converter, converter.hasXsltSupport, hasXsltSupport_new ) # replace method
 
 		xmlString = converter.convertToHtml()
 		self.assertTrue( xmlString == None, "If no XSLT support is available, converting to HTML should not work" )
@@ -164,11 +165,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportOnStepFailure( self ):
 		self._build()
 
-		def failed_new():
+		def failed_new( self ):
 			return True
 
 		step = self.project.getStep( 'build-cleanup' )
-		step.failed = failed_new
+		replace_bound_method( step, step.failed, failed_new )
 
 		converter = XmlReportConverter( self.getXmlReport() )
 		logText = converter.convertToFailedStepsLog()
@@ -178,11 +179,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportOnException( self ):
 		# Covers runSetups phase
 
-		def runSetups_new():
+		def runSetups_new( self ):
 			raise MomError( "Test Error" )
 
 		# inject erroneous method
-		self.build.runSetups = runSetups_new
+		replace_bound_method( self.build, self.build.runSetups, runSetups_new )
 
 		self._build()
 		doc = etree.XML( self.getXmlReport().getReport() )
@@ -202,11 +203,10 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportOnException1( self ):
 		# Covers runPreflightChecks phase
 
-		def runPreFlightChecks_new():
-			raise ConfigurationError( "Test Error" )
-
 		# inject erroneous method
-		self.build.runPreFlightChecks = runPreFlightChecks_new
+		def runPreFlightChecks_new( self ):
+			raise ConfigurationError( "Test Error" )
+		replace_bound_method( self.build, self.build.runPreFlightChecks, runPreFlightChecks_new )
 
 		self._build()
 		doc = etree.XML( self.getXmlReport().getReport() )
@@ -226,11 +226,10 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportOnException2( self ):
 		# Covers run phase
 
-		def runExecute_new():
-			raise BuildError( "Test Error" )
-
 		# inject erroneous method
-		self.build.runExecute = runExecute_new
+		def runExecute_new( self ):
+			raise BuildError( "Test Error" )
+		replace_bound_method( self.build, self.build.runExecute, runExecute_new )
 
 		self._build()
 		doc = etree.XML( self.getXmlReport().getReport() )
@@ -243,13 +242,12 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertTrue( "self.runExecute()" in doc.find( "{0}/traceback".format( e ) ).text )
 
 	def testXmlReportOnExceptionInXmlReportGeneration( self ):
-		def command_new( arg1, arg2 ):
-			raise MomError( "Test Error" )
-
 		# inject invalid XML template function into plugin
+		def command_new( self, arg1, arg2 ):
+			raise MomError( "Test Error" )
 		logger = ConsoleLogger()
 		self.build.addPlugin( logger )
-		logger.getXmlTemplate = command_new
+		replace_bound_method( logger, logger.getXmlTemplate, command_new )
 
 		self._build()
 
