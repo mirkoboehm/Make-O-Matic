@@ -23,8 +23,8 @@ from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
 class ScmModulesTests ( MomBuildMockupTestCase ):
 
-	GIT_EXAMPLE = 'git://github.com/KDAB/Make-O-Matic.git'
-	SVN_EXAMPLE = 'http://svn.github.com/KDAB/Make-O-Matic'
+	GIT_EXAMPLE = 'git://github.com/defunkt/hub.git'
+	SVN_EXAMPLE = 'http://googletest.googlecode.com/svn/'
 
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self )
@@ -32,8 +32,17 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 	def tearDown( self ):
 		MomBuildMockupTestCase.tearDown( self )
 
-	def _initialize( self, scmUrl ):
+	def _initialize( self, scmUrl, revision = None, branch = None, tag = None ):
 		self.project.createScm( scmUrl )
+
+		if revision:
+			self.project.getScm().setRevision( revision )
+
+		if branch:
+			self.project.getScm().setBranch( branch )
+
+		if tag:
+			self.project.getScm().setTag( tag )
 
 		self.build.getParameters().parse()
 		self.build.initialize()
@@ -56,12 +65,54 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self._validateRevisionInfoContent( info )
 		self.assertNotEquals( info.shortRevision, None, "Git should have a short revision" )
 
+	def testScmGitRevision( self ):
+		self._initialize( self.GIT_EXAMPLE, revision = "c2e575fa09b2e90a9108" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+
+	def testScmGitShortRevision( self ):
+		self._initialize( self.GIT_EXAMPLE, revision = "c2e575" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+
+	def testScmGitBranch( self ):
+		self._initialize( self.GIT_EXAMPLE, branch = "gh-pages" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+
+	def testScmGitTag( self ):
+		self._initialize( self.GIT_EXAMPLE, tag = "v1.4.1" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+
 	def testScmSvn( self ):
 		self._initialize( self.SVN_EXAMPLE )
 
 		info = self.project.getScm().getRevisionInfo()
 		self._validateRevisionInfoContent( info )
 		self.assertEquals( info.shortRevision, None, "Subversion should not have a short revision" )
+
+	def testScmSvnRevision( self ):
+		self._initialize( self.SVN_EXAMPLE, revision = "522" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+
+	def testScmSvnBranch( self ):
+		self._initialize( self.SVN_EXAMPLE, branch = "release-1.5" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+
+	def testScmSvnTag( self ):
+		self._initialize( self.SVN_EXAMPLE, tag = "release-1.5.0" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
 
 	def testScmSvnRevisionInfoCache( self ):
 		self._initialize( self.SVN_EXAMPLE )
