@@ -92,6 +92,7 @@ class SCMGit( SourceCodeProvider ):
 		return self.__cachedCheckoutsDir
 
 	def getRevisionInfo( self ):
+		self.updateHiddenClone()
 		sep = chr( 0x0A ) + chr( 0x03 ) # use some ASCII codes as separator, to avoid clashes in commit messages
 		formatStr = "%cn{0}%ce{0}%s\n\n%b{0}%ct{0}%ci{0}%H{0}%h".format( sep )
 
