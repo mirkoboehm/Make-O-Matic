@@ -43,14 +43,24 @@ class SCMSubversion( SourceCodeProvider ):
 			searchPaths += getPathsFromRegistry( keys, ".." )
 		self._setCommand( "svn", searchPaths )
 		self.__revisionInfoCache = {} # key: revision, value: RevisionInfo instance
+		self.__rootTrunk = False
+
+	def setRootTrunk( self, rootTrunk ):
+		self.__rootTrunk = rootTrunk
+
+	def rootIsTrunk( self ):
+		return self.__rootTrunk
 
 	def getUrl( self ):
 		# TODO Work out sensible ordering here or fail if we have more than one of these parameters
 		url = SourceCodeProvider.getUrl( self )
 		if self.getTag():
-			url = url + '/tags/' + self.getTag()
+			return url + '/tags/' + self.getTag()
 		elif self.getBranch():
-			url = url + '/branches/' + self.getBranch()
+			return url + '/branches/' + self.getBranch()
+		elif not self.rootIsTrunk():
+			return url + '/trunk'
+
 		return url
 
 	def getIdentifier( self ):
