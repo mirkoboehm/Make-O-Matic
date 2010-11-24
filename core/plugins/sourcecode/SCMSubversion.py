@@ -77,9 +77,6 @@ class SCMSubversion( SourceCodeProvider ):
 
 			if self.getSCMUidMapper():
 				info.committerEmail = self.getSCMUidMapper().getEmail( info.committerName )
-		else:
-			raise ConfigurationError( 'cannot get log for "{0}"'
-				.format( self.getUrl() ) )
 
 		# add to cache. do not add 'HEAD'
 		if self.getRevision():

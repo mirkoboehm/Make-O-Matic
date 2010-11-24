@@ -52,21 +52,7 @@ class EmailReporter( Reporter ):
 	@note Settings marked with a (*) are required
 	"""
 
-	def __init__( self, name = None ):
-		Reporter.__init__( self, name )
-
-		self.__info = None
-
 	def preFlightCheck( self ):
-		self.__info = None
-
-		# try to get info, may fail
-		try:
-			self.__info = mApp().getProject().getScm().getRevisionInfo()
-		except Exception as e:
-			# FIXME Kevin, we need to rethink this:
-			mApp().message( self, 'Querying the revision info during pre-flight check failed: {0}'.format ( e ) )
-
 		# check settings, may fail
 		settings = mApp().getSettings()
 		for setting in [
@@ -106,7 +92,7 @@ class EmailReporter( Reporter ):
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
 
 		# get revision info, do not crash here
-		info = self.__info or RevisionInfo()
+		info = instructions.getProject().getScm().getRevisionInfo()
 		revision = ( info.shortRevision if info.shortRevision else info.revision ) or "N/A"
 
 		returnCode = instructions.getReturnCode()

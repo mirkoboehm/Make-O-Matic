@@ -111,9 +111,6 @@ class SCMGit( SourceCodeProvider ):
 			info.commitTimeReadable = infos[4]
 			info.revision = infos[5]
 			info.shortRevision = infos[6]
-		else:
-			raise ConfigurationError( 'Cannot get log for the clone of "{0}" at "{1}"'
-				.format( self.getUrl(), self._getHiddenClonePath() ) )
 
 		return info
 
@@ -235,7 +232,7 @@ class SCMGit( SourceCodeProvider ):
 					self.getCachedCheckoutsDir(), e ) )
 		if os.path.exists( self._getCachedCheckoutPath() ):
 			# update an existing repository
-			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to treeish {1}'.format(
+			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to treeish {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getTreeish( 'origin' ) ) )
 			# reset the hidden clone to a branch
 			resetRunner = RunCommand( [ self.getCommand(), 'fetch', '--all' ] )
@@ -247,7 +244,7 @@ class SCMGit( SourceCodeProvider ):
 				raise MomError( 'error fetching revisions into the hidden clone' )
 			# FIXME we may not be on the master branch:
 		else:
-			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with treeish {1}'.format(
+			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with treeish {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getTreeish() ) )
 			# create the clone
 			cloneCmd = [ self.getCommand(), 'clone', self._getHiddenClonePath(), self.__getTempRepoName() ]
@@ -264,7 +261,7 @@ class SCMGit( SourceCodeProvider ):
 		checkoutRunner.run()
 		if checkoutRunner.getReturnCode() != 0:
 			# FIXME delete, continue with regular checkout
-			raise ConfigurationError( 'Cannot update the checkout at {0} to treeish {1}'.format(
+			raise ConfigurationError( 'Cannot update the checkout at {0} to treeish {1}'.format( 
 				self.getCachedCheckoutsDir(), self.getTreeish() ) )
 
 	def fetchRepositoryFolder( self, remotePath ):
@@ -274,5 +271,5 @@ class SCMGit( SourceCodeProvider ):
 		if os.path.exists( hiddenCheckoutPath ):
 			return hiddenCheckoutPath
 		else:
-			raise ConfigurationError( 'The remote path {0} was not found in the repository at treeish {1}'.format(
+			raise ConfigurationError( 'The remote path {0} was not found in the repository at treeish {1}'.format( 
 					remotePath, self.getTreeish() ) )

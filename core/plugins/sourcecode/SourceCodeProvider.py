@@ -79,6 +79,7 @@ class SourceCodeProvider( Plugin ):
 
 	def getRevisionInfo( self ):
 		"""Returns a RevisionInfo object"""
+
 		raise NotImplementedError
 
 	def printRevisionsSince( self, options ):

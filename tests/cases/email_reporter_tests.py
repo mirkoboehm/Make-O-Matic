@@ -92,11 +92,9 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		scm = self.build.getProject().getScm()
 
 		scm.setRevision( "---" )
-		# FIXME Kevin this needs to be changed, the exception is now suppressed 
-		# self.failUnlessRaises( ConfigurationError, self.build.runPreFlightChecks )
 
-		# email = self.reporter.createEmail()
-		# self.assertTrue( "N/A" in email.getSubject() )
+		email = self.reporter.createEmail()
+		self.assertTrue( "N/A" in email.getSubject() )
 
 	# TODO: Implement at some point
 	#def testCreateEmailBody( self ):
