@@ -80,6 +80,16 @@ class _MyTextWrapper( TextWrapper ):
 	def dedent( self, level = 1, indentString = " " ):
 		self.initial_indent = self.subsequent_indent = self.initial_indent[:-len( indentString ) * level]
 
+	def wrapAndFillLine( self, text, fillChar = '*' ):
+		out = []
+		out += self.wrap( text )
+
+		# let's fill up the last line with fillChar
+		if len( out ) > 0:
+			out[-1] += ' ' + ( fillChar * ( self.width - len( out[-1] ) - 1 ) )
+
+		return out
+
 	def wrapMultiLine( self, text, drop_empty_lines = True ):
 		out = []
 		for line in text.splitlines():
@@ -241,38 +251,40 @@ class XmlReportConverter( MObject ):
 		if startTime > 0:
 			roundTripTime = formatted_time_delta( datetime.utcnow() - datetime.utcfromtimestamp( startTime ) )
 		else:
-			roundTripTime = "N/A"
+			roundTripTime = -1
 
 		out = []
-		out += wrapper.wrap( "*" * wrapper.width )
-		out += wrapper.wrap( "Summary of the {0} Build Report".format( element.attrib["name"] ) )
-		out += " "
+		out += wrapper.wrapAndFillLine( "*** Build report: {0}, on {1} ({2})".format( 
+				element.attrib["name"],
+				element.attrib["sys-platform"],
+				element.attrib["sys-architecture"] ), '*' )
 
 		wrapper.indent()
-		out += wrapper.wrap( "Build status:   {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
+		out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
+		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
 
 		# only show detailed summary on success or build error
 		if int( element.attrib["returncode"] ) in ( 0, BuildError.getReturnCode() ):
-			out += wrapper.wrap( "Build time:     {0}".format( string_from_node_attribute( element, "project", "timing" ) ) )
-			out += wrapper.wrap( "Report delay:   {0} after commit".format( roundTripTime ) )
-			out += " "
-			out += wrapper.wrap( "Revision:       {0}".format( string_from_node_attribute( element, "plugin", "revision" ) ) )
-			out += wrapper.wrap( "Committer:      {0}".format( string_from_node_attribute( element, "plugin", "committerName" ) ) )
-			out += wrapper.wrap( "Time:           {0}".format( string_from_node_attribute( element, "plugin", "commitTimeReadable" ) ) )
+			out += wrapper.wrap( "Commit        {0}, revision: {1}".format( 
+					string_from_node_attribute( element, "plugin", "committerName" ),
+					string_from_node_attribute( element, "plugin", "revision" ) ) )
+			out += wrapper.wrap( "Time:         {0}".format( 
+					string_from_node_attribute( element, "plugin", "commitTimeReadable" ) ) )
 
-			out += " "
-			out += wrapper.wrap( "--- Commit message following ---" )
-			out += " "
-			wrapper.indent( indentString = " " )
+			wrapper.indent( indentString = "| " )
 			out += wrapper.wrapMultiLine( string_from_node( element, "commitMessage" ), drop_empty_lines = False )
-			wrapper.dedent( indentString = " " )
-			out += " "
-			out += wrapper.wrap( "--- End of commit message ---" )
+			wrapper.dedent( indentString = "  " )
+
+
 
 		wrapper.dedent()
 
-		out += " "
-		out += wrapper.wrap( "*" * wrapper.width )
+		if roundTripTime > 0:
+			out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
+					string_from_node_attribute( element, "project", "timing" ),
+			roundTripTime ), '*' )
+		else:
+			out += wrapper.wrap( "*" * wrapper.width )
 		out += " "
 
 		return "\n".join( out )
