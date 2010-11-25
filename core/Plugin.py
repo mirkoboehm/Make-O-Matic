@@ -23,6 +23,7 @@ from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, \
 	check_for_list_of_strings, check_for_list_of_paths
 from core.helpers.XmlUtils import create_child_node
+from copy import deepcopy, copy
 
 class Plugin( MObject ):
 	"""
@@ -56,6 +57,13 @@ class Plugin( MObject ):
 		self.__command = None
 		self.__commandArguments = []
 		self.__commandSearchPaths = []
+
+	def __deepcopy__( self, memo ):
+		clone = copy( self )
+		clone.__command = deepcopy( self.__command, memo )
+		clone.__commandArguments = deepcopy( self.__commandArguments, memo )
+		clone.__commandSearchPaths = deepcopy( self.__commandSearchPaths, memo )
+		return clone
 
 	def setInstructions( self, instructions ):
 		'''Assign this plugin to it's instruction object. 

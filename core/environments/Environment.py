@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.ConfigurationBase import ConfigurationBase
 from core.helpers.EnvironmentSaver import EnvironmentSaver
+from copy import deepcopy
 
 class Environment( ConfigurationBase ):
 	'''Environment is a single match of the required build environment for a single 
@@ -36,9 +37,7 @@ class Environment( ConfigurationBase ):
 		for configuration in configs:
 			# cloning needs to be done before the steps are created
 			assert not configuration.getSteps()
-			clone = configuration.clone()
-			for plugin in clone.getPlugins():
-				plugin.setInstructions( clone )
+			clone = deepcopy( configuration )
 			self.addChild( clone )
 
 	def setDependencies( self, deps ):
@@ -66,7 +65,3 @@ class Environment( ConfigurationBase ):
 			names.append( dep.getDescription() )
 		return ' - '.join( names )
 
-	def clone( self ):
-		c = super( Environment, self ).clone()
-		c.setDependencies( self.getDependencies() [:] )
-		return c

@@ -181,3 +181,10 @@ class Action( MObject ):
 			stderr = ""
 			stdout = ""
 		return stderr, stdout
+
+	def describe( self, prefix ):
+		"""Describe this object
+		Print out information like class name"""
+
+		name = self.getLogDescription()
+		print( '{0}{1}'.format( prefix, name ) )

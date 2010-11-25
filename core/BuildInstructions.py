@@ -26,7 +26,7 @@ from core.helpers.TypeCheckers import check_for_path_or_none, check_for_nonempty
 from core.executomat.Step import Step
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
-from copy import copy
+from copy import deepcopy
 
 class BuildInstructions( Instructions ):
 	def __init__( self, name = None, parent = None ):
@@ -35,6 +35,12 @@ class BuildInstructions( Instructions ):
 		self.__timeKeeper = TimeKeeper()
 		self.setLogDir( None )
 		self.__failedStep = None
+
+	def __deepcopy__( self, memo ):
+		clone = super( BuildInstructions, self ).__deepcopy__( memo )
+		clone.__timeKeeper = deepcopy( self.__timeKeeper, memo )
+		clone.__steps = deepcopy( self.__steps, memo )
+		return clone
 
 	def hasFailed( self ):
 		return self.__failedStep != None
@@ -53,12 +59,21 @@ class BuildInstructions( Instructions ):
 		"""Return the log dir."""
 		return self.__logDir
 
+	def __hasStep( self, stepName ):
+		try:
+			self.getStep( stepName )
+			return True
+		except MomError:
+			return False
+
 	def addStep( self, newStep ):
 		"""Add a newStep identified by identifier. If the identifier already exists, the new 
 		command replaces the old one."""
 		if not isinstance( newStep, Step ):
-			raise MomError( 'only executomat.Step instances can be added to the queue' )
-		check_for_nonempty_string( newStep.getName(), "Every Executomat step must have a name!" )
+			raise MomError( 'only Step instances can be added to the queue' )
+		check_for_nonempty_string( newStep.getName(), "Every step must have a name!" )
+		if self.__hasStep( newStep.getName() ):
+			raise MomError( 'A step with the name {0} already exists for this Instructions object!'.format( newStep.getName() ) )
 		self.__steps.append( newStep )
 
 	def getSteps( self ):
@@ -77,7 +92,8 @@ class BuildInstructions( Instructions ):
 	def describe( self, prefix ):
 		Instructions.describe( self, prefix )
 		for step in self.getSteps():
-			step.describe( prefix + '    ' )
+			if not step.isEmpty():
+				step.describe( prefix + '    ' )
 
 	def createXmlNode( self, document ):
 		node = Instructions.createXmlNode( self, document )
@@ -155,10 +171,4 @@ class BuildInstructions( Instructions ):
 				self.__failedStep = step
 			mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
 			mApp().debugN( self, 1, 'failure: "{0}"'.format( step.getName() ) )
-
-	def clone( self ):
-		'''Create a clone of this object.'''
-		c = copy( self )
-		return c
-
 

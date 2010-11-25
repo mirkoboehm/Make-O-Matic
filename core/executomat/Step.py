@@ -158,18 +158,11 @@ class Step( MObject ):
 
 	def describe( self, prefix ):
 		MObject.describe( self, prefix )
-		if self.getPreActions():
-			print( '{0} - pre actions: '.format( prefix ) )
-			for action in self.getPreActions():
-				action.describe( prefix + '    ' )
-		if self.getMainActions():
-			print( '{0} - main actions: '.format( prefix ) )
-			for action in self.getMainActions():
-				action.describe( prefix + '    ' )
-		if self.getPostActions():
-			print( '{0} - post actions: '.format( prefix ) )
-			for action in self.getPostActions():
-				action.describe( prefix + '    ' )
+		for phase in [ [ ' pre:', self.getPreActions() ],
+						[ 'main:', self.getMainActions() ],
+						[ 'post:', self.getPostActions() ] ]:
+			for action in phase[1]:
+				print( '{0}  {1} {2}'.format( prefix, phase[0], action.getLogDescription() ) )
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )

@@ -67,7 +67,6 @@ class Environments( ConfigurationBase ):
 		for config in configs:
 			self.removeChild( config )
 		for environment in environments:
-			environment.setName( environment.makeDescription() )
 			environment.cloneConfigurations( configs )
 
 	def prepare( self ):
@@ -208,6 +207,7 @@ class Environments( ConfigurationBase ):
 			envs = frozenset( envs )
 			match = Environment( parent = self )
 			match.setDependencies( envs )
+			match.setName( match.makeDescription() )
 			environments.append( match )
 		environments = frozenset( environments )
 		return environments
@@ -216,8 +216,3 @@ class Environments( ConfigurationBase ):
 		ConfigurationBase.describe( self, prefix )
 		deps = '{0}- dependencies: {1}'.format( prefix, ', '.join( self.getDependencies() ) )
 		print( deps )
-
-	def clone( self ):
-		c = super( Environments, self ).clone()
-		c.setDependencies( self.getDependencies()[:] )
-		return c

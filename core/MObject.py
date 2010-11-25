@@ -16,7 +16,6 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 class MObject( object ):
 	"""MObject is the base class for objects used during a MoM script run."""
 

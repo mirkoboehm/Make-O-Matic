@@ -37,8 +37,3 @@ class PythonConfiguration( Configuration ):
 		'''Check that the configured Python executable exists and can be called.'''
 		RunCommand( [self.getExecutable() ] ).checkVersion()
 		super( PythonConfiguration, self ).preFlightCheck()
-
-	def clone( self ):
-		c = super( PythonConfiguration, self ).clone()
-		c.setExecutable( self.getExecutable() )
-		return c

@@ -27,6 +27,7 @@ from core.executomat.Step import Step
 from core.Settings import Settings
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
+from copy import deepcopy, copy
 
 class Instructions( MObject ):
 	"""
@@ -57,6 +58,16 @@ class Instructions( MObject ):
 			parent.addChild( self )
 		self.__plugins = []
 		self.__instructions = []
+
+	def __deepcopy__( self, memo ):
+		# make shallow copy:
+		clone = copy( self )
+		# plug-ins and instructions need to be deep-copied
+		clone.__plugins = deepcopy( self.__plugins, memo )
+		for plugin in clone.__plugins:
+			plugin.setInstructions( clone )
+		clone.__instructions = deepcopy( self.__instructions, memo )
+		return clone
 
 	def setParent( self, parent ):
 		assert parent == None or isinstance( parent, Instructions )

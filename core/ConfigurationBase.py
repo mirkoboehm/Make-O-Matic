@@ -20,7 +20,7 @@ from core.Project import Project
 from core.BuildInstructions import BuildInstructions
 
 class ConfigurationBase( BuildInstructions ):
-	'''Configurationbase encapsulates common logic of configuration-like objects.'''
+	'''ConfigurationBase encapsulates common logic of configuration-like objects.'''
 
 	def __init__( self, name, parent = None ):
 		BuildInstructions.__init__( self, name, parent )
@@ -31,7 +31,3 @@ class ConfigurationBase( BuildInstructions ):
 			project = self.getParent().getProject()
 		assert isinstance( project, Project )
 		return project
-
-	def clone( self ):
-		c = super( ConfigurationBase, self ).clone()
-		return c
