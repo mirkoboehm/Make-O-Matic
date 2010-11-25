@@ -216,3 +216,8 @@ class Environments( ConfigurationBase ):
 		ConfigurationBase.describe( self, prefix )
 		deps = '{0}- dependencies: {1}'.format( prefix, ', '.join( self.getDependencies() ) )
 		print( deps )
+
+	def clone( self ):
+		c = super( Environments, self ).clone()
+		c.setDependencies( self.getDependencies()[:] )
+		return c

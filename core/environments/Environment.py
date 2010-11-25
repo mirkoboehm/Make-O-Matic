@@ -16,7 +16,6 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from copy import copy
 from core.ConfigurationBase import ConfigurationBase
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 
@@ -35,7 +34,9 @@ class Environment( ConfigurationBase ):
 
 	def cloneConfigurations( self, configs ):
 		for configuration in configs:
-			clone = copy( configuration )
+			# cloning needs to be done before the steps are created
+			assert not configuration.getSteps()
+			clone = configuration.clone()
 			for plugin in clone.getPlugins():
 				plugin.setInstructions( clone )
 			self.addChild( clone )
@@ -65,3 +66,7 @@ class Environment( ConfigurationBase ):
 			names.append( dep.getDescription() )
 		return ' - '.join( names )
 
+	def clone( self ):
+		c = super( Environment, self ).clone()
+		c.setDependencies( self.getDependencies() [:] )
+		return c

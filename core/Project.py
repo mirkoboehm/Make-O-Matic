@@ -105,3 +105,6 @@ class Project( BuildInstructions ):
 		with self.getTimeKeeper():
 			self.executeSteps()
 			super( Project, self ).execute()
+
+	def clone( self ):
+		raise NotImplementedError( 'At the moment, projects cannot be cloned!' )

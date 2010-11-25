@@ -16,7 +16,6 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.helpers.TimeKeeper import TimeKeeper
 from core.Project import Project
 from core.BuildInstructions import BuildInstructions
 
@@ -25,13 +24,6 @@ class ConfigurationBase( BuildInstructions ):
 
 	def __init__( self, name, parent = None ):
 		BuildInstructions.__init__( self, name, parent )
-		self.__timeKeeper = TimeKeeper()
-
-	def getTimeKeeper( self ):
-		return self.__timeKeeper
-
-#	def buildConfiguration( self ):
-#		raise NotImplementedError
 
 	def getProject( self ):
 		project = self.getParent()
@@ -39,3 +31,7 @@ class ConfigurationBase( BuildInstructions ):
 			project = self.getParent().getProject()
 		assert isinstance( project, Project )
 		return project
+
+	def clone( self ):
+		c = super( ConfigurationBase, self ).clone()
+		return c

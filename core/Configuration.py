@@ -68,3 +68,8 @@ class Configuration( ConfigurationBase ):
 			create.addMainAction( MkDirAction( PathResolver( self.getBaseDir, folder ) ) )
 		for folder in folders:
 			cleanup.prependMainAction( RmDirAction( PathResolver( self.getBaseDir, folder ) ) )
+
+	def clone( self ):
+		c = super( Configuration, self ).clone()
+		c.setSourcePrefix( self.getSourcePrefix()[:] )
+		return c

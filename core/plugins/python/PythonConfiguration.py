@@ -38,3 +38,7 @@ class PythonConfiguration( Configuration ):
 		RunCommand( [self.getExecutable() ] ).checkVersion()
 		super( PythonConfiguration, self ).preFlightCheck()
 
+	def clone( self ):
+		c = super( PythonConfiguration, self ).clone()
+		c.setExecutable( self.getExecutable() )
+		return c

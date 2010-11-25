@@ -26,6 +26,7 @@ from core.helpers.TypeCheckers import check_for_path_or_none, check_for_nonempty
 from core.executomat.Step import Step
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
+from copy import copy
 
 class BuildInstructions( Instructions ):
 	def __init__( self, name = None, parent = None ):
@@ -154,3 +155,10 @@ class BuildInstructions( Instructions ):
 				self.__failedStep = step
 			mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
 			mApp().debugN( self, 1, 'failure: "{0}"'.format( step.getName() ) )
+
+	def clone( self ):
+		'''Create a clone of this object.'''
+		c = copy( self )
+		return c
+
+
