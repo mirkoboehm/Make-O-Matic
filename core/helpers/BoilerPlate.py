@@ -46,7 +46,7 @@ def getBuild( buildName = "MOMBuild", minimumMomVersion = "0.5.0" ):
 
 def getProject( build, projectName = "MOMProject",
 				projectVersionNumber = "0.0.1", projectVersionName = None,
-				scmUrl = None ):
+				scmUrl = None, scmRevision = None, scmBranch = None, scmTag = None ):
 	'''Create a standard default Project object.
 	A default project will have a ConsoleLogger, and a ConsoleReporter.
 	makeProject will also parse the configuration files.
@@ -54,9 +54,15 @@ def getProject( build, projectName = "MOMProject",
 	project = Project( projectName )
 	# the command line parameter takes precedence
 	url = build.getParameters().getScmLocation() or scmUrl
+	revision = build.getParameters().getRevision() or scmRevision
+	branch = build.getParameters().getBranch() or scmBranch
+	tag = build.getParameters().getTag() or scmTag
 	mApp().getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
 	mApp().getSettings().set( Settings.ProjectVersionName, projectVersionName )
 	mApp().getSettings().set( Settings.ProjectSourceLocation, url )
+	mApp().getSettings().set( Settings.ProjectRevision, revision )
+	mApp().getSettings().set( Settings.ProjectBranch, branch )
+	mApp().getSettings().set( Settings.ProjectTag, tag )
 	project.createScm( url )
 	build.setProject( project )
 	return project
