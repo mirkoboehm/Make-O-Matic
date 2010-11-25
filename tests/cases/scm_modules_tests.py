@@ -97,7 +97,7 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertEquals( info.shortRevision, None, "Subversion should not have a short revision" )
 
 	def testScmSvnRevision( self ):
-		self._initialize( self.SVN_EXAMPLE, revision = "522" )
+		self._initialize( self.SVN_EXAMPLE, revision = "246" )
 
 		info = self.project.getScm().getRevisionInfo()
 		self._validateRevisionInfoContent( info )
@@ -118,7 +118,7 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self._initialize( self.SVN_EXAMPLE )
 
 		scm = self.project.getScm()
-		scm.setRevision( 9 ) # set revision explicitly, HEAD revision info isn't cached
+		scm.setRevision( 246 ) # set revision explicitly, HEAD revision info isn't cached
 		info1 = scm.getRevisionInfo()
 
 		# test if cache is working
