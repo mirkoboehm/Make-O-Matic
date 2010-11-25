@@ -89,10 +89,9 @@ class BuildInstructions( Instructions ):
 	def getTimeKeeper( self ):
 		return self.__timeKeeper
 
-	def describe( self, prefix ):
+	def describe( self, prefix, details = None ):
 		Instructions.describe( self, prefix )
 		for step in self.getSteps():
-			if not step.isEmpty():
 				step.describe( prefix + '    ' )
 
 	def createXmlNode( self, document ):

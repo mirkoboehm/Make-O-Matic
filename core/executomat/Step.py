@@ -156,13 +156,14 @@ class Step( MObject ):
 		finally:
 			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
-	def describe( self, prefix ):
-		MObject.describe( self, prefix )
-		for phase in [ [ ' pre:', self.getPreActions() ],
-						[ 'main:', self.getMainActions() ],
-						[ 'post:', self.getPostActions() ] ]:
-			for action in phase[1]:
-				print( '{0}  {1} {2}'.format( prefix, phase[0], action.getLogDescription() ) )
+	def describe( self, prefix, details = None ):
+		if not self.isEmpty():
+			MObject.describe( self, prefix )
+			for phase in [ [ ' pre', self.getPreActions() ],
+							[ 'main', self.getMainActions() ],
+							[ 'post', self.getPostActions() ] ]:
+				for action in phase[1]:
+					action.describe( prefix, details = phase[0] )
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )

@@ -114,15 +114,14 @@ class Instructions( MObject ):
 			raise MomError( 'Cannot remove child {0}, I am not it\'s parent {1}!'
 				.format( instructions.getName(), self.getName() ) )
 
-	def describe( self, prefix ):
-		MObject.describe( self, prefix )
+	def describe( self, prefix, details = None ):
 		basedir = '(not set)'
 		try:
 			basedir = self.getBaseDir()
 		except ConfigurationError:
 			pass
-		text = '{0}- base dir: {1}'.format( prefix, basedir )
-		print( text )
+		text = ' {1}'.format( prefix, basedir )
+		MObject.describe( self, prefix, text )
 		subPrefix = prefix + '    '
 		for plugin in self.getPlugins():
 			plugin.describe( subPrefix )
@@ -147,9 +146,8 @@ class Instructions( MObject ):
 
 	def describeRecursively( self, prefix = '' ):
 		'''Describe this instruction object in human readable form.'''
-		self.describe( prefix )
+		self.describe( prefix, details = None )
 		prefix = '    {0}'.format( prefix )
-		#print( "LENGTH: {0}".format( len( self.getChildren() ) ) )
 		for child in self.getChildren():
 			child.describeRecursively( prefix )
 

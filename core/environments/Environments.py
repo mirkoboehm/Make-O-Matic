@@ -212,7 +212,5 @@ class Environments( ConfigurationBase ):
 		environments = frozenset( environments )
 		return environments
 
-	def describe( self, prefix ):
-		ConfigurationBase.describe( self, prefix )
-		deps = '{0}- dependencies: {1}'.format( prefix, ', '.join( self.getDependencies() ) )
-		print( deps )
+	def describe( self, prefix, details = None ):
+		self._printDescribeLine( prefix, self.getName(), details = ', '.join( self.getDependencies() ) )

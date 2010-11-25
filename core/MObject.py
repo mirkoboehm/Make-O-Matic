@@ -16,6 +16,8 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+import re
+from core.Exceptions import MomException
 class MObject( object ):
 	"""MObject is the base class for objects used during a MoM script run."""
 
@@ -35,16 +37,31 @@ class MObject( object ):
 	def getTagName( self ):
 		return self.__class__.__name__.lower()
 
-	def describe( self, prefix ):
+	def describe( self, prefix, details = None ):
 		"""Describe this object
 		Print out information like class name"""
+		self._printDescribeLine( prefix, self.getName(), details )
 
-		name = self.getName()
+	def _printDescribeLine( self, prefix, name, details, replacePatterns = True ):
 		clazz = self.__class__.__name__
 		if name != clazz:
-			print( '{0}{1}: {2}'.format( prefix, clazz, name ) )
-		else:
-			print( '{0}{1}'.format( prefix, clazz ) )
+			name = '{0} ({1})'.format( name, clazz )
+		elements = [ name ]
+		if details:
+			elements += [ details.strip() ]
+		text = ': '.join( elements )
+		line = '{0}{1}'.format( prefix, text )
+
+		# FIXME this is duplicated form ConsoleLogger, maybe it could use a helper?
+		if replacePatterns:
+			try:
+				from core.helpers.GlobalMApp import mApp
+				basedir = mApp().getBaseDir()
+				line = re.sub( basedir, '$BASE', line )
+			except MomException:
+				pass # no base directory set yet
+
+		print( line )
 
 	def createXmlNode( self, document, recursive = True ):
 		"""Create XML node for this object
