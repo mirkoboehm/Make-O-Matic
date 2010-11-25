@@ -44,7 +44,7 @@ class Action( MObject ):
 		raise NotImplementedError()
 
 	def __init__( self, name = None ):
-		MObject.__init__( self, name, "action" )
+		MObject.__init__( self, name )
 		self.__timeKeeper = TimeKeeper()
 		self.__workingDir = None
 		self.__started = False

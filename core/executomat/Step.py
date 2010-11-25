@@ -28,7 +28,7 @@ from core.helpers.GlobalMApp import mApp
 class Step( MObject ):
 	"""An individual step of an Executomat run."""
 	def __init__( self, stepName = None ):
-		MObject.__init__( self, stepName, "step" )
+		MObject.__init__( self, stepName )
 		self.__timeKeeper = TimeKeeper()
 		self.__enabled = True
 		self.__ignorePreviousFailure = False
