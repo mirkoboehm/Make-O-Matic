@@ -70,7 +70,6 @@ div#build-report div {
 	margin-left: 1%;
 }
 
-
 pre {
 	font-size: 8pt;
 	margin-top: 10px;
@@ -107,6 +106,13 @@ h3 {
 }
 h4 {
 	font-size: 105%;
+}
+
+h5 {
+	margin-top: 5px;
+	margin-bottom: 5px;
+
+	font-size: 100%;
 }
 
 /*** classes ***/
@@ -192,9 +198,10 @@ h4 {
 			<xsl:apply-templates/>
 		</div>
 	</xsl:template>
+	<xsl:template match="dependencies"/> <!-- do not show this tag -->
 
 	<xsl:template match="environment">
-		<h2>Environment: <xsl:value-of select="@name" /></h2>
+		<h2>Environment: <xsl:value-of select="@name" /> (<xsl:call-template name="showBuildInstructionsStatus"/>)</h2>
 		<div class="tag-environment">
 			<xsl:apply-templates />
 		</div>
@@ -209,33 +216,34 @@ h4 {
 
 	<xsl:template match="steps">
 		<xsl:if test="count(./step) > 0">
-			<h4>Steps: <xsl:value-of select="@name" /></h4>
-			<div class="tag-steps">
-				<table>
-					<thead>
-						<tr>
-							<th width="500px">Instruction</th>
-							<th width="200px">Timing</th>
-							<th width="300px">Status</th>
-						</tr>
-					</thead>
-					<tbody>
-						<xsl:apply-templates />
-					</tbody>
-				</table>
-			</div>
+			<table>
+				<thead>
+					<tr>
+						<th width="500px">Steps: <xsl:value-of select="@name" /></th>
+						<th width="200px">Timing</th>
+						<th width="300px">Status</th>
+					</tr>
+				</thead>
+				<tbody>
+					<xsl:apply-templates />
+				</tbody>
+			</table>
 		</xsl:if>
 	</xsl:template>
 
+<!--
 	<xsl:template match="plugins">
-		<h4>Plugins:</h4>
-		<div class="tag-plugins">
-			<xsl:apply-templates/>
-		</div>
+		<xsl:if test="count(./plugin) > 0">
+			<h4>Plugins:</h4>
+			<div class="tag-plugins">
+				<xsl:apply-templates/>
+			</div>
+		</xsl:if>
 	</xsl:template>
+-->
 
 	<xsl:template match="plugin">
-		<h4>
+		<h5>
 			<xsl:value-of select="@name" />
 			<xsl:if test="@isEnabled = 'False'">
 				[Disabled]
@@ -246,7 +254,7 @@ h4 {
 			<xsl:if test="string-length(plugindescription) > 0">
 				(<xsl:value-of select="plugindescription"/>)
 			</xsl:if>
-		</h4>
+		</h5>
 		<!-- TODO: Doesn't work for some reason, why?
 		<div class="tag-plugin">
 		 -->
@@ -258,27 +266,25 @@ h4 {
 		</xsl:template>
 
 	<xsl:template match="step">
-		<div class="tag-step">
-			<!-- Hide if no actions registered -->
-			<xsl:if test="@isEmpty = 'False'">
-				<tr>
-					<td>
-						<xsl:value-of select="@name" />
-					</td>
-					<td>
-						<xsl:value-of select="@timing" />
-					</td>
-					<td class="step-status">
-						<xsl:call-template name="showStepStatus" />
-					</td>
-				</tr>
-	
-				<!-- Only show actions if step has failed -->
-				<xsl:if test="@failed = 'True'">
-					<xsl:apply-templates />
-				</xsl:if>
+		<!-- Hide if no actions registered -->
+		<xsl:if test="@isEmpty = 'False'">
+			<tr>
+				<td>
+					<xsl:value-of select="@name" />
+				</td>
+				<td>
+					<xsl:value-of select="@timing" />
+				</td>
+				<td class="step-status">
+					<xsl:call-template name="showStepStatus" />
+				</td>
+			</tr>
+
+			<!-- Only show actions if step has failed -->
+			<xsl:if test="@failed = 'True'">
+				<xsl:apply-templates />
 			</xsl:if>
-		</div>
+		</xsl:if>
 	</xsl:template>
 
 	<xsl:template match="step/action">
