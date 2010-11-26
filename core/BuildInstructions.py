@@ -99,6 +99,7 @@ class BuildInstructions( Instructions ):
 		node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
 		node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
 		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
+		node.attributes["failed"] = str( self.hasFailed() )
 
 		stepsElement = document.createElement( "steps" )
 		for step in self.getSteps():

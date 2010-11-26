@@ -265,7 +265,7 @@ class XmlReportConverter( MObject ):
 
 		# only show detailed summary on success or build error
 		if int( element.attrib["returncode"] ) in ( 0, BuildError.getReturnCode() ):
-			out += wrapper.wrap( "Commit        {0}, revision: {1}".format( 
+			out += wrapper.wrap( "Commit:       {0}, revision: {1}".format( 
 					string_from_node_attribute( element, "plugin", "committerName" ),
 					string_from_node_attribute( element, "plugin", "revision" ) ) )
 			out += wrapper.wrap( "Time:         {0}".format( 
@@ -274,8 +274,6 @@ class XmlReportConverter( MObject ):
 			wrapper.indent( indentString = "| " )
 			out += wrapper.wrapMultiLine( string_from_node( element, "commitMessage" ), drop_empty_lines = False )
 			wrapper.dedent( indentString = "  " )
-
-
 
 		wrapper.dedent()
 
@@ -394,7 +392,17 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "configuration":
 			out += " "
-			out += wrapper.wrap( "Configuration: {0}".format( element.attrib["name"] ) )
+			out += wrapper.wrap( "Configuration: {0}, ({1})".format(
+					element.attrib["name"],
+					"success" if element.attrib["failed"] == "False" else "FAILED"
+			) )
+
+		elif element.tag == "environments":
+			out += " "
+			out += wrapper.wrap( "Environments: {0} (Depends on: {1})".format(
+					element.attrib["name"],
+					element.find("dependencies").text
+			) )
 
 		elif element.tag == "environment":
 			out += " "

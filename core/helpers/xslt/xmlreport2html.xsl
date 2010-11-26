@@ -45,6 +45,17 @@
 		</xsl:choose>
 	</xsl:template>
 
+	<xsl:template name="showBuildInstructionsStatus">
+		<xsl:choose>
+			<xsl:when test="@failed = 'True'">
+				<span class="fail">FAILED</span>
+			</xsl:when>
+			<xsl:otherwise>
+				<span class="success">SUCCESS</span>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
 	<xsl:template match="/">
 		<html>
 			<head>
@@ -175,6 +186,13 @@ h4 {
 		</div>
 	</xsl:template>
 
+	<xsl:template match="environments">
+		<h2>Environments: <xsl:value-of select="@name" /> (Depends on: <xsl:value-of select="dependencies" />)</h2>
+		<div class="tag-environments">
+			<xsl:apply-templates/>
+		</div>
+	</xsl:template>
+
 	<xsl:template match="environment">
 		<h2>Environment: <xsl:value-of select="@name" /></h2>
 		<div class="tag-environment">
@@ -183,7 +201,7 @@ h4 {
 	</xsl:template>
 
 	<xsl:template match="configuration">
-		<h3>Configuration: <xsl:value-of select="@name" /></h3>
+		<h3>Configuration: <xsl:value-of select="@name" /> (<xsl:call-template name="showBuildInstructionsStatus"/>)</h3>
 		<div class="tag-configuration">
 			<xsl:apply-templates />
 		</div>

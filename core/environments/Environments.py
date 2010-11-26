@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.ConfigurationBase import ConfigurationBase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
@@ -24,6 +25,7 @@ from core.Exceptions import MomError, ConfigurationError
 from core.environments.Dependency import Dependency
 from fnmatch import fnmatch
 from core.environments.Environment import Environment
+from core.helpers.XmlUtils import create_child_node
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches 
@@ -211,6 +213,11 @@ class Environments( ConfigurationBase ):
 			environments.append( match )
 		environments = frozenset( environments )
 		return environments
+
+	def createXmlNode(self, document):
+		node = super(Environments, self).createXmlNode(document)
+		create_child_node(document, node, "dependencies", ', '.join( self.getDependencies() ))
+		return node
 
 	def describe( self, prefix, details = None ):
 		self._printDescribeLine( prefix, self.getName(), details = ', '.join( self.getDependencies() ) )
