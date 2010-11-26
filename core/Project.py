@@ -73,17 +73,11 @@ class Project( BuildInstructions ):
 	def getSourceDir( self ):
 		return self.__getNormPath( Settings.ProjectSourceDir )
 
-	def getPackagesDir( self ):
-		return self.__getNormPath( Settings.ProjectPackagesDir )
-
 	def getTempDir( self ):
 		return self.__getNormPath( Settings.ProjectTempDir )
 
 	def getDocsDir( self ):
 		return self.__getNormPath( Settings.ProjectDocsDir )
-
-	def getLogDir( self ):
-		return self.__getNormPath( Settings.ProjectLogDir )
 
 	def setup( self ):
 		super( Project, self ).setup()
@@ -93,7 +87,7 @@ class Project( BuildInstructions ):
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		create = self.getStep( 'build-create-folders' )
 		delete = self.getStep( 'build-cleanup' )
-		for folder in ( self.getDocsDir(), self.getSourceDir(), self.getPackagesDir(), self.getTempDir() ):
+		for folder in ( self.getDocsDir(), self.getSourceDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.prependMainAction( RmDirAction( folder ) )
 

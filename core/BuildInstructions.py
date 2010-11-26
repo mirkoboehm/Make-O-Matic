@@ -22,7 +22,7 @@ from core.helpers.GlobalMApp import mApp
 from core.Exceptions import MomError, BuildError, ConfigurationError
 from core.helpers.TimeKeeper import formatted_time, TimeKeeper
 from core.Settings import Settings
-from core.helpers.TypeCheckers import check_for_path_or_none, check_for_nonempty_string
+from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.executomat.Step import Step
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
@@ -37,7 +37,6 @@ class BuildInstructions( Instructions ):
 		Instructions.__init__( self, name, parent )
 		self.__steps = []
 		self.__timeKeeper = TimeKeeper()
-		self.setLogDir( None )
 		self.__failedStep = None
 
 	def __deepcopy__( self, memo ):
@@ -55,18 +54,6 @@ class BuildInstructions( Instructions ):
 		'''Return the log output of the first step that failed during execution.'''
 		if self.__failedStep:
 			return self.__failedStep.getLogFileName()
-
-	def setLogDir( self, path ):
-		"""Set the directory where all log information is stored."""
-		check_for_path_or_none( path, "The log directory name must be a string containing a path name." )
-		self.__logDir = path
-
-	# FIXME bad name, Project has getLogDir, this is confusing
-	def _getLogDir( self ):
-		"""Return the log directory.
-		The log directory is the full path the the location where log output of the step should be saved. It is usually located
-		under the log/ sub-directory of the build object, outside of the build tree."""
-		return self.__logDir
 
 	def __hasStep( self, stepName ):
 		'''Returns True if a step with the specified name already exists.'''
@@ -130,16 +117,21 @@ class BuildInstructions( Instructions ):
 		super( BuildInstructions, self ).prepare()
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
-			# set base dir
+			# set base directory
 			parentBaseDir = self.getParent().getBaseDir()
 			baseDirName = self._getBaseDirName()
 			baseDir = os.path.join( parentBaseDir, baseDirName )
 			self._setBaseDir( baseDir )
-			# set log dir
+			# set log directory
 			logDirName = self._getBaseDirName()
 			parentLogDir = self.getParent()._getLogDir()
 			logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
 			self.setLogDir( logDir )
+			# set packages directory
+			packagesDirName = self._getBaseDirName()
+			parentPackageDir = self.getParent().getPackagesDir()
+			packagesDir = os.path.abspath( os.path.join( parentPackageDir, packagesDirName ) )
+			self.setPackagesDir( packagesDir )
 		else:
 			self._setBaseDir( os.getcwd() )
 			self.setLogDir( os.getcwd() )
@@ -164,6 +156,11 @@ class BuildInstructions( Instructions ):
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
 										.format( self._getLogDir(), self.getName(), e ) )
+			try:
+				os.makedirs( self.getPackagesDir() )
+			except ( OSError, IOError )as e:
+				raise ConfigurationError( 'Cannot create required packages directory "{0}" for {1}: {2}!'
+					.format( self._getLogDir(), self.getName(), e ) )
 
 	def calculateBuildSequence( self ):
 		'''Define the build sequence for this object.

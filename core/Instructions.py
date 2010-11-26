@@ -20,9 +20,7 @@ from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.Exceptions import ConfigurationError, MomError
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string
-from core.Defaults import Defaults
-import os
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string, check_for_path_or_none
 from core.executomat.Step import Step
 from core.Settings import Settings
 from core.helpers.EnvironmentSaver import EnvironmentSaver
@@ -53,6 +51,8 @@ class Instructions( MObject ):
 	def __init__( self, name = None, parent = None ):
 		MObject.__init__( self, name )
 		self._setBaseDir( None )
+		self.setLogDir( None )
+		self.setPackagesDir( None )
 		self.setParent( None )
 		if parent: # the parent instructions object
 			parent.addChild( self )
@@ -84,16 +84,34 @@ class Instructions( MObject ):
 		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		return self.__baseDir
 
+	def setLogDir( self, path ):
+		"""Set the directory where all log information is stored."""
+		check_for_path_or_none( path, "The log directory name must be a string containing a path name." )
+		self.__logDir = path
+
+	# FIXME bad name, Project has getLogDir, this is confusing
+	def _getLogDir( self ):
+		"""Return the log directory.
+		The log directory is the full path the the location where log output of the step should be saved. It is usually located
+		under the log/ sub-directory of the build object, outside of the build tree."""
+		return self.__logDir
+
+	def setPackagesDir( self, path ):
+		'''Return the packages directory for this object. 
+		All data files produced by the build should be stored in the packages directory.'''
+		check_for_path_or_none( path, "The packages directory name must be a string containing a path name." )
+		self.__packagesDir = path
+
+	def getPackagesDir( self ):
+		'''Get the packages directory.'''
+		return self.__packagesDir
+
 	def getPlugins( self ):
 		return self.__plugins
 
 	def addPlugin( self, plugin ):
 		plugin.setInstructions( self )
 		self.__plugins.append( plugin )
-
-	def _getLogDir( self ):
-		logDirName = mApp().getSettings().get( Defaults.ProjectLogDir )
-		return os.path.join( self.getBaseDir(), logDirName )
 
 	def getChildren( self ):
 		return self.__instructions

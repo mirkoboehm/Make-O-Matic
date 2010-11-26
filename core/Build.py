@@ -28,6 +28,7 @@ from core.helpers.GlobalMApp import mApp
 import time
 import shutil
 import sys
+from core.Defaults import Defaults
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -101,12 +102,23 @@ class Build( MApplication ):
 		# the build object does not have a parent, and defines the build base dir:
 		mode = self.getSettings().get( Settings.ScriptRunMode )
 		if mode in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
+			# set base directory name
 			parentBaseDir = os.getcwd()
 			baseDirName = self._getBaseDirName()
 			baseDir = os.path.join( parentBaseDir, baseDirName )
 			self._setBaseDir( baseDir )
+			# set the base log directory name
+			logDirName = mApp().getSettings().get( Defaults.ProjectLogDir )
+			logDir = os.path.join( baseDir, logDirName )
+			self.setLogDir( logDir )
+			# set the base packages directory name
+			packagesDirName = mApp().getSettings().get( Defaults.ProjectPackagesDir )
+			packagesDir = os.path.join( baseDir, packagesDirName )
+			self.setPackagesDir( packagesDir )
 		else:
 			self._setBaseDir( os.getcwd() )
+			self.setLogDir( os.getcwd() )
+			self.setPackagesDir( os.getcwd() )
 		assert self.getBaseDir()
 
 	def setup( self ):
@@ -151,6 +163,11 @@ class Build( MApplication ):
 				os.makedirs( self._getLogDir() )
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create build log directory "{0}" for {1}: {2}!'
+					.format( self._getLogDir(), self.getName(), e ) )
+			try:
+				os.makedirs( self.getPackagesDir() )
+			except ( OSError, IOError )as e:
+				raise ConfigurationError( 'Cannot create build packages directory "{0}" for {1}: {2}!'
 					.format( self._getLogDir(), self.getName(), e ) )
 		super( Build, self ).setup()
 

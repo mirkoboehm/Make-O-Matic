@@ -121,15 +121,15 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 
 		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
 
-		generators = { ('WINDOWS',True): 'ZIP',
-					   ('WINDOWS',False): 'NSIS;ZIP',
-					   ('APPLE', True): 'TBZ2;ZIP',
-					   ('APPLE', False): 'DragNDrop;TBZ2',
-					   ('ELSE', True): 'TBZ2;ZIP',
-					   ('ELSE', False): 'STGZ;TBZ2' }
+		generators = { ( 'WINDOWS', True ): 'ZIP',
+					   ( 'WINDOWS', False ): 'NSIS;ZIP',
+					   ( 'APPLE', True ): 'TBZ2;ZIP',
+					   ( 'APPLE', False ): 'DragNDrop;TBZ2',
+					   ( 'ELSE', True ): 'TBZ2;ZIP',
+					   ( 'ELSE', False ): 'STGZ;TBZ2' }
 
-		for i in ('WINDOWS', 'APPLE', 'ELSE'):
-			config = config.replace( "@CPACK_GENERATOR_%s@" % i, generators[(i, self._sourcePackage)] )
+		for i in ( 'WINDOWS', 'APPLE', 'ELSE' ):
+			config = config.replace( "@CPACK_GENERATOR_%s@" % i, generators[( i, self._sourcePackage )] )
 
 		if self._sourcePackage:
 			cpackSource = "TRUE"
@@ -182,6 +182,6 @@ class CPack( PackageProvider ):
 		generateConfig.setWorkingDirectory( configuration.getBuildDir() )
 		step.addMainAction( generateConfig )
 		makePackage = PackageProvider.makePackageStep( self )
-		movePackageDestination = project.getPackagesDir()
+		movePackageDestination = self.getInstructions().getPackagesDir()
 		movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
 		step.addMainAction( movePackage )
