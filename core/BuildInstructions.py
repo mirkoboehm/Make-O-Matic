@@ -29,7 +29,11 @@ from core.actions.filesystem.RmDirAction import RmDirAction
 from copy import deepcopy
 
 class BuildInstructions( Instructions ):
+	'''BuildInstructions is the base class for all elements that form the build tree of a project.
+	BuildInstructions introduces the build steps, and the packages and reports locations.'''
+
 	def __init__( self, name = None, parent = None ):
+		'''Constructor.'''
 		Instructions.__init__( self, name, parent )
 		self.__steps = []
 		self.__timeKeeper = TimeKeeper()
@@ -37,15 +41,18 @@ class BuildInstructions( Instructions ):
 		self.__failedStep = None
 
 	def __deepcopy__( self, memo ):
+		'''Customize the behaviour of deepcopy to not include the parent object.'''
 		clone = super( BuildInstructions, self ).__deepcopy__( memo )
 		clone.__timeKeeper = deepcopy( self.__timeKeeper, memo )
 		clone.__steps = deepcopy( self.__steps, memo )
 		return clone
 
 	def hasFailed( self ):
+		'''Returns True if any action of the build steps for this object has failed.'''
 		return self.__failedStep != None
 
 	def logFilePathForFailedStep( self ):
+		'''Return the log output of the first step that failed during execution.'''
 		if self.__failedStep:
 			return self.__failedStep.getLogFileName()
 
@@ -56,10 +63,13 @@ class BuildInstructions( Instructions ):
 
 	# FIXME bad name, Project has getLogDir, this is confusing
 	def _getLogDir( self ):
-		"""Return the log dir."""
+		"""Return the log directory.
+		The log directory is the full path the the location where log output of the step should be saved. It is usually located
+		under the log/ sub-directory of the build object, outside of the build tree."""
 		return self.__logDir
 
 	def __hasStep( self, stepName ):
+		'''Returns True if a step with the specified name already exists.'''
 		try:
 			self.getStep( stepName )
 			return True
@@ -77,6 +87,8 @@ class BuildInstructions( Instructions ):
 		self.__steps.append( newStep )
 
 	def getSteps( self ):
+		'''Return the list of build steps for the object.
+		It is a list, not a dictionary, because the steps are a sequence and cannot be reordered.'''
 		return self.__steps
 
 	def getStep( self, identifier ):
@@ -87,14 +99,17 @@ class BuildInstructions( Instructions ):
 		raise MomError( 'no such step "{0}"'.format( identifier ) )
 
 	def getTimeKeeper( self ):
+		'''Return the TimeKeeper object to measure execution time.'''
 		return self.__timeKeeper
 
 	def describe( self, prefix, details = None ):
+		'''Print describe output.'''
 		Instructions.describe( self, prefix )
 		for step in self.getSteps():
 				step.describe( prefix + '    ' )
 
 	def createXmlNode( self, document ):
+		'''Create a node for the XML report.'''
 		node = Instructions.createXmlNode( self, document )
 		node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
 		node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
@@ -110,6 +125,8 @@ class BuildInstructions( Instructions ):
 		return node
 
 	def prepare( self ):
+		'''Execute the prepare phase.
+		Sets the packages and reports directories if the script is executed in build or describe mode.'''
 		super( BuildInstructions, self ).prepare()
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
@@ -130,6 +147,8 @@ class BuildInstructions( Instructions ):
 			self.addStep( step )
 
 	def setup( self ):
+		'''Execute the setup phase.
+		Creates actions to create the build base directory for this object, and creates the packages and log directories.'''
 		super( BuildInstructions, self ).setup()
 		# add actions to create the base directory:
 		createStep = self.getStep( 'build-create-folders' )
@@ -147,17 +166,23 @@ class BuildInstructions( Instructions ):
 										.format( self._getLogDir(), self.getName(), e ) )
 
 	def calculateBuildSequence( self ):
+		'''Define the build sequence for this object.
+		By the default, the build sequence is identical for every BuildInstructions object. Command line parameters that
+		enable or disable steps are applied by this method.'''
 		buildSteps = self._setupBuildSteps( Settings.ProjectBuildSequence )
 		# apply customizations passed as command line parameters:
 		mApp().getParameters().applyBuildSequenceSwitches( buildSteps )
 		return buildSteps
 
 	def _executeStepRecursively( self, instructions, name ):
+		'''Execute one step of the build sequence recursively, for this object, and all child objects.'''
 		self.executeStep( name )
 		for child in instructions.getChildren():
 			child._executeStepRecursively( child, name )
 
 	def executeStep( self, stepName ):
+		'''Execute one individual step.
+		This method does not recurse to child objects.'''
 		step = self.getStep( stepName )
 		if step.isEmpty():
 			mApp().debugN( self, 4, 'step "{0}" is empty for {1}'.format( step.getName(), self.getName() ) )
