@@ -28,9 +28,9 @@ from core.plugins.reporters.ConsoleReporter import ConsoleReporter
 from core.plugins.reporters.XmlReportGenerator import XmlReportGenerator
 from core.Configuration import Configuration
 
-def getBuild( buildName = "MOMBuild", minimumMomVersion = "0.5.0" ):
+def getBuild( name, minimumMomVersion ):
 	try:
-		build = Build( minimumMomVersion, buildName )
+		build = Build( minimumMomVersion, name )
 		build.getParameters().parse()
 		mApp().getSettings().set( Settings.ScriptLogLevel, build.getParameters().getDebugLevel() )
 		logger = ConsoleLogger()
@@ -44,21 +44,19 @@ def getBuild( buildName = "MOMBuild", minimumMomVersion = "0.5.0" ):
 		print( 'Error during setup, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ), sys.stderr )
 		sys.exit( e.getReturnCode() )
 
-def getProject( build, projectName = "MOMProject",
-				projectVersionNumber = "0.0.1", projectVersionName = None,
-				scmUrl = None, scmRevision = None, scmBranch = None, scmTag = None ):
-	'''Create a standard default Project object.
+def getProject( build, name, url, version, revision, branch, tag, versionName ):
+	'''Create a standard default getProject object.
 	A default project will have a ConsoleLogger, and a ConsoleReporter.
 	makeProject will also parse the configuration files.
 	'''
-	project = Project( projectName )
+	project = Project( name )
 	# the command line parameter takes precedence
-	url = build.getParameters().getScmLocation() or scmUrl
-	revision = build.getParameters().getRevision() or scmRevision
-	branch = build.getParameters().getBranch() or scmBranch
-	tag = build.getParameters().getTag() or scmTag
-	mApp().getSettings().set( Settings.ProjectVersionNumber, projectVersionNumber )
-	mApp().getSettings().set( Settings.ProjectVersionName, projectVersionName )
+	url = build.getParameters().getScmLocation() or url
+	revision = build.getParameters().getRevision() or revision
+	branch = build.getParameters().getBranch() or branch
+	tag = build.getParameters().getTag() or tag
+	mApp().getSettings().set( Settings.ProjectVersionNumber, version )
+	mApp().getSettings().set( Settings.ProjectVersionName, versionName )
 	mApp().getSettings().set( Settings.ProjectSourceLocation, url )
 	mApp().getSettings().set( Settings.ProjectRevision, revision )
 	mApp().getSettings().set( Settings.ProjectBranch, branch )
@@ -67,24 +65,16 @@ def getProject( build, projectName = "MOMProject",
 	build.setProject( project )
 	return project
 
-def getBuildProject( buildName = None, minimumMomVersion = None,
-		projectName = None,
-		projectVersionNumber = None, projectVersionName = None,
-		scmUrl = None ):
-	# If the only one of the project/build names is set, initialise both with the same value
-	if buildName and not projectName:
-		projectName = buildName
-	if projectName and not buildName:
-		buildName = projectName
-	build = getBuild( buildName, minimumMomVersion )
-	project = getProject( build, projectName, projectVersionNumber, projectVersionName, scmUrl )
+def BuildProject( name, url, version = "0.0.1", revision = None, branch = None, tag = None,
+				versionName = None, build = None, minimumMomVersion = "0.5.0" ):
+	if name and not build:
+		build = name
+	build = getBuild( build, minimumMomVersion )
+	project = getProject( build, name, url, version, revision, branch, tag, versionName )
 	return build, project
 
-def getBuildConfiguration( buildName = None, minimumMomVersion = None,
-		projectName = None,
-		projectVersionNumber = None, projectVersionName = None,
-		scmUrl = None ):
-	build, project = getBuildProject( buildName, minimumMomVersion, projectName,
-												projectVersionNumber, projectVersionName, scmUrl )
+def BuildConfiguration( name, url, version = "0.0.1", revision = None, branch = None, tag = None,
+					versionName = None, build = None, minimumMomVersion = "0.5.0" ):
+	build, project = BuildProject( name, url, version, revision, branch, tag, versionName, build, minimumMomVersion )
 	configuration = Configuration( project.getName(), project )
 	return build, configuration

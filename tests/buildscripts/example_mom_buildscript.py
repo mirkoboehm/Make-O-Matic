@@ -20,11 +20,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.python.PythonConfiguration import PythonConfiguration
-from core.helpers.BoilerPlate import getBuildProject
+from core.helpers.BoilerPlate import BuildProject
 from tests.helpers.CrashMePlugin import CrashMePlugin
 
-build, project = getBuildProject( projectName = 'Make-O-Matic', projectVersionNumber = '0.5.0',
-								projectVersionName = 'French Fries', scmUrl = 'git://github.com/KDAB/Make-O-Matic.git' )
+build, project = BuildProject( 'Make-O-Matic', 'git://github.com/KDAB/Make-O-Matic.git', '0.5.0', versionName = 'French Fries' )
 
 build.addPlugin( CrashMePlugin() )
 # set up configurations:
