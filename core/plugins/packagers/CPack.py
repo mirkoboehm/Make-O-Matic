@@ -24,6 +24,7 @@ import os
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
 from core.Settings import Settings
+import re
 
 _CPackConfig = '''SET(CPACK_PACKAGE_NAME "@CPACK_PACKAGE_NAME@")
 SET(CPACK_PACKAGE_NAME_SIMPLIFIED "@CPACK_PACKAGE_NAME_SIMPLIFIED@")
@@ -80,15 +81,14 @@ class _CPackMovePackageAction( FilesMoveAction ):
 		if ( self.__action.getResult() != 0 ):
 			return 1
 		lines = self.__action.getStdOut().splitlines()
-		packageLinePrefix = 'CPack: Package '
-		packageLineSuffix = ' generated.'
+		# This might break with newer versions. Tested with CPack 2.8.2 and 2.8.3
+		packageRegex = re.compile( 'CPack: -? ?[Pp]ackage:? (.*) generated\.' )
 		packageFiles = []
 		for line in lines:
 			line = line.decode()
-			if line.startswith( packageLinePrefix ) and line.endswith( packageLineSuffix ):
-				line = line.replace( packageLinePrefix, '' )
-				packageFile = line.replace( packageLineSuffix, '' )
-				packageFiles.append( packageFile )
+			match = packageRegex.match( line )
+			if match:
+				packageFiles.append( match.group( 1 ) )
 		self.setFiles( packageFiles )
 		return FilesMoveAction.run( self )
 
