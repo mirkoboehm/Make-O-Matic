@@ -103,6 +103,7 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self._validateRevisionInfoContent( info )
 
 	def testScmSvnBranch( self ):
+		# FIXME Mike: The branch "release-1.5" that this was referring to is gone!
 		self._initialize( self.SVN_EXAMPLE, branch = "unsupported-vc6-port" )
 
 		info = self.project.getScm().getRevisionInfo()
