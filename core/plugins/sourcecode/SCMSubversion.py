@@ -29,6 +29,9 @@ import tempfile
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import sys
 from core.helpers.TimeKeeper import formatted_time
+from buildcontrol.common.BuildInfo import BuildInfo
+from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -113,9 +116,20 @@ class SCMSubversion( SourceCodeProvider ):
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			for entry in logentries:
 				result = parse_log_entry( entry )
-				if int( result[2] ) != revision: # svn log always spits out the last revision 
-					revisions.append( ['C', int( result[2] ), self.getUrl() ] )
-			return revisions
+				if int( result[2] ) != revision: # svn log always spits out the last revision
+					info = BuildInfo()
+					info.setBuildType( 'C' ) # the default, FIXME add classifiers
+					info.setRevision( int( result[2] ) )
+					info.setUrl( self.getUrl() )
+					# FIXME only trunk is supported this way
+					info.setBranch( None )
+					info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
+					info.setTag( None )
+					revisions.append( info )
+			if cap:
+				return revisions[-cap:]
+			else:
+				return revisions
 		elif runner.getTimedOut() == True:
 			raise ConfigurationError( 'Getting svn log for "{0}" timed out.'.format( self.getUrl() ) )
 		else:

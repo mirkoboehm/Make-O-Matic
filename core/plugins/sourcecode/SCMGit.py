@@ -27,6 +27,8 @@ from core.helpers.FilesystemAccess import make_foldername_from_string
 import re
 from core.helpers.GlobalMApp import mApp
 from core.plugins.sourcecode.RevisionInfo import RevisionInfo
+from core.Settings import Settings
+from buildcontrol.common.BuildInfo import BuildInfo
 
 class _UpdateHiddenCloneAction( Action ):
 
@@ -133,8 +135,15 @@ class SCMGit( SourceCodeProvider ):
 					if hash == revision:
 						break
 					else:
-						data = ( 'C', hash, self.getUrl() )
-						revisions.append( data )
+						info = BuildInfo()
+						info.setBuildType( 'C' ) # the default, FIXME add classifiers
+						info.setRevision( hash )
+						info.setUrl( self.getUrl() )
+						# FIXME only master is supported this way
+						info.setBranch( None )
+						info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
+						info.setTag( None )
+						revisions.append( info )
 			if cap:
 				return revisions[-cap:]
 			else:

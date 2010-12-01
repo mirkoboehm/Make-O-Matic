@@ -292,16 +292,9 @@ where id=?'''\
 			if not line:
 				continue
 
-			parts = line.split( ' ' )
-			if len( parts ) != 3:
-				MomError( 'Error in build script output in line "{0}"'.format( line ) )
-
 			buildInfo = BuildInfo()
-			buildInfo.setProjectName( projectName )
+			buildInfo.initializeFromPrintableRepresentation( line )
 			buildInfo.setBuildStatus( buildInfo.Status.NewRevision )
-			buildInfo.setBuildType( parts[0] )
-			buildInfo.setRevision( parts[1] )
-			buildInfo.setUrl( parts[2] )
 			buildInfo.setBuildScript( buildScript )
 			buildInfos.append( buildInfo )
 

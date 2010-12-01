@@ -18,9 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonnegative_int_or_none, check_for_int_or_none
+from repr import repr
+import re
+from core.Exceptions import MomError
 
 class BuildInfo( MObject ):
 	'''BuildInfo represents a single build script run.'''
+	LineIdentifier = 'revision'
 
 	class Status( object ):
 		# pylint: disable-msg=r0903
@@ -104,3 +108,35 @@ class BuildInfo( MObject ):
 
 	def setBuildScript( self, script ):
 		self.__buildScript = script
+
+	def printableRepresentation( self ):
+		values = {
+			'buildtype' : self.getBuildType(),
+			'priority' : self.getPriority(),
+			'project' : self.getProjectName(),
+			'revision' : self.getRevision(),
+			'url' : self.getUrl(),
+			'branch' : self.getBranch(),
+			'tag' : self.getTag()
+		}
+		# Do not use repr() directly, the Pydev debugger overloads it to shorten the results.
+		# As a result, tests fail when run within Eclipse.
+		representation = values.__repr__()
+		return format( '{0}: {1}'.format( BuildInfo.LineIdentifier, representation ) )
+
+	def initializeFromPrintableRepresentation( self, line ):
+		match = re.match( '^{0}: (.+)$'.format( BuildInfo.LineIdentifier ), line )
+		if not match:
+			raise MomError( 'Unable to parse revision description "{0}"'.format( line ) )
+		representation = match.group( 1 )
+		if not representation:
+			raise MomError( 'Malformated revision description "{0}"'.format( line ) )
+		# FIXME parse errors?
+		dictionary = eval( representation )
+		self.setBuildType( dictionary[ 'buildtype' ] )
+		self.setPriority( dictionary[ 'priority' ] )
+		self.setProjectName( dictionary[ 'project'] )
+		self.setRevision( dictionary['revision'] )
+		self.setUrl( dictionary['url'] )
+		self.setBranch( dictionary['branch'] )
+		self.setTag( dictionary['tag'] )

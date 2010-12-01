@@ -26,9 +26,12 @@ import random
 import string
 
 class BuildStatusPersistenceTests( MomTestCase ):
+	def _randomString( self, length = 8 ):
+		return ''.join( random.choice( string.ascii_uppercase + string.digits ) for x in range( 8 ) ) #@UnusedVariable
+
 	def testPersistBuildInfo( self ):
-		randomBranch = ''.join( random.choice( string.ascii_uppercase + string.digits ) for x in range( 8 ) ) #@UnusedVariable
-		randomTag = ''.join( random.choice( string.ascii_uppercase + string.digits ) for x in range( 8 ) ) #@UnusedVariable
+		randomBranch = self._randomString()
+		randomTag = self._randomString()
 		status = BuildStatus()
 		filename = NamedTemporaryFile( suffix = '.sqlite' ).name
 		status.setDatabaseFilename( filename )
@@ -47,6 +50,20 @@ class BuildStatusPersistenceTests( MomTestCase ):
 		self.assertTrue( len( revs ) == 1 )
 		self.assertEqual( revs[0].__dict__, info.__dict__ )
 		os.remove( filename )
+
+	def testParsingPrintableRepresentation( self ):
+		info = BuildInfo()
+		info.setBuildType( self._randomString() )
+		info.setPriority( 3 )
+		info.setProjectName( self._randomString() )
+		info.setRevision( self._randomString() )
+		info.setUrl( self._randomString() )
+		info.setBranch( self._randomString() )
+		info.setTag( self._randomString() )
+		stringRepresentation = info.printableRepresentation()
+		result = BuildInfo()
+		result.initializeFromPrintableRepresentation( stringRepresentation )
+		self.assertEqual( info.__dict__, result.__dict__ )
 
 if __name__ == "__main__":
 	unittest.main()

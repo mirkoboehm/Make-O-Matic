@@ -23,6 +23,7 @@ from core.Plugin import Plugin
 from core.helpers.XmlUtils import create_child_node
 from core.helpers.XmlReportConverter import ReportFormat
 from core.helpers.SCMUidMapper import SCMUidMapper
+from buildcontrol.common.BuildInfo import BuildInfo
 
 class SourceCodeProvider( Plugin ):
 
@@ -83,20 +84,21 @@ class SourceCodeProvider( Plugin ):
 		raise NotImplementedError
 
 	def printRevisionsSince( self, options ):
-		"""Print revisions committed since the specified revision."""
+		"""Print revisions committed since the specified buildInfo."""
 		if not options:
-			raise MomError( 'No revision specified to start with!' )
+			raise MomError( 'No buildInfo specified to start with!' )
 		if len( options ) > 2:
-			raise MomError( 'Error, extra options. Specify revision and optionally the maximum number of revisions to print.' )
-		revision = options[0]
+			raise MomError( 'Error, extra options. Specify buildInfo and optionally the maximum number of buildInfos to print.' )
+		buildInfo = options[0]
 		cap = None
 		if len( options ) == 2:
 			cap = int( options[1] )
 
-		revisions = self._getRevisionsSince( revision, cap )
+		buildInfos = self._getRevisionsSince( buildInfo, cap )
 		lines = []
-		for revision in revisions:
-			line = '{0} {1} {2}:{3}'.format( revision[0], revision[1], self.getIdentifier(), revision[2] )
+		for buildInfo in buildInfos:
+			assert isinstance( buildInfo, BuildInfo )
+			line = buildInfo.printableRepresentation()
 			lines.append( line )
 		return '\n'.join( lines )
 
