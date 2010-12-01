@@ -57,10 +57,14 @@ class RSyncPublisher( Plugin ):
 				mApp().message( self, 'Upload location is empty. Not generating any actions.' )
 				return
 		step = self.getInstructions().getStep( 'project-upload-docs' )
-		fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-		action = ShellCommandAction( [ self.getCommand(), '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ], 7200 )
-		action.setWorkingDirectory( self.getInstructions().getBaseDir() )
-		step.addMainAction( action )
+		if str( self.getLocalDir() ):
+			fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
+			cmd = [ self.getCommand(), '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ]
+			action = ShellCommandAction( cmd, 7200 )
+			action.setWorkingDirectory( self.getInstructions().getBaseDir() )
+			step.addMainAction( action )
+		else:
+			mApp().debugN( self, 2, 'No local directory specified, not generating action' )
 
 
 	def __makeCygwinPathForRsync( self, directory ):
