@@ -78,3 +78,7 @@ def check_for_nonnegative_int( expression, description ):
 def check_for_positive_int( expression, description ):
 	check_for_int( expression, description, 1 )
 
+def check_for_callable( expression, description ):
+	if not callable( expression ):
+		raise ConfigurationError( description )
+

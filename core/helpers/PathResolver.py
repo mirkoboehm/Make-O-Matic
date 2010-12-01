@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_callable
 
 class PathResolver( object ):
 	'''A path resolver resolves a project filename to its full path at the time it is converted to a string.
@@ -35,14 +35,18 @@ class PathResolver( object ):
 		return self.__filename
 
 	def setFunction( self, function ):
-		# FIXME how to check that function is callable?
+		check_for_callable( function, 'The function the PathResolver should call needs to be callable!' )
 		self.__function = function
 
 	def getFunction( self ):
 		return self.__function
 
 	def __str__( self ):
-		if( self.getFilename() ):
-			return os.path.join( self.getFunction()(), self.getFilename() )
+		filename = self.getFilename()
+		path = self.getFunction()()
+		if not filename and not path:
+			return ''
+		elif self.getFilename():
+			return os.path.join( path, filename )
 		else:
-			return os.path.join( self.getFunction()() )
+			return os.path.join( path )
