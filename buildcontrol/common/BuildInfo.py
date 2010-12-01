@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonnegative_int_or_none, check_for_int_or_none
 
 class BuildInfo( MObject ):
 	'''BuildInfo represents a single build script run.'''
@@ -28,28 +29,33 @@ class BuildInfo( MObject ):
 
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
-		self.__buildId = None
-		self.__projectName = None
-		self.__priority = None
-		self.__buildStatus = BuildInfo.Status.NoStatus
-		self.__buildType = None
-		self.__revision = None
-		self.__url = None
-		self.__buildScript = None
+		self.setBuildId( None )
+		self.setProjectName( None )
+		self.setPriority( None )
+		self.setBuildStatus( BuildInfo.Status.NoStatus )
+		self.setBuildType( None )
+		self.setRevision( None )
+		self.setUrl( None )
+		self.setBranch( None )
+		self.setTag( None )
+		self.setBuildScript( None )
 
 	def getProjectName( self ):
 		return self.__projectName
 
 	def setProjectName( self, name ):
+		check_for_nonempty_string_or_none( name, 'The project name should not be empty!' )
 		self.__projectName = name
 
 	def getBuildId( self ):
 		return self.__buildId
 
 	def setBuildId( self, buildId ):
+		check_for_nonnegative_int_or_none( buildId, 'The build id needs to be a non-negative integer!' )
 		self.__buildId = buildId
 
 	def setPriority( self, priority ):
+		check_for_int_or_none( priority, 'The priority should be an integer number!' )
 		self.__priority = priority
 
 	def getPriority( self ):
@@ -78,6 +84,20 @@ class BuildInfo( MObject ):
 
 	def setUrl( self, url ):
 		self.__url = url
+
+	def setBranch( self, branch ):
+		check_for_nonempty_string_or_none( branch, 'The branch should be a string!' )
+		self.__branch = branch
+
+	def getBranch( self ):
+		return self.__branch
+
+	def setTag( self, tag ):
+		check_for_nonempty_string_or_none( tag, 'The tag should be a string!' )
+		self.__tag = tag
+
+	def getTag( self ):
+		return self.__tag
 
 	def getBuildScript( self ):
 		return self.__buildScript

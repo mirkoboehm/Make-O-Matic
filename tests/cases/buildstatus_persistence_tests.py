@@ -22,9 +22,13 @@ from buildcontrol.common.BuildInfo import BuildInfo
 from tempfile import NamedTemporaryFile
 import os
 from tests.helpers.MomTestCase import MomTestCase
+import random
+import string
 
 class BuildStatusPersistenceTests( MomTestCase ):
 	def testPersistBuildInfo( self ):
+		randomBranch = ''.join( random.choice( string.ascii_uppercase + string.digits ) for x in range( 8 ) ) #@UnusedVariable
+		randomTag = ''.join( random.choice( string.ascii_uppercase + string.digits ) for x in range( 8 ) ) #@UnusedVariable
 		status = BuildStatus()
 		filename = NamedTemporaryFile( suffix = '.sqlite' ).name
 		status.setDatabaseFilename( filename )
@@ -35,6 +39,8 @@ class BuildStatusPersistenceTests( MomTestCase ):
 		info.setBuildType( 'm' )
 		info.setRevision( 'abcdef' )
 		info.setUrl( '0123456789' )
+		info.setBranch( randomBranch )
+		info.setTag( randomTag )
 		info.setBuildScript( 'dummy.py' )
 		status.saveBuildInfo( [ info ] )
 		revs = status.loadBuildInfo( BuildInfo.Status.NewRevision )

@@ -46,12 +46,14 @@ class BuildStatus( MObject ):
 		conn = sqlite3.connect( self.getDatabaseFilename() )
 		conn.execute( '''CREATE TABLE IF NOT EXISTS {0} (
 id INTEGER PRIMARY KEY AUTOINCREMENT,
-project_name text,
+build_name text,
 status int,
 priority int,
 type text,
 revision text,
 url text,
+branch text,
+tag text,
 script text
 )'''.format( BuildStatus.TableName ) )
 		conn.commit()
@@ -68,10 +70,12 @@ script text
 					buildInfo.getBuildType(),
 					buildInfo.getRevision(),
 					buildInfo.getUrl(),
+					buildInfo.getBranch(),
+					buildInfo.getTag(),
 					buildInfo.getBuildScript() ]
 				query = '''insert into {0}
-( id, project_name, status, priority, type, revision, url, script )
-values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
+( id, build_name, status, priority, type, revision, url, branch, tag, script )
+values ( NULL, ?, ?, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				cursor.execute( query, values )
 				buildInfo.setBuildId( cursor.lastrowid )
 		finally:
@@ -91,9 +95,14 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				buildInfo.getBuildType(),
 				buildInfo.getRevision(),
 				buildInfo.getUrl(),
+				buildInfo.getBranch(),
+				buildInfo.getTag(),
 				buildInfo.getBuildScript(),
 				buildInfo.getBuildId() ]
-			query = '''update {0} set project_name=?, status=?, priority=?, type=?, revision=?, url=?, script=? where id=?'''\
+			query = '''update {0} 
+set build_name=?, status=?, priority=?, type=?, 
+    revision=?, url=?, branch=?, tag=?, script=? 
+where id=?'''\
 				.format( BuildStatus.TableName )
 			c.execute( query, values )
 		finally:
@@ -112,7 +121,9 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 		buildInfo.setBuildType( row[4] )
 		buildInfo.setRevision( row[5] )
 		buildInfo.setUrl( row[6] )
-		buildInfo.setBuildScript( row[7] )
+		buildInfo.setBranch( row[7] )
+		buildInfo.setTag( row[8] )
+		buildInfo.setBuildScript( row[9] )
 		return buildInfo
 
 	def _loadBuildInfo( self, connection , status ):

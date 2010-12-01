@@ -64,6 +64,10 @@ def check_for_path_or_none( expression, description ):
 	if expression:
 		check_for_path( expression, description )
 
+def check_for_int_or_none( expression, description ):
+	if expression != None:
+		check_for_int( expression, description )
+
 def check_for_int( expression, description, lessThan = None ):
 	try:
 		value = int( expression )
@@ -74,6 +78,10 @@ def check_for_int( expression, description, lessThan = None ):
 
 def check_for_nonnegative_int( expression, description ):
 	check_for_int( expression, description, 0 )
+
+def check_for_nonnegative_int_or_none( expression, description ):
+	if expression != None:
+		check_for_int( expression, description, 0 )
 
 def check_for_positive_int( expression, description ):
 	check_for_int( expression, description, 1 )
