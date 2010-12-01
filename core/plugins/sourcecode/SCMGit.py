@@ -225,6 +225,7 @@ class SCMGit( SourceCodeProvider ):
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 
 	def updateCachedCheckout( self ):
+		treeish = self.getTreeish( 'origin' )
 		if not os.path.exists( self.getCachedCheckoutsDir() ):
 			try:
 				os.makedirs( self.getCachedCheckoutsDir() )
@@ -234,7 +235,7 @@ class SCMGit( SourceCodeProvider ):
 		if os.path.exists( self._getCachedCheckoutPath() ):
 			# update an existing repository
 			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to treeish {1}'.format( 
-				self.getCachedCheckoutsDir(), self.getTreeish( 'origin' ) ) )
+				self.getCachedCheckoutsDir(), treeish ) )
 			# reset the hidden clone to a branch
 			resetRunner = RunCommand( [ self.getCommand(), 'fetch', '--all' ] )
 			resetRunner.setWorkingDir( self._getCachedCheckoutPath() )
@@ -246,7 +247,7 @@ class SCMGit( SourceCodeProvider ):
 			# FIXME we may not be on the master branch:
 		else:
 			mApp().debugN( self, 2, 'creating the cached checkout at "{0}" with treeish {1}'.format( 
-				self.getCachedCheckoutsDir(), self.getTreeish() ) )
+				self.getCachedCheckoutsDir(), treeish ) )
 			# create the clone
 			cloneCmd = [ self.getCommand(), 'clone', self._getHiddenClonePath(), self.__getTempRepoName() ]
 			cloneRunner = RunCommand( cloneCmd )
@@ -256,14 +257,14 @@ class SCMGit( SourceCodeProvider ):
 				raise ConfigurationError( 'Cannot create the cached checkout at {0}'.format( 
 					self.getCachedCheckoutsDir() ) )
 		# now checkout the requested treeish
-		checkoutCmd = [ self.getCommand(), 'checkout', self.getTreeish() ]
+		checkoutCmd = [ self.getCommand(), 'checkout', treeish ]
 		checkoutRunner = RunCommand( checkoutCmd )
 		checkoutRunner.setWorkingDir( self._getCachedCheckoutPath() )
 		checkoutRunner.run()
 		if checkoutRunner.getReturnCode() != 0:
 			# FIXME delete, continue with regular checkout
 			raise ConfigurationError( 'Cannot update the checkout at {0} to treeish {1}'.format( 
-				self.getCachedCheckoutsDir(), self.getTreeish() ) )
+				self.getCachedCheckoutsDir(), treeish ) )
 
 	def fetchRepositoryFolder( self, remotePath ):
 		self.updateHiddenClone()
