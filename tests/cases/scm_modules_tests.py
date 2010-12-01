@@ -103,7 +103,7 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self._validateRevisionInfoContent( info )
 
 	def testScmSvnBranch( self ):
-		self._initialize( self.SVN_EXAMPLE, branch = "release-1.5" )
+		self._initialize( self.SVN_EXAMPLE, branch = "unsupported-vc6-port" )
 
 		info = self.project.getScm().getRevisionInfo()
 		self._validateRevisionInfoContent( info )
