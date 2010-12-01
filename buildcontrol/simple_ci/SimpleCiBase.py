@@ -27,32 +27,42 @@ from core.helpers.GlobalMApp import mApp
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 
 class SimpleCiBase( MApplication ):
-	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of make-o-matic build scripts.
+	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of Make-O-Matic build scripts.
+	SimpleCIBase implements the common logic of the simple_ci master and slave processes.
 	"""
 
 	def __init__( self, params, name = None, parent = None ):
+		'''Constructor.'''
 		MApplication.__init__( self, name, parent )
 		self.__params = params
 		self.__buildStatus = BuildStatus()
 
 	def preFlightCheck( self ):
+		'''Perform the pre-flight check.'''
 		self._setBaseDir( os.getcwd() )
 		super( SimpleCiBase, self ).preFlightCheck()
 
 	def getParameters( self ):
+		'''Access the command line parameters.'''
 		return self.__params
 
 	def getBuildStatus( self ):
+		'''Access the build status object.
+		The BuildStatus object is the interface to the database of revisions and the build results.'''
 		return self.__buildStatus
 
 	def getToolName( self ):
+		'''The tool name is used to select configuration files.'''
 		raise NotImplementedError()
 
 	def getInstanceName( self ):
+		'''Instance name can be used if multiple independent SimpleCI instances are running on the same machine
+		(since configuration files are usually loaded by host name).'''
 		name = make_foldername_from_string( self.getName() )
 		return name
 
 	def getInstanceDir( self ):
+		'''The instance directory contains all instance specific data.'''
 		path = self.getSettings().userFolder( self.getToolName() )
 		if not os.path.isdir( path ):
 			try:
@@ -63,6 +73,7 @@ class SimpleCiBase( MApplication ):
 		return path
 
 	def getDataDir( self ):
+		'''The data directory contains the build status database.'''
 		path = os.path.join( self.getInstanceDir(), '{0}-data'.format( self.getInstanceName() ) )
 		if not os.path.isdir( path ):
 			try:
@@ -73,6 +84,7 @@ class SimpleCiBase( MApplication ):
 		return path
 
 	def build( self ):
+		'''Execute the tool.'''
 		settings = self.getSettings()
 		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevel() )
 		self.addLogger( ConsoleLogger() )
@@ -85,6 +97,8 @@ class SimpleCiBase( MApplication ):
 		MApplication.build( self ) # call base class implementation
 
 	def performBuilds( self, buildScripts ):
+		'''PerformBuilds is the central method of a SimpleCI run. 
+		It retrieves new revisions, and calls the build scripts.'''
 		error = []
 		x = 0
 		# register all revisions committed since the last run in the database:
@@ -114,6 +128,10 @@ class SimpleCiBase( MApplication ):
 		return x
 
 	def checkBuildScripts( self, buildScripts ):
+		'''Verify that the build scripts are working as expected.
+		The method checks that the build script can be called with basic parameters.
+		@return all build scripts that passed the test
+		'''
 		goodScripts = []
 		for buildScript in buildScripts:
 			iface = BuildScriptInterface( buildScript )
@@ -127,6 +145,8 @@ class SimpleCiBase( MApplication ):
 		return goodScripts
 
 	def runBuildScriptTestBuild( self, buildScripts ):
+		'''Execute a test build for every build script.
+		If enabled on the command line arguments, SimpleCI calls every build script once, and then exits.'''
 		error = False
 		caughtException = False
 		for script in buildScripts:
@@ -151,4 +171,5 @@ class SimpleCiBase( MApplication ):
 			pass
 
 	def execute( self ):
+		'''Execute needs to be implemented in the master and slave inherited classes.'''
 		raise NotImplementedError()
