@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonnegative_int_or_none, check_for_int_or_none
-from repr import repr
 import re
 from core.Exceptions import MomError
 

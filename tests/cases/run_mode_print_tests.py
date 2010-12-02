@@ -29,11 +29,11 @@ class RunModePrintTests( MomBuildMockupTestCase ):
 		revision = '57307ee83930c089d0eb9b4e7342c87784257071'
 		result = self._getRevisions( revision, 1 )
 		self.assertEqual( len( result ), 1, 'The test asked for only one revision to be listed.' )
-		line = result[0]
 		expected = '795a9394bf3e4f7c46a88c81446cc691a662ec9b'
-		self.assertEqual( line[1], expected,
+		info = result[0]
+		self.assertEqual( info.getRevision(), expected,
 			'The next revision after {0} should be {1}'.format( revision, expected ) )
-		self.assertEqual( line[0].lower(), 'c', 'Revision {0} should be a C type build!'.format( expected ) )
+		self.assertEqual( info.getBuildType().lower(), 'c', 'Revision {0} should be a C type build!'.format( expected ) )
 
 	def testPrintAllRevisionsSince( self ):
 		result = self._getRevisions( '57307ee83930c089d0eb9b4e7342c87784257071' )

@@ -19,7 +19,7 @@
 from core.MObject import MObject
 import sqlite3, os, shutil
 from buildcontrol.common.BuildInfo import BuildInfo
-from core.Exceptions import MomError, ConfigurationError
+from core.Exceptions import ConfigurationError
 from core.Settings import Settings
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.FilesystemAccess import make_foldername_from_string
