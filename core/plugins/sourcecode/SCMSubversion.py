@@ -54,6 +54,9 @@ class SCMSubversion( SourceCodeProvider ):
 	def rootIsTrunk( self ):
 		return self.__rootTrunk
 
+	def __getRootUrl( self ):
+		return super( SCMSubversion, self ).getUrl()
+
 	def getUrl( self ):
 		# TODO Work out sensible ordering here or fail if we have more than one of these parameters
 		url = SourceCodeProvider.getUrl( self )
@@ -118,12 +121,12 @@ class SCMSubversion( SourceCodeProvider ):
 				result = parse_log_entry( entry )
 				if int( result[2] ) != revision: # svn log always spits out the last revision
 					info = BuildInfo()
+					info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
 					info.setBuildType( 'C' ) # the default, FIXME add classifiers
 					info.setRevision( int( result[2] ) )
-					info.setUrl( self.getUrl() )
+					info.setUrl( self.__getRootUrl() )
 					# FIXME only trunk is supported this way
 					info.setBranch( None )
-					info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
 					info.setTag( None )
 					revisions.append( info )
 			if cap:
