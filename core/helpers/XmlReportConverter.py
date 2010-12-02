@@ -271,9 +271,8 @@ class XmlReportConverter( MObject ):
 		out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
 
 		# only show exception description if there actually is an exception 
-		exceptionMessage = string_from_node( element, "exception/description" )
-		if exceptionMessage:
-			out += wrapper.wrap( "Description:  {0}".format( exceptionMessage ) )
+		if element.find( "exception" ):
+			out += wrapper.wrap( "Description:  {0}".format( string_from_node( element, "exception/description" ) ) )
 
 		# show client information
 		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
