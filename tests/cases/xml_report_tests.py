@@ -102,9 +102,15 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self._build()
 		converter = XmlReportConverter( self.getXmlReport() )
 		xmlString = converter.convertToHtml()
-		doc = etree.XML( xmlString )
+
+		if converter.hasXsltSupport(): # can convert to HTML
+			self.assertNotEquals( xmlString, None )
+		else: # cannot convert, should be None
+			self.assertEquals( xmlString, None )
+			return # quit test case, to HTML conversion is not possible here
 
 		# TODO: Add more _useful_ tests 
+		doc = etree.XML( xmlString )
 		self.assertEqual( doc.tag, "{http://www.w3.org/1999/xhtml}html" ) # root
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ), None )
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}td" ), None )

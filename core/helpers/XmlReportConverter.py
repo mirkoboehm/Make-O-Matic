@@ -116,6 +116,8 @@ class XmlReportConverter( MObject ):
 		MObject.__init__( self )
 
 		mApp().debugN( self, 4, "Using following etree implementation: {0}. XSLT support: {1}".format( etree.__name__, self.hasXsltSupport() ) )
+		if not self.hasXsltSupport():
+			mApp().debug( self, "Lacking support for XSLT transformations. Support for HTML conversion not available. Please install the python-lxml package." )
 
 		self.__xmlReport = xmlReport
 		self.__elementTree = xml.etree.ElementTree.parse( StringIO( xmlReport.getReport() ) ) # cache ElementTree object
@@ -173,6 +175,10 @@ class XmlReportConverter( MObject ):
 		
 		Merges templates from plugins into the stylesheets provided by XSL_STYLESHEETS."""
 
+		if not self.hasXsltSupport():
+			mApp().debugN( self, 5, "Cannot add XSL template, lacking support for XSLT transformations. Please install the python-lxml package." )
+			return
+
 		# iterate trough the dict from getXslTemplates(), add each template to the corresponding stylesheet
 		for destinationReportFormat, markup in plugin.getXslTemplates().items():
 			if not destinationReportFormat in self.__xslTemplateSnippets.keys():
@@ -223,7 +229,7 @@ class XmlReportConverter( MObject ):
 		"""Converts the report to HTML using the XSL stylesheet for HTML"""
 
 		if not self.hasXsltSupport():
-			mApp().debug( self, "Cannot convert to HTML. Lacking support for XSLT transformations. Please install the python-lxml package." )
+			mApp().debugN( self, 5, "Cannot convert to HTML. Lacking support for XSLT transformations. Please install the python-lxml package." )
 			return None
 
 		transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
