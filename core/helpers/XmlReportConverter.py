@@ -254,6 +254,8 @@ class XmlReportConverter( MObject ):
 			roundTripTime = -1
 
 		out = []
+
+		# START: Summary
 		out += wrapper.wrapAndFillLine( "*** Build report: {0}, on {1} ({2})".format( 
 				element.attrib["name"],
 				element.attrib["sys-platform"],
@@ -261,10 +263,18 @@ class XmlReportConverter( MObject ):
 
 		wrapper.indent()
 		out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
+
+		# only show exception description if there actually is an exception 
+		exceptionMessage = string_from_node( element, "exception/description" )
+		if exceptionMessage:
+			out += wrapper.wrap( "Description:  {0}".format( exceptionMessage ) )
+
+		# show client information
 		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
 
 		# only show detailed summary on success or build error
-		if int( element.attrib["returncode"] ) in ( 0, BuildError.getReturnCode() ):
+		returnCode = int ( element.attrib["returncode"] )
+		if returnCode in ( 0, BuildError.getReturnCode() ):
 			out += wrapper.wrap( "Commit:       {0}, revision: {1}".format( 
 					string_from_node_attribute( element, "plugin", "committerName" ),
 					string_from_node_attribute( element, "plugin", "revision" ) ) )
@@ -280,9 +290,11 @@ class XmlReportConverter( MObject ):
 		if roundTripTime > 0:
 			out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
 					string_from_node_attribute( element, "project", "timing" ),
-			roundTripTime ), '*' )
+					roundTripTime ), '*' )
 		else:
 			out += wrapper.wrap( "*" * wrapper.width )
+		# END: Summary
+
 		out += " "
 
 		return "\n".join( out )
@@ -392,16 +404,16 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "configuration":
 			out += " "
-			out += wrapper.wrap( "Configuration: {0}, ({1})".format(
+			out += wrapper.wrap( "Configuration: {0}, ({1})".format( 
 					element.attrib["name"],
 					"success" if element.attrib["failed"] == "False" else "FAILED"
 			) )
 
 		elif element.tag == "environments":
 			out += " "
-			out += wrapper.wrap( "Environments: {0} (Depends on: {1})".format(
+			out += wrapper.wrap( "Environments: {0} (Depends on: {1})".format( 
 					element.attrib["name"],
-					element.find("dependencies").text
+					element.find( "dependencies" ).text
 			) )
 
 		elif element.tag == "environment":
