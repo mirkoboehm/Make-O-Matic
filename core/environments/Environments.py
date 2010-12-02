@@ -26,6 +26,7 @@ from core.environments.Dependency import Dependency
 from fnmatch import fnmatch
 from core.environments.Environment import Environment
 from core.helpers.XmlUtils import create_child_node
+from Finder.Containers_and_folders import folder
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches 
@@ -34,16 +35,22 @@ class Environments( ConfigurationBase ):
 	'''
 
 	def __init__( self, dependencies = None, name = None, parent = None ):
+		'''Constructor.'''
 		ConfigurationBase.__init__( self, name, parent )
 		self._setDependencies( dependencies )
+		self.setOptional( False )
 
 	def _setDependencies( self, deps ):
+		'''Set the list of dependencies. A match must be found for every listed dependency for the child 
+		configurations to be built. The dependencies are shell patterns that are looked for in the Make-O-Matic packages folder.'''
 		self.__dependencies = deps
 
 	def addDependency( self, dep ):
+		'''Add a dependency.'''
 		self.__dependencies.append( dep )
 
 	def getDependencies( self ):
+		'''Return the dependencies.'''
 		return self.__dependencies
 
 	def _setInstalledDependencies( self, deps ):
@@ -51,6 +58,16 @@ class Environments( ConfigurationBase ):
 
 	def _getInstalledDependencies( self ):
 		return self.__installedDeps
+
+	def setOptional( self, onOff ):
+		'''Mark the environments as optional.
+		By default, the build is aborted if no environment can be found in which the configurations can be built. If the 
+		environment is optional and no matches are found, the configurations will not be built, but no error is raised.'''
+		self.__optional = onOff
+
+	def getOptional( self ):
+		'''Return if this environment is optional.'''
+		return self.__optional
 
 	def __selectBestScoringEnvironment( self, environments ):
 		assert len( environments ) > 0
@@ -72,6 +89,7 @@ class Environments( ConfigurationBase ):
 			environment.cloneConfigurations( configs )
 
 	def prepare( self ):
+		'''Prepare method, overloaded.'''
 		# discover matching environments:
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
 		# FIXME (Kevin, what do you think?) this may have to be a property, so that the expansion mode can be added to the build report 
@@ -82,17 +100,18 @@ class Environments( ConfigurationBase ):
 		mApp().debugN( self, 2, 'Environment expansion mode for build type {0} is "{1}"'.format( buildType, description ) )
 		configs = self.getChildren()[:]
 		environments = self.findMatchingEnvironments()
-		if mode == Settings.EnvironmentExpansionMode_BuildAll:
+		if mode in ( Settings.EnvironmentExpansionMode_BuildAll, Settings.EnvironmentExpansionMode_BuildHighestScoring ):
 			if not environments:
-				raise ConfigurationError( 'No environment found that matches the project requirements!' )
+				if self.getOptional():
+					mApp().message( self, 'No environments found, and this environment is optional, continuing.' )
+				else:
+					raise ConfigurationError( 'No environment found that matches the project requirements!' )
+			if mode == Settings.EnvironmentExpansionMode_BuildHighestScoring:
+				environment = self.__selectBestScoringEnvironment( environments )
+				mApp().debugN( self, 2, 'best scoring environment is "{0}" (out of {1})'
+					.format( environment.makeDescription(), len( environments ) ) )
+				environments = [ environment ]
 			self.__expandConfigurations( configs, environments )
-		elif mode == Settings.EnvironmentExpansionMode_BuildHighestScoring:
-			if not environments:
-				raise ConfigurationError( 'No environment found that matches the project requirements!' )
-			environment = self.__selectBestScoringEnvironment( environments )
-			mApp().debugN( self, 2, 'best scoring environment is "{0}" (out of {1})'
-				.format( environment.makeDescription(), len( environments ) ) )
-			self.__expandConfigurations( configs, [ environment ] )
 		elif mode == Settings.EnvironmentExpansionMode_Ignore:
 			mApp().debugN( self, 2, 'environments will not be applied in build type {0}'.format( buildType ) )
 		else:
@@ -117,6 +136,7 @@ class Environments( ConfigurationBase ):
 		return leafNodes
 
 	def detectMomDependencies( self ):
+		'''Detect all mom dependency packages in the configured base directory.'''
 		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )
 		detectedDependencies = self._findMomDependencies( momEnvironmentsRoot )
 		deps = {}
@@ -125,7 +145,8 @@ class Environments( ConfigurationBase ):
 			deps[ folder ] = dep
 		self._setInstalledDependencies( deps )
 
-	def calculateMatches( self, packages, remainingDependencies, folders ):
+	def __calculateMatches( self, packages, remainingDependencies, folders ):
+		'''Recursively find the matches for this environment.'''
 		matches = []
 		if not folders:
 			return None
@@ -145,7 +166,7 @@ class Environments( ConfigurationBase ):
 					newDeps.remove( dep )
 					if newDeps:
 						# there are still dependencies to find further up the path
-						theseMatches = self.calculateMatches( newPackages, newDeps, folders[1:] )
+						theseMatches = self.__calculateMatches( newPackages, newDeps, folders[1:] )
 						if theseMatches:
 							matches.append( theseMatches )
 					else:
@@ -167,6 +188,7 @@ class Environments( ConfigurationBase ):
 		return matches
 
 	def findMatchingEnvironments( self ):
+		'''Find and return all matches for the specified dependencies.'''
 		# find all leaf nodes:
 		momEnvironmentsRoot = mApp().getSettings().get( Settings.EnvironmentsBaseDir )
 
@@ -196,7 +218,7 @@ class Environments( ConfigurationBase ):
 				reversePaths.append( current )
 			reversePaths.reverse()
 			mApp().debugN( self, 5, 'incremental paths: {0}'.format( ', '.join( reversePaths ) ) )
-			matches = self.calculateMatches( [], list( self.getDependencies() ), reversePaths )
+			matches = self.__calculateMatches( [], list( self.getDependencies() ), reversePaths )
 			if matches:
 				sortedMatches = self.__ensureDependencyOrder( matches, self.getDependencies() )
 				allRawEnvironments.extend( sortedMatches )
@@ -214,9 +236,9 @@ class Environments( ConfigurationBase ):
 		environments = frozenset( environments )
 		return environments
 
-	def createXmlNode(self, document):
-		node = super(Environments, self).createXmlNode(document)
-		create_child_node(document, node, "dependencies", ', '.join( self.getDependencies() ))
+	def createXmlNode( self, document ):
+		node = super( Environments, self ).createXmlNode( document )
+		create_child_node( document, node, "dependencies", ', '.join( self.getDependencies() ) )
 		return node
 
 	def describe( self, prefix, details = None ):
