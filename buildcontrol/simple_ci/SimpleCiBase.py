@@ -132,13 +132,18 @@ class SimpleCiBase( MApplication ):
 		The method checks that the build script can be called with basic parameters.
 		@return all build scripts that passed the test
 		'''
+		buildNames = []
 		goodScripts = []
 		for buildScript in buildScripts:
 			iface = BuildScriptInterface( buildScript )
 			try:
 				name = iface.querySetting( Settings.ScriptBuildName )
-				if name:
+				if name and name not in buildNames:
+					buildNames.append( name )
 					goodScripts.append( buildScript )
+				else:
+					self.message( self, 'ERROR in build script "{0}": The build name "{1}" is already used by another '
+								'build script. Build script disregarded.'.format( buildScript, name ) )
 			except MomError:
 				self.message( self, 'ERROR in build script "{0}": error querying the build name. Build script disregarded.'
 					.format( buildScript ) )
