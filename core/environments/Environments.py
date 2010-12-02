@@ -105,7 +105,7 @@ class Environments( ConfigurationBase ):
 					mApp().message( self, 'No environments found, and this environment is optional, continuing.' )
 				else:
 					raise ConfigurationError( 'No environment found that matches the project requirements!' )
-			if mode == Settings.EnvironmentExpansionMode_BuildHighestScoring:
+			if mode == Settings.EnvironmentExpansionMode_BuildHighestScoring and environments:
 				environment = self.__selectBestScoringEnvironment( environments )
 				mApp().debugN( self, 2, 'best scoring environment is "{0}" (out of {1})'
 					.format( environment.makeDescription(), len( environments ) ) )
