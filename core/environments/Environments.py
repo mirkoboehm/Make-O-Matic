@@ -26,7 +26,6 @@ from core.environments.Dependency import Dependency
 from fnmatch import fnmatch
 from core.environments.Environment import Environment
 from core.helpers.XmlUtils import create_child_node
-from Finder.Containers_and_folders import folder
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches 
