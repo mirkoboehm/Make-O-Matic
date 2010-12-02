@@ -57,6 +57,7 @@ pylint = PyLintChecker( pyLintTool = 'pylint-2.6',
 	modules = [ 'core', 'buildcontrol', 'tools', 'tests' ],
 	minimumScore = 7.5
 	)
+pylint.setOptional( True )
 python26.addPlugin( pylint )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
