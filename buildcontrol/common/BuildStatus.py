@@ -148,26 +148,26 @@ where id=?'''\
 		'''Determines new revisions committed since the last call with the same build script, 
 		and adds those to the database.'''
 		iface = BuildScriptInterface( buildScript )
-		projectName = iface.querySetting( Settings.ProjectName )
+		buildName = iface.querySetting( Settings.ScriptBuildName )
 		newestBuildInfo = self.getNewestBuildInfo( buildScript )
 		if newestBuildInfo:
 			revision = newestBuildInfo.getRevision()
 			mApp().debugN( self, 2, 'newest known revision for build script "{0}" ({1}) is "{2}"'
-				.format( buildScript, projectName, revision ) )
-			buildInfos = self.getBuildInfoForRevisionsSince( buildScript, projectName, revision )
+				.format( buildScript, buildName, revision ) )
+			buildInfos = self.getBuildInfoForRevisionsSince( buildScript, buildName, revision )
 			if buildInfos:
-				mApp().message( self, 'build script "{0}" ({1}):'.format( buildScript, projectName ) )
+				mApp().message( self, 'build script "{0}" ({1}):'.format( buildScript, buildName ) )
 				for buildInfo in buildInfos:
 					msg = 'new revision "{0}"'.format( buildInfo.getRevision() )
 					mApp().message( self, msg )
 				self.saveBuildInfo( buildInfos )
 			else:
 				mApp().debug( self, 'no new revisions found for build script "{0}" ({1})'
-					.format( buildScript, projectName ) )
+					.format( buildScript, buildName ) )
 		else:
-			buildInfo = self.getBuildInfoForInitialRevision( buildScript, projectName )
+			buildInfo = self.getBuildInfoForInitialRevision( buildScript, buildName )
 			mApp().debug( self, 'saving initial revision "{0}" for build script "{1}" ({2})'
-				.format( buildInfo.getRevision(), buildScript, projectName ) )
+				.format( buildInfo.getRevision(), buildScript, buildName ) )
 			self.saveBuildInfo( [ buildInfo ] )
 
 	def listNewBuildInfos( self ):
@@ -258,11 +258,13 @@ where id=?'''\
 				return True
 
 	def getNewestBuildInfo( self, buildScript ):
+		iface = BuildScriptInterface( buildScript )
+		buildName = iface.querySetting( Settings.ScriptBuildName )
 		connection = self.getConnection()
 		try:
 			cursor = connection.cursor()
-			query = 'select * from {0} where script=? order by id desc limit 1'.format( BuildStatus.TableName )
-			cursor.execute( query, [ buildScript ] )
+			query = 'select * from {0} where build_name=? order by id desc limit 1'.format( BuildStatus.TableName )
+			cursor.execute( query, [ buildName ] )
 			for row in cursor:
 				buildInfo = self.__makeBuildInfoFromRow( row )
 				return buildInfo # only the first (and only) result is interesting
