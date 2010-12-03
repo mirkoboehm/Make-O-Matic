@@ -306,11 +306,21 @@ where id=?'''\
 	def takeBuildInfoAndBuild( self, buildScripts ):
 		'''Take a new revision from the build job list. Mark it as pending, and build it. Mark it as done afterwards.'''
 		buildInfo = None
+		# get the build names of the build scripts:
+		buildNames = {}
+		for buildScript in buildScripts:
+			iface = BuildScriptInterface( buildScript )
+			buildName = iface.querySetting( Settings.ScriptBuildName )
+			if buildName:
+				buildNames[ buildName ] = buildScript
+			else:
+				# this should not happen, since it was checked before
+				mApp().debug( self, 'build script {0} is broken, ignoring.'.format( buildScript ) )
 		with self.getConnection() as conn:
 			buildInfos = self._loadBuildInfo( conn, BuildInfo.Status.NewRevision )
 			for build in buildInfos:
 				# the list is ordered by priority
-				if os.path.normpath( os.path.abspath( build.getBuildScript() ) ) in buildScripts:
+				if build.getProjectName() in buildNames:
 					build.setBuildStatus( BuildInfo.Status.Pending )
 					self._updateBuildInfo( conn, build )
 					buildInfo = build
