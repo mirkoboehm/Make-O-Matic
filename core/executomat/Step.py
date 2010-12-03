@@ -131,7 +131,7 @@ class Step( MObject ):
 				self._logEnvironment( instructions )
 
 				logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
-				logfileName = os.path.join( instructions._getLogDir(), logfileName )
+				logfileName = os.path.join( instructions.getLogDir(), logfileName )
 				self.setLogfileName( logfileName )
 
 				phases = [ [ 'preparatory actions', self.__preActions ],

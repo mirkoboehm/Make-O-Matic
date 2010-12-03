@@ -29,7 +29,7 @@ from copy import deepcopy, copy
 
 class Instructions( MObject ):
 	"""
-	Instructions is the base class for anything that can be built by Make-O-Matic.
+	Instructions is the base class for anything that can be built by Make-O-Matic, including the packages and reports locations.
 	
 	- The Build object is a singleton that represents the build script run.
 	- Projects are Instructions to build a Project.
@@ -89,8 +89,7 @@ class Instructions( MObject ):
 		check_for_path_or_none( path, "The log directory name must be a string containing a path name." )
 		self.__logDir = path
 
-	# FIXME bad name, Project has getLogDir, this is confusing
-	def _getLogDir( self ):
+	def getLogDir( self ):
 		"""Return the log directory.
 		The log directory is the full path the the location where log output of the step should be saved. It is usually located
 		under the log/ sub-directory of the build object, outside of the build tree."""

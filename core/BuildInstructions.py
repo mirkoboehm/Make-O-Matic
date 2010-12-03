@@ -30,7 +30,7 @@ from copy import deepcopy
 
 class BuildInstructions( Instructions ):
 	'''BuildInstructions is the base class for all elements that form the build tree of a project.
-	BuildInstructions introduces the build steps, and the packages and reports locations.'''
+	BuildInstructions introduces the build steps.'''
 
 	def __init__( self, name = None, parent = None ):
 		'''Constructor.'''
@@ -124,7 +124,7 @@ class BuildInstructions( Instructions ):
 			self._setBaseDir( baseDir )
 			# set log directory
 			logDirName = self._getBaseDirName()
-			parentLogDir = self.getParent()._getLogDir()
+			parentLogDir = self.getParent().getLogDir()
 			logDir = os.path.abspath( os.path.join( parentLogDir, logDirName ) )
 			self.setLogDir( logDir )
 			# set packages directory
@@ -152,15 +152,15 @@ class BuildInstructions( Instructions ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode == Settings.RunMode_Build:
 			try:
-				os.makedirs( self._getLogDir() )
+				os.makedirs( self.getLogDir() )
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create required log directory "{0}" for {1}: {2}!'
-										.format( self._getLogDir(), self.getName(), e ) )
+										.format( self.getLogDir(), self.getName(), e ) )
 			try:
 				os.makedirs( self.getPackagesDir() )
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create required packages directory "{0}" for {1}: {2}!'
-					.format( self._getLogDir(), self.getName(), e ) )
+					.format( self.getLogDir(), self.getName(), e ) )
 
 	def calculateBuildSequence( self ):
 		'''Define the build sequence for this object.

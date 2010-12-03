@@ -86,6 +86,10 @@ def check_for_nonnegative_int_or_none( expression, description ):
 def check_for_positive_int( expression, description ):
 	check_for_int( expression, description, 1 )
 
+def check_for_callable_or_none( expression, description ):
+	if expression != None:
+		check_for_callable( expression, description )
+
 def check_for_callable( expression, description ):
 	if not callable( expression ):
 		raise ConfigurationError( description )

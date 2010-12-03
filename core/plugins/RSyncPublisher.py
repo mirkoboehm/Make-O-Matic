@@ -22,6 +22,7 @@ from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_f
 import platform, os, re
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
+from core.helpers.PathResolver import PathResolver
 
 class RSyncPublisher( Plugin ):
 	'''A publisher that uses RSync to send results to a remote site.'''
@@ -50,7 +51,7 @@ class RSyncPublisher( Plugin ):
 	def setup( self ):
 		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
-			defaultLocation = mApp().getSettings().get( Settings.RSyncPublisherUploadLocation, False )
+			defaultLocation = mApp().getSettings().get( Settings.PublisherPackageUploadLocation, False )
 			mApp().debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
 			uploadLocation = defaultLocation
 			if not uploadLocation:
@@ -90,3 +91,20 @@ class RSyncPublisher( Plugin ):
 		directory = '/cygdrive/' + driveLetter + directory
 		directory = re.sub( '\\\\+', '/', directory )
 		return directory
+
+class RSyncPackagesPublisher( RSyncPublisher ):
+	'''A RSync publisher that is pre-configured to publish the packages structure to the default location.'''
+
+	def __init__( self, name = None ):
+		RSyncPublisher.__init__( self, name,
+			uploadLocation = mApp().getSettings().get( Settings.PublisherPackageUploadLocation ),
+			localDir = PathResolver( mApp().getPackagesDir ) )
+
+class RSyncReportsPublisher( RSyncPublisher ):
+	'''A RSync publisher that is pre-configured to publish the reports structure to the default location.'''
+
+	def __init__( self, name = None ):
+		RSyncPublisher.__init__( self, name,
+			uploadLocation = mApp().getSettings().get( Settings.PublisherReportsUploadLocation ),
+			localDir = PathResolver( mApp().getLogDir ) )
+

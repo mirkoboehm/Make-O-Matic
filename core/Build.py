@@ -160,15 +160,15 @@ class Build( MApplication ):
 										.format( baseDir, self.getName(), e ) )
 			os.chdir( baseDir )
 			try:
-				os.makedirs( self._getLogDir() )
+				os.makedirs( self.getLogDir() )
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create build log directory "{0}" for {1}: {2}!'
-					.format( self._getLogDir(), self.getName(), e ) )
+					.format( self.getLogDir(), self.getName(), e ) )
 			try:
 				os.makedirs( self.getPackagesDir() )
 			except ( OSError, IOError )as e:
 				raise ConfigurationError( 'Cannot create build packages directory "{0}" for {1}: {2}!'
-					.format( self._getLogDir(), self.getName(), e ) )
+					.format( self.getLogDir(), self.getName(), e ) )
 		super( Build, self ).setup()
 
 	def runExecute( self ):

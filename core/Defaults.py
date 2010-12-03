@@ -83,8 +83,9 @@ class Defaults( MObject ):
 	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
 	# ----- CMake Builder settings
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
-	# ----- RSync publisher settings (should be set in .mom/config.py):
-	RSyncPublisherUploadLocation = 'publisher.rsync.uploadlocation'
+	# ----- Ppublisher settings (should be set in .mom/config.py):
+	PublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
+	PublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
 	# ----- EmailReporter settings:
 	EmailReporterSender = 'emailreporter.sender'
 	EmailReporterDefaultRecipients = 'emailreporter.defaultrecipients'
