@@ -5,7 +5,7 @@
 # Author: Mirko Boehm <mirko@kdab.com>
 # 
 # Make-O-Matic is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
+# it un>r the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 # 
@@ -99,6 +99,9 @@ class RSyncPublisher( Plugin ):
 		directory = '/cygdrive/' + driveLetter + directory
 		directory = re.sub( '\\\\+', '/', directory )
 		return directory
+
+	def describe( self, prefix, details = None, replacePatterns = True ):
+		super( RSyncPublisher, self ).describe( prefix, self.getUploadLocation(), replacePatterns )
 
 class RSyncPackagesPublisher( RSyncPublisher ):
 	'''A RSync publisher that is pre-configured to publish the packages structure to the default location.'''

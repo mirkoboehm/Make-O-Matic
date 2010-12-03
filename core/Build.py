@@ -120,6 +120,9 @@ class Build( MApplication ):
 			self.setLogDir( os.getcwd() )
 			self.setPackagesDir( os.getcwd() )
 		assert self.getBaseDir()
+		for step in self.calculateBuildSequence():
+			self.addStep( step )
+
 
 	def setup( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
@@ -184,6 +187,15 @@ class Build( MApplication ):
 		else:
 			pass
 		return None
+
+	def execute( self ):
+		with self.getTimeKeeper():
+			self.executeSteps()
+			super( Build, self ).execute()
+
+	def executeSteps( self ):
+		for step in self.getSteps():
+			self._executeStepRecursively( self, step.getName() )
 
 	def runWrapups( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )

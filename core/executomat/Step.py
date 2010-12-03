@@ -156,9 +156,9 @@ class Step( MObject ):
 		finally:
 			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
 
-	def describe( self, prefix, details = None ):
+	def describe( self, prefix, details = None, replacePatterns = True ):
 		if not self.isEmpty():
-			MObject.describe( self, prefix )
+			MObject.describe( self, prefix, details, replacePatterns )
 			for phase in [ [ ' pre', self.getPreActions() ],
 							[ 'main', self.getMainActions() ],
 							[ 'post', self.getPostActions() ] ]:

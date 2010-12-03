@@ -93,11 +93,3 @@ class Project( BuildInstructions ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.prependMainAction( RmDirAction( folder ) )
 
-	def executeSteps( self ):
-		for step in self.getSteps():
-			self._executeStepRecursively( self, step.getName() )
-
-	def execute( self ):
-		with self.getTimeKeeper():
-			self.executeSteps()
-			super( Project, self ).execute()

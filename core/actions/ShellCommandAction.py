@@ -34,7 +34,7 @@ class ShellCommandAction( Action ):
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
-		return '{0}: {1}'.format( self.getName(), ' '.join( self.getCommand() ) )
+		return '{0}'.format( ' '.join( self.getCommand() ) )
 
 	def setCommand( self, command, timeOutPeriod = None ):
 		"""Set the shell command"""

@@ -170,6 +170,7 @@ class MApplication( Instructions ):
 		'''build executes the program and exits the process with the correct return code.'''
 		sys.exit( self.buildAndReturn() )
 
-	def describe( self, prefix, details = None ):
+	def describe( self, prefix, details = None, replacePatterns = True ):
 		"""Describe this object."""
-		self._printDescribeLine( prefix, self.getName(), self.getBaseDir() + ' (<-- $BASE)', replacePatterns = False )
+		details = self.getBaseDir() + ' (<-- $BASE)' + ( details or '' )
+		super( MApplication, self ).describe( prefix, details, replacePatterns = False )

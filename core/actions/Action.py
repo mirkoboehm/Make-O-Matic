@@ -182,6 +182,6 @@ class Action( MObject ):
 			stdout = ""
 		return stderr, stdout
 
-	def describe( self, prefix, details = None ):
+	def describe( self, prefix, details = None, replacePatterns = True ):
 		"""Describe this action."""
-		self._printDescribeLine( prefix + '    ', details, self.getLogDescription() )
+		self._printDescribeLine( prefix + '    ', details, self.getLogDescription(), replacePatterns )

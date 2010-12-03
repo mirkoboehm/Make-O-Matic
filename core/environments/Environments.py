@@ -240,5 +240,5 @@ class Environments( ConfigurationBase ):
 		create_child_node( document, node, "dependencies", ', '.join( self.getDependencies() ) )
 		return node
 
-	def describe( self, prefix, details = None ):
-		self._printDescribeLine( prefix, self.getName(), details = ', '.join( self.getDependencies() ) )
+	def describe( self, prefix, details = None, replacePatterns = True ):
+		super( Environments, self ).describe( prefix, ', '.join( self.getDependencies() ), replacePatterns = replacePatterns )

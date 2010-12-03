@@ -19,13 +19,14 @@
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
 from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.Exceptions import ConfigurationError, MomError
+from core.Exceptions import ConfigurationError, MomError, BuildError
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string, check_for_path_or_none
 from core.executomat.Step import Step
 from core.Settings import Settings
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
 from copy import deepcopy, copy
+from core.helpers.TimeKeeper import TimeKeeper
 
 class Instructions( MObject ):
 	"""
@@ -58,8 +59,11 @@ class Instructions( MObject ):
 			parent.addChild( self )
 		self.__plugins = []
 		self.__instructions = []
+		self.__steps = []
+		self.__timeKeeper = TimeKeeper()
 
 	def __deepcopy__( self, memo ):
+		'''Customize the behaviour of deepcopy to not include the parent object.'''
 		# make shallow copy:
 		clone = copy( self )
 		# plug-ins and instructions need to be deep-copied
@@ -67,6 +71,8 @@ class Instructions( MObject ):
 		for plugin in clone.__plugins:
 			plugin.setInstructions( clone )
 		clone.__instructions = deepcopy( self.__instructions, memo )
+		clone.__timeKeeper = deepcopy( self.__timeKeeper, memo )
+		clone.__steps = deepcopy( self.__steps, memo )
 		return clone
 
 	def setParent( self, parent ):
@@ -131,17 +137,74 @@ class Instructions( MObject ):
 			raise MomError( 'Cannot remove child {0}, I am not it\'s parent {1}!'
 				.format( instructions.getName(), self.getName() ) )
 
-	def describe( self, prefix, details = None ):
-		basedir = '(not set)'
+	def getTimeKeeper( self ):
+		'''Return the TimeKeeper object to measure execution time.'''
+		return self.__timeKeeper
+
+	def getFailedStep( self ):
+		'''Return the first step that failed during execution, or None.'''
+		for step in self.getSteps():
+			if step.hasFailed():
+				return step
+		return None
+
+	def hasFailed( self ):
+		'''Returns True if any action of the build steps for this object has failed.'''
+		return self.getFailedStep() != None
+
+	def __hasStep( self, stepName ):
+		'''Returns True if a step with the specified name already exists.'''
 		try:
-			basedir = self.getBaseDir()
-		except ConfigurationError:
-			pass
-		text = ' {1}'.format( prefix, basedir )
-		MObject.describe( self, prefix, text )
+			self.getStep( stepName )
+			return True
+		except MomError:
+			return False
+
+	def addStep( self, newStep ):
+		"""Add a newStep identified by identifier. If the identifier already exists, the new 
+		command replaces the old one."""
+		if not isinstance( newStep, Step ):
+			raise MomError( 'only Step instances can be added to the queue' )
+		check_for_nonempty_string( newStep.getName(), "Every step must have a name!" )
+		if self.__hasStep( newStep.getName() ):
+			raise MomError( 'A step with the name {0} already exists for this Instructions object!'.format( newStep.getName() ) )
+		self.__steps.append( newStep )
+
+	def getSteps( self ):
+		'''Return the list of build steps for the object.
+		It is a list, not a dictionary, because the steps are a sequence and cannot be reordered.'''
+		return self.__steps
+
+	def getStep( self, identifier ):
+		"""Find the step with this identifier and return it."""
+		for step in self.getSteps():
+			if step.getName() == identifier:
+				return step
+		raise MomError( 'no such step "{0}"'.format( identifier ) )
+
+	def calculateBuildSequence( self ):
+		'''Define the build sequence for this object.
+		By the default, the build sequence is identical for every BuildInstructions object. Command line parameters that
+		enable or disable steps are applied by this method.'''
+		buildSteps = self._setupBuildSteps( Settings.ProjectBuildSequence )
+		# apply customizations passed as command line parameters:
+		mApp().getParameters().applyBuildSequenceSwitches( buildSteps )
+		return buildSteps
+
+	def describe( self, prefix, details = None, replacePatterns = True ):
+		if not details:
+			basedir = '(not set)'
+			try:
+				basedir = self.getBaseDir()
+			except ConfigurationError:
+				pass
+			details = ' {1}'.format( prefix, basedir )
+		super( Instructions, self ).describe( prefix, details, replacePatterns )
 		subPrefix = prefix + '    '
 		for plugin in self.getPlugins():
 			plugin.describe( subPrefix )
+		for step in self.getSteps():
+				step.describe( prefix + '    ' )
 
 	def createXmlNode( self, document, recursive = True ):
 		node = MObject.createXmlNode( self, document )
@@ -163,7 +226,7 @@ class Instructions( MObject ):
 
 	def describeRecursively( self, prefix = '' ):
 		'''Describe this instruction object in human readable form.'''
-		self.describe( prefix, details = None )
+		self.describe( prefix )
 		prefix = '    {0}'.format( prefix )
 		for child in self.getChildren():
 			child.describeRecursively( prefix )
@@ -231,6 +294,26 @@ class Instructions( MObject ):
 			mApp().debugN( self, 2, 'executing' )
 			self.execute()
 			[ child.execute() for child in self.getChildren() ]
+
+	def _executeStepRecursively( self, instructions, name ):
+		'''Execute one step of the build sequence recursively, for this object, and all child objects.'''
+		self.executeStep( name )
+		for child in instructions.getChildren():
+			child._executeStepRecursively( child, name )
+
+	def executeStep( self, stepName ):
+		'''Execute one individual step.
+		This method does not recurse to child objects.'''
+		step = self.getStep( stepName )
+		if step.isEmpty():
+			mApp().debugN( self, 4, 'step "{0}" is empty for {1}'.format( step.getName(), self.getName() ) )
+			return
+		mApp().debugN( self, 2, 'now executing step "{0}"'.format( step.getName() ) )
+		if step.execute( self ):
+			mApp().debugN( self, 1, 'success: "{0}"'.format( step.getName() ) )
+		else:
+			mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
+			mApp().debugN( self, 1, 'failure: "{0}"'.format( step.getName() ) )
 
 	def runWrapups( self ):
 		with EnvironmentSaver():

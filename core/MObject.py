@@ -37,10 +37,10 @@ class MObject( object ):
 	def getTagName( self ):
 		return self.__class__.__name__.lower()
 
-	def describe( self, prefix, details = None ):
+	def describe( self, prefix, details = None, replacePatterns = True ):
 		"""Describe this object
 		Print out information like class name"""
-		self._printDescribeLine( prefix, self.getName(), details )
+		self._printDescribeLine( prefix, self.getName(), details, replacePatterns )
 
 	def _printDescribeLine( self, prefix, name, details, replacePatterns = True ):
 		clazz = self.__class__.__name__
