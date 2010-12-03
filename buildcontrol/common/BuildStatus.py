@@ -225,7 +225,7 @@ where id=?'''\
 			os.chdir( directory )
 			extend_debug_prefix( buildInfo.getProjectName() )
 			iface = BuildScriptInterface( os.path.abspath( buildInfo.getBuildScript() ) )
-			runner = iface.execute( revision = rev, url = buildInfo.getUrl(), buildType = buildType )
+			runner = iface.executeBuildInfo( buildInfo )
 			try:
 				with open( 'buildscript.log', 'w' ) as f:
 					text = runner.getStdOut() or b''

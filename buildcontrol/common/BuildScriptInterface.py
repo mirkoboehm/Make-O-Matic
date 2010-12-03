@@ -26,6 +26,7 @@ from core.helpers.GlobalMApp import mApp
 import os
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 from buildcontrol.SubprocessHelpers import extend_debug_prefix
+from core.Settings import Settings
 
 class BuildScriptInterface( MObject ):
 	'''BuildScriptInterface encapsulates ways to invoke a build script.'''
@@ -91,6 +92,23 @@ class BuildScriptInterface( MObject ):
 		revision = runner.getStdOut().decode().strip()
 		return revision
 
+	def executeBuildInfo( self, buildInfo, timeout = 24 * 60 * 60, captureOutput = False ):
+		params = []
+		# temp 
+		debugLevel = mApp().getSettings().get( Settings.SimpleCIScriptDebugLevel, False ) or 0
+		# assemble args:
+		params.extend( [ '-t', buildInfo.getBuildType() or 'M'] )
+		params.extend( [ '-{0}'.format( 'v' * debugLevel ) ] )
+		if buildInfo.getUrl():
+			params.extend( [ '-u', buildInfo.getUrl() ] )
+		if buildInfo.getRevision():
+			params.extend( [ '-r', buildInfo.getRevision() ] )
+		if buildInfo.getTag():
+			params.extend( [ '--tag', buildInfo.getTag() ] )
+		if buildInfo.getBranch():
+			params.extend( [ '--branch', buildInfo.getBranch() ] )
+		return self.executeWithArgs( timeout, params, captureOutput )
+
 	def execute( self, timeout = 24 * 60 * 60, buildType = 'm', revision = None, url = None, args = None, captureOutput = False ):
 		'''Execute the build script. 
 		The method returns the RunCommand object used to execute the build script, through which the return code and the output 
@@ -102,18 +120,15 @@ class BuildScriptInterface( MObject ):
 			params.extend( [ '-u', url ] )
 		if revision:
 			params.extend( [ '-r', str( revision ) ] )
-			revText = 'revision ' + str( revision )
-		else:
-			revText = 'latest revision'
 		if args:
 			params.extend( args )
-		mApp().message( self, 'invoking build script "{0}" at {1}.'.format( self.getBuildScript(), revText ) )
 		return self.executeWithArgs( timeout, params, captureOutput )
 
 	def executeWithArgs( self, timeout = 24 * 60 * 60, args = None, captureOutput = False ):
 		cmd = [ sys.executable, os.path.abspath( self.getBuildScript() ) ]
 		if args:
 			cmd.extend( args )
+		mApp().message( self, 'invoking build script: {0}'.format( ' '.join( cmd ) ) )
 		runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
 		with EnvironmentSaver():
 			extend_debug_prefix( 'script>' )
