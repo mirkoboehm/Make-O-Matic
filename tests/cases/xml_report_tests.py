@@ -175,7 +175,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 			return True
 
 		step = self.project.getStep( 'build-cleanup' )
-		replace_bound_method( step, step.failed, failed_new )
+		replace_bound_method( step, step.hasFailed, failed_new )
 
 		converter = XmlReportConverter( self.getXmlReport() )
 		logText = converter.convertToFailedStepsLog()

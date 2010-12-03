@@ -39,7 +39,7 @@ class Step( MObject ):
 		self.__failed = False
 		self.__skipped = False
 
-	def failed( self ):
+	def hasFailed( self ):
 		return self.__failed
 
 	def setEnabled( self, enabled = True ):
@@ -170,7 +170,7 @@ class Step( MObject ):
 		node.attributes["isEmpty"] = str ( self.isEmpty() )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
-		node.attributes["failed"] = str( self.failed() )
+		node.attributes["failed"] = str( self.hasFailed() )
 		node.attributes["skipped"] = str( self.wasSkipped() )
 
 		if self.getPreActions():

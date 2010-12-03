@@ -37,7 +37,6 @@ class BuildInstructions( Instructions ):
 		Instructions.__init__( self, name, parent )
 		self.__steps = []
 		self.__timeKeeper = TimeKeeper()
-		self.__failedStep = None
 
 	def __deepcopy__( self, memo ):
 		'''Customize the behaviour of deepcopy to not include the parent object.'''
@@ -46,14 +45,16 @@ class BuildInstructions( Instructions ):
 		clone.__steps = deepcopy( self.__steps, memo )
 		return clone
 
+	def getFailedStep( self ):
+		'''Return the first step that failed during execution, or None.'''
+		for step in self.getSteps():
+			if step.hasFailed():
+				return step
+		return None
+
 	def hasFailed( self ):
 		'''Returns True if any action of the build steps for this object has failed.'''
-		return self.__failedStep != None
-
-	def logFilePathForFailedStep( self ):
-		'''Return the log output of the first step that failed during execution.'''
-		if self.__failedStep:
-			return self.__failedStep.getLogFileName()
+		return self.getFailedStep() != None
 
 	def __hasStep( self, stepName ):
 		'''Returns True if a step with the specified name already exists.'''
@@ -188,9 +189,6 @@ class BuildInstructions( Instructions ):
 		if step.execute( self ):
 			mApp().debugN( self, 1, 'success: "{0}"'.format( step.getName() ) )
 		else:
-			if self.__failedStep == None:
-				# we are only interested in the log files for the first failure 
-				self.__failedStep = step
 			mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
 			mApp().debugN( self, 1, 'failure: "{0}"'.format( step.getName() ) )
 
