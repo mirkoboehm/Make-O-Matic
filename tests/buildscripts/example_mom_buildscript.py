@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.python.PythonConfiguration import PythonConfiguration
+from core.configurations.PythonConfiguration import PythonConfiguration
 from core.helpers.BoilerPlate import BuildProject
 from tests.helpers.CrashMePlugin import CrashMePlugin
 

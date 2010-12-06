@@ -23,7 +23,7 @@ class PythonConfiguration( Configuration ):
 	'''PythonConfiguration is used to "build" and test software written in Python.
 	It defines the Python executable used by all Python-specific plugins.'''
 
-	def __init__( self, configName, executable = None, parent = None ):
+	def __init__( self, configName = None, executable = 'python', parent = None ):
 		Configuration.__init__( self, configName, parent )
 		self.setExecutable( executable )
 

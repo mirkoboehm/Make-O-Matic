@@ -23,7 +23,7 @@ from core.plugins.DoxygenGenerator import DoxygenGenerator
 from core.plugins.RSyncPublisher import RSyncPublisher
 from core.plugins.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
-from core.plugins.python.PythonConfiguration import PythonConfiguration
+from core.configurations.PythonConfiguration import PythonConfiguration
 from core.helpers.BoilerPlate import BuildProject
 from core.plugins.python.PyUnitTester import PyUnitTester
 from core.plugins.python.PyLintChecker import PyLintChecker
@@ -48,8 +48,8 @@ project.addPlugin( dox )
 
 # set up configurations:
 # python3 = Configuration( 'Python 3', project )
-python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
-python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite_selftest.py' ) ) ) )
+python2 = PythonConfiguration( 'Python 2', executable = 'python', parent = project )
+python2.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite_selftest.py' ) ) ) )
 
 pylint = PyLintChecker( pyLintTool = 'pylint-2.6',
 	pyLintRcFile = PathResolver( project.getSourceDir, 'pylintrc' ),
@@ -58,7 +58,7 @@ pylint = PyLintChecker( pyLintTool = 'pylint-2.6',
 	minimumScore = 7.5
 	)
 pylint.setOptional( True )
-python26.addPlugin( pylint )
+python2.addPlugin( pylint )
 
 # add a RSync publisher (remember to set the default upload location in the configuration file!):
 uploader = RSyncPublisher( localDir = PathResolver( project.getDocsDir ) )

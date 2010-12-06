@@ -19,7 +19,7 @@
 
 from core.plugins.testers.Analyzer import Analyzer
 from core.helpers.TypeCheckers import check_for_list_of_paths_or_none, check_for_path_or_none
-from core.plugins.python.PythonConfiguration import PythonConfiguration
+from core.configurations.PythonConfiguration import PythonConfiguration
 from core.Exceptions import MomError
 from core.actions.Action import Action
 from core.helpers.RunCommand import RunCommand
@@ -91,7 +91,7 @@ class _PyLintCheckerAction( Action ):
 
 class PyLintChecker( Analyzer ):
 
-	def __init__( self, pyLintTool = None, pyLintRcFile = None, htmlOutputPath = None,
+	def __init__( self, pyLintTool = 'pylint', pyLintRcFile = 'pylintrc' , htmlOutputPath = 'pylint.html',
 				modules = None, name = None, minimumScore = 0.0 ):
 		Analyzer.__init__( self, name, minimumScore )
 		self._setCommand( pyLintTool )

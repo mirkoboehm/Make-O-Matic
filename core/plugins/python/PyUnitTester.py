@@ -18,9 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.testers.TestProvider import TestProvider
-from core.plugins.python.PythonConfiguration import PythonConfiguration
+from core.configurations.PythonConfiguration import PythonConfiguration
 from core.Exceptions import MomError, ConfigurationError
-from core.helpers.TypeCheckers import check_for_path
+from core.helpers.TypeCheckers import check_for_path_or_none
 import re
 from core.helpers.GlobalMApp import mApp
 
@@ -32,7 +32,7 @@ class PyUnitTester( TestProvider ):
 		self.setTestProgram( testprogram )
 
 	def setTestProgram( self, program ):
-		check_for_path( program, 'The test program must be a Python executable!' )
+		check_for_path_or_none( program, 'The test program must be a Python executable!' )
 		self.__program = program
 
 	def getTestProgram( self ):
