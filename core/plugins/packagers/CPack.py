@@ -25,6 +25,7 @@ from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
 from core.Settings import Settings
 import re
+from datetime import datetime
 
 _CPackConfig = '''SET(CPACK_PACKAGE_NAME "@CPACK_PACKAGE_NAME@")
 SET(CPACK_PACKAGE_NAME_SIMPLIFIED "@CPACK_PACKAGE_NAME_SIMPLIFIED@")
@@ -117,19 +118,27 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
 		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", self._directory, 1 )
 
-		licenseFile = self._licenseFile if self._licenseFile != None else ""
+		licenseFile = self._licenseFile
+
+		if not licenseFile:
+			licenseFile = "CPackGeneratedLicense.txt"
+			licenseFilePath = os.path.join( self.getWorkingDirectory(), licenseFile )
+			with open( licenseFilePath, 'w' ) as license:
+				license.write( '{0} - Copyright {1}, All Rights Reserved.'.format( packageName, datetime.now().year ) )
 
 		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
 
-		generators = { ( 'WINDOWS', True ): 'ZIP',
-					   ( 'WINDOWS', False ): 'NSIS;ZIP',
-					   ( 'APPLE', True ): 'TBZ2;ZIP',
-					   ( 'APPLE', False ): 'DragNDrop;TBZ2',
-					   ( 'ELSE', True ): 'TBZ2;ZIP',
-					   ( 'ELSE', False ): 'STGZ;TBZ2' }
+		source_generators = 'TBZ2;ZIP'
+		binary_generators = { 'WINDOWS':'NSIS;ZIP',
+		                      'APPLE':  'DragNDrop;TBZ2',
+		                      'ELSE':   'STGZ;TBZ2' }
 
-		for i in ( 'WINDOWS', 'APPLE', 'ELSE' ):
-			config = config.replace( "@CPACK_GENERATOR_%s@" % i, generators[( i, self._sourcePackage )] )
+		for platform in ( 'WINDOWS', 'APPLE', 'ELSE' ):
+			if self._sourcePackage:
+				generator = source_generators
+			else:
+				generator = binary_generators[ platform ]
+			config = config.replace( "@CPACK_GENERATOR_%s@" % platform, generator )
 
 		if self._sourcePackage:
 			cpackSource = "TRUE"
@@ -156,11 +165,6 @@ class CPack( PackageProvider ):
 		PackageProvider.__init__( self, name )
 		self._licenseFile = licenseFile
 		self._setCommand( "cpack", CMakeSearchPaths )
-
-		if licenseFile == None and not sourcePackage:
-			raise ConfigurationError( 'CPack requires a license file for binary packages!' )
-		elif licenseFile != None and sourcePackage:
-			raise ConfigurationError( 'You must not set a license file for source packages!' )
 
 		if sourcePackage:
 			self.__configFile = "CPackSourceConfig.cmake"
