@@ -41,6 +41,18 @@ from tests.cases.settings_tests import SettingsTests
 from tests.selftest.environment_setup_tests import EnvironmentSetupTests
 import sys
 from tests.cases.pyunittester_tests import PyUnitTesterTest
+from core.plugins.builders.maketools import getMakeTool, MAKE_TOOLS
+from core.Exceptions import ConfigurationError, MomException
+from core.plugins.sourcecode.SCMSubversion import SCMSubversion
+from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder
+from core.plugins.testers.CTest import CTest
+from core.plugins.packagers.CPack import CPack
+from core.plugins.sourcecode.SCMGit import SCMGit
+from core.plugins.DoxygenGenerator import DoxygenGenerator
+from core.plugins.RSyncPublisher import RSyncPublisher
+from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
+from core.plugins.python.PyLintChecker import PyLintChecker
+from core.MApplication import MApplication
 
 CLASSES = [
 	# self tests first
@@ -68,7 +80,68 @@ CLASSES = [
 	SettingsTests
 ]
 
+PLUGIN_DEPENDENCIES = [
+	SCMGit,
+	SCMSubversion,
+	RSyncPublisher,
+]
+
+OPTIONAL_DEPENDENCIES = [
+	DoxygenGenerator,
+]
+
+CXX_DEPENDENCIES = [
+	CMakeBuilder,
+	QMakeBuilder,
+	CTest,
+	CPack
+]
+
+PYTHON_DEPENDENCIES = [
+	PyLintChecker,
+]
+
+def check_dependencies():
+	def check_plugins( plugins ):
+		failed_list = []
+		for plugin_class in plugins:
+			plugin = plugin_class()
+			try:
+				plugin.resolveCommand()
+			except ( MomException, ConfigurationError ):
+				failed_list.append( plugin.getCommand() )
+		return failed_list
+
+	def print_warning( missing_list, optional = False, type = '' ):
+		if missing_list:
+			type = type + ' '
+			missing = ' '.join( missing_list )
+			if optional:
+				force = 'may'
+			else:
+				force = 'will'
+			print( "WARNING: You appear to be missing some {0}dependencies: {1}".format( type, missing ) )
+			print( "This {0} cause test failures and will break some {1}functionality.".format( force, type ) )
+
+	MApplication()
+
+	plugin_missing = check_plugins( PLUGIN_DEPENDENCIES )
+	optional_missing = check_plugins( OPTIONAL_DEPENDENCIES )
+	cxx_missing = check_plugins( CXX_DEPENDENCIES )
+	try:
+		getMakeTool().checkVersion()
+	except ( MomException, ConfigurationError ):
+		cxx_missing.append( '/'.join( MAKE_TOOLS ) )
+	python_missing = check_plugins( PYTHON_DEPENDENCIES )
+
+	print_warning( plugin_missing )
+	print_warning( optional_missing, True, 'optional' )
+	print_warning( cxx_missing, True, 'C++' )
+	print_warning( python_missing, True, 'Python' )
+
 def main():
+	check_dependencies();
+
 	suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
 	result = unittest.TextTestRunner( verbosity = 2 ).run( suite )
 	sys.stderr.flush()
