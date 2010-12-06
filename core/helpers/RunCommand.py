@@ -174,13 +174,6 @@ class RunCommand( MObject ):
 		paths = searchPaths
 		paths += os.environ["PATH"].split( os.pathsep )
 
-		# These paths are often used by package managers but might not be in the path
-		extraPaths = [ '/usr/local/bin', '/opt/local/bin', '/sw/bin' ]
-		for extraPath in extraPaths:
-			if not extraPath in paths:
-				if os.path.exists( extraPath ):
-					paths.append( extraPath )
-
 		# These paths have been added by the local configuration so complain when we can't find them
 		extraPaths = mApp().getSettings().get( Settings.SystemExtraPaths )
 		for extraPath in extraPaths:
@@ -191,7 +184,6 @@ class RunCommand( MObject ):
 					raise ConfigurationError( "RunCommand::resolveCommand: Can't find extra PATH '{0}' appended in configuration."
 											.format( extraPath ) )
 
-		#paths = []
 		for path in paths:
 			path = os.path.normpath( path )
 			executableFile = os.path.join( path, fname )
