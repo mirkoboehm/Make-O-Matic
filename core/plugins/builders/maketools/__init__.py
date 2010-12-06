@@ -22,6 +22,8 @@ from core.plugins.builders.maketools.GNUMakeTool import GNUMakeTool
 from core.plugins.builders.maketools.JomTool import JomTool
 from core.Exceptions import ConfigurationError
 
+MAKE_TOOLS = [ 'jom', 'nmake', 'make' ]
+
 def getMakeTool():
 	try:
 		return JomTool()
