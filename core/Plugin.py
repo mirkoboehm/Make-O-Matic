@@ -90,6 +90,11 @@ class Plugin( MObject ):
 		that setup errors can happen.'''
 		pass
 
+	def resolveCommand( self ):
+		runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
+		runCommand.checkVersion()
+		return runCommand.getCommand()[0]
+
 	def performPreFlightCheck( self ):
 		'''This method handles the execution of the pre flight check.
 
@@ -101,10 +106,7 @@ class Plugin( MObject ):
 
 		def findCommandAndPreFlightCheck():
 			if self.getCommand():
-				runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
-				runCommand.checkVersion()
-				# Set the now resolved command
-				self.__command = runCommand.getCommand()[0]
+				self.__command = self.resolveCommand()
 			self.preFlightCheck()
 
 		if self.isOptional():
