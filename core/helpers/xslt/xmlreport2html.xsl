@@ -169,18 +169,6 @@ h5 {
 					<xsl:with-param name="returncode" select="@returncode"/>
 				</xsl:call-template>
 			</p>
-			<xsl:apply-templates />
-		</div>
-	</xsl:template>
-
-	<xsl:template match="project">
-		<h2>Project: <xsl:value-of select="@name" /></h2>
-		<div class="tag-project">
-			<!--
-			<p>
-				Base directory: <xsl:value-of select="@basedir" />
-			</p>
-			-->
 			<p>
 				Start time: <xsl:value-of select="@starttime" /><br />
 				Stop time : <xsl:value-of select="@stoptime" />
@@ -188,6 +176,13 @@ h5 {
 			<p>
 				Build time: <xsl:value-of select="@timing" />
 			</p>
+			<xsl:apply-templates />
+		</div>
+	</xsl:template>
+
+	<xsl:template match="project">
+		<h2>Project: <xsl:value-of select="@name" /></h2>
+		<div class="tag-project">
 			<xsl:apply-templates />
 		</div>
 	</xsl:template>

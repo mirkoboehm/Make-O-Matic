@@ -294,7 +294,7 @@ class XmlReportConverter( MObject ):
 
 		if roundTripTime > 0:
 			out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
-					string_from_node_attribute( element, "project", "timing" ),
+					string_from_node_attribute( element, "build", "timing" ),
 					roundTripTime ), '*' )
 		else:
 			out += wrapper.wrap( "*" * wrapper.width )
@@ -355,20 +355,16 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrap( "Node name:    {0}".format( element.attrib["sys-nodename"] ) )
 			out += " "
 			out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
-			wrapper.dedent()
-
-		elif element.tag == "project":
 			out += " "
-			out += wrapper.wrap( "Project: {0}".format( element.attrib["name"] ) )
-			out += " "
-			wrapper.indent()
-			#out += wrapper.wrap( "Base directory: {0}".format( element.attrib["basedir"] ) )
-			#out += " "
 			out += wrapper.wrap( "Start time (UTC): {0}".format( element.attrib["starttime"] ) )
 			out += wrapper.wrap( "Stop time (UTC):  {0}".format( element.attrib["stoptime"] ) )
 			out += " "
 			out += wrapper.wrap( "Build time: {0}".format( element.attrib["timing"] ) )
 			wrapper.dedent()
+
+		elif element.tag == "project":
+			out += " "
+			out += wrapper.wrap( "Project: {0}".format( element.attrib["name"] ) )
 
 		elif element.tag == "plugins": # container element
 			if len( element.getchildren() ) > 0:
