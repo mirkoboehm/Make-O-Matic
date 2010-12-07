@@ -122,15 +122,15 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.ProjectExecutomatLogfileName ] = 'execution.log'
 		defaultSettings[ Defaults.ProjectBuildType ] = 'm'
 		defaultSettings[ Defaults.ProjectBuildSequence] = [ # name, modes, execute-on-failure
-			[ 'build-create-folders', 'mcdhpsf', False ],
-			[ 'project-checkout', 'mcdhpsf', False ],
-			[ 'conf-export-sources', 'mcdhpsf', False ],
-			[ 'conf-configure', 'mcdhpsf', False ],
-			[ 'conf-make', 'mcdhpsf', False ],
-			[ 'conf-make-test', 'mcdhpsf', False ],
-			[ 'conf-make-install', 'mcdhpsf', False ],
+			[ 'build-create-folders', 'mcgdhpsf', False ],
+			[ 'project-checkout', 'mcgdhpsf', False ],
+			[ 'conf-export-sources', 'mcgdhpsf', False ],
+			[ 'conf-configure', 'mcgdhpsf', False ],
+			[ 'conf-make', 'mcgdhpsf', False ],
+			[ 'conf-make-test', 'mcgdhpsf', False ],
+			[ 'conf-make-install', 'mcgdhpsf', False ],
 			[ 'conf-package', 'dsfp', False ],
-			[ 'project-create-docs', 'mcdhpsf', False ],
+			[ 'project-create-docs', 'mcgdhpsf', False ],
 			[ 'project-package', 'dsf', False ],
 			[ 'project-upload-packages', 'dsf', False ],
 			[ 'project-cleanup-packages', 'cdsf', True ],
@@ -140,6 +140,7 @@ class Defaults( MObject ):
 			'm' : 'Manual build. Does not modify environment variables. Deletes temporary folders.',
 			'c' : 'Continuous build. Builds configurations against the best scoring matching environment. Deletes temporary folders.',
 			'd' : 'Daily build. Builds configurations against every matching environment. Deletes temporary folders.',
+			'g' : 'Continuous build, with cleanup steps disabled.',
 			'h' : 'Hacker build. Similar to manual builds. Does not delete temporary folders.',
 			'p' : '1337 coder build. Similar to daily builds. Does not delete temporary folders.',
 			's' : 'Snapshot build. Similar to daily builds. Creates and uploads packages and documentation.',
@@ -157,6 +158,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
 		defaultSettings[ Defaults.EnvironmentsExpansionModeMapping ] = {
 			'c' : Defaults.EnvironmentExpansionMode_BuildHighestScoring,
+			'g' : Defaults.EnvironmentExpansionMode_BuildHighestScoring,
 			'd' : Defaults.EnvironmentExpansionMode_BuildAll,
 			's' : Defaults.EnvironmentExpansionMode_BuildAll,
 			'p' : Defaults.EnvironmentExpansionMode_BuildAll,
