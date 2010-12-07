@@ -144,7 +144,11 @@ def check_dependencies():
 	print_warning( python_missing, True, 'Python' )
 
 	if missing or optional_missing or cxx_missing or python_missing:
-		raw_input( 'Press "Enter" to continue...' )
+		try:
+			raw_input( 'Press "Enter" to continue...' )
+		except KeyboardInterrupt:
+			print( '' )
+			sys.exit( 1 )
 
 def main():
 	check_dependencies();
