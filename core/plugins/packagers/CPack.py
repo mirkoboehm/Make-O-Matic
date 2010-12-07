@@ -22,7 +22,6 @@ from core.actions.filesystem.FilesMoveAction import FilesMoveAction
 from core.plugins.builders.generators.CMakeBuilder import CMakeSearchPaths
 import os
 from core.helpers.GlobalMApp import mApp
-from core.Exceptions import ConfigurationError
 from core.Settings import Settings
 import re
 from datetime import datetime

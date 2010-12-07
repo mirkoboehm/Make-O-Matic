@@ -131,9 +131,7 @@ class Defaults( MObject ):
 			[ 'conf-package', 'dsfp', False ],
 			[ 'project-create-docs', 'mcdhpsf', False ],
 			[ 'project-package', 'dsf', False ],
-			[ 'project-upload-docs', 'dsf', False ],
 			[ 'project-upload-packages', 'dsf', False ],
-			[ 'project-cleanup-docs', 'cdsf', True ],
 			[ 'project-cleanup-packages', 'cdsf', True ],
 			[ 'build-cleanup', 'mcdsf', True ] ]
 		defaultSettings[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text

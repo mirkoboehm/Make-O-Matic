@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Plugin import Plugin
 from core.actions.ShellCommandAction import ShellCommandAction
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none, check_for_string
 import platform, os, re
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
@@ -33,6 +33,7 @@ class RSyncPublisher( Plugin ):
 		self._setCommand( "rsync", searchPaths )
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
+		self.setStep( 'project-upload-packages' )
 
 	def setUploadLocation( self, location ):
 		check_for_nonempty_string_or_none( location, 'The rsync upload location must be a nonempty string!' )
@@ -48,6 +49,13 @@ class RSyncPublisher( Plugin ):
 	def getLocalDir( self ):
 		return self.__localDir
 
+	def setStep( self, step ):
+		check_for_string( step, 'The step for the rsync publisher must be a string representing a step name!' )
+		self.__step = step
+
+	def getStep( self ):
+		return self.__step
+
 	def setup( self ):
 		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
@@ -57,7 +65,7 @@ class RSyncPublisher( Plugin ):
 			if not uploadLocation:
 				mApp().message( self, 'Upload location is empty. Not generating any actions.' )
 				return
-		step = self.getInstructions().getStep( 'project-upload-docs' )
+		step = self.getInstructions().getStep( self.getStep() )
 		if str( self.getLocalDir() ):
 			fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
 			cmd = [ self.getCommand(), '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ]
@@ -99,7 +107,11 @@ class RSyncPackagesPublisher( RSyncPublisher ):
 		RSyncPublisher.__init__( self, name,
 			uploadLocation = mApp().getSettings().get( Settings.PublisherPackageUploadLocation ),
 			localDir = PathResolver( mApp().getPackagesDir ) )
+		self.setStep( 'project-upload-packages' )
 
+# FIXME the reports publisher needs to be called after the build finished 
+# (chicken and egg problem, the report can only be created once the build is done)
+# implement uploading in wrapUp()?
 class RSyncReportsPublisher( RSyncPublisher ):
 	'''A RSync publisher that is pre-configured to publish the reports structure to the default location.'''
 
