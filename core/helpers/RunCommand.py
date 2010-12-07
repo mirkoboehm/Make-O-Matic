@@ -232,7 +232,7 @@ class RunCommand( MObject ):
 
 		if returnCode == expectedReturnCode:
 			version = getStdOut.decode().splitlines()[ lineNumber ].strip()
-			mApp().debugN( self, 4, 'RunCommand found: "{0}"'.format( version ) )
+			mApp().debugN( self, 1, 'RunCommand found: "{0}"'.format( version ) )
 			return version
 		else:
 			raise ConfigurationError( "RunCommand::checkVersion: {0} returned {1}, expected: {2}."
