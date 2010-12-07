@@ -18,11 +18,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
+import sys
 
-CMakeSearchPaths = [
-				"C:\Program Files\CMake 2.8\bin",
-				"C:\Program Files\CMake 2.6\bin"
-]
+def getCMakeSearchPaths():
+	searchPaths = []
+	if sys.platform == "win32":
+		from core.helpers.RegistryHelper import getPathsFromRegistry
+		registryKeys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\CMake\\UninstallString" ]
+		relativePath = "../bin"
+		searchPaths += getPathsFromRegistry( registryKeys, relativePath )
+	return searchPaths
 
 class CMakeVariable( object ):
 	def __init__( self, name, value, typeString = None ):
@@ -61,7 +66,7 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 
 	def __init__( self, name = None, inSourceBuild = False ):
 		MakefileGeneratorBuilder.__init__( self, name )
-		self._setCommand( 'cmake', CMakeSearchPaths )
+		self._setCommand( 'cmake', getCMakeSearchPaths() )
 		self.setInSourceBuild( inSourceBuild )
 		self._setOutOfSourceBuildSupported( True )
 		self.__cmakeVariables = []

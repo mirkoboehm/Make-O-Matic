@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.testers.TestProvider import TestProvider
-from core.plugins.builders.generators.CMakeBuilder import CMakeSearchPaths
+from core.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
 from core.helpers.GlobalMApp import mApp
 import re
 
@@ -26,7 +26,7 @@ class CTest( TestProvider ):
 
 	def __init__( self, name = None ):
 		TestProvider.__init__( self, name )
-		self._setCommand( "ctest", CMakeSearchPaths )
+		self._setCommand( "ctest", getCMakeSearchPaths() )
 		self._setCommandArguments( ["--verbose"] )
 
 	def saveReport( self ):

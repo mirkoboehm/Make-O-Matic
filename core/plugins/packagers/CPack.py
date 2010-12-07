@@ -19,7 +19,7 @@
 
 from core.plugins.packagers.PackageProvider import PackageProvider
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
-from core.plugins.builders.generators.CMakeBuilder import CMakeSearchPaths
+from core.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
 import os
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
@@ -162,8 +162,7 @@ class CPack( PackageProvider ):
 
 	def __init__( self, sourcePackage = False, licenseFile = None, name = None ):
 		PackageProvider.__init__( self, name )
-		self._licenseFile = licenseFile
-		self._setCommand( "cpack", CMakeSearchPaths )
+		self._setCommand( "cpack", getCMakeSearchPaths() )
 
 		if sourcePackage:
 			self.__configFile = "CPackSourceConfig.cmake"
@@ -171,6 +170,7 @@ class CPack( PackageProvider ):
 			self.__configFile = "CPackConfig.cmake"
 		self._sourcePackage = sourcePackage
 		self._setPackageArguments( [ "--verbose", "--config", self.__configFile ] )
+		self._licenseFile = licenseFile
 
 	def makePackageStep( self ):
 		"""Create packages for the project using CPack."""
