@@ -98,7 +98,8 @@ class BuildScriptInterface( MObject ):
 		debugLevel = mApp().getSettings().get( Settings.SimpleCIScriptDebugLevel, False ) or 0
 		# assemble args:
 		params.extend( [ '-t', buildInfo.getBuildType() or 'M'] )
-		params.extend( [ '-{0}'.format( 'v' * debugLevel ) ] )
+		if debugLevel > 0:
+			params.extend( [ '-{0}'.format( 'v' * debugLevel ) ] )
 		if buildInfo.getUrl():
 			params.extend( [ '-u', buildInfo.getUrl() ] )
 		if buildInfo.getRevision():
