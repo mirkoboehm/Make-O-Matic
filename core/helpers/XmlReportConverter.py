@@ -274,6 +274,13 @@ class XmlReportConverter( MObject ):
 		if element.find( "exception" ):
 			out += wrapper.wrap( "Description:  {0}".format( string_from_node( element, "exception/description" ) ) )
 
+		# show failed steps if any
+		failedSteps = set( [] )
+		for node in find_nodes_with_attribute_and_value( element, "step", "failed", "True" ):
+			failedSteps.add( node.attrib["name"] )
+		if len( failedSteps ) > 0:
+			out += wrapper.wrap( "Failed steps: {0}".format( ", ".join( failedSteps ) ) )
+
 		# show client information
 		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
 
