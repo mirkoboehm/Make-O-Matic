@@ -77,7 +77,8 @@ class Project( BuildInstructions ):
 		return self.__getNormPath( Settings.ProjectTempDir )
 
 	def getDocsDir( self ):
-		path = os.path.join( self.getPackagesDir(), mApp().getSettings().get( Settings.ProjectDocsDir ) )
+		path = os.path.join( self.getPackagesDir() or self.getBaseDir() or '',
+			mApp().getSettings().get( Settings.ProjectDocsDir ) )
 		return os.path.normpath( path )
 
 	def setup( self ):
