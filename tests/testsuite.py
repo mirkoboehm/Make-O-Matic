@@ -80,7 +80,7 @@ CLASSES = [
 	SettingsTests
 ]
 
-PLUGIN_DEPENDENCIES = [
+DEPENDENCIES = [
 	SCMGit,
 	SCMSubversion,
 	RSyncPublisher,
@@ -125,7 +125,11 @@ def check_dependencies():
 
 	MApplication()
 
-	plugin_missing = check_plugins( PLUGIN_DEPENDENCIES )
+	missing = check_plugins( DEPENDENCIES )
+	try:
+		import lxml
+	except ImportError:
+		missing.append( 'lxml' )
 	optional_missing = check_plugins( OPTIONAL_DEPENDENCIES )
 	cxx_missing = check_plugins( CXX_DEPENDENCIES )
 	try:
@@ -134,10 +138,13 @@ def check_dependencies():
 		cxx_missing.append( '/'.join( MAKE_TOOLS ) )
 	python_missing = check_plugins( PYTHON_DEPENDENCIES )
 
-	print_warning( plugin_missing )
+	print_warning( missing )
 	print_warning( optional_missing, True, 'optional' )
 	print_warning( cxx_missing, True, 'C++' )
 	print_warning( python_missing, True, 'Python' )
+
+	if missing or optional_missing or cxx_missing or python_missing:
+		raw_input( 'Press "Enter" to continue...' )
 
 def main():
 	check_dependencies();
