@@ -32,6 +32,8 @@ from core.helpers.TimeKeeper import formatted_time
 from buildcontrol.common.BuildInfo import BuildInfo
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
+from datetime import datetime
+import calendar
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -205,7 +207,7 @@ def parse_log_entry( logentry ):
 	# now turn commiTime into a Python datetime:
 	timeString = commitTime.split( '.' )[0] # strip microseconds
 	timeTuple = time.strptime( timeString, '%Y-%m-%dT%H:%M:%S' )
-	return ( committer, message, revision, time.mktime( timeTuple ), formatted_time( time ) )
+	return ( committer, message, revision, calendar.timegm( timeTuple ), formatted_time( datetime( *timeTuple[0:6] ) ) )
 
 def get_node_text( node ):
 	text = ''
