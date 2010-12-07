@@ -16,12 +16,17 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from tests.helpers.MomTestCase import MomTestCase
 import os
 import unittest
 import sys
 import shutil
 import glob
+from core.MApplication import MApplication
+from buildcontrol.simple_ci import Parameters
+from buildcontrol.simple_ci.Slave import Slave
+from tests.helpers.TestUtils import md5sum
 
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
@@ -32,12 +37,44 @@ class SimpleCITests( MomTestCase ):
 	ToolName = os.path.join( ThisFilePath, '..', '..', 'tools', 'simple_ci.py' )
 	CurrentDirectory = os.getcwd()
 
+	DatabaseChecksum = None
+
+	def setUp( self ):
+		MomTestCase.setUp( self )
+
+		# save current database checksum for later comparison, check if database file exists (e.g. at first run)
+		if os.path.exists( self._getSimpleCiDatabaseFilename() ):
+			self.DatabaseChecksum = md5sum( self._getSimpleCiDatabaseFilename() )
+
 	def tearDown( self ):
+		MomTestCase.tearDown( self )
+
+		# make sure config content stayed the same
+		if self.DatabaseChecksum:
+			self.assertEqual( self.DatabaseChecksum, md5sum( self._getSimpleCiDatabaseFilename() ),
+					"Database changed during tests run." )
+
 		os.chdir( self.CurrentDirectory )
 		removeDirectories = glob.glob( "make-o-matic*" )
 		removeDirectories.extend( glob.glob( "builds" ) )
 		for directory in removeDirectories:
 			shutil.rmtree( directory )
+
+	# get the SimpleCI database file path by instantiating an SimpleCiBase instance
+	def _getSimpleCiDatabaseFilename( self ):
+		# we need to replace the MApplication instance
+		oldInstance = MApplication.instance
+		MApplication.instance = None
+
+		# instantiate SimpleCiBase instance
+		params = Parameters.Parameters()
+		params.parse()
+		simpleCiInstance = Slave( params )
+		databaseFilename = os.path.join( simpleCiInstance.getDataDir(), 'buildstatus.sqlite' )
+
+		# reset MApplication instance
+		MApplication.instance = oldInstance
+		return databaseFilename
 
 	def testUsageHelp( self ):
 		cmd = [ sys.executable, SimpleCITests.ToolName, '-h' ]

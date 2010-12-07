@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import types
+from hashlib import md5
 
 def replace_bound_method( instance, methodPointer, newMethodPointer ):
 	"""Replaces the bound method of instance with newMethodPointer
@@ -31,3 +32,16 @@ def replace_bound_method( instance, methodPointer, newMethodPointer ):
 		instance.__dict__[ methodPointer.__name__ ] = f
 	else:
 		raise AttributeError( "Method is not callable" )
+
+def md5sum( filename, buf_size = 8192 ):
+	m = md5()
+	# the with statement makes sure the file will be closed 
+	with open( filename ) as f:
+		# We read the file in small chunk until EOF
+		data = f.read( buf_size )
+		while data:
+			# We had data to the md5 hash
+			m.update( data )
+			data = f.read( buf_size )
+	# We return the md5 hash in hexadecimal format
+	return m.hexdigest()
