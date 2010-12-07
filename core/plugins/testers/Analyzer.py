@@ -25,7 +25,7 @@ class Analyzer( Plugin ):
 
 		self.__score = None
 		self.__report = None
-		self._setMinimumScore( minimumScore )
+		self._setRequiredMinimumScore( minimumScore )
 
 	def _setScore( self, score, top ):
 		self.__score = [ score, top ]
@@ -44,17 +44,18 @@ class Analyzer( Plugin ):
 
 		return self.__report
 
-	def _setMinimumScore( self, minimumScore ):
-		self.__minimumScore = minimumScore
+	def _setRequiredMinimumScore( self, minimumScore ):
+		self.__requiredMinimumScore = minimumScore
 
-	def getMinimumScore( self ):
-		return self.__minimumScore
+	def getRequiredMinimumScore( self ):
+		return self.__requiredMinimumScore
 
 	def isScoreOkay( self ):
 		if not self.getScore():
 			return True # score is None => no score calculated => okay
 
-		return ( self.getScore()[0] >= self.getMinimumScore() )
+		# is: return bool ((score / maxScore ) >= requiredMinimumScore)
+		return ( ( self.getScore()[0] / self.getScore()[1] ) >= self.getRequiredMinimumScore() )
 
 	def getDescription( self ):
 		if not self.getInstructions().getStep( "conf-make-test" ).isEnabled():
