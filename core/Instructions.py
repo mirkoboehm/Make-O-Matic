@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
 from core.helpers.FilesystemAccess import make_foldername_from_string
@@ -26,7 +27,7 @@ from core.Settings import Settings
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
 from copy import deepcopy, copy
-from core.helpers.TimeKeeper import TimeKeeper
+from core.helpers.TimeKeeper import TimeKeeper, formatted_time
 
 class Instructions( MObject ):
 	"""
@@ -209,16 +210,23 @@ class Instructions( MObject ):
 	def createXmlNode( self, document, recursive = True ):
 		node = MObject.createXmlNode( self, document )
 
+		node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
+		node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
+		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
+		node.attributes["failed"] = str( self.hasFailed() )
+
+		# loop through steps
+		stepsElement = document.createElement( "steps" )
+		for step in self.getSteps():
+			element = step.createXmlNode( document )
+			stepsElement.appendChild( element )
+		node.appendChild( stepsElement )
+
 		if recursive:
+			# loop through plugins
 			pluginsElement = document.createElement( "plugins" )
 			for plugin in self.getPlugins():
-#				#try:
 				element = plugin.createXmlNode( document )
-#				except Exception as e:
-#					element = document.createElement( plugin.getTagName() )
-#					element.attributes["name"] = str( plugin.getName() )
-#					exceptionNode = create_exception_xml_node( document, e, traceback.format_exc() )
-#					element.appendChild( exceptionNode )
 				pluginsElement.appendChild( element )
 			node.appendChild( pluginsElement )
 

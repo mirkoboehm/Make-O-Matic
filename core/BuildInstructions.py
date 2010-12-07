@@ -16,11 +16,11 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Instructions import Instructions
 import os
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
-from core.helpers.TimeKeeper import formatted_time
 from core.Settings import Settings
 from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
@@ -28,26 +28,6 @@ from core.actions.filesystem.RmDirAction import RmDirAction
 class BuildInstructions( Instructions ):
 	'''BuildInstructions is the base class for all elements that form the build tree of a project.
 	BuildInstructions introduces the build steps.'''
-
-	def __init__( self, name = None, parent = None ):
-		'''Constructor.'''
-		Instructions.__init__( self, name, parent )
-
-	def createXmlNode( self, document ):
-		'''Create a node for the XML report.'''
-		node = Instructions.createXmlNode( self, document )
-		node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
-		node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
-		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
-		node.attributes["failed"] = str( self.hasFailed() )
-
-		stepsElement = document.createElement( "steps" )
-		for step in self.getSteps():
-			element = step.createXmlNode( document )
-			stepsElement.appendChild( element )
-		node.appendChild( stepsElement )
-
-		return node
 
 	def prepare( self ):
 		'''Execute the prepare phase.
