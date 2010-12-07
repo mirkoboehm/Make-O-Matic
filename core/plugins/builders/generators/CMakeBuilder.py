@@ -61,23 +61,19 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 
 	def __init__( self, name = None, inSourceBuild = False ):
 		MakefileGeneratorBuilder.__init__( self, name )
-		# Use the Plugin support for finding the CMake command
-		makeCommand = self.getCommand()
 		self._setCommand( 'cmake', CMakeSearchPaths )
-		self._setMakefileGeneratorCommand( self.getCommand() )
-		self._setCommand( makeCommand )
 		self.setInSourceBuild( inSourceBuild )
 		self._setOutOfSourceBuildSupported( True )
-		self.setCMakeVariables( [] )
+		self.__cmakeVariables = []
 
-	def setCMakeVariables( self, options ):
-		self.__options = options
+	def setCMakeVariables( self, variables ):
+		self.__cmakeVariables = variables
 
 	def getCMakeVariables( self ):
-		return self.__options
+		return self.__cmakeVariables
 
-	def addCMakeVariable( self, option ):
-		self.getCMakeVariables().append( option )
+	def addCMakeVariable( self, variable ):
+		self.getCMakeVariables().append( variable )
 
 	def createConfigureActions( self ):
 		configuration = self.getInstructions()
@@ -86,5 +82,5 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 		for variable in self.getCMakeVariables():
 			arguments.append( '-D{0}'.format( variable ) )
 		arguments.append( configuration.getProject().getSourceDir() )
-		self._setMakefileGeneratorArguments( arguments )
+		self._setCommandArguments( arguments )
 		MakefileGeneratorBuilder.createConfigureActions( self )

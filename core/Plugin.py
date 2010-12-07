@@ -21,7 +21,7 @@ from core.Exceptions import MomException, ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, \
-	check_for_list_of_strings, check_for_list_of_paths
+	check_for_list_of_strings, check_for_list_of_paths, check_for_int
 from core.helpers.XmlUtils import create_child_node
 from copy import deepcopy, copy
 

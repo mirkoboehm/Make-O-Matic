@@ -26,7 +26,7 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 	def __init__( self, name = None, projectFile = None ):
 		MakefileGeneratorBuilder.__init__( self, name )
 		self._projectFile = projectFile
-		self._setMakefileGeneratorCommand( "qmake" )
+		self._setCommand( "qmake" )
 
 	def createConfigureActions( self ):
 		if not self.getInSourceBuild():
@@ -37,12 +37,9 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 				# FIXME: We should probably check this somehow but can't be done until after preFlightCheck
 				self._projectFile = "{0}.pro".format( project.getName() )
 			projectFilePath = os.path.join( sourceDirectory, self._projectFile )
-			self._setMakefileGeneratorArguments( [ projectFilePath ] )
+			self._setMakeToolArguments( [ projectFilePath ] )
 		MakefileGeneratorBuilder.createConfigureActions( self )
 
 	def createConfMakeInstallActions( self ):
 		# Stupidly, QMake doesn't have a standard way of installing to a prefix so just disable this
 		pass
-
-	def preFlightCheck( self ):
-		self.getMakeTool().checkVersion( expectedReturnCode = 154 )
