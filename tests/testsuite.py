@@ -109,7 +109,15 @@ def check_dependencies():
 			try:
 				plugin.resolveCommand()
 			except ( MomException, ConfigurationError ):
-				failed_list.append( plugin.getCommand() )
+				if hasattr( plugin, 'getMakefileGeneratorCommand' ):
+					failed = plugin.getMakefileGeneratorCommand()
+				elif hasattr( plugin, 'getCommand' ):
+					failed = plugin.getCommand()
+				elif hasattr( plugin, 'getName' ):
+					failed = plugin.getName()
+				else:
+					failed = plugin.__class__.__name__
+				failed_list.append( failed )
 		return failed_list
 
 	def print_warning( missing_list, optional = False, type = '' ):
