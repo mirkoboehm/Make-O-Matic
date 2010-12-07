@@ -89,7 +89,8 @@ class Project( BuildInstructions ):
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		create = self.getStep( 'build-create-folders' )
 		delete = self.getStep( 'build-cleanup' )
-		for folder in ( self.getDocsDir(), self.getSourceDir(), self.getTempDir() ):
+		create.addMainAction( MkDirAction( self.getDocsDir() ) ) # will be cleaned up as part of packages
+		for folder in ( self.getSourceDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 			delete.prependMainAction( RmDirAction( folder ) )
 

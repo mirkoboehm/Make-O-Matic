@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from core.Exceptions import MomError
+from core.Exceptions import MomError, ConfigurationError
 from core.MObject import MObject
 from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.TypeCheckers import check_for_string
@@ -105,6 +105,10 @@ class Step( MObject ):
 		return self.__timeKeeper
 
 	def __addAction( self, container, action, prepend = False ):
+		from core.actions.Action import Action
+		if not isinstance( action, Action ):
+			raise ConfigurationError( 'An action needs to implement the Action class (got {0} instead)!'
+				.format( repr( action ) if action else 'None' ) )
 		if prepend:
 			container.insert( 0, action )
 		else:
