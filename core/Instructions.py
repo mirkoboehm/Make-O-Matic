@@ -215,13 +215,6 @@ class Instructions( MObject ):
 		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
 		node.attributes["failed"] = str( self.hasFailed() )
 
-		# loop through steps
-		stepsElement = document.createElement( "steps" )
-		for step in self.getSteps():
-			element = step.createXmlNode( document )
-			stepsElement.appendChild( element )
-		node.appendChild( stepsElement )
-
 		if recursive:
 			# loop through plugins
 			pluginsElement = document.createElement( "plugins" )
@@ -229,6 +222,13 @@ class Instructions( MObject ):
 				element = plugin.createXmlNode( document )
 				pluginsElement.appendChild( element )
 			node.appendChild( pluginsElement )
+
+		# loop through steps
+		stepsElement = document.createElement( "steps" )
+		for step in self.getSteps():
+			element = step.createXmlNode( document )
+			stepsElement.appendChild( element )
+		node.appendChild( stepsElement )
 
 		return node
 
