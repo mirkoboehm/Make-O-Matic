@@ -27,9 +27,9 @@ build, project = BuildProject( 'Make-O-Matic', 'git://github.com/KDAB/Make-O-Mat
 
 build.addPlugin( CrashMePlugin() )
 # set up configurations:
-python26 = PythonConfiguration( 'Python 2.6', executable = 'python2.6', parent = project )
+python = PythonConfiguration( 'Python', parent = project )
 # Hint: do not enable running the test suite here, because this script is part of the test suite :-)
-# python26.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
+# python.addPlugin( PyUnitTester( testprogram = PathResolver( project.getSourceDir, os.path.join( 'tests', 'testsuite.py' ) ) ) )
 
 # run:
 build.build()
