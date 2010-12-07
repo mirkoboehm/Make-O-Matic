@@ -23,8 +23,8 @@ def machine_info():
 	"""Returns a dict of machine information, like architecture or platform type"""
 
 	info = {}
-	info["sys-architecture"] = " ".join( platform.architecture() )
-	info["sys-platform"] = platform.system()
+	info["sys-architecture"] = " ".join( platform.architecture() ).replace( "ELF", "" ).rstrip()
+	info["sys-platform"] = platform.system().replace( "Darwin", "Mac OS X" )
 	info["sys-nodename"] = platform.node()
 	info["sys-version"] = platform.version()
 	info["python-version"] = platform.python_version()

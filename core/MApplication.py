@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import sys
 from core.loggers.Logger import Logger
 from core.Exceptions import MomError, MomException, InterruptedException
@@ -23,6 +24,7 @@ from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
 from core.Instructions import Instructions
 import traceback
+from core.helpers.MachineInfo import machine_info
 
 class MApplication( Instructions ):
 	'''MApplication represents the facilities provided by the currently running script.
@@ -47,6 +49,13 @@ class MApplication( Instructions ):
 
 	def getMomVersion( self ):
 		return self.getSettings().get( Settings.MomVersionNumber )
+
+	def getSystemShortName( self ):
+		return self.getSettings().get( Settings.SystemShortName ) or "{0} on {1} ({2})".format( 
+				machine_info()["sys-nodename"].split( '.' )[0],
+				machine_info()["sys-platform"],
+				machine_info()["sys-architecture"]
+				)
 
 	def _checkMinimumMomVersion( self, minimumMomVersion ):
 		'''Check if this make-o-matic copy is recent enough for this build script.

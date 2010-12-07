@@ -227,5 +227,6 @@ class Build( MApplication ):
 			node.attributes[key] = value
 
 		node.attributes["returncode"] = str( self.getReturnCode() )
+		node.attributes["sys-shortname"] = self.getSystemShortName()
 
 		return node

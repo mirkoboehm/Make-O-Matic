@@ -77,6 +77,7 @@ class Defaults( MObject ):
 	EnvironmentsExpansionModeMapping = 'environments.expansionmodes'
 	# ----- System path settings:
 	SystemExtraPaths = 'system.extrapaths'
+	SystemShortName = 'system.shortname'
 	# ----- Build settings:
 	BuildMoveOldDirectories = 'build.moveolddirectories'
 	# ----- Builder settings
@@ -164,6 +165,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.EnvironmentsApplicableBuildTypes ] = 'cdpsf'
 		# ----- System path settings:
 		defaultSettings[ Defaults.SystemExtraPaths ] = []
+		defaultSettings[ Defaults.SystemShortName ] = None
 		# ----- Build settings:
 		defaultSettings[ Defaults.BuildMoveOldDirectories ] = True
 		# ----- EmailReporter settings:

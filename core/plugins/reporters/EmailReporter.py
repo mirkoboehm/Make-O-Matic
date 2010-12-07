@@ -25,7 +25,6 @@ from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Build import Build
 from core.Settings import Settings
 from core.Exceptions import MomError, BuildError, ConfigurationError
-from core.plugins.sourcecode.RevisionInfo import RevisionInfo
 from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
 
 class EmailReporter( Reporter ):
@@ -102,7 +101,13 @@ class EmailReporter( Reporter ):
 		email = Email()
 
 		# build header
-		email.setSubject( '{0} {1} ({2}), {3}'.format( status, instructions.getName(), type, revision, ) )
+		email.setSubject( '{0} {1} ({2}), {3}, {4}'.format( 
+				status,
+				instructions.getName(),
+				type,
+				instructions.getSystemShortName(),
+				revision
+				) )
 		email.setFromAddress( reporterSender )
 
 		# set custom headers

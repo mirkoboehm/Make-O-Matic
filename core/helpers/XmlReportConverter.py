@@ -262,10 +262,10 @@ class XmlReportConverter( MObject ):
 		out = []
 
 		# START: Summary
-		out += wrapper.wrapAndFillLine( "*** Build report: {0}, on {1} ({2})".format( 
+		out += wrapper.wrapAndFillLine( "*** Build report: {0}, {1}".format( 
 				element.attrib["name"],
-				element.attrib["sys-platform"],
-				element.attrib["sys-architecture"] ), '*' )
+				element.attrib["sys-shortname"] ),
+				'*' )
 
 		wrapper.indent()
 		out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
