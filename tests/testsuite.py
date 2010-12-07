@@ -113,24 +113,29 @@ def check_dependencies():
 		return failed_list
 
 	def print_warning( missing_list, optional = False, type = '' ):
-		if missing_list:
-			type = type + ' '
-			missing = ' '.join( missing_list )
-			if optional:
-				force = 'may'
-			else:
-				force = 'will'
-			print( "WARNING: You appear to be missing some {0}dependencies: {1}".format( type, missing ) )
-			print( "This {0} cause test failures and will break some {1}functionality.".format( force, type ) )
+		if not missing_list:
+			return
+
+		type = type + ' '
+		missing = ' '.join( missing_list )
+		if optional:
+			force = 'may'
+		else:
+			force = 'will'
+		print( "WARNING: You appear to be missing some {0}dependencies: {1}".format( type, missing ) )
+		print( "This {0} cause test failures and will break some {1}functionality.".format( force, type ) )
 
 	MApplication()
 
 	missing = check_plugins( DEPENDENCIES )
 	try:
 		import lxml
+		lxml.__class__ # remove unused warning
 	except ImportError:
 		missing.append( 'lxml' )
+
 	optional_missing = check_plugins( OPTIONAL_DEPENDENCIES )
+
 	cxx_missing = check_plugins( CXX_DEPENDENCIES )
 	try:
 		getMakeTool().checkVersion()
@@ -143,20 +148,24 @@ def check_dependencies():
 	print_warning( cxx_missing, True, 'C++' )
 	print_warning( python_missing, True, 'Python' )
 
-	if missing or optional_missing or cxx_missing or python_missing:
-		try:
-			raw_input( 'Press "Enter" to continue...' )
-		except KeyboardInterrupt:
-			print( '' )
-			sys.exit( 1 )
+	# check if this was called directly, if yes: wait for user input on missing deps
+	if __name__ == "__main__":
+		if missing or optional_missing or cxx_missing or python_missing:
+			try:
+				raw_input( 'Press "Enter" to continue...' )
+			except KeyboardInterrupt:
+				print( '' )
+				sys.exit( 1 )
 
 def main():
-	check_dependencies();
+	check_dependencies()
 
 	suite = unittest.TestSuite( map( unittest.TestLoader().loadTestsFromTestCase, CLASSES ) )
 	result = unittest.TextTestRunner( verbosity = 2 ).run( suite )
+
 	sys.stderr.flush()
 	sys.stdout.flush()
+
 	if result.wasSuccessful():
 		print( 'Tests completed successfully.' )
 		sys.exit( 0 )
