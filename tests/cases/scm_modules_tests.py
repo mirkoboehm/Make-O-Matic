@@ -26,12 +26,6 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 	GIT_EXAMPLE = 'git://github.com/defunkt/hub.git'
 	SVN_EXAMPLE = 'http://googletest.googlecode.com/svn/'
 
-	def setUp( self ):
-		MomBuildMockupTestCase.setUp( self )
-
-	def tearDown( self ):
-		MomBuildMockupTestCase.tearDown( self )
-
 	def _initialize( self, scmUrl, revision = None, branch = None, tag = None ):
 		self.project.createScm( scmUrl )
 

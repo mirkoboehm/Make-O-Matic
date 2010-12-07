@@ -27,7 +27,6 @@ import sys
 class EmailerTest( MomTestCase ):
 	'''This test is not part of the test suite, because it will only succeed if an email server is configured properly.'''
 
-
 	def testSendEmail( self ):
 		# force loading settings from configuration files
 		mApp().getSettings().evalConfigurationFiles()

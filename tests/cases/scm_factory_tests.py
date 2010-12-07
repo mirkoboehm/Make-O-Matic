@@ -26,25 +26,22 @@ from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
 class ScmFactoryTests( MomBuildMockupTestCase ):
 
-	def setUp( self ):
-		MomBuildMockupTestCase.setUp( self )
-
-	def checkScm( self, url, type ):
+	def _checkScm( self, url, type ):
 		scm = getScm( url )
 		if type:
 			self.assertTrue( isinstance( scm, type ), 'The descriptor {0} should result in a {1} object!'.format( url, type ) )
 
 	def testCreateGitScm( self ):
-		self.checkScm( 'git:git://github.com/KDAB/Make-O-Matic.git', SCMGit )
-		self.checkScm( 'git://github.com/KDAB/Make-O-Matic.git', SCMGit )
+		self._checkScm( 'git:git://github.com/KDAB/Make-O-Matic.git', SCMGit )
+		self._checkScm( 'git://github.com/KDAB/Make-O-Matic.git', SCMGit )
 
 	def testCreateSvnScm( self ):
-		self.checkScm( 'svn:http://svn.github.com/KDAB/Make-O-Matic', SCMSubversion )
-		self.checkScm( 'http://svn.github.com/KDAB/Make-O-Matic', SCMSubversion )
+		self._checkScm( 'svn:http://svn.github.com/KDAB/Make-O-Matic', SCMSubversion )
+		self._checkScm( 'http://svn.github.com/KDAB/Make-O-Matic', SCMSubversion )
 
 	def testCreateUnknownScm( self ):
 		try:
-			self.checkScm( 'nonsense:nonsense', None )
+			self._checkScm( 'nonsense:nonsense', None )
 		except ConfigurationError:
 			pass # just as expected
 		else:

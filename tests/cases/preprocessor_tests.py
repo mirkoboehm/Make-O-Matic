@@ -31,7 +31,7 @@ class PreprocessorTest( MomTestCase ):
 			msg = '{0} should resolve to {1}'.format( inputString, outputString )
 		self.assertEqual( outputString, prep.processLine( inputString ), msg )
 
-	def testEmptyinputString( self ):
+	def testEmptyInputString( self ):
 		self._runTest( '', '', 'An empty input line should result in an empty output line' )
 
 	def testinputStringWithoutPlaceholders( self ):
