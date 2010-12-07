@@ -40,4 +40,4 @@ def getMakeTool():
 	except ConfigurationError:
 		pass
 
-	raise ConfigurationError( 'Cannot find any valid make tool' )
+	raise ConfigurationError( 'Cannot find any valid make tool. Looked for: {0}'.format( '/'.join( MAKE_TOOLS ) ) )
