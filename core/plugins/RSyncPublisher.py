@@ -35,6 +35,9 @@ class RSyncPublisher( Plugin ):
 		self.setLocalDir( localDir )
 		self.setStep( 'project-upload-packages' )
 
+	def getDescription( self ):
+		return "Upload location: {0}".format( self.getUploadLocation() )
+
 	def setUploadLocation( self, location ):
 		check_for_nonempty_string_or_none( location, 'The rsync upload location must be a nonempty string!' )
 		self.__uploadLocation = location
@@ -101,7 +104,7 @@ class RSyncPublisher( Plugin ):
 		return directory
 
 	def describe( self, prefix, details = None, replacePatterns = True ):
-		super( RSyncPublisher, self ).describe( prefix, self.getUploadLocation(), replacePatterns )
+		super( RSyncPublisher, self ).describe( prefix, self.getDescription(), replacePatterns )
 
 class RSyncPackagesPublisher( RSyncPublisher ):
 	'''A RSync publisher that is pre-configured to publish the packages structure to the default location.'''
