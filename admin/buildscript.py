@@ -20,7 +20,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.DoxygenGenerator import DoxygenGenerator
-from core.plugins.RSyncPublisher import RSyncPublisher
 from core.plugins.Preprocessor import Preprocessor
 from core.helpers.PathResolver import PathResolver
 from core.configurations.PythonConfiguration import PythonConfiguration
@@ -59,11 +58,6 @@ pylint = PyLintChecker( pyLintTool = 'pylint-2.6',
 	)
 pylint.setOptional( True )
 python2.addPlugin( pylint )
-
-# add a RSync publisher (remember to set the default upload location in the configuration file!):
-uploader = RSyncPublisher( localDir = PathResolver( project.getDocsDir ) )
-uploader.setUploadLocation( 'docs.kdab.com:/home/klaralv-web/docs.kdab.net/make-o-matic' )
-project.addPlugin( uploader )
 
 # run:
 build.build()
