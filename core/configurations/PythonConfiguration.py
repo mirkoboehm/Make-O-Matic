@@ -18,12 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Configuration import Configuration
 from core.helpers.RunCommand import RunCommand
+import sys
 
 class PythonConfiguration( Configuration ):
 	'''PythonConfiguration is used to "build" and test software written in Python.
 	It defines the Python executable used by all Python-specific plugins.'''
 
-	def __init__( self, configName = None, executable = 'python', parent = None ):
+	def __init__( self, configName = None, executable = sys.executable, parent = None ):
 		Configuration.__init__( self, configName, parent )
 		self.setExecutable( executable )
 
