@@ -28,6 +28,9 @@ class Analyzer( Plugin ):
 		self._setRequiredMinimumScore( minimumScore )
 
 	def _setScore( self, score, top ):
+		if score <= 0 or top <= 0:
+			return # invalid, do not set score here
+
 		self.__score = [ score, top ]
 
 	def _setReport( self, txt ):
@@ -62,5 +65,5 @@ class Analyzer( Plugin ):
 			return "Step disabled"
 
 		scoreText = " out of ".join( [str( x ) for x in self.getScore()] ) if self.getScore() else "N/A"
-		scoreOkayText = "skipped" if not self.getScore() else ( "passed" if self.isScoreOkay() else "FAILED" )
-		return "Score: {0} -> {1}. Report: {2}".format( scoreText, scoreOkayText, self.getReport() )
+		isScoreOkayText = "skipped" if not self.getScore() else ( "passed" if self.isScoreOkay() else "FAILED" )
+		return "Score: {0} -> {1}. Report: {2}".format( scoreText, isScoreOkayText, self.getReport() or "Empty" )

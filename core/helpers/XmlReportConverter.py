@@ -321,9 +321,9 @@ class XmlReportConverter( MObject ):
 
 				out += ["* Action: {0} *".format( action.find( "logdescription" ).text )]
 				out += ["STDOUT:"]
-				out += [action.find( "stdout" ).text]
+				out += [action.find( "stdout" ).text or ""]
 				out += ["STDERR:"]
-				out += [action.find( "stderr" ).text]
+				out += [action.find( "stderr" ).text or ""]
 				out += " "
 			out += " "
 
