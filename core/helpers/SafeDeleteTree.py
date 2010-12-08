@@ -28,6 +28,6 @@ def rmtree( path ):
 		#FIXME Try and delete path twice (if needed) to work around stupid Windows race condition
 		shutil.rmtree( realpath, True )
 		if os.path.exists( realpath ):
-			time.sleep( 2 )
+			time.sleep( 15 )
 			shutil.rmtree( realpath, False )
 		os.chdir( cwd )
