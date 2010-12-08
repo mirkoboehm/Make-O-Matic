@@ -138,7 +138,7 @@ def check_dependencies():
 	missing = check_plugins( DEPENDENCIES )
 	try:
 		import lxml
-		lxml.__class__ # remove unused warning
+		lxml.__path__ # remove unused warning
 	except ImportError:
 		missing.append( 'lxml' )
 
