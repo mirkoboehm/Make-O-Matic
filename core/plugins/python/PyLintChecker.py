@@ -26,6 +26,7 @@ from core.helpers.RunCommand import RunCommand
 import re
 from core.helpers.GlobalMApp import mApp
 import os
+import sys
 
 class _PyLintCheckerAction( Action ):
 	'''_PyLintCheckerAction executes PyLint and parses it's output'''
@@ -94,7 +95,8 @@ class PyLintChecker( Analyzer ):
 	def __init__( self, pyLintTool = 'pylint', pyLintRcFile = 'pylintrc' , htmlOutputPath = 'pylint.html',
 				modules = None, name = None, minimumSuccessRate = 0.0 ):
 		Analyzer.__init__( self, name, minimumSuccessRate )
-		self._setCommand( pyLintTool )
+		searchPaths = [ os.path.join( sys.prefix, 'Scripts' ), os.path.join( sys.prefix, 'bin' ) ]
+		self._setCommand( pyLintTool, searchPaths )
 		self.setModules( modules )
 		self.setPyLintRcFile( pyLintRcFile )
 		self.setHtmlOutputPath( htmlOutputPath )
