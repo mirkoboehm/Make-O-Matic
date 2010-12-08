@@ -20,6 +20,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
+import sys
 from tests.cases.preprocessor_tests import PreprocessorTest
 from tests.cases.environment_saver_tests import EnvironmentSaverTest
 from tests.cases.buildstatus_persistence_tests import BuildStatusPersistenceTests
@@ -39,7 +40,6 @@ from tests.cases.run_mode_describe_tests import RunModeDescribeTests
 #from tests.cases.emailer_tests import EmailerTest
 from tests.cases.settings_tests import SettingsTests
 from tests.selftest.environment_setup_tests import EnvironmentSetupTests
-import sys
 from tests.cases.pyunittester_tests import PyUnitTesterTest
 from core.plugins.builders.maketools import getMakeTool, MAKE_TOOLS
 from core.Exceptions import ConfigurationError, MomException
@@ -53,6 +53,7 @@ from core.plugins.RSyncPublisher import RSyncPublisher
 from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
 from core.plugins.python.PyLintChecker import PyLintChecker
 from core.MApplication import MApplication
+from tests.cases.analyzer_tests import AnalyzerTest
 
 CLASSES = [
 	# self tests first
@@ -62,6 +63,7 @@ CLASSES = [
 	SimpleCITests,
 
 	# others
+	AnalyzerTest,
 	BuildEnvironmentTests,
 	BuildScriptInterfaceTests,
 	BuildStatusPersistenceTests,

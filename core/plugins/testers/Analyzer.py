@@ -18,14 +18,15 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
+from core.Exceptions import MomError
 
 class Analyzer( Plugin ):
-	def __init__( self, name = None, minimumScore = 0.0 ):
+	def __init__( self, name = None, minimumSuccessRate = 0.0 ):
 		Plugin.__init__( self, name )
 
 		self.__score = None
 		self.__report = None
-		self._setRequiredMinimumScore( minimumScore )
+		self._setRequiredMinimumSuccessRate( minimumSuccessRate )
 
 	def _setScore( self, score, top ):
 		if score <= 0 or top <= 0:
@@ -47,18 +48,21 @@ class Analyzer( Plugin ):
 
 		return self.__report
 
-	def _setRequiredMinimumScore( self, minimumScore ):
-		self.__requiredMinimumScore = minimumScore
+	def _setRequiredMinimumSuccessRate( self, percentage ):
+		if percentage < 0.0 or percentage > 1.0:
+			raise MomError( "Success rate must be an integer in the range of [0.0, 1,0]" )
 
-	def getRequiredMinimumScore( self ):
-		return self.__requiredMinimumScore
+		self.__requiredMinimumSuccessRate = percentage
+
+	def getRequiredMinimumSuccessRate( self ):
+		return self.__requiredMinimumSuccessRate
 
 	def isScoreOkay( self ):
 		if not self.getScore():
 			return True # score is None => no score calculated => okay
 
 		# is: return bool ((score / maxScore ) >= requiredMinimumScore)
-		return ( ( self.getScore()[0] / self.getScore()[1] ) >= self.getRequiredMinimumScore() )
+		return ( ( self.getScore()[0] / self.getScore()[1] ) >= self.getRequiredMinimumSuccessRate() )
 
 	def getDescription( self ):
 		if not self.getInstructions().getStep( "conf-make-test" ).isEnabled():

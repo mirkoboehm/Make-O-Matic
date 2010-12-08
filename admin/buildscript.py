@@ -54,7 +54,7 @@ pylint = PyLintChecker( pyLintTool = 'pylint-2.6',
 	pyLintRcFile = PathResolver( project.getSourceDir, 'pylintrc' ),
 	htmlOutputPath = PathResolver( project.getDocsDir, 'pylint.html' ),
 	modules = [ 'core', 'buildcontrol', 'tools', 'tests' ],
-	minimumScore = 7.5
+	minimumSuccessRate = 0.75
 	)
 pylint.setOptional( True )
 python2.addPlugin( pylint )
