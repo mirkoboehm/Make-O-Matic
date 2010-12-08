@@ -26,9 +26,9 @@ class RunWithTimeoutTest( MomTestCase ):
 	def setUp( self ):
 		MomTestCase.setUp( self )
 		if sys.platform == 'win32':
-			self.sleepCommand = [ 'ping', '127.0.0.1', '-n', '2' ]
+			self.sleepCommand = [ 'ping', '127.0.0.1', '-n', '3' ]
 		else:
-			self.sleepCommand = [ 'sleep', '2']
+			self.sleepCommand = [ 'sleep', '3']
 
 	def testRunWithTimeout( self ):
 		timeout = 1
