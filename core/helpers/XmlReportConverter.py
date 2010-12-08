@@ -268,18 +268,20 @@ class XmlReportConverter( MObject ):
 				'*' )
 
 		wrapper.indent()
-		out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
-
-		# only show exception description if there actually is an exception 
-		if element.find( "exception" ):
-			out += wrapper.wrap( "Description:  {0}".format( string_from_node( element, "exception/description" ) ) )
 
 		# show failed steps if any
 		failedSteps = set( [] )
 		for node in find_nodes_with_attribute_and_value( element, "step", "failed", "True" ):
 			failedSteps.add( node.attrib["name"] )
-		if len( failedSteps ) > 0:
-			out += wrapper.wrap( "Failed steps: {0}".format( ", ".join( failedSteps ) ) )
+
+		out += wrapper.wrap( "Build status: {0} {1}".format( 
+				"success" if int( element.attrib["returncode"] ) == 0 else "ERROR",
+				"({0} failed)".format( ", ".join( failedSteps ) ) if len ( failedSteps ) > 0 else ""
+				) )
+
+		# only show exception description if there actually is an exception 
+		if element.find( "exception" ):
+			out += wrapper.wrap( "Description:  {0}".format( string_from_node( element, "exception/description" ) ) )
 
 		# show client information
 		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
