@@ -29,6 +29,7 @@ import time
 import shutil
 import sys
 from core.Defaults import Defaults
+from core.helpers.SafeDeleteTree import rmtree
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -151,7 +152,7 @@ class Build( MApplication ):
 					mApp().debugN( self, 2, 'moved to "{0}".'.format( newFolder ) )
 				else:
 					try:
-						shutil.rmtree( baseDir )
+						rmtree( baseDir )
 					except ( OSError, shutil.Error ) as o:
 						raise ConfigurationError( 'Cannot remove existing build folder at "{0}": {1}'
 							.format( baseDir, str( o ) ) )

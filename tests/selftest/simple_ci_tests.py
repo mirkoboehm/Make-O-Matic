@@ -27,6 +27,7 @@ from core.MApplication import MApplication
 from buildcontrol.simple_ci import Parameters
 from buildcontrol.simple_ci.Slave import Slave
 from tests.helpers.TestUtils import md5sum
+from core.helpers.SafeDeleteTree import rmtree
 
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
@@ -58,10 +59,7 @@ class SimpleCITests( MomTestCase ):
 		removeDirectories = glob.glob( "make-o-matic*" )
 		removeDirectories.extend( glob.glob( "builds" ) )
 		for directory in removeDirectories:
-			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
-			shutil.rmtree( directory, True )
-			if os.path.exists( directory ):
-				shutil.rmtree( directory, False )
+			rmtree( directory )
 
 	# get the SimpleCI database file path by instantiating an SimpleCiBase instance
 	def _getSimpleCiDatabaseFilename( self ):

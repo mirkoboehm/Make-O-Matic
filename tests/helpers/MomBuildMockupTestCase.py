@@ -28,7 +28,7 @@ from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
 import os
 import sys
-import shutil
+from core.helpers.SafeDeleteTree import rmtree
 
 class MomBuildMockupTestCase( MomTestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
@@ -73,8 +73,4 @@ class MomBuildMockupTestCase( MomTestCase ):
 	def tearDown( self ):
 		MomTestCase.tearDown( self )
 		os.chdir( self.cwd )
-		if os.path.exists( "xmlreporttestbuild" ):
-			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
-			shutil.rmtree( "xmlreporttestbuild", True )
-			if os.path.exists( "xmlreporttestbuild" ):
-				shutil.rmtree( "xmlreporttestbuild", False )
+		rmtree( "xmlreporttestbuild" )

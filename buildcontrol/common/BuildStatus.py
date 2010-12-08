@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-import sqlite3, os, shutil
+import sqlite3, os
 from buildcontrol.common.BuildInfo import BuildInfo
 from core.Exceptions import ConfigurationError
 from core.Settings import Settings
@@ -26,6 +26,7 @@ from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.GlobalMApp import mApp
 from buildcontrol.SubprocessHelpers import extend_debug_prefix
 from core.helpers.EnvironmentSaver import EnvironmentSaver
+from core.helpers.SafeDeleteTree import rmtree
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -210,7 +211,7 @@ where id=?'''\
 		if os.path.isdir( directory ):
 			mApp().debug( self, 'found remainders of a previous build, nuking it...' )
 			try:
-				shutil.rmtree( directory )
+				rmtree( directory )
 				mApp().debug( self, '...that was good!' )
 			except ( OSError, IOError ) as e:
 				raise ConfigurationError( 'Remnants of a previous build exist at "{0}" and cannot be deleted, bad. Reason: {1}.'

@@ -23,8 +23,8 @@ import os
 from core.Settings import Settings
 import unittest
 from core.helpers.GlobalMApp import mApp
-import shutil
 from core.Exceptions import MomError
+from core.helpers.SafeDeleteTree import rmtree
 
 class BuildScriptInterfaceTests( MomTestCase ):
 
@@ -38,11 +38,7 @@ class BuildScriptInterfaceTests( MomTestCase ):
 
 	def tearDown( self ):
 		MomTestCase.tearDown( self )
-		if os.path.exists( "make-o-matic" ):
-			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
-			shutil.rmtree( "make-o-matic", True )
-			if os.path.exists( "make-o-matic" ):
-				shutil.rmtree( "make-o-matic", False )
+		rmtree( "make-o-matic" )
 
 	def testQuerySetting( self ):
 		variable = self.iface.querySetting( Settings.MomVersionNumber )

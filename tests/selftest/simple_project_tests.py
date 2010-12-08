@@ -24,8 +24,8 @@ from core.Settings import Settings
 from core.helpers.RunCommand import RunCommand
 from core.helpers.GlobalMApp import mApp
 from tests.helpers.MomTestCase import MomTestCase
-import shutil
 import glob
+from core.helpers.SafeDeleteTree import rmtree
 
 class SimpleProjectTests( MomTestCase ):
 	'''SimpleProjectTests runs the example_mom_builscript in the three major run modes.
@@ -38,10 +38,7 @@ class SimpleProjectTests( MomTestCase ):
 		MomTestCase.tearDown( self )
 		removeDirectories = glob.glob( "make-o-matic*" )
 		for directory in removeDirectories:
-			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
-			shutil.rmtree( directory, True )
-			if os.path.exists( directory ):
-				shutil.rmtree( directory, False )
+			rmtree( directory )
 
 	def querySetting( self, name ):
 		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, 'query', name ]
