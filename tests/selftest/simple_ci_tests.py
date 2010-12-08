@@ -21,13 +21,13 @@ from tests.helpers.MomTestCase import MomTestCase
 import os
 import unittest
 import sys
-import shutil
 import glob
 from core.MApplication import MApplication
 from buildcontrol.simple_ci import Parameters
 from buildcontrol.simple_ci.Slave import Slave
 from tests.helpers.TestUtils import md5sum
 from core.helpers.SafeDeleteTree import rmtree
+from os import removedirs
 
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''
@@ -36,6 +36,7 @@ class SimpleCITests( MomTestCase ):
 	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
 	SyntaxErrorBuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'syntax-error.py' )
 	ToolName = os.path.join( ThisFilePath, '..', '..', 'tools', 'simple_ci.py' )
+	TestInstanceName = 'simple_ci_tests'
 	CurrentDirectory = os.getcwd()
 
 	DatabaseChecksum = None
@@ -58,11 +59,11 @@ class SimpleCITests( MomTestCase ):
 		os.chdir( self.CurrentDirectory )
 		removeDirectories = glob.glob( "make-o-matic*" )
 		removeDirectories.extend( glob.glob( "builds" ) )
+		removeDirectories.append( self._getSimpleCiDataDir( SimpleCITests.TestInstanceName ) )
 		for directory in removeDirectories:
 			rmtree( directory )
 
-	# get the SimpleCI database file path by instantiating an SimpleCiBase instance
-	def _getSimpleCiDatabaseFilename( self ):
+	def _getSimpleCiDataDir( self, instanceName = None ):
 		# we need to replace the MApplication instance
 		oldInstance = MApplication.instance
 		MApplication.instance = None
@@ -70,12 +71,19 @@ class SimpleCITests( MomTestCase ):
 		# instantiate SimpleCiBase instance
 		params = Parameters.Parameters()
 		params.parse()
+		if instanceName:
+			params.setInstanceName( instanceName )
 		simpleCiInstance = Slave( params )
-		databaseFilename = os.path.join( simpleCiInstance.getDataDir(), 'buildstatus.sqlite' )
+		dir = simpleCiInstance.getDataDir()
 
 		# reset MApplication instance
 		MApplication.instance = oldInstance
-		return databaseFilename
+		return dir
+
+	# get the SimpleCI database file path by instantiating an SimpleCiBase instance
+	def _getSimpleCiDatabaseFilename( self, instanceName = None ):
+		# we need to replace the MApplication instance
+		return os.path.join( self._getSimpleCiDataDir( instanceName ), 'buildstatus.sqlite' )
 
 	def testUsageHelp( self ):
 		cmd = [ sys.executable, SimpleCITests.ToolName, '-h' ]
@@ -83,19 +91,19 @@ class SimpleCITests( MomTestCase ):
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunFindRevisions( self ):
-		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
+		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave', '-n', SimpleCITests.TestInstanceName,
 			'--pause', '1', '-b', SimpleCITests.BuildScriptName ]
 		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunPerformBuilds( self ):
-		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
+		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave', '-n', SimpleCITests.TestInstanceName,
 			'--pause', '1', '-f', SimpleCITests.BuildScriptName ]
-		runner = self.runCommand( cmd, 'simple_ci slave find revisions' )
+		runner = self.runCommand( cmd, 'simple_ci slave perform builds' )
 		self.assertEquals( runner.getReturnCode(), 0 )
 
 	def testSlaveRunFindRevisionsSyntaxError( self ):
-		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave',
+		cmd = [ sys.executable, SimpleCITests.ToolName, '--slave', '-n', SimpleCITests.TestInstanceName,
 			'--pause', '1', '-b', SimpleCITests.SyntaxErrorBuildScriptName ]
 		runner = self.runCommand( cmd, 'simple_ci slave find revisions, build script syntax error' )
 		# simple_ci is supposed to work with broken build scripts

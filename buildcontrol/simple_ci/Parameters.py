@@ -31,6 +31,7 @@ class Parameters( MObject ):
 		self.setFindRevisions( True )
 		self.setPerformBuilds( True )
 		self.setDelay( None )
+		self.setInstanceName( None )
 
 	def setControlDir( self, controlDir ):
 		self.__controlDir = controlDir
@@ -80,6 +81,12 @@ class Parameters( MObject ):
 	def getBuildScripts( self ):
 		return self.__buildScripts
 
+	def setInstanceName( self, name ):
+		self.__instanceName = name
+
+	def getInstanceName( self ):
+		return self.__instanceName
+
 	def parse( self ):
 		"""Parse command line options, give help"""
 		parser = optparse.OptionParser()
@@ -116,7 +123,7 @@ class Parameters( MObject ):
 		if options.delay:
 			self.setDelay( options.delay )
 		if options.instance_name:
-			self.setName( options.instance_name )
+			self.setInstanceName( options.instance_name )
 		self.setBuildScripts( args[1:] )
 
 
