@@ -38,7 +38,10 @@ class SimpleProjectTests( MomTestCase ):
 		MomTestCase.tearDown( self )
 		removeDirectories = glob.glob( "make-o-matic*" )
 		for directory in removeDirectories:
-			shutil.rmtree( directory )
+			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
+			shutil.rmtree( directory, True )
+			if os.path.exists( directory ):
+				shutil.rmtree( directory, False )
 
 	def querySetting( self, name ):
 		cmd = [ sys.executable, SimpleProjectTests.BuildScriptName, 'query', name ]

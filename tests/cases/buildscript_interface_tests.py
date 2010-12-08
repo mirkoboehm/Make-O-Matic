@@ -39,7 +39,10 @@ class BuildScriptInterfaceTests( MomTestCase ):
 	def tearDown( self ):
 		MomTestCase.tearDown( self )
 		if os.path.exists( "make-o-matic" ):
-			shutil.rmtree( "make-o-matic" )
+			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
+			shutil.rmtree( "make-o-matic", True )
+			if os.path.exists( "make-o-matic" ):
+				shutil.rmtree( "make-o-matic", False )
 
 	def testQuerySetting( self ):
 		variable = self.iface.querySetting( Settings.MomVersionNumber )

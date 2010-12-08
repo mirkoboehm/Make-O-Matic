@@ -62,7 +62,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 		cmakeRelease = CMakeBuilder()
 		release.addPlugin( cmakeRelease )
 		release.addPlugin( CTest() )
-		release.addPlugin( CPack( sourcePackage=True ) )
+		release.addPlugin( CPack( sourcePackage = True ) )
 
 		build.getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
 
@@ -74,4 +74,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 		MomTestCase.tearDown( self )
 		os.chdir( self.cwd )
 		if os.path.exists( "xmlreporttestbuild" ):
-			shutil.rmtree( "xmlreporttestbuild" )
+			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
+			shutil.rmtree( "xmlreporttestbuild", True )
+			if os.path.exists( "xmlreporttestbuild" ):
+				shutil.rmtree( "xmlreporttestbuild", False )

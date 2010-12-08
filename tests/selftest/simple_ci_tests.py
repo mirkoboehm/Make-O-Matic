@@ -58,7 +58,10 @@ class SimpleCITests( MomTestCase ):
 		removeDirectories = glob.glob( "make-o-matic*" )
 		removeDirectories.extend( glob.glob( "builds" ) )
 		for directory in removeDirectories:
-			shutil.rmtree( directory )
+			#FIXME Try and delete directory twice (if needed) to work around stupid Windows race condition
+			shutil.rmtree( directory, True )
+			if os.path.exists( directory ):
+				shutil.rmtree( directory, False )
 
 	# get the SimpleCI database file path by instantiating an SimpleCiBase instance
 	def _getSimpleCiDatabaseFilename( self ):
