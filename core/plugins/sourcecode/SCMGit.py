@@ -206,7 +206,7 @@ class SCMGit( SourceCodeProvider ):
 
 	def updateHiddenClone( self ):
 		hiddenClone = self._getHiddenClonePath()
-		self.resolveCommand()
+		self._setCommand( self.resolveCommand() )
 		# check if the clone directory exists, create if necessary: 
 		if os.path.exists( hiddenClone ):
 			if not os.path.isdir( hiddenClone ):
