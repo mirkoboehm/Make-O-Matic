@@ -97,7 +97,6 @@ class Build( MApplication ):
 	def prepare( self ):
 		'''Execute the prepare phase for builds.'''
 		super( Build, self ).prepare()
-		mApp().message( self, 'FIXME CHECK FOR SCM HERE' )
 		# set folder names
 		# the build object does not have a parent, and defines the build base dir:
 		mode = self.getSettings().get( Settings.ScriptRunMode )

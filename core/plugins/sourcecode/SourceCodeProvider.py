@@ -130,6 +130,10 @@ class SourceCodeProvider( Plugin ):
 		for mapping in self.getSetting( self.DefaultUidMappings, False ) or []:
 			self.getSCMUidMapper().addMapping( mapping )
 
+		# We need to check for the SCM here to error if the SCM can't be found for checkout.
+		if self.getCommand():
+			self.__command = self.resolveCommand()
+
 	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 
 		options have been applied to them. It can be used to insert actions into the build
