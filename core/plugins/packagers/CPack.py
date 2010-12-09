@@ -162,14 +162,15 @@ class CPack( PackageProvider ):
 
 	def __init__( self, sourcePackage = False, licenseFile = None, name = None ):
 		PackageProvider.__init__( self, name )
-		self._setCommand( "cpack", getCMakeSearchPaths() )
+		self._setCommand( "cpack" )
+		self._setCommandSearchPaths( getCMakeSearchPaths() )
 
 		if sourcePackage:
 			self.__configFile = "CPackSourceConfig.cmake"
 		else:
 			self.__configFile = "CPackConfig.cmake"
 		self._sourcePackage = sourcePackage
-		self._setPackageArguments( [ "--verbose", "--config", self.__configFile ] )
+		self._setCommandArguments( [ "--verbose", "--config", self.__configFile ] )
 		self._licenseFile = licenseFile
 
 	def makePackageStep( self ):

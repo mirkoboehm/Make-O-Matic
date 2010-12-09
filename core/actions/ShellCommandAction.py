@@ -26,9 +26,9 @@ class ShellCommandAction( Action ):
 	"""ShellCommandAction encapsulates the execution of one command in the Step class. 
 	It is mostly used internally, but can be of general use as well."""
 
-	def __init__( self, command = None, timeout = None, combineOutput = True ):
+	def __init__( self, command = None, timeout = None, combineOutput = True, searchPaths = None ):
 		Action.__init__( self )
-		self.setCommand( command, timeout )
+		self.setCommand( command, timeout, searchPaths )
 		self.__combineOutput = combineOutput
 		self.__runner = None
 
@@ -36,13 +36,17 @@ class ShellCommandAction( Action ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
 		return '{0}'.format( ' '.join( self.getCommand() ) )
 
-	def setCommand( self, command, timeOutPeriod = None ):
+	def setCommand( self, command, timeOutPeriod = None, searchPaths = None ):
 		"""Set the shell command"""
-		if timeOutPeriod != None:
-			check_for_nonnegative_int( timeOutPeriod, 'invalid timeout period, valid periods are [0..inf) or None for no timeout' )
 		check_for_list_of_strings( command, "The shell command must be a list of strings." )
+		if timeOutPeriod != None:
+			check_for_nonnegative_int( timeOutPeriod, 'invalid timeout period, valid periods are [0..inf] or None for no timeout' )
+		if searchPaths is None:
+			searchPaths = []
+		check_for_list_of_strings( searchPaths, "The search paths need to be a list of strings." )
 		self.__command = command
 		self.__timeOutPeriod = timeOutPeriod
+		self.__searchPaths = searchPaths
 
 	def getCommand( self ):
 		"""Returns the command"""
@@ -55,7 +59,7 @@ class ShellCommandAction( Action ):
 
 	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
-		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, combineOutput = self.__combineOutput )
+		self.__runner = RunCommand( self.__command, self.__timeOutPeriod, self.__combineOutput, self.__searchPaths )
 		if self.getWorkingDirectory() != None:
 			self.__runner.setWorkingDir( self.getWorkingDirectory() )
 		self._getRunner().run()

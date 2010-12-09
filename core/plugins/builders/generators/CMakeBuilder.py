@@ -66,7 +66,8 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 
 	def __init__( self, name = None, inSourceBuild = False ):
 		MakefileGeneratorBuilder.__init__( self, name )
-		self._setCommand( 'cmake', getCMakeSearchPaths() )
+		self._setCommand( 'cmake' )
+		self._setCommandSearchPaths( getCMakeSearchPaths() )
 		self.setInSourceBuild( inSourceBuild )
 		self._setOutOfSourceBuildSupported( True )
 		self.__cmakeVariables = []

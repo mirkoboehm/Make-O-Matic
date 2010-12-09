@@ -48,6 +48,7 @@ class _PyLintCheckerAction( Action ):
 		\return 0 if minimum score is met, otherwise 1"""
 
 		cmd = [ self._getPyLintChecker().getCommand() ]
+		paths = self._getPyLintChecker().getCommandSearchPaths()
 
 		args = [ ]
 		if self._getPyLintChecker().getPyLintRcFile():
@@ -62,7 +63,7 @@ class _PyLintCheckerAction( Action ):
 			return 0
 		# First, run PyLint with parseable output, and retrieve the score and comment:
 		parseableCommand = cmd + [ '--output-format=parseable' ] + args + self._getPyLintChecker().getModules()
-		runner1 = RunCommand( parseableCommand, 1800 )
+		runner1 = RunCommand( parseableCommand, 1800, searchPaths = paths )
 		runner1.run()
 		if runner1.getReturnCode() >= 32:
 			mApp().debugN( self, 2, 'error running pylint to produce the parseable report' )
@@ -96,7 +97,8 @@ class PyLintChecker( Analyzer ):
 				modules = None, name = None, minimumSuccessRate = 0.0 ):
 		Analyzer.__init__( self, name, minimumSuccessRate )
 		searchPaths = [ os.path.join( sys.prefix, 'Scripts' ), os.path.join( sys.prefix, 'bin' ) ]
-		self._setCommand( pyLintTool, searchPaths )
+		self._setCommand( pyLintTool )
+		self._setCommandSearchPaths( searchPaths )
 		self.setModules( modules )
 		self.setPyLintRcFile( pyLintRcFile )
 		self.setHtmlOutputPath( htmlOutputPath )

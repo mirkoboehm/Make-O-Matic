@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.helpers.TypeCheckers import check_for_positive_int, check_for_nonempty_string, \
-	check_for_list_of_strings
+	check_for_list_of_strings, check_for_int
 from core.helpers.RunCommand import RunCommand
 
 class MakeTool():
@@ -25,28 +25,37 @@ class MakeTool():
 
 	def __init__( self ):
 		self.__command = None
+		self.__commandSearchPaths = None
 		self.__versionParameter = "--version"
 		self.__versionOutputLine = 0
+		self.__versionReturnCode = 0
 		self.__jobs = 1
 
-	def checkVersion( self, expectedReturnCode = 0 ):
-		RunCommand( [ self.getCommand() ] ).checkVersion( 
+	def checkVersion( self ):
+		RunCommand( [ self.getCommand() ], searchPaths = self.getCommandSearchPaths() ).checkVersion(
 			self.getVersionParameter(),
 			self.getVersionOutputLine(),
-			expectedReturnCode = 0
+			self.getVersionReturnCode()
 		)
 
-	def _setCommand( self, command, searchPaths = None ):
+	def resolveCommand( self ):
+		RunCommand( [ self.getCommand() ], searchPaths = self.getCommandSearchPaths() ).resolveCommand()
+
+	def _setCommand( self, command ):
 		check_for_nonempty_string( command, 'The make tool command must be a non-empty string' )
+		self.__command = command
+
+	def _setCommandSearchPaths( self, searchPaths ):
 		if searchPaths == None:
 			searchPaths = []
-		check_for_list_of_strings( searchPaths, 'The search paths must be a list of strings' )
-		runCommand = RunCommand( [ command ] )
-		runCommand.resolveCommand( searchPaths )
-		self.__command = runCommand.getCommand()[0]
+		check_for_list_of_strings( searchPaths, 'The make tool command search paths must be a list of strings' )
+		self.__commandSearchPaths = searchPaths
 
 	def getCommand( self ):
 		return self.__command
+
+	def getCommandSearchPaths( self ):
+		return self.__commandSearchPaths
 
 	def _setVersionParameter( self, versionParameter ):
 		check_for_nonempty_string( versionParameter, 'The make tool version parameter must be a non-empty string.' )
@@ -61,6 +70,13 @@ class MakeTool():
 
 	def getVersionOutputLine( self ):
 		return self.__versionOutputLine
+
+	def _setVersionReturnCode( self, versionReturnCode ):
+		check_for_int( versionReturnCode, 'The make tool version expected return code must be an integer.' )
+		self.__versionReturnCode = versionReturnCode
+
+	def getVersionReturnCode( self ):
+		return self.__versionReturnCode
 
 	def setJobs( self, jobs ):
 		check_for_positive_int( jobs, 'The make tool number of jobs must be a positive integer.' )

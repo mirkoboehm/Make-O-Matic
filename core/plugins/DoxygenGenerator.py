@@ -34,7 +34,8 @@ class DoxygenGenerator( Plugin ):
 			from core.helpers.RegistryHelper import getPathsFromRegistry
 			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\doxygen_is1\\Inno Setup: App Path" ]
 			searchPaths += getPathsFromRegistry( keys, "bin" )
-		self._setCommand( "doxygen", searchPaths )
+		self._setCommand( "doxygen" )
+		self._setCommandSearchPaths( searchPaths )
 		self.__doxygenFile = None
 		self.setDocsDir( None )
 
@@ -68,7 +69,7 @@ class DoxygenGenerator( Plugin ):
 		# run doxygen
 		step = self.getInstructions().getStep( 'project-create-docs' )
 		cmd = [ self.getCommand(), str( self.getDoxygenFile() ) ]
-		doxygenCall = ShellCommandAction( cmd )
+		doxygenCall = ShellCommandAction( cmd, searchPaths = self.getCommandSearchPaths() )
 		doxygenCall.setWorkingDirectory( docsDir )
 		step.addMainAction( doxygenCall )
 

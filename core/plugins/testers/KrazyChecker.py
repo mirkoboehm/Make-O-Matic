@@ -43,7 +43,6 @@ class KrazyChecker( Analyzer ):
 
 	def __init__( self, name = None ):
 		Analyzer.__init__( self, name )
-
 		self._setCommand( "krazy2" )
 
 	def runMethod( self, action ):

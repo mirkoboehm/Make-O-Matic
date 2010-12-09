@@ -41,7 +41,7 @@ from tests.cases.run_mode_describe_tests import RunModeDescribeTests
 from tests.cases.settings_tests import SettingsTests
 from tests.selftest.environment_setup_tests import EnvironmentSetupTests
 from tests.cases.pyunittester_tests import PyUnitTesterTest
-from core.plugins.builders.maketools import getMakeTool, MAKE_TOOLS
+from core.plugins.builders.maketools import getMakeTool, getMakeToolNames
 from core.Exceptions import ConfigurationError, MomException
 from core.plugins.sourcecode.SCMSubversion import SCMSubversion
 from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder
@@ -148,7 +148,7 @@ def check_dependencies():
 	try:
 		getMakeTool().checkVersion()
 	except ( MomException, ConfigurationError ):
-		cxx_missing.append( '/'.join( MAKE_TOOLS ) )
+		cxx_missing.append( '/'.join( getMakeToolNames() ) )
 	python_missing = check_plugins( PYTHON_DEPENDENCIES )
 
 	print_warning( missing )

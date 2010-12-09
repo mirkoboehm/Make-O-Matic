@@ -30,7 +30,8 @@ class RSyncPublisher( Plugin ):
 	def __init__( self, name = None, uploadLocation = None, localDir = None ):
 		Plugin.__init__( self, name )
 		searchPaths = [ "C:/Program Files/cwRsync/bin" ]
-		self._setCommand( "rsync", searchPaths )
+		self._setCommand( "rsync" )
+		self._setCommandSearchPaths( searchPaths )
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
 		self.setStep( 'project-upload-packages' )
@@ -72,7 +73,7 @@ class RSyncPublisher( Plugin ):
 		if str( self.getLocalDir() ):
 			fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
 			cmd = [ self.getCommand(), '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ]
-			action = ShellCommandAction( cmd, 7200 )
+			action = ShellCommandAction( cmd, 7200, searchPaths = self.getCommandSearchPaths() )
 			action.setWorkingDirectory( self.getInstructions().getBaseDir() )
 			step.addMainAction( action )
 		else:

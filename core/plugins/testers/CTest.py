@@ -26,7 +26,8 @@ class CTest( TestProvider ):
 
 	def __init__( self, name = None ):
 		TestProvider.__init__( self, name )
-		self._setCommand( "ctest", getCMakeSearchPaths() )
+		self._setCommand( "ctest" )
+		self._setCommandSearchPaths( getCMakeSearchPaths() )
 		self._setCommandArguments( ["--verbose"] )
 
 	def saveReport( self ):

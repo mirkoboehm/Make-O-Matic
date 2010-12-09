@@ -93,7 +93,6 @@ class Plugin( MObject ):
 	def resolveCommand( self ):
 		runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
 		runCommand.checkVersion()
-		return runCommand.getCommand()[0]
 
 	def performPreFlightCheck( self ):
 		'''This method handles the execution of the pre flight check.
@@ -106,7 +105,7 @@ class Plugin( MObject ):
 
 		def findCommandAndPreFlightCheck():
 			if self.getCommand():
-				self.__command = self.resolveCommand()
+				self.resolveCommand()
 			self.preFlightCheck()
 
 		if self.isOptional():
@@ -175,16 +174,21 @@ class Plugin( MObject ):
 		cmd += [str( x ) for x in self.getCommandArguments()] # str() evaluates the PathResolver objects
 		return cmd
 
-	def getCommand( self ):
-		return self.__command
-
-	def _setCommand( self, command, searchPaths = None ):
-		check_for_nonempty_string( command, "The command needs to be a non-empty string." )
+	def _setCommandSearchPaths( self, searchPaths ):
 		if searchPaths is None:
 			searchPaths = []
 		check_for_list_of_strings( searchPaths, "The search paths need to be a list of strings." )
-		self.__command = command
 		self.__commandSearchPaths = searchPaths
+
+	def getCommandSearchPaths( self ):
+		return self.__commandSearchPaths
+
+	def getCommand( self ):
+		return self.__command
+
+	def _setCommand( self, command ):
+		check_for_nonempty_string( command, "The command needs to be a non-empty string." )
+		self.__command = command
 
 	def setEnabled( self, onOff ):
 		self.__enabled = onOff

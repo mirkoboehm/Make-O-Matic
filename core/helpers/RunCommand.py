@@ -21,7 +21,7 @@ import subprocess, time
 from threading import Thread
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths, check_for_list_of_strings
 import os.path
 import sys
 from core.Exceptions import ConfigurationError
@@ -111,7 +111,11 @@ class RunCommand( MObject ):
 		self.__stdErr = None
 		self.__returnCode = None
 		self.__timedOut = False
-		self.__searchPaths = searchPaths
+		if searchPaths is None:
+			self.__searchPaths = []
+		else:
+			check_for_list_of_strings( searchPaths, "The search paths must be a list of strings." )
+			self.__searchPaths = searchPaths
 
 	def getTimeoutSeconds( self ):
 		return self.__timeoutSeconds
@@ -153,17 +157,14 @@ class RunCommand( MObject ):
 	def getCommand( self ):
 		return self.__cmd
 
-	def resolveCommand( self, searchPaths ):
+	def resolveCommand( self ):
 		"""Sets the full path to the command by searching PATH and other specified search paths"""
 
-		def isExecutable( fpath ):
-			return os.path.exists( fpath ) and os.access( fpath, os.X_OK )
-
-		if searchPaths is None:
-			searchPaths = []
+		def isExecutableFullPath( fpath ):
+			return os.path.sep in fpath and os.path.exists( fpath ) and os.access( fpath, os.X_OK )
 
 		command = self.__cmd[0]
-		if isExecutable( command ):
+		if isExecutableFullPath( command ):
 			return
 
 		fpath, fname = os.path.split( command )
@@ -171,7 +172,7 @@ class RunCommand( MObject ):
 		if fpath:
 			return
 
-		paths = searchPaths
+		paths = self.__searchPaths
 		paths += os.environ["PATH"].split( os.pathsep )
 
 		# These paths have been added by the local configuration so complain when we can't find them
@@ -187,14 +188,14 @@ class RunCommand( MObject ):
 		for path in paths:
 			path = os.path.normpath( path )
 			executableFile = os.path.join( path, fname )
-			if isExecutable( executableFile ):
+			if isExecutableFullPath( executableFile ):
 				self.__cmd[0] = executableFile
 				return
 			if sys.platform == "win32":
 				commandExtensions = os.environ["PATHEXT"].split( os.pathsep )
 				for extension in commandExtensions:
 					executableFileAndExtension = executableFile + extension
-					if isExecutable( executableFileAndExtension ):
+					if isExecutableFullPath( executableFileAndExtension ):
 						self.__cmd[0] = executableFileAndExtension
 						return
 
@@ -206,29 +207,12 @@ class RunCommand( MObject ):
 		@param parameter Command parameter
 		@param lineNumber Line number of version string in command output
 		@param expectedReturnCode Return code which command should return on success"""
-		self.resolveCommand( self.__searchPaths )
+		self.resolveCommand()
 
-		# backup old data
-		oldCmd = self.getCommand()
-		oldStdOut = self.getStdOut()
-		oldStdErr = self.getStdErr()
-		oldReturnCode = self.getReturnCode()
-
-		# run version check
-		newcmd = [ self.__cmd[0], parameter ]
-		self.__cmd = newcmd
-		runner = _CommandRunner ( self )
-		runner.setCombineOutput( True )
-		runner.start()
-		runner.join()
-		returnCode = self.getReturnCode()
-		getStdOut = self.getStdOut()
-
-		# reset
-		self.__cmd = oldCmd
-		self.__stdOut = oldStdOut
-		self.__stdErr = oldStdErr
-		self.__returnCode = oldReturnCode
+		checkVersionCommand = RunCommand( [ self.__cmd[0], parameter ], combineOutput = True, searchPaths = self.__searchPaths )
+		checkVersionCommand.run()
+		returnCode = checkVersionCommand.getReturnCode()
+		getStdOut = checkVersionCommand.getStdOut()
 
 		if returnCode == expectedReturnCode:
 			version = getStdOut.decode().splitlines()[ lineNumber ].strip()
@@ -236,10 +220,11 @@ class RunCommand( MObject ):
 			return version
 		else:
 			raise ConfigurationError( "RunCommand::checkVersion: {0} returned {1}, expected: {2}."
-				.format( newcmd[0], returnCode, expectedReturnCode ) )
+				.format( self.__cmd[0], returnCode, expectedReturnCode ) )
 
 	def run( self ):
-		self.resolveCommand( self.__searchPaths )
+		self.resolveCommand()
+
 		timeoutString = 'without a timeout'
 		if self.getTimeoutSeconds() != None:
 			timeoutString = 'with timeout of {0} seconds'.format( self.getTimeoutSeconds() )

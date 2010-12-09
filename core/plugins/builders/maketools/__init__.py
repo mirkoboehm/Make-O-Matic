@@ -22,22 +22,20 @@ from core.plugins.builders.maketools.GNUMakeTool import GNUMakeTool
 from core.plugins.builders.maketools.JomTool import JomTool
 from core.Exceptions import ConfigurationError
 
-MAKE_TOOLS = [ 'jom', 'nmake', 'make' ]
+def getMakeTools():
+	return [ JomTool, NMakeTool, GNUMakeTool ]
+
+def getMakeToolNames():
+	return [ tool().getCommand() for tool in getMakeTools() ]
 
 def getMakeTool():
-	try:
-		return JomTool()
-	except ConfigurationError:
-		pass
+	for MakeTool in getMakeTools():
+		tool = MakeTool()
+		try:
+			tool.resolveCommand()
+		except ConfigurationError:
+			pass
+		else:
+			return tool
 
-	try:
-		return NMakeTool()
-	except ConfigurationError:
-		pass
-
-	try:
-		return GNUMakeTool()
-	except ConfigurationError:
-		pass
-
-	raise ConfigurationError( 'Cannot find any valid make tool. Looked for: {0}'.format( '/'.join( MAKE_TOOLS ) ) )
+	raise ConfigurationError( 'Cannot find any valid make tool. Looked for: {0}'.format( '/'.join( getMakeToolNames() ) ) )

@@ -22,6 +22,7 @@ from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 import multiprocessing
 from core.plugins.builders import maketools
+from core.plugins.builders.maketools import getMakeTool
 
 class MakeBasedBuilder( Builder ):
 	'''MakeBasedBuilder implements a base class for builders that implement variants of a build process that uses the make tools.'''
@@ -30,6 +31,7 @@ class MakeBasedBuilder( Builder ):
 		Builder.__init__( self, name )
 		self.__makeTool = maketools.getMakeTool()
 		self._setCommand( self.__makeTool.getCommand() )
+		self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
 
 	def preFlightCheck( self ):
 		self.getMakeTool().checkVersion()
@@ -45,7 +47,7 @@ class MakeBasedBuilder( Builder ):
 		tool.setJobs( multiprocessing.cpu_count() )
 		command = [ tool.getCommand() ]
 		command.extend( tool.getArguments() )
-		action = ShellCommandAction( command )
+		action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-make' )
 		step.addMainAction( action )
@@ -56,7 +58,7 @@ class MakeBasedBuilder( Builder ):
 		tool.setJobs( 1 )
 		command = [ tool.getCommand() ]
 		command.append( mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) )
-		action = ShellCommandAction( command )
+		action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
 		action.setWorkingDirectory( self._getBuildDir() )
 		step = self.getInstructions().getStep( 'conf-make-install' )
 		step.addMainAction( action )

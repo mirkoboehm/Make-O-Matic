@@ -46,7 +46,8 @@ class SCMSubversion( SourceCodeProvider ):
 			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
 				+ "\\Uninstall\\CollabNet Subversion Client\\UninstallString" ]
 			searchPaths += getPathsFromRegistry( keys, ".." )
-		self._setCommand( "svn", searchPaths )
+		self._setCommand( "svn" )
+		self._setCommandSearchPaths( searchPaths )
 		self.__revisionInfoCache = {} # key: revision, value: RevisionInfo instance
 		self.__rootTrunk = False
 
@@ -83,7 +84,7 @@ class SCMSubversion( SourceCodeProvider ):
 
 		revisionParameter = ['-r', str( self.getRevision() )] if self.getRevision() else []
 		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ] + revisionParameter
-		runner = RunCommand( cmd )
+		runner = RunCommand( cmd, searchPaths = self.getCommandSearchPaths() )
 		runner.run()
 
 		if runner.getReturnCode() == 0:
@@ -112,7 +113,7 @@ class SCMSubversion( SourceCodeProvider ):
 		if revision == 0:
 			cmd.extend( ['--limit', '1' ] )
 		cmd.extend( ['-rHEAD:{0}'.format( str( revision ).strip() ), self.getUrl() ] )
-		runner = RunCommand( cmd, 3600 )
+		runner = RunCommand( cmd, 3600, searchPaths = self.getCommandSearchPaths() )
 		runner.run()
 
 		if runner.getReturnCode() == 0:
@@ -143,7 +144,7 @@ class SCMSubversion( SourceCodeProvider ):
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
 		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ]
-		runner = RunCommand( cmd )
+		runner = RunCommand( cmd, searchPaths = self.getCommandSearchPaths() )
 		runner.run()
 
 		if runner.getReturnCode() == 0:
@@ -176,7 +177,7 @@ class SCMSubversion( SourceCodeProvider ):
 		if remotePath:
 			location += '/' + remotePath
 		cmd = [ self.getCommand(), 'co', '-r', self.getRevision(), location ]
-		runner = RunCommand( cmd )
+		runner = RunCommand( cmd, searchPaths = self.getCommandSearchPaths() )
 		runner.setWorkingDir( path )
 		runner.run()
 		if runner.getReturnCode() == 0:

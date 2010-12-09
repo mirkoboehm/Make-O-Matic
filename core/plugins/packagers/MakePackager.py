@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.packagers.PackageProvider import PackageProvider
-from core.actions.ShellCommandAction import ShellCommandAction
 from core.plugins.builders import maketools
 
 class MakePackager( PackageProvider ):
@@ -27,17 +26,8 @@ class MakePackager( PackageProvider ):
 		PackageProvider.__init__( self, name )
 		self.__makeTool = maketools.getMakeTool()
 		self._setCommand( self.__makeTool.getCommand() )
-		self._setPackageArgument( "package" )
-
-	def makePackageStep( self ):
-		"""Create package for the project."""
-		step = self.getInstructions().getStep( 'conf-package' )
-		makePackage = ShellCommandAction( self.getCommand(), 'package' )
-		makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
-		step.addMainAction( makePackage )
+		self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
+		self._setCommandArguments( ["package"] )
 
 	def preFlightCheck( self ):
-		self.getMakeTool().checkVersion()
-
-	def getMakeTool( self ):
-		return self.__makeTool
+		self.__makeTool.checkVersion()

@@ -31,6 +31,7 @@ class GNUMakeTool( MakeTool ):
 				"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MSYS-1.0_is1\\Inno Setup: App Path" ]
 			searchPaths += getPathsFromRegistry( keys, "bin" )
 		self._setCommand( 'make' )
+		self._setCommandSearchPaths( searchPaths )
 
 	def getArguments( self ):
 		return [ '-j{0}'.format( self._getJobs() )  ]

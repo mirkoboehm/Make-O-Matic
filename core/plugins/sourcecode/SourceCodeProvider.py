@@ -132,7 +132,7 @@ class SourceCodeProvider( Plugin ):
 
 		# We need to check for the SCM here to error if the SCM can't be found for checkout.
 		if self.getCommand():
-			self.__command = self.resolveCommand()
+			self.resolveCommand()
 
 	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 

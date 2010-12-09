@@ -37,7 +37,7 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 				# FIXME: We should probably check this somehow but can't be done until after preFlightCheck
 				self._projectFile = "{0}.pro".format( project.getName() )
 			projectFilePath = os.path.join( sourceDirectory, self._projectFile )
-			self._setMakeToolArguments( [ projectFilePath ] )
+			self._setCommandArguments( [ projectFilePath ] )
 		MakefileGeneratorBuilder.createConfigureActions( self )
 
 	def createConfMakeInstallActions( self ):

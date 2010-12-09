@@ -56,7 +56,8 @@ class SCMGit( SourceCodeProvider ):
 			from core.helpers.RegistryHelper import getPathsFromRegistry
 			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Git_is1\\Inno Setup: App Path" ]
 			searchPaths += getPathsFromRegistry( keys, "bin" )
-		self._setCommand( "git", searchPaths )
+		self._setCommand( "git" )
+		self._setCommandSearchPaths( searchPaths )
 		self.__cloneArmy = self._findCloneArmyDir()
 		self.__cachedCheckoutsDir = self._findCachedCheckoutsDir()
 		self.__revisionInfo = RevisionInfo()
@@ -99,7 +100,7 @@ class SCMGit( SourceCodeProvider ):
 		formatStr = "%cn{0}%ce{0}%s\n\n%b{0}%ct{0}%ci{0}%H{0}%h".format( sep )
 
 		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), '{0}^..{0}'.format( self.getTreeish() )]
-		runner = RunCommand( cmd, 3600 )
+		runner = RunCommand( cmd, 3600, searchPaths = self.getCommandSearchPaths() )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -121,7 +122,7 @@ class SCMGit( SourceCodeProvider ):
 		"""Print revisions committed since the specified revision."""
 		self.updateHiddenClone()
 		cmd = [ self.getCommand(), 'log', '{0}..'.format( revision ) ]
-		runner = RunCommand( cmd, 3600 )
+		runner = RunCommand( cmd, 3600, searchPaths = self.getCommandSearchPaths() )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -156,7 +157,7 @@ class SCMGit( SourceCodeProvider ):
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
 		self.updateHiddenClone()
-		runner = RunCommand( [ self.getCommand(), 'log', '-n1' ] )
+		runner = RunCommand( [ self.getCommand(), 'log', '-n1' ], searchPaths = self.getCommandSearchPaths() )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
 
@@ -174,10 +175,12 @@ class SCMGit( SourceCodeProvider ):
 		step = self.getInstructions().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
-		updateClone = ShellCommandAction( [ self.getCommand(), 'clone', '--local', '--depth', '1', self._getHiddenClonePath(), "." ] )
+		updateCommand = [ self.getCommand(), 'clone', '--local', '--depth', '1', self._getHiddenClonePath(), "." ]
+		updateClone = ShellCommandAction( updateCommand, searchPaths = self.getCommandSearchPaths() )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
-		checkout = ShellCommandAction( [ self.getCommand(), 'checkout', self.getTreeish() ] )
+		checkoutCommand = [ self.getCommand(), 'checkout', self.getTreeish() ]
+		checkout = ShellCommandAction( checkoutCommand, searchPaths = self.getCommandSearchPaths() )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 
@@ -206,13 +209,13 @@ class SCMGit( SourceCodeProvider ):
 
 	def updateHiddenClone( self ):
 		hiddenClone = self._getHiddenClonePath()
-		self._setCommand( self.resolveCommand() )
 		# check if the clone directory exists, create if necessary: 
 		if os.path.exists( hiddenClone ):
 			if not os.path.isdir( hiddenClone ):
 				raise MomError( 'hidden clone exists at "{0}", but is not a directory. Help!'.format( hiddenClone ) )
 			# FIXME get timeout value from settings
-			runner = RunCommand( [ self.getCommand(), 'fetch', '--all' ], 1200, True )
+			fetchCommand = [ self.getCommand(), 'fetch', '--all' ]
+			runner = RunCommand( fetchCommand, 1200, True, searchPaths = self.getCommandSearchPaths() )
 			runner.setWorkingDir( hiddenClone )
 			runner.run()
 			if runner.getReturnCode() == 0:
@@ -222,8 +225,8 @@ class SCMGit( SourceCodeProvider ):
 		else:
 			if not os.path.exists( self.getCloneArmyDir() ):
 				os.makedirs( self.getCloneArmyDir() )
-			runner = RunCommand( [ self.getCommand(), 'clone', '--mirror',
-				self.getUrl(), make_foldername_from_string( self.getUrl() ) ], 1200, True )
+			cloneCommand = [ self.getCommand(), 'clone', '--mirror', self.getUrl(), make_foldername_from_string( self.getUrl() ) ]
+			runner = RunCommand( cloneCommand, 1200, True, searchPaths = self.getCommandSearchPaths() )
 			runner.setWorkingDir( self.getCloneArmyDir() )
 			runner.run()
 
@@ -247,7 +250,7 @@ class SCMGit( SourceCodeProvider ):
 			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to treeish {1}'.format( 
 				self.getCachedCheckoutsDir(), treeish ) )
 			# reset the hidden clone to a branch
-			resetRunner = RunCommand( [ self.getCommand(), 'fetch', '--all' ] )
+			resetRunner = RunCommand( [ self.getCommand(), 'fetch', '--all' ], searchPaths = self.getCommandSearchPaths() )
 			resetRunner.setWorkingDir( self._getCachedCheckoutPath() )
 			resetRunner.run()
 			if resetRunner.getReturnCode() == 0:
@@ -260,7 +263,7 @@ class SCMGit( SourceCodeProvider ):
 				self.getCachedCheckoutsDir(), treeish ) )
 			# create the clone
 			cloneCmd = [ self.getCommand(), 'clone', self._getHiddenClonePath(), self.__getTempRepoName() ]
-			cloneRunner = RunCommand( cloneCmd )
+			cloneRunner = RunCommand( cloneCmd, searchPaths = self.getCommandSearchPaths() )
 			cloneRunner.setWorkingDir( self.getCachedCheckoutsDir() )
 			cloneRunner.run()
 			if cloneRunner.getReturnCode() != 0:
@@ -268,7 +271,7 @@ class SCMGit( SourceCodeProvider ):
 					self.getCachedCheckoutsDir() ) )
 		# now checkout the requested treeish
 		checkoutCmd = [ self.getCommand(), 'checkout', treeish ]
-		checkoutRunner = RunCommand( checkoutCmd )
+		checkoutRunner = RunCommand( checkoutCmd, searchPaths = self.getCommandSearchPaths() )
 		checkoutRunner.setWorkingDir( self._getCachedCheckoutPath() )
 		checkoutRunner.run()
 		if checkoutRunner.getReturnCode() != 0:

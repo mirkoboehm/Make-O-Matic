@@ -26,10 +26,8 @@ class MakeTester( TestProvider ):
 		TestProvider.__init__( self, name )
 		self.__makeTool = maketools.getMakeTool()
 		self._setCommand( self.__makeTool.getCommand() )
+		self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
 		self._setCommandArguments( ["test"] )
 
 	def preFlightCheck( self ):
-		self.getMakeTool().checkVersion()
-
-	def getMakeTool( self ):
-		return self.__makeTool
+		self.__makeTool.checkVersion()

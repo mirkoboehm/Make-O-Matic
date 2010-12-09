@@ -18,30 +18,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
-from core.helpers.TypeCheckers import check_for_list_of_strings
 from core.actions.ShellCommandAction import ShellCommandAction
 
 class PackageProvider( Plugin ):
 
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
-		self.__packageArguments = None
-
-	def _setPackageArguments( self, packageArguments ):
-		check_for_list_of_strings( packageArguments, "The package argument needs to be a list of strings" )
-		self.__packageArguments = packageArguments
-
-	def _getPackageArguments( self ):
-		return self.__packageArguments
 
 	def makePackageStep( self ):
 		"""Create package for the project."""
-		if self._getPackageArguments() == None:
+		if self.getCommandArguments() == None:
 			raise NotImplementedError()
 		step = self.getInstructions().getStep( 'conf-package' )
 		command = [ self.getCommand() ]
-		command.extend( self._getPackageArguments() )
-		makePackage = ShellCommandAction( command )
+		command.extend( self.getCommandArguments() )
+		makePackage = ShellCommandAction( command, searchPaths = self.getCommandSearchPaths() )
 		makePackage.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makePackage )
 		return makePackage
