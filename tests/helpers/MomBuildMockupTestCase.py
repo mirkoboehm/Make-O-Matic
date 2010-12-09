@@ -20,15 +20,13 @@
 from core.Project import Project
 from core.Settings import Settings
 from core.environments.Environments import Environments
-from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder
 from core.Configuration import Configuration
-from core.plugins.testers.CTest import CTest
-from core.plugins.packagers.CPack import CPack
 from core.Build import Build
 from tests.helpers.MomTestCase import MomTestCase
 import os
 import sys
 from core.helpers.SafeDeleteTree import rmtree
+from core.plugins.DoxygenGenerator import DoxygenGenerator
 
 class MomBuildMockupTestCase( MomTestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
@@ -54,15 +52,14 @@ class MomBuildMockupTestCase( MomTestCase ):
 		else:
 			environments = Environments()
 
-		debug = Configuration( 'Debug', environments, )
-		cmakeDebug = CMakeBuilder()
-		debug.addPlugin( cmakeDebug )
+		# add some plugin
+		dox = DoxygenGenerator()
+		dox.setEnabled( False )
+		project.addPlugin( dox )
 
-		release = Configuration( 'Release', environments )
-		cmakeRelease = CMakeBuilder()
-		release.addPlugin( cmakeRelease )
-		release.addPlugin( CTest() )
-		release.addPlugin( CPack( sourcePackage = True ) )
+		# add some configurations
+		Configuration( 'Debug', environments )
+		Configuration( 'Release', environments )
 
 		build.getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
 

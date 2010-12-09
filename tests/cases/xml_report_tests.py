@@ -83,7 +83,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEquals( doc.find( './/action' ), None )
 
 		if etree.__name__ == "lxml.etree":
-			self.assertNotEquals( doc.find( './/plugin[@name="CMakeBuilder"]' ), None )
+			self.assertNotEquals( doc.find( './/plugin[@name="DoxygenGenerator"]' ), None )
 
 	def testEnvironmentExpand( self ):
 		self._build( 'c' )
