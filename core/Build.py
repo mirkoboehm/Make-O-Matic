@@ -174,6 +174,12 @@ class Build( MApplication ):
 					.format( self.getLogDir(), self.getName(), e ) )
 		super( Build, self ).setup()
 
+	def runPreFlightChecks( self ):
+		if self.getSettings().get( Settings.ScriptRunMode ) in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
+			return super( Build, self ).runExecute()
+		# no pre-flight check in query and print modes
+		return None
+
 	def runExecute( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
 			self.describeRecursively()
