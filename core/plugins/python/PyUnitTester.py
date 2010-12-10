@@ -80,6 +80,9 @@ class PyUnitTester( TestProvider ):
 		if not self.getTestProgram():
 			raise ConfigurationError( 'A Python test program needs to be specified (setTestProgram)!' )
 
+	def setup( self ):
 		# set runners
+		pyConf = self.getInstructions()
 		self._setCommand( pyConf.getExecutable() )
 		self._setCommandArguments( [self.getTestProgram()] )
+		super( PyUnitTester, self ).setup()
