@@ -202,11 +202,10 @@ where id=?'''\
 		rev = buildInfo.getRevision()
 		name = make_foldername_from_string( buildInfo.getProjectName() )
 		# find suitable names for the different build dirs:
-		# <build type>/<project, branch or tag name>-revision/
-		# FIXME get baseDir from settings
-		baseDir = 'builds'
+		baseDir = os.path.join( os.getcwd(), 'builds' )
+		buildRoot = mApp().getSettings().get( Settings.SimpleCIBuildDirectory, required = False ) or baseDir
 		subfolder = make_foldername_from_string( rev )
-		directory = os.path.normpath( os.path.join( os.getcwd(), baseDir, buildType, name, subfolder ) )
+		directory = os.path.normpath( os.path.join( buildRoot, name, buildType, subfolder ) )
 		# prepare build directory:
 		if os.path.isdir( directory ):
 			mApp().debug( self, 'found remainders of a previous build, nuking it...' )

@@ -104,6 +104,7 @@ class Defaults( MObject ):
 	# ----- simple_ci settings: 
 	SimpleCIBuildJobCap = 'simple_ci.build.cap'
 	SimpleCIScriptDebugLevel = 'simple_ci.build.loglevel'
+	SimpleCIBuildDirectory = 'simple_ci.build.directory'
 
 	def getDefaultSettings( self ):
 		home = os.path.expanduser( "~" )
@@ -176,5 +177,6 @@ class Defaults( MObject ):
 		# ----- simple_ci settings:
 		defaultSettings[ Defaults.SimpleCIBuildJobCap ] = 8
 		defaultSettings[ Defaults.SimpleCIScriptDebugLevel ] = 0
+		defaultSettings[ Defaults.SimpleCIBuildDirectory ] = None
 
 		return defaultSettings
