@@ -79,7 +79,7 @@ class Email( MObject ):
 		self._getMessage()['Subject'] = h
 
 	def getSubject( self ):
-		return str( self._getMessage()['Subject'] )
+		return unicode( self._getMessage()['Subject'] )
 
 	def addTextAttachment( self, text, filename, useCompression = False ):
 		if useCompression:

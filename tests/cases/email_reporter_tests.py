@@ -92,6 +92,7 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		scm = self.build.getProject().getScm()
 
 		scm.setRevision( "---" )
+		self.build.runPreFlightChecks()
 
 		email = self.reporter.createEmail()
 		self.assertTrue( "N/A" in email.getSubject() )
