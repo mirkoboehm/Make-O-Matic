@@ -147,9 +147,7 @@ class Step( MObject ):
 					for action in actions:
 						if not self.__failed or action.getIgnorePreviousFailure():
 							result = action.executeAction( self, instructions )
-							resultText = 'successful'
-							if result != 0:
-								resultText = 'failed'
+							resultText = 'successful' if result == 0 else 'failed'
 							mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
 							if result != 0:
 								self.__failed = True
