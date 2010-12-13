@@ -314,11 +314,18 @@ class Instructions( MObject ):
 		'''Execute one individual step.
 		This method does not recurse to child objects.'''
 		step = self.getStep( stepName )
-		if step.isEmpty():
-			mApp().debugN( self, 4, 'step "{0}" is empty for {1}'.format( step.getName(), self.getName() ) )
-			return
-		if not step.execute( self ):
-			mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
+		try:
+			if not step.execute( self ):
+				mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
+		finally:
+			if not step.isEmpty():
+				noOfActions = len( step.getPreActions() ) + len( step.getMainActions() ) + len( step.getPostActions() )
+				mApp().debug( self, '{0}: actions: {1}, status: {2}, result: {3}, duration: {4}'.format( 
+					step.getName(),
+					noOfActions,
+					Step.Status.Descriptions[ step.getStatus() ],
+					Step.Result.Descriptions[ step.getResult() ],
+					step.getTimeKeeper().deltaString() ) )
 
 	def runWrapups( self ):
 		with EnvironmentSaver():

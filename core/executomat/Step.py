@@ -145,46 +145,42 @@ class Step( MObject ):
 	def execute( self, instructions ):
 		"""Execute the step"""
 		check_for_nonempty_string( self.getName(), "Cannot execute a step with no name!" )
-		mApp().debugN( self, 2, 'starting step "{0}"'.format( self.getName() ) )
+		if not self.isEmpty():
+			mApp().debugN( self, 2, 'starting step "{0}"'.format( self.getName() ) )
 		self.setStatus( Step.Status.Started )
-		try:
-			if not self.__enabled:
-				self.setStatus( Step.Status.Skipped_Disabled )
-				return True
-			if instructions.hasFailed() and not self.getExecuteOnFailure():
-				self.setStatus( Step.Status.Skipped_Error )
-				return True
-			with self.getTimeKeeper():
-				self._logEnvironment( instructions )
+		if not self.isEnabled():
+			self.setStatus( Step.Status.Skipped_Disabled )
+			return True
+		# (usually) abort if another step has failed for this Instructions object:
+		if instructions.hasFailed() and not self.getExecuteOnFailure():
+			self.setStatus( Step.Status.Skipped_Error )
+			return True
+		with self.getTimeKeeper():
+			self._logEnvironment( instructions )
 
-				logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
-				logfileName = os.path.join( instructions.getLogDir(), logfileName )
-				self.setLogfileName( logfileName )
+			logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
+			logfileName = os.path.join( instructions.getLogDir(), logfileName )
+			self.setLogfileName( logfileName )
 
-				phases = [ [ 'preparatory actions', self.__preActions ],
-						[ 'main actions', self.__mainActions ],
-						[ 'post actions', self.__postActions ] ]
-				for phase, actions in phases:
-					if not actions:
-						mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
-					for action in actions:
-						resultText = 'skipped'
-						if self.getResult() != Step.Result.Failure or action.getIgnorePreviousFailure():
-							result = action.executeAction( self, instructions )
-							resultText = 'successful' if result == 0 else 'failed'
-							if result != 0:
-								self.setResult( Step.Result.Failure )
-							elif self.getResult() == Step.Result.NotExecuted:
-								# the result is only updated if there was no other update before: 
-								self.setResult( Step.Result.Success )
-						else:
-							self.setStatus( Step.Status.Skipped_Error )
-						mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
-				self.setStatus( Step.Status.Finished )
-				return self.getResult() != Step.Result.Failure
-		finally:
-			mApp().debug( self, 'status: {0}, result: {1}, duration: {2}'.format( Step.Status.Descriptions[ self.getStatus() ],
-				Step.Result.Descriptions[ self.getResult() ], self.__timeKeeper.deltaString() ) )
+			phases = [ [ 'preparatory actions', self.__preActions ],
+					[ 'main actions', self.__mainActions ],
+					[ 'post actions', self.__postActions ] ]
+			self.setResult( Step.Result.Success )
+			for phase, actions in phases:
+				if not actions:
+					mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
+				for action in actions:
+					resultText = 'skipped'
+					if self.getResult() != Step.Result.Failure or action.getIgnorePreviousFailure():
+						result = action.executeAction( self, instructions )
+						resultText = 'successful' if result == 0 else 'failed'
+						if result != 0:
+							self.setResult( Step.Result.Failure )
+					else:
+						self.setStatus( Step.Status.Skipped_Error )
+					mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
+			self.setStatus( Step.Status.Finished )
+			return self.getResult() != Step.Result.Failure
 
 	def describe( self, prefix, details = None, replacePatterns = True ):
 		if not self.isEmpty():
