@@ -163,7 +163,7 @@ class SCMSubversion( SourceCodeProvider ):
 		step = self.getInstructions().getStep( 'project-checkout' )
 		cmd = [ self.getCommand(), '--non-interactive', 'checkout',
 			'-r{0}'.format( self.getRevision() or 'HEAD' ), self.getUrl(), '.' ]
-		checkout = ShellCommandAction( cmd )
+		checkout = ShellCommandAction( cmd, searchPaths = self.getCommandSearchPaths() )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
 		return step
