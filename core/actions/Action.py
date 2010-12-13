@@ -25,6 +25,7 @@ from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 from core.helpers.XmlUtils import create_child_node
 from core.helpers.EnvironmentSaver import EnvironmentSaver
+import traceback
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -136,6 +137,8 @@ class Action( MObject ):
 					except MomException as e:
 						self._aborted()
 						mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
+						mApp().debugN( self, 2, traceback.format_exc() )
+
 						self._setResult( e.getReturnCode() )
 					if step.getLogfileName():
 						try:
