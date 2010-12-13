@@ -27,7 +27,6 @@ from buildcontrol.simple_ci import Parameters
 from buildcontrol.simple_ci.Slave import Slave
 from tests.helpers.TestUtils import md5sum
 from core.helpers.SafeDeleteTree import rmtree
-from os import removedirs
 
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''

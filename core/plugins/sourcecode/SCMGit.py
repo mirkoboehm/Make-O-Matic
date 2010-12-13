@@ -247,15 +247,13 @@ class SCMGit( SourceCodeProvider ):
 					self.getCachedCheckoutsDir(), e ) )
 		if os.path.exists( self._getCachedCheckoutPath() ):
 			# update an existing repository
-			mApp().debugN( self, 2, 'updating the cached checkout at "{0}" to treeish {1}'.format( 
+			mApp().debugN( self, 3, 'updating the cached checkout at "{0}" to treeish {1}'.format( 
 				self.getCachedCheckoutsDir(), treeish ) )
 			# reset the hidden clone to a branch
 			resetRunner = RunCommand( [ self.getCommand(), 'fetch', '--all' ], searchPaths = self.getCommandSearchPaths() )
 			resetRunner.setWorkingDir( self._getCachedCheckoutPath() )
 			resetRunner.run()
-			if resetRunner.getReturnCode() == 0:
-				mApp().debugN( self, 4, 'fetched revisions into the hidden clone' )
-			else:
+			if resetRunner.getReturnCode() != 0:
 				raise MomError( 'error fetching revisions into the hidden clone' )
 			# FIXME we may not be on the master branch:
 		else:

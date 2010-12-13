@@ -21,14 +21,26 @@ import os
 from core.Exceptions import MomError, ConfigurationError
 from core.MObject import MObject
 from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.helpers.TypeCheckers import check_for_string
+from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_string
 from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 
 class Step( MObject ):
+	class Result( object ):
+		'''Enumerated values representing the result of a step.'''
+		NotExecuted, Success, Failure = range ( 3 )
+		Descriptions = [ 'not executed', 'success', 'failure' ]
+
+	class Status( object ):
+		'''Enumerated values representing the status of a step.'''
+		New, Skipped_Disabled, Started, Finished, Skipped_Error = range( 5 )
+		Descriptions = [ 'new', 'skipped (disabled)', 'started', 'finished', 'skipped (previous error)' ]
+
 	"""An individual step of an Executomat run."""
 	def __init__( self, stepName = None ):
 		MObject.__init__( self, stepName )
+		self.setStatus( Step.Status.New )
+		self.setResult( Step.Result.NotExecuted )
 		self.__timeKeeper = TimeKeeper()
 		self.__enabled = True
 		self.__ignorePreviousFailure = False
@@ -36,20 +48,31 @@ class Step( MObject ):
 		self.__mainActions = [] # list of main actions
 		self.__postActions = [] # list of post actions
 		self.__logfileName = None
-		self.__failed = False
-		self.__skipped = False
 
-	def hasFailed( self ):
-		return self.__failed
+	def setStatus( self, status ):
+		if status in ( Step.Status.New, Step.Status.Skipped_Disabled, Step.Status.Started,
+					Step.Status.Finished, Step.Status.Skipped_Error ):
+			self.__status = status
+		else:
+			raise MomError( 'Unknown step status {0}'.format( status ) )
+
+	def getStatus( self ):
+		return self.__status
+
+	def setResult( self, result ):
+		if result in ( Step.Result.NotExecuted, Step.Result.Success, Step.Result.Failure ):
+			self.__result = result
+		else:
+			raise MomError( 'Unknown step result {0}'.format( result ) )
+
+	def getResult( self ):
+		return self.__result
 
 	def setEnabled( self, enabled = True ):
 		self.__enabled = enabled
 
 	def isEnabled( self ):
 		return self.__enabled
-
-	def wasSkipped( self ):
-		return self.__skipped
 
 	def setIgnorePreviousFailure( self, doIt ):
 		"""Set execute-on-failure. If true, the command will be executed, even if a previous command of the same sequence failed."""
@@ -121,17 +144,17 @@ class Step( MObject ):
 
 	def execute( self, instructions ):
 		"""Execute the step"""
+		check_for_nonempty_string( self.getName(), "Cannot execute a step with no name!" )
+		mApp().debugN( self, 2, 'starting step "{0}"'.format( self.getName() ) )
+		self.setStatus( Step.Status.Started )
 		try:
+			if not self.__enabled:
+				self.setStatus( Step.Status.Skipped_Disabled )
+				return True
+			if instructions.hasFailed() and not self.getExecuteOnFailure():
+				self.setStatus( Step.Status.Skipped_Error )
+				return True
 			with self.getTimeKeeper():
-				if not self.getName():
-					raise MomError( "Cannot execute a step with no name!" )
-				if not self.__enabled:
-					mApp().debugN( self, 2, 'step "{0}" disabled, skipping.'.format( self.getName() ) )
-					return True
-				if instructions.hasFailed() and not self.getExecuteOnFailure():
-					self.__skipped = True
-					mApp().debugN( self, 4, 'aborting because of errors earlier in the build' )
-					return True
 				self._logEnvironment( instructions )
 
 				logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
@@ -145,18 +168,23 @@ class Step( MObject ):
 					if not actions:
 						mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
 					for action in actions:
-						if not self.__failed or action.getIgnorePreviousFailure():
+						resultText = 'skipped'
+						if self.getResult() != Step.Result.Failure or action.getIgnorePreviousFailure():
 							result = action.executeAction( self, instructions )
 							resultText = 'successful' if result == 0 else 'failed'
-							mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
 							if result != 0:
-								self.__failed = True
+								self.setResult( Step.Result.Failure )
+							elif self.getResult() == Step.Result.NotExecuted:
+								# the result is only updated if there was no other update before: 
+								self.setResult( Step.Result.Success )
 						else:
-							resultText = 'skipped'
-							self.__skipped = True
-				return not self.__failed
+							self.setStatus( Step.Status.Skipped_Error )
+						mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
+				self.setStatus( Step.Status.Finished )
+				return self.getResult() != Step.Result.Failure
 		finally:
-			mApp().debugN( self, 3, 'duration: {0}'.format( self.__timeKeeper.deltaString() ) )
+			mApp().debug( self, 'status: {0}, result: {1}, duration: {2}'.format( Step.Status.Descriptions[ self.getStatus() ],
+				Step.Result.Descriptions[ self.getResult() ], self.__timeKeeper.deltaString() ) )
 
 	def describe( self, prefix, details = None, replacePatterns = True ):
 		if not self.isEmpty():
@@ -172,8 +200,9 @@ class Step( MObject ):
 		node.attributes["isEmpty"] = str ( self.isEmpty() )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
-		node.attributes["failed"] = str( self.hasFailed() )
-		node.attributes["skipped"] = str( self.wasSkipped() )
+		# FIXME Kevin: use status and result as properties?
+		node.attributes["failed"] = str( self.getResult() == Step.Result.Failure )
+		node.attributes["skipped"] = str( self.getStatus() == Step.Status.Skipped_Error )
 
 		if self.getPreActions():
 			for action in self.getPreActions():

@@ -145,7 +145,7 @@ class Instructions( MObject ):
 	def getFailedStep( self ):
 		'''Return the first step that failed during execution, or None.'''
 		for step in self.getSteps():
-			if step.hasFailed():
+			if step.getResult() == Step.Result.Failure:
 				return step
 		return None
 
@@ -213,6 +213,7 @@ class Instructions( MObject ):
 		node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
 		node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
 		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
+		# FIXME Kevin: better use Step.getStatus() and Step.getResult()
 		node.attributes["failed"] = str( self.hasFailed() )
 
 		if recursive:
@@ -316,12 +317,8 @@ class Instructions( MObject ):
 		if step.isEmpty():
 			mApp().debugN( self, 4, 'step "{0}" is empty for {1}'.format( step.getName(), self.getName() ) )
 			return
-		mApp().debugN( self, 2, 'now executing step "{0}"'.format( step.getName() ) )
-		if step.execute( self ):
-			mApp().debugN( self, 1, 'success: "{0}"'.format( step.getName() ) )
-		else:
+		if not step.execute( self ):
 			mApp().registerReturnCode( BuildError( 'dummy' ).getReturnCode() )
-			mApp().debugN( self, 1, 'failure: "{0}"'.format( step.getName() ) )
 
 	def runWrapups( self ):
 		with EnvironmentSaver():

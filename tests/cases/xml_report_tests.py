@@ -29,6 +29,7 @@ from core.loggers.ConsoleLogger import ConsoleLogger
 import os.path
 from core.helpers.XmlUtils import xml_compare
 from tests.helpers.TestUtils import replace_bound_method
+from core.executomat.Step import Step
 
 try:
 	from lxml import etree
@@ -172,10 +173,10 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self._build()
 
 		def failed_new( self ):
-			return True
+			return Step.Result.Failure
 
 		step = self.project.getStep( 'build-cleanup' )
-		replace_bound_method( step, step.hasFailed, failed_new )
+		replace_bound_method( step, step.getResult, failed_new )
 
 		converter = XmlReportConverter( self.getXmlReport() )
 		logText = converter.convertToFailedStepsLog()
