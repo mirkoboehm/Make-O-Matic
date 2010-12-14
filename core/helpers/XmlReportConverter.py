@@ -338,6 +338,14 @@ class XmlReportConverter( MObject ):
 
 		return "\n".join( out )
 
+	def _statesToStringList( self, element ):
+		states = []
+		if element.attrib["isEnabled"] == "False":
+			states.append( "disabled" )
+		if element.attrib["isOptional"] == "True":
+			states.append( "optional" )
+		return states
+
 	def _toText( self, element, wrapper, ignoredTags ):
 		"""Recursive method for parsing an ElementTree and converting it to plain text"""
 
@@ -381,19 +389,15 @@ class XmlReportConverter( MObject ):
 				out += wrapper.wrap( "Plugins:" )
 
 		elif element.tag == "plugin":
-			name = element.attrib["name"]
-			description = element.find( "plugindescription" ).text
-
 			# show plugin info like optional or disabled status
-			environmentsState = []
-			if element.attrib["isEnabled"] == "False":
-				environmentsState.append( "disabled" )
-			if element.attrib["isOptional"] == "True":
-				environmentsState.append( "optional" )
-			if len( environmentsState ) > 0:
-				name = "{0} [{1}]".format( name, ", ".join( environmentsState ) )
+			states = self._statesToStringList( element )
+			if len( states ) > 0:
+				name = "{0} [{1}]".format( element.attrib["name"], ", ".join( states ) )
+			else:
+				name = element.attrib["name"]
 
 			# show description if any
+			description = element.find( "plugindescription" ).text
 			if description is not None:
 				out += wrapper.wrap( "{0}: {1}".format( name, description ) )
 			else:
@@ -421,14 +425,12 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "environments":
 			out += " "
-			name = element.attrib["name"]
-			environmentsState = []
-			if element.attrib["isEnabled"] == "False":
-				environmentsState.append( "disabled" )
-			if element.attrib["isOptional"] == "True":
-				environmentsState.append( "optional" )
-			if len( environmentsState ) > 0:
-				name = "{0} [{1}]".format( name, ", ".join( environmentsState ) )
+
+			states = self._statesToStringList( element )
+			if len( states ) > 0:
+				name = "{0} [{1}]".format( name, ", ".join( states ) )
+			else:
+				name = element.attrib["name"]
 
 			out += wrapper.wrap( "Environments: {0} (Depends on: {1})".format( 
 					name,
