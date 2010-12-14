@@ -437,6 +437,10 @@ class XmlReportConverter( MObject ):
 					element.find( "dependencies" ).text
 			) )
 
+			# if there are no configurations attached: hide environments content, stop recursion here
+			if len( element.getchildren() ) == 0:
+				return out
+
 		elif element.tag == "environment":
 			out += " "
 			out += wrapper.wrap( "Environment: {0}".format( element.attrib["name"] ) )

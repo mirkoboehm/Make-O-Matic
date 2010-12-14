@@ -198,9 +198,11 @@ h5 {
 			</xsl:if>
 			(Depends on: <xsl:value-of select="dependencies" />)
 		</h2>
-		<div class="tag-environments">
-			<xsl:apply-templates/>
-		</div>
+		<xsl:if test="count(./configuration) > 0">
+			<div class="tag-environments">
+				<xsl:apply-templates/>
+			</div>
+		</xsl:if>
 	</xsl:template>
 	<xsl:template match="dependencies"/> <!-- do not show this tag -->
 
