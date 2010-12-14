@@ -188,7 +188,13 @@ h5 {
 	</xsl:template>
 
 	<xsl:template match="environments">
-		<h2>Environments: <xsl:value-of select="@name" /> (Depends on: <xsl:value-of select="dependencies" />)</h2>
+		<h2>
+			Environments: <xsl:value-of select="@name" />
+			<xsl:if test="@isOptional = 'True'">
+				[Optional]
+			</xsl:if>
+			(Depends on: <xsl:value-of select="dependencies" />)
+		</h2>
 		<div class="tag-environments">
 			<xsl:apply-templates/>
 		</div>

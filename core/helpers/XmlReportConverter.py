@@ -391,7 +391,7 @@ class XmlReportConverter( MObject ):
 			if element.attrib["isOptional"] == "True":
 				pluginState.append( "optional" )
 			if len( pluginState ) > 0:
-				name = "{0} ({1})".format( name, ", ".join( pluginState ) )
+				name = "{0} [{1}]".format( name, ", ".join( pluginState ) )
 
 			# show description if any
 			if description is not None:
@@ -414,15 +414,19 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "configuration":
 			out += " "
-			out += wrapper.wrap( "Configuration: {0}, ({1})".format( 
+			out += wrapper.wrap( "Configuration: {0} [{1}]".format( 
 					element.attrib["name"],
 					"success" if element.attrib["failed"] == "False" else "FAILED"
 			) )
 
 		elif element.tag == "environments":
 			out += " "
+			name = element.attrib["name"]
+			if element.attrib["isOptional"] == "True":
+				name = "{0} [{1}]".format( name, "optional" )
+
 			out += wrapper.wrap( "Environments: {0} (Depends on: {1})".format( 
-					element.attrib["name"],
+					name,
 					element.find( "dependencies" ).text
 			) )
 

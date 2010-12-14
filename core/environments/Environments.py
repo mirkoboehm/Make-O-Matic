@@ -64,7 +64,7 @@ class Environments( ConfigurationBase ):
 		environment is optional and no matches are found, the configurations will not be built, but no error is raised.'''
 		self.__optional = onOff
 
-	def getOptional( self ):
+	def isOptional( self ):
 		'''Return if this environment is optional.'''
 		return self.__optional
 
@@ -101,7 +101,7 @@ class Environments( ConfigurationBase ):
 		environments = self.findMatchingEnvironments()
 		if mode in ( Settings.EnvironmentExpansionMode_BuildAll, Settings.EnvironmentExpansionMode_BuildHighestScoring ):
 			if not environments:
-				if self.getOptional():
+				if self.isOptional():
 					mApp().message( self, 'No environments found, and this environment is optional, continuing.' )
 				else:
 					raise ConfigurationError( 'No environment found that matches the project requirements!' )
@@ -237,6 +237,7 @@ class Environments( ConfigurationBase ):
 
 	def createXmlNode( self, document ):
 		node = super( Environments, self ).createXmlNode( document )
+		node.attributes["isOptional"] = str( not self.isOptional() )
 		create_child_node( document, node, "dependencies", ', '.join( self.getDependencies() ) )
 		return node
 
