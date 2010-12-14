@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # 
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-# Author: Mirko Boehm <mirko@kdab.com>
+# Author: Mirko Boehm <mirko.boehm@kdab.com>
 # 
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -166,7 +166,6 @@ class SCMSubversion( SourceCodeProvider ):
 		checkout = ShellCommandAction( cmd, searchPaths = self.getCommandSearchPaths() )
 		checkout.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( checkout )
-		return step
 
 	def fetchRepositoryFolder( self, remotePath ):
 		# FIXME Mike abstract cache location

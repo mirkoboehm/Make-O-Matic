@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.plugins.sourcecode.SCMGit import SCMGit
 from core.plugins.sourcecode.SCMSubversion import SCMSubversion
+from core.plugins.sourcecode.LocalSourceDirectory import LocalSourceDirectory
 from core.Exceptions import ConfigurationError
 import re
 
@@ -29,7 +30,7 @@ def getScm( url, name = None ):
 	'git://github.com/KDAB/Make-O-Matic.git' auto-detects a GIT repository.
 	'''
 	scmProviders = {}
-	for scm in [ SCMGit( name ), SCMSubversion( name ) ]:
+	for scm in [ SCMGit( name ), SCMSubversion( name ), LocalSourceDirectory( name ) ]:
 		scmProviders[scm.getIdentifier()] = scm
 
 	scmRegex = '(' + '|'.join( scmProviders ) + ')'

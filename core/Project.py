@@ -29,6 +29,7 @@ from core.actions.filesystem.MkDirAction import MkDirAction
 from core.actions.filesystem.RmDirAction import RmDirAction
 from core.BuildInstructions import BuildInstructions
 from core.plugins.sourcecode import getScm
+from core.helpers.TypeCheckers import check_for_path_or_none
 
 class Project( BuildInstructions ):
 	"""A Project represents an entity to build. 
@@ -40,6 +41,7 @@ class Project( BuildInstructions ):
 		"""Set up the build steps, parse the command line arguments."""
 		BuildInstructions.__init__( self, projectName, parent )
 		mApp().getSettings().set( Settings.ProjectName, projectName )
+		self.setSourceDir( None )
 		self.__scm = None
 
 	def getBuild( self ):
@@ -70,8 +72,15 @@ class Project( BuildInstructions ):
 		path = os.path.join( self.getBaseDir(), mApp().getSettings().get( name ) )
 		return os.path.normpath( path )
 
+	def setSourceDir( self, srcDir ):
+		check_for_path_or_none( srcDir, 'The source directory needs to be a non-empty string!' )
+		self.__srcDir = srcDir
+
 	def getSourceDir( self ):
-		return self.__getNormPath( Settings.ProjectSourceDir )
+		if self.__srcDir:
+			return self.__srcDir
+		else:
+			return self.__getNormPath( Settings.ProjectSourceDir )
 
 	def getTempDir( self ):
 		return self.__getNormPath( Settings.ProjectTempDir )
@@ -88,9 +97,6 @@ class Project( BuildInstructions ):
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
 		create = self.getStep( 'build-create-folders' )
-		delete = self.getStep( 'build-cleanup' )
-		create.addMainAction( MkDirAction( self.getDocsDir() ) ) # will be cleaned up as part of packages
-		for folder in ( self.getSourceDir(), self.getTempDir() ):
+		for folder in ( self.getSourceDir(), self.getDocsDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
-			delete.prependMainAction( RmDirAction( folder ) )
 

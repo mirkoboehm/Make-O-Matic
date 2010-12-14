@@ -139,8 +139,6 @@ class SourceCodeProvider( Plugin ):
 		options have been applied to them. It can be used to insert actions into the build
 		steps, for example."""
 		self.makeCheckoutStep()
-		# FIXME it needs to be decided by the builder if this gets called!
-		# self.makeExportStep( project )
 
 	def getXslTemplates( self ):
 		return { ReportFormat.HTML:
