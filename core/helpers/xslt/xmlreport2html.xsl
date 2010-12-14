@@ -193,6 +193,9 @@ h5 {
 			<xsl:if test="@isOptional = 'True'">
 				[Optional]
 			</xsl:if>
+			<xsl:if test="@isEnabled = 'False'">
+				[Disabled]
+			</xsl:if>
 			(Depends on: <xsl:value-of select="dependencies" />)
 		</h2>
 		<div class="tag-environments">

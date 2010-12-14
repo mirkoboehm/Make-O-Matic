@@ -385,13 +385,13 @@ class XmlReportConverter( MObject ):
 			description = element.find( "plugindescription" ).text
 
 			# show plugin info like optional or disabled status
-			pluginState = []
+			environmentsState = []
 			if element.attrib["isEnabled"] == "False":
-				pluginState.append( "disabled" )
+				environmentsState.append( "disabled" )
 			if element.attrib["isOptional"] == "True":
-				pluginState.append( "optional" )
-			if len( pluginState ) > 0:
-				name = "{0} [{1}]".format( name, ", ".join( pluginState ) )
+				environmentsState.append( "optional" )
+			if len( environmentsState ) > 0:
+				name = "{0} [{1}]".format( name, ", ".join( environmentsState ) )
 
 			# show description if any
 			if description is not None:
@@ -422,8 +422,13 @@ class XmlReportConverter( MObject ):
 		elif element.tag == "environments":
 			out += " "
 			name = element.attrib["name"]
+			environmentsState = []
+			if element.attrib["isEnabled"] == "False":
+				environmentsState.append( "disabled" )
 			if element.attrib["isOptional"] == "True":
-				name = "{0} [{1}]".format( name, "optional" )
+				environmentsState.append( "optional" )
+			if len( environmentsState ) > 0:
+				name = "{0} [{1}]".format( name, ", ".join( environmentsState ) )
 
 			out += wrapper.wrap( "Environments: {0} (Depends on: {1})".format( 
 					name,

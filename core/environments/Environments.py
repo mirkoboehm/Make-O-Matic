@@ -238,6 +238,7 @@ class Environments( ConfigurationBase ):
 	def createXmlNode( self, document ):
 		node = super( Environments, self ).createXmlNode( document )
 		node.attributes["isOptional"] = str( self.isOptional() )
+		node.attributes["isEnabled"] = str( self.getChildren() > 0 ) # no configurations as children => disabled
 		create_child_node( document, node, "dependencies", ', '.join( self.getDependencies() ) )
 		return node
 
