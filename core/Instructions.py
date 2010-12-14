@@ -304,6 +304,9 @@ class Instructions( MObject ):
 			self.execute()
 			[ child.execute() for child in self.getChildren() ]
 
+	def _stepsShouldExecute( self ):
+		return mApp().getReturnCode() == 0
+
 	def _executeStepRecursively( self, instructions, name ):
 		'''Execute one step of the build sequence recursively, for this object, and all child objects.'''
 		self.executeStep( name )

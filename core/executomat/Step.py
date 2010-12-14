@@ -152,7 +152,7 @@ class Step( MObject ):
 			self.setStatus( Step.Status.Skipped_Disabled )
 			return True
 		# (usually) abort if another step has failed for this Instructions object:
-		if instructions.hasFailed() and not self.getExecuteOnFailure():
+		if not instructions._stepsShouldExecute() and not self.getExecuteOnFailure():
 			self.setStatus( Step.Status.Skipped_Error )
 			return True
 		with self.getTimeKeeper():
