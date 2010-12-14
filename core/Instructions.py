@@ -305,6 +305,9 @@ class Instructions( MObject ):
 			[ child.execute() for child in self.getChildren() ]
 
 	def _stepsShouldExecute( self ):
+		'''Return if the steps should be executed for this object. 
+		By default, steps should be executed if no error happened so far. Steps with the execute-on-failure property set to True
+		will execute even if this method returns False.'''
 		return mApp().getReturnCode() == 0
 
 	def _executeStepRecursively( self, instructions, name ):

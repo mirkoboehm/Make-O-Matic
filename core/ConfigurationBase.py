@@ -31,3 +31,18 @@ class ConfigurationBase( BuildInstructions ):
 			project = self.getParent().getProject()
 		assert isinstance( project, Project )
 		return project
+
+	def _stepsShouldExecute( self ):
+		'''Override the behavior that defines if Steps should be executed for Configurations.
+		Configurations should be built, even if another Configuration produced an error before. Configurations should only be 
+		skipped if an error happened in a instructions object, because that might influence the build for the Configuration.'''
+		# if there was no problem so far, stick to the base class implementation
+		if super( ConfigurationBase, self )._stepsShouldExecute():
+			return True
+		# check if self or any of the instructions objects caused it
+		instructions = self
+		while instructions:
+			if instructions.hasFailed(): return False
+			instructions = instructions.getParent()
+		return True
+
