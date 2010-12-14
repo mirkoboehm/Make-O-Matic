@@ -329,8 +329,8 @@ class Instructions( MObject ):
 				mApp().debug( self, '{0}: actions: {1}, status: {2}, result: {3}, duration: {4}'.format( 
 					step.getName(),
 					noOfActions,
-					Step.Status.Descriptions[ step.getStatus() ],
-					Step.Result.Descriptions[ step.getResult() ],
+					Step.Status.getDescription( step.getStatus() ),
+					Step.Result.getDescription( step.getResult() ),
 					step.getTimeKeeper().deltaString() ) )
 
 	def runWrapups( self ):

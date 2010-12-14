@@ -28,6 +28,7 @@ from datetime import datetime
 from core.helpers.TimeKeeper import formatted_time_delta
 import xml.etree.ElementTree
 from StringIO import StringIO
+from core.executomat.Step import Step
 
 try:
 	from lxml import etree
@@ -319,7 +320,7 @@ class XmlReportConverter( MObject ):
 		out = []
 		element = self.__elementTree.getroot()
 
-		failedSteps = find_nodes_with_attribute_and_value( element, "step", "failed", "True" )
+		failedSteps = find_nodes_with_attribute_and_value( element, "step", "result", "Failure" )
 		for step in failedSteps:
 			out += ["*** Step failed: {0} ***".format( step.attrib["name"] )]
 
@@ -454,25 +455,15 @@ class XmlReportConverter( MObject ):
 			if element.attrib["isEmpty"] == "True":
 				return out # do not show empty step
 
-			if element.attrib["isEnabled"] == "False":
-				status = "disabled"
-			elif element.attrib["isEmpty"] == "True":
-				status = "noaction"
-			elif element.attrib["failed"] == "True":
-				status = "!failed!"
-			elif element.attrib["skipped"] == "True":
-				status = "skipped "
-			else:
-				status = "success "
-
-			out += wrapper.wrap( '{0}: Step "{1}" (took {2})'.format( 
-				status,
+			out += wrapper.wrap( '{0} [{1}]: Step "{2}" (took {3})'.format( 
+				Step.Status.getDescriptionFromKey( element.attrib["status"] ),
+				Step.Result.getDescriptionFromKey( element.attrib["result"] ),
 				element.attrib["name"] ,
 				element.attrib["timing"]
 			) )
 
-			if element.attrib["failed"] == "False":
-				return out # do not show children
+			if element.attrib["result"] == "Success":
+				return out # do not show children if result is okay
 
 		wrapper.indent()
 		for childElement in element.getchildren():

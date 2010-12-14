@@ -26,23 +26,24 @@
 	</xsl:template>
 
 	<xsl:template name="showStepStatus">
-		<xsl:choose>
-			<xsl:when test="@isEnabled = 'False'">
-				<span class="neutral">DISABLED</span>
-			</xsl:when>
-			<xsl:when test="@isEmpty = 'True'">
-				<span class="neutral">NO ACTIONS REGISTERED</span>
-			</xsl:when>
-			<xsl:when test="@failed = 'True'">
-				<span class="fail">FAILED</span>
-			</xsl:when>
-			<xsl:when test="@skipped = 'True'">
-				<span class="neutral">SKIPPED</span>
-			</xsl:when>
-			<xsl:otherwise>
-				<span class="success">SUCCESS</span>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:variable name="stepResultClassName">
+			<xsl:choose>
+				<xsl:when test="@result = 'Success'">
+					success
+				</xsl:when>
+				<xsl:when test="@result = 'NotExecuted'">
+					neutral
+				</xsl:when>
+				<xsl:otherwise>
+					fail
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+
+		<span class="{$stepResultClassName}">
+			<xsl:value-of select="@status"/>
+		</span>
+
 	</xsl:template>
 
 	<xsl:template name="showBuildInstructionsStatus">

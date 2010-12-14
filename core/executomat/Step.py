@@ -26,15 +26,42 @@ from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 
 class Step( MObject ):
-	class Result( object ):
+
+	class Enum( object ):
+		_Descriptions = [] # overwrite in subclass!
+
+		@classmethod
+		def getKey( cls, enumValue ):
+			l = [key for key, val in cls.__dict__.items() if val == enumValue]
+			if len( l ) > 0:
+				return l[0]
+			else:
+				return None
+
+		@classmethod
+		def getDescriptionFromKey( cls, enumKeyString ):
+			l = [val for key, val in cls.__dict__.items() if key == enumKeyString]
+			if len( l ) > 0:
+				return cls.getDescription( l[0] )
+			else:
+				return None
+
+		@classmethod
+		def getDescription( cls, enumValue ):
+			try:
+				return cls._Descriptions[enumValue]
+			except KeyError:
+				return "N/A"
+
+	class Result( Enum ):
 		'''Enumerated values representing the result of a step.'''
 		NotExecuted, Success, Failure = range ( 3 )
-		Descriptions = [ 'not executed', 'success', 'failure' ]
+		_Descriptions = [ 'not executed', 'success', 'failure' ]
 
-	class Status( object ):
+	class Status( Enum ):
 		'''Enumerated values representing the status of a step.'''
 		New, Skipped_Disabled, Started, Finished, Skipped_Error = range( 5 )
-		Descriptions = [ 'new', 'skipped (disabled)', 'started', 'finished', 'skipped (previous error)' ]
+		_Descriptions = [ 'new', 'skipped (disabled)', 'started', 'finished', 'skipped (previous error)' ]
 
 	"""An individual step of an Executomat run."""
 	def __init__( self, stepName = None ):
@@ -196,9 +223,8 @@ class Step( MObject ):
 		node.attributes["isEmpty"] = str ( self.isEmpty() )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
-		# FIXME Kevin: use status and result as properties?
-		node.attributes["failed"] = str( self.getResult() == Step.Result.Failure )
-		node.attributes["skipped"] = str( self.getStatus() == Step.Status.Skipped_Error )
+		node.attributes["result"] = str( self.Result.getKey( self.getResult() ) )
+		node.attributes["status"] = str( self.Status.getKey( self.getStatus() ) )
 
 		if self.getPreActions():
 			for action in self.getPreActions():
