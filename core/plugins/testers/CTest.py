@@ -31,7 +31,7 @@ class CTest( TestProvider ):
 		self._setCommandArguments( ["--verbose"] )
 
 	def saveReport( self ):
-		mApp().debug( self, "Saving unit test report" )
+		mApp().debugN( self, 3, "Saving unit test report" )
 
 		stdout = self.getAction()._getRunner().getStdOut()
 		if not stdout:
