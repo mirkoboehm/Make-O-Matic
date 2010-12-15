@@ -20,8 +20,7 @@ from core.MObject import MObject
 from core.Exceptions import MomException, ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
-from core.helpers.TypeCheckers import check_for_nonempty_string, \
-	check_for_list_of_strings, check_for_list_of_paths
+from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
 from core.helpers.XmlUtils import create_child_node
 from copy import deepcopy, copy
 
@@ -177,7 +176,7 @@ class Plugin( MObject ):
 	def _setCommandSearchPaths( self, searchPaths ):
 		if searchPaths is None:
 			searchPaths = []
-		check_for_list_of_strings( searchPaths, "The search paths need to be a list of strings." )
+		check_for_list_of_paths( searchPaths, "The search paths need to be a list of file system paths." )
 		self.__commandSearchPaths = searchPaths
 
 	def getCommandSearchPaths( self ):

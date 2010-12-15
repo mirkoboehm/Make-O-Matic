@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_list_of_strings
+from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_list_of_strings, check_for_list_of_paths
 from core.Exceptions import MomError
 from core.helpers.RunCommand import RunCommand
 from core.actions.Action import Action
@@ -38,19 +38,19 @@ class ShellCommandAction( Action ):
 
 	def setCommand( self, command, timeOutPeriod = None, searchPaths = None ):
 		"""Set the shell command"""
-		check_for_list_of_strings( command, "The shell command must be a list of strings." )
+		check_for_list_of_paths( command, "The shell command must be a list of strings or paths." )
 		if timeOutPeriod != None:
 			check_for_nonnegative_int( timeOutPeriod, 'invalid timeout period, valid periods are [0..inf] or None for no timeout' )
 		if searchPaths is None:
 			searchPaths = []
-		check_for_list_of_strings( searchPaths, "The search paths need to be a list of strings." )
+		check_for_list_of_paths( searchPaths, "The search paths need to be a list of strings." )
 		self.__command = command
 		self.__timeOutPeriod = timeOutPeriod
 		self.__searchPaths = searchPaths
 
 	def getCommand( self ):
 		"""Returns the command"""
-		return self.__command
+		return map( lambda x: str( x ) , self.__command )
 
 	def _getRunner( self ):
 		if self.__runner == None:

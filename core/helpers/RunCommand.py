@@ -21,7 +21,7 @@ import subprocess, time
 from threading import Thread
 from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths, check_for_list_of_strings
+from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths
 import os.path
 import sys
 from core.Exceptions import ConfigurationError
@@ -114,7 +114,7 @@ class RunCommand( MObject ):
 		if searchPaths is None:
 			self.__searchPaths = []
 		else:
-			check_for_list_of_strings( searchPaths, "The search paths must be a list of strings." )
+			check_for_list_of_paths( searchPaths, "The search paths must be a list of strings." )
 			self.__searchPaths = searchPaths
 
 	def getTimeoutSeconds( self ):
@@ -155,7 +155,7 @@ class RunCommand( MObject ):
 		return self.__stdErr
 
 	def getCommand( self ):
-		return self.__cmd
+		return map( lambda x: str( x ) , self.__cmd )
 
 	def resolveCommand( self ):
 		"""Sets the full path to the command by searching PATH and other specified search paths"""
@@ -186,7 +186,7 @@ class RunCommand( MObject ):
 											.format( extraPath ) )
 
 		for path in paths:
-			path = os.path.normpath( path )
+			path = os.path.normpath( str( path ) )
 			executableFile = os.path.join( path, fname )
 			if isExecutableFullPath( executableFile ):
 				self.__cmd[0] = executableFile
