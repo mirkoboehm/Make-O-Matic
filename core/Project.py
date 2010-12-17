@@ -26,7 +26,6 @@ from core.helpers.PathResolver import PathResolver
 from core.helpers.GlobalMApp import mApp
 import os
 from core.actions.filesystem.MkDirAction import MkDirAction
-from core.actions.filesystem.RmDirAction import RmDirAction
 from core.BuildInstructions import BuildInstructions
 from core.plugins.sourcecode import getScm
 from core.helpers.TypeCheckers import check_for_path_or_none
