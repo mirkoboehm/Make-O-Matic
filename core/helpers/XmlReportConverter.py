@@ -429,7 +429,7 @@ class XmlReportConverter( MObject ):
 
 			states = self._statesToStringList( element )
 			if len( states ) > 0:
-				name = "{0} [{1}]".format( name, ", ".join( states ) )
+				name = "{0} [{1}]".format( element.attrib["name"], ", ".join( states ) )
 			else:
 				name = element.attrib["name"]
 
