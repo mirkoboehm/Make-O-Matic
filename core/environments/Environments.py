@@ -78,7 +78,7 @@ class Environments( ConfigurationBase ):
 				scores.append( dep.getScore() )
 			decoratedTuples.append( [ scores, index, env ] )
 			index += 1
-		decoratedTuples.sort()
+		decoratedTuples.sort( reverse = True )
 		return decoratedTuples[0][2]
 
 	def __expandConfigurations( self, configs, environments ):
