@@ -28,7 +28,7 @@ class Enum( object ):
 		else:
 			return None
 
-	@staticmethod
+	@classmethod
 	def getDescriptionFromKey( cls, enumKeyString ):
 		l = [val for key, val in cls.__dict__.items() if key == enumKeyString]
 		if len( l ) > 0:
@@ -36,7 +36,7 @@ class Enum( object ):
 		else:
 			return None
 
-	@staticmethod
+	@classmethod
 	def getDescription( cls, enumValue ):
 		try:
 			return cls._Descriptions[enumValue]
