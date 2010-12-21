@@ -88,7 +88,7 @@ class Dependency( MObject ):
 	def _readControlFile( self, controlFile ):
 		try:
 			with open( controlFile, 'r' ) as inputFile:
-				mApp().debugN( self, 3, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
+				mApp().debugN( self, 2, 'loading settings from package control file "{0}"'.format( str ( controlFile ) ) )
 				self._setValid( True )
 				for line in inputFile.readlines():
 					if re.match( '^\s*#', line ):
@@ -153,17 +153,17 @@ class Dependency( MObject ):
 				if export:
 					variable = str( export.group( 2 ) )
 					value = self._expandVariables( export.group( 3 ) )
-					mApp().debugN( self, 4, 'setBuildEnvironment: >export< ' + variable + '="' + value + '"' )
+					mApp().debugN( self, 3, 'setBuildEnvironment: >export< ' + variable + '="' + value + '"' )
 					os.environ[variable] = value
 				elif addTo:
 					variable = str( addTo.group( 2 ) )
 					mode = self._expandVariables( addTo.group( 3 ) )
 					value = self._expandVariables( addTo.group( 4 ) )
 					if mode == 'APPEND':
-						mApp().debugN( self, 4, 'setBuildEnvironment: >append< ' + variable + ': "' + value + '"' )
+						mApp().debugN( self, 3, 'setBuildEnvironment: >append< ' + variable + ': "' + value + '"' )
 						add_to_path_collection( variable, value, 'append' )
 					elif mode == 'PREPEND':
-						mApp().debugN( self, 4, 'setBuildEnvironment: >prepend< ' + variable + ': "' + value + '"' )
+						mApp().debugN( self, 3, 'setBuildEnvironment: >prepend< ' + variable + ': "' + value + '"' )
 						add_to_path_collection( variable, value, 'prepend' )
 					else:
 						raise ConfigurationError( 'mode missing' )
@@ -175,7 +175,7 @@ class Dependency( MObject ):
 						enabled = True
 					else:
 						raise ConfigurationError( 'enable must be true or false' )
-					mApp().debugN( self, 2, 'setBuildEnvironment: >enabled< ' + str( enabled ) )
+					mApp().debugN( self, 3, 'setBuildEnvironment: >enabled< ' + str( enabled ) )
 				elif re.match( '^{0}'.format( Dependency._CommandPrefix ), line ):
 					mApp().message( self, 'unknown command in control file for ' + controlFile + '\n--> ' + str( line ).strip() )
 				else:
@@ -191,13 +191,13 @@ class Dependency( MObject ):
 			self._readControlFile( self._getControlFileName( self.getFolder() ) )
 			if self.isValid():
 				if self.isEnabled():
-					mApp().debugN( self, 4, '{0} is an enabled dependency'.format( str( self.getFolder() ) ) )
+					mApp().debugN( self, 3, '{0} is an enabled dependency'.format( str( self.getFolder() ) ) )
 					return True
 				else:
-					mApp().debugN( self, 4, '{0} is a disabled dependency'.format( str( self.getFolder() ) ) )
+					mApp().debugN( self, 3, '{0} is a disabled dependency'.format( str( self.getFolder() ) ) )
 					return False
 			else:
-				mApp().debugN( self, 5, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
+				mApp().debugN( self, 4, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
 				return False
 
 	def _setDescription( self, description ):
