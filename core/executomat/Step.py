@@ -24,34 +24,9 @@ from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_string
 from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
+from core.helpers.Enum import Enum
 
 class Step( MObject ):
-
-	class Enum( object ):
-		_Descriptions = [] # overwrite in subclass!
-
-		@classmethod
-		def getKey( cls, enumValue ):
-			l = [key for key, val in cls.__dict__.items() if val == enumValue]
-			if len( l ) > 0:
-				return l[0]
-			else:
-				return None
-
-		@classmethod
-		def getDescriptionFromKey( cls, enumKeyString ):
-			l = [val for key, val in cls.__dict__.items() if key == enumKeyString]
-			if len( l ) > 0:
-				return cls.getDescription( l[0] )
-			else:
-				return None
-
-		@classmethod
-		def getDescription( cls, enumValue ):
-			try:
-				return cls._Descriptions[enumValue]
-			except KeyError:
-				return "N/A"
 
 	class Result( Enum ):
 		'''Enumerated values representing the result of a step.'''
