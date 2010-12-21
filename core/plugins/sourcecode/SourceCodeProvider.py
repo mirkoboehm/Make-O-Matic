@@ -180,3 +180,12 @@ class SourceCodeProvider( Plugin ):
 		'''Retrieve a remote path from the repository. The path will be retrieved with the revision specified by getRevision(). 
 		The method returns the path where the folder has been stored.'''
 		raise NotImplementedError()
+
+	def describe( self, prefix, details = None, replacePatterns = True ):
+		branch = 'branch {0}'.format( self.getBranch() ) if self.getBranch() else None
+		tag = 'tag {0}'.format( self.getTag() ) if self.getTag() else None
+		revision = 'revision {0}'.format( self.getRevision() ) if self.getRevision() else None
+		elements = filter( lambda x : x, [ self.getUrl(), branch, tag, revision] )
+		status = ', '.join( elements )
+		self.setObjectStatus( status )
+		super( SourceCodeProvider, self ).describe( prefix, details, replacePatterns )

@@ -18,14 +18,17 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import re
 from core.Exceptions import MomException
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
+
 class MObject( object ):
 	"""MObject is the base class for objects used during a MoM script run."""
 
 	def __init__( self, name = None ):
 		if name == None:
 			name = self.__class__.__name__
-
 		self.setName( name )
+		self.setObjectStatus( None )
+		self.setObjectDescription( None )
 
 	def setName( self, name ):
 		# FIXME check for string
@@ -34,13 +37,35 @@ class MObject( object ):
 	def getName( self ):
 		return self.__name
 
+	def setObjectStatus( self, status ):
+		'''The status is a short string message about the status of the object.
+		The status is used in reports and in describe output. If it is None, it will be ignored.'''
+		check_for_nonempty_string_or_none( status, 'The object status needs to be a string or None!' )
+		self.__status = status
+
+	def getObjectStatus( self ):
+		return self.__status
+
+	def setObjectDescription( self, description ):
+		'''The description is a more detailed message about the object.
+		The description is used in reports and in describe output. If it is None, it will be ignored.'''
+		check_for_nonempty_string_or_none( description, 'The object status needs to be a string or None!' )
+		self.__description = description
+
+	def getObjectDescription( self ):
+		return self.__description
+
 	def getTagName( self ):
 		return self.__class__.__name__.lower()
 
 	def describe( self, prefix, details = None, replacePatterns = True ):
 		"""Describe this object
 		Print out information like class name"""
-		self._printDescribeLine( prefix, self.getName(), details, replacePatterns )
+		status = ', '.join( filter( lambda x: x, [ details, self.getObjectStatus() ] ) )
+		self._printDescribeLine( prefix, self.getName(), status, replacePatterns )
+		if self.getObjectDescription():
+			# FIXME (Mirko) find a better formating for the details
+			self._printDescribeLine( prefix + ' > ', self.getName(), self.getObjectDescription(), replacePatterns )
 
 	def _printDescribeLine( self, prefix, name, details, replacePatterns = True ):
 		clazz = self.__class__.__name__

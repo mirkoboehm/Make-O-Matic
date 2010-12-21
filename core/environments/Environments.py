@@ -101,10 +101,15 @@ class Environments( ConfigurationBase ):
 		environments = self.findMatchingEnvironments()
 		if mode in ( Settings.EnvironmentExpansionMode_BuildAll, Settings.EnvironmentExpansionMode_BuildHighestScoring ):
 			if not environments:
+				status = 'optional' if self.isOptional() else 'required'
+				self.setObjectStatus( 'no environments found ({0})'.format( status ) )
 				if self.isOptional():
-					mApp().message( self, 'No environments found, and this environment is optional, continuing.' )
+					mApp().message( self, '{0}, continuing.'.format( self.getObjectStatus() ) )
 				else:
-					raise ConfigurationError( 'No environment found that matches the project requirements!' )
+					if buildType == Settings.RunMode_Build:
+						raise ConfigurationError( 'No environment found that matches the project requirements!' )
+					else:
+						pass
 			if mode == Settings.EnvironmentExpansionMode_BuildHighestScoring and environments:
 				environment = self.__selectBestScoringEnvironment( environments )
 				mApp().debugN( self, 2, 'best scoring environment is "{0}" (out of {1})'

@@ -212,3 +212,7 @@ class Preprocessor( Plugin ):
 		step = self.getInstructions().getStep( self.getStep() )
 		action = _PreprocessorAction( self )
 		step.addPostAction( action )
+
+	def describe( self, prefix, details = None, replacePatterns = True ):
+		self.setObjectStatus( self.getDescription() )
+		super( Preprocessor, self ).describe( prefix, details, replacePatterns )
