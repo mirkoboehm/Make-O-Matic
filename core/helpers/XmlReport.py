@@ -34,7 +34,7 @@ class XmlReport( object ):
 		self.__doc = xml.dom.minidom.Document()
 
 	def getReport( self ):
-		return self.__doc.toxml( encoding = "utf-8" )
+		return self.__doc.toxml()
 
 	def prepare( self ):
 		# fetch exception if any from mApp

@@ -22,6 +22,7 @@ from core.helpers.XmlReport import XmlReport
 import os.path
 from core.Exceptions import ConfigurationError
 from core.helpers.XmlReportConverter import ReportFormat, XmlReportConverter
+import codecs
 
 class XmlReportGenerator( Plugin ):
 	"""
@@ -70,7 +71,7 @@ class XmlReportGenerator( Plugin ):
 
 		try:
 			self.__reportFile = baseDirectory + os.sep + reportFileName
-			self.__fileHandle = open( self.__reportFile, 'w' )
+			self.__fileHandle = codecs.open( self.__reportFile, 'w', encoding = "utf-8" )
 		except IOError:
 			raise ConfigurationError( 'Cannot open log file at "{0}"'.format( reportFileName ) )
 
@@ -79,7 +80,7 @@ class XmlReportGenerator( Plugin ):
 			convertedText = self.convert( report )
 
 			if convertedText:
-				self.__fileHandle.write( convertedText )
+				self.__fileHandle.write( convertedText.decode( "utf-8" ) )
 			else:
 				self.__failed = True
 
