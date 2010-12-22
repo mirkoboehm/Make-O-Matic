@@ -176,7 +176,7 @@ class Preprocessor( Plugin ):
 		self.setStep( step )
 		self.setProject( project )
 
-	def getDescription( self ):
+	def getObjectDescription( self ):
 		return "{0} -> {1}".format( os.path.basename( str( self.getInputFilename() ) ),
 								os.path.basename( str( self.getOutputFilename() ) ) )
 
@@ -212,7 +212,3 @@ class Preprocessor( Plugin ):
 		step = self.getInstructions().getStep( self.getStep() )
 		action = _PreprocessorAction( self )
 		step.addPostAction( action )
-
-	def describe( self, prefix, details = None, replacePatterns = True ):
-		self.setObjectStatus( self.getDescription() )
-		super( Preprocessor, self ).describe( prefix, details, replacePatterns )

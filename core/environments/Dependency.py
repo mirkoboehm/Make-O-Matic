@@ -22,7 +22,7 @@ from core.helpers.GlobalMApp import mApp
 import re
 from core.Exceptions import ConfigurationError
 from core.helpers.EnvironmentVariables import add_to_path_collection
-from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_int
+from core.helpers.TypeCheckers import check_for_int
 
 class Dependency( MObject ):
 	'''Dependency represents a single installed dependency, and the adaptations to the environment variables needed to use it.'''
@@ -37,7 +37,6 @@ class Dependency( MObject ):
 		self._setValid( False )
 		self.setEnabled( False )
 		self.setScore( 0 )
-		self.__description = None
 
 	def _getControlFileName( self, path ):
 		return os.path.join( path, Dependency._ControlFileName )
@@ -122,8 +121,8 @@ class Dependency( MObject ):
 				return True
 			elif descriptionLine:
 				description = str( descriptionLine.group( 2 ) )
-				self._setDescription( description )
-				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getDescription() ) )
+				self.setObjectDescription( description )
+				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getObjectDescription() ) )
 				return True
 			elif scoreLine:
 				score = str( scoreLine.group( 2 ) )
@@ -200,14 +199,9 @@ class Dependency( MObject ):
 				mApp().debugN( self, 4, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
 				return False
 
-	def _setDescription( self, description ):
-		check_for_nonempty_string( description, 'A MOM Package Configuration description cannot be empty!' )
-		self.__description = description
-
-	def getDescription( self ):
-		if not self.__description:
-			name = os.path.split( self.getFolder() )[1]
-			return name
+	def getObjectDescription( self ):
+		description = super( Dependency, self ).getObjectDescription()
+		if description:
+			return description
 		else:
-			return self.__description
-
+			return os.path.split( self.getFolder() )[1]

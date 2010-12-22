@@ -19,6 +19,7 @@
 import re
 from core.Exceptions import MomException
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
+from core.helpers.XmlUtils import create_child_node
 
 class MObject( object ):
 	"""MObject is the base class for objects used during a MoM script run."""
@@ -95,5 +96,7 @@ class MObject( object ):
 
 		node = document.createElement( self.getTagName() )
 		node.attributes["name"] = self.getName()
+		create_child_node( document, node, "objectdescription", str( self.getObjectDescription() ) )
+		create_child_node( document, node, "objectstatus", str( self.getObjectStatus() ) )
 
 		return node

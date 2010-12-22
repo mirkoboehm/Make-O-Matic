@@ -399,7 +399,7 @@ class XmlReportConverter( MObject ):
 				name = element.attrib["name"]
 
 			# show description if any
-			description = element.find( "plugindescription" ).text
+			description = element.find( "objectdescription" ).text
 			if description is not None:
 				out += wrapper.wrap( "{0}: {1}".format( name, description ) )
 			else:

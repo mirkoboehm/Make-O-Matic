@@ -21,6 +21,7 @@ from core.Plugin import Plugin
 from core.Exceptions import MomError
 
 class Analyzer( Plugin ):
+
 	def __init__( self, name = None, minimumSuccessRate = 0.0 ):
 		Plugin.__init__( self, name )
 
@@ -64,7 +65,7 @@ class Analyzer( Plugin ):
 		# is: return bool ((score / maxScore ) >= requiredMinimumScore)
 		return ( ( self.getScore()[0] / self.getScore()[1] ) >= self.getRequiredMinimumSuccessRate() )
 
-	def getDescription( self ):
+	def getObjectDescription( self ):
 		if not self.getInstructions().getStep( "conf-make-test" ).isEnabled():
 			return "Step disabled"
 

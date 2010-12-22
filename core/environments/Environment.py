@@ -62,6 +62,6 @@ class Environment( ConfigurationBase ):
 	def makeDescription( self ):
 		names = []
 		for dep in self.getDependencies():
-			names.append( dep.getDescription() )
+			names.append( dep.getObjectDescription() )
 		return ' - '.join( names )
 

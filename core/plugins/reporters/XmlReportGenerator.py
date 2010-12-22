@@ -53,7 +53,7 @@ class XmlReportGenerator( Plugin ):
 		self._writeReport( report )
 		self._saveReportFile()
 
-	def getDescription( self ):
+	def getObjectDescription( self ):
 		if not self.__failed:
 			return "Report saved to: {0}".format( self.getFileName() )
 		else:

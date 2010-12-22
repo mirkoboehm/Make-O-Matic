@@ -21,7 +21,6 @@ from core.Exceptions import MomException, ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
-from core.helpers.XmlUtils import create_child_node
 from copy import deepcopy, copy
 
 class Plugin( MObject ):
@@ -37,7 +36,7 @@ class Plugin( MObject ):
 
 	\section reports Reporting functionality
 	Each plugin can provide a short textual description which is shown in all report formats
-	\see getDescription
+	\see getObjectDescription
 
 	\subsection plain-text Plain text
 	Each plugin can register its own templating function which will be shown in the plain text output
@@ -201,13 +200,6 @@ class Plugin( MObject ):
 	def isOptional( self ):
 		return self.__optional
 
-	def getDescription( self ):
-		'''Returns the plugin results in human readable text.
-
-		\return A string representing the plugin's short description. May be empty if not implemented.'''
-
-		return ""
-
 	@classmethod
 	def setDefaultSetting( cls, name, value ):
 		"""Call this to set a default settings of a plugin, does nothing if name already exists in settings"""
@@ -233,7 +225,6 @@ class Plugin( MObject ):
 		node = MObject.createXmlNode( self, document )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["isOptional"] = str( self.isOptional() )
-		create_child_node( document, node, "plugindescription", str( self.getDescription() ) )
 		return node
 
 	def getXmlTemplate( self, element, wrapper ):

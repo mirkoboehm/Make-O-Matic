@@ -32,7 +32,7 @@ class MomException( Exception ):
 	def getReturnCode():
 		raise NotImplementedError( "Abstract base class method called!" )
 
-	def getDescription( self ):
+	def getObjectDescription( self ):
 		return self.__doc__
 
 class BuildError( MomException ):

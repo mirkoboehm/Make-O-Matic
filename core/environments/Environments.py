@@ -87,6 +87,9 @@ class Environments( ConfigurationBase ):
 		for environment in environments:
 			environment.cloneConfigurations( configs )
 
+	def getObjectDescription( self ):
+		return ', '.join( self.getDependencies() )
+
 	def prepare( self ):
 		'''Prepare method, overloaded.'''
 		# discover matching environments:
@@ -247,6 +250,3 @@ class Environments( ConfigurationBase ):
 		node.attributes["isEnabled"] = str( self.getChildren() > 0 ) # no configurations as children => disabled
 		create_child_node( document, node, "dependencies", ', '.join( self.getDependencies() ) )
 		return node
-
-	def describe( self, prefix, details = None, replacePatterns = True ):
-		super( Environments, self ).describe( prefix, ', '.join( self.getDependencies() ), replacePatterns = replacePatterns )

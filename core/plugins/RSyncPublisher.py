@@ -36,7 +36,7 @@ class RSyncPublisher( Plugin ):
 		self.setLocalDir( localDir )
 		self.setStep( 'project-upload-packages' )
 
-	def getDescription( self ):
+	def getObjectDescription( self ):
 		return "Upload location: {0}".format( self.getUploadLocation() )
 
 	def setUploadLocation( self, location ):
@@ -103,9 +103,6 @@ class RSyncPublisher( Plugin ):
 		directory = '/cygdrive/' + driveLetter + directory
 		directory = re.sub( '\\\\+', '/', directory )
 		return directory
-
-	def describe( self, prefix, details = None, replacePatterns = True ):
-		super( RSyncPublisher, self ).describe( prefix, self.getDescription(), replacePatterns )
 
 class RSyncPackagesPublisher( RSyncPublisher ):
 	'''A RSync publisher that is pre-configured to publish the packages structure to the default location.'''

@@ -77,7 +77,7 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		dep.setFolder( packageFolder )
 		self.assertTrue( dep._readControlFile( packageFile ) )
 		self.assertTrue( dep.isEnabled() )
-		self.assertEquals( dep.getDescription(), 'Test MOM Package' )
+		self.assertEquals( dep.getObjectDescription(), 'Test MOM Package' )
 		with EnvironmentSaver():
 			dep.apply()
 			self.assertEquals( os.environ[ 'EXAMPLE_VARIABLE'], 'example_variable' )
@@ -91,7 +91,7 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		dep.setFolder( packageFolder )
 		self.assertTrue( dep._readControlFile( packageFile ) )
 		self.assertTrue( not dep.isEnabled() )
-		self.assertEquals( dep.getDescription(), 'Test Disabled MOM Package' )
+		self.assertEquals( dep.getObjectDescription(), 'Test Disabled MOM Package' )
 		self.assertEquals( dep.getScore(), 120 )
 
 if __name__ == "__main__":
