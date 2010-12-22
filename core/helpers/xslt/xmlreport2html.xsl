@@ -171,10 +171,6 @@ h5 {
 				</xsl:call-template>
 			</p>
 			<p>
-				Start time: <xsl:value-of select="@starttime" /><br />
-				Stop time : <xsl:value-of select="@stoptime" />
-			</p>
-			<p>
 				Build time: <xsl:value-of select="@timing" />
 			</p>
 			<xsl:apply-templates />

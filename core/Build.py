@@ -30,6 +30,8 @@ import shutil
 import sys
 from core.Defaults import Defaults
 from core.helpers.SafeDeleteTree import rmtree
+from datetime import datetime
+from core.helpers.TimeUtils import formatted_time
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -40,6 +42,7 @@ class Build( MApplication ):
 		mApp().getSettings().set( Settings.ScriptBuildName, name )
 		self.__project = None
 		self.__parameters = Parameters()
+		self.__startTime = datetime.utcnow()
 
 	def getParameters( self ):
 		return self.__parameters
@@ -233,6 +236,7 @@ class Build( MApplication ):
 			node.attributes[key] = value
 
 		node.attributes["returncode"] = str( self.getReturnCode() )
+		node.attributes["startTime"] = str ( formatted_time( self.__startTime ) )
 		node.attributes["sys-shortname"] = self.getSystemShortName()
 
 		return node
