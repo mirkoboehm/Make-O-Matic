@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def time_format():
 	return "%a, %d %b %Y %H:%M:%S +0000"
@@ -76,8 +76,8 @@ class TimeKeeper( object ):
 	'''TimeKeeper records the time an operation took.'''
 
 	def __init__( self ):
+		self.__duration = timedelta( 0 )
 		self.__startTime = None
-		self.__stopTime = None
 
 	def __enter__( self ):
 		self.start()
@@ -88,21 +88,16 @@ class TimeKeeper( object ):
 	def start( self ):
 		self.__startTime = datetime.utcnow()
 
-	def getStartTime( self ):
-		return self.__startTime
-
 	def stop( self ):
-		self.__stopTime = datetime.utcnow()
-
-	def getStopTime( self ):
-		return self.__stopTime
+		assert self.__startTime
+		delta = datetime.utcnow() - self.__startTime
+		self.__startTime = None
+		self.__duration += delta
 
 	def delta( self ):
-		if not self.getStartTime() or not self.getStopTime():
-			return 0
-		return self.getStopTime() - self.getStartTime()
+		return self.__duration
 
 	def deltaString( self ):
-		if not self.getStartTime() or not self.getStopTime():
+		if self.__duration == None:
 			return '---'
 		return formatted_time_delta( self.delta() )

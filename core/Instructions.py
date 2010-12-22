@@ -210,8 +210,9 @@ class Instructions( MObject ):
 	def createXmlNode( self, document, recursive = True ):
 		node = MObject.createXmlNode( self, document )
 
-		node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
-		node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
+		# FIXME Kevin: start and stop time are not recorded anymore
+		# node.attributes["starttime"] = str ( formatted_time( self.getTimeKeeper().getStartTime() ) )
+		# node.attributes["stoptime"] = str ( formatted_time( self.getTimeKeeper().getStopTime() ) )
 		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
 		# FIXME Kevin: better use Step.getStatus() and Step.getResult()
 		node.attributes["failed"] = str( self.hasFailed() )

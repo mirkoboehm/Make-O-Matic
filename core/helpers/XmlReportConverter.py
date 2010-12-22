@@ -374,9 +374,10 @@ class XmlReportConverter( MObject ):
 			out += " "
 			out += wrapper.wrap( "Build status: {0}".format( returncode_to_description( int( element.attrib["returncode"] ) ) ) )
 			out += " "
-			out += wrapper.wrap( "Start time (UTC): {0}".format( element.attrib["starttime"] ) )
-			out += wrapper.wrap( "Stop time (UTC):  {0}".format( element.attrib["stoptime"] ) )
-			out += " "
+# FIXME Kevin: review
+# 			out += wrapper.wrap( "Start time (UTC): {0}".format( element.attrib["starttime"] ) )
+# 			out += wrapper.wrap( "Stop time (UTC):  {0}".format( element.attrib["stoptime"] ) )
+# 			out += " "
 			out += wrapper.wrap( "Build time: {0}".format( element.attrib["timing"] ) )
 			wrapper.dedent()
 
