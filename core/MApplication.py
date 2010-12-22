@@ -101,6 +101,8 @@ class MApplication( Instructions ):
 		if self.__returnCode == 0:
 			# only if there was no previous error:
 			self.__returnCode = code
+			self.debugN( self, 2, 'return code {0} registered'.format( code ) )
+			self.debugN( self, 5, 'printing stack trace for debugging purposes:\n' + ''.join( traceback.format_stack() ) )
 		else:
 			self.debugN( self, 3, 'new return code {0} ignored, return code is already set to {1}.'
 						.format( code, self.getReturnCode() ) )
