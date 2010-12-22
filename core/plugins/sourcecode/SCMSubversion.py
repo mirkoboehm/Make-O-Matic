@@ -28,12 +28,12 @@ import os
 import tempfile
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import sys
-from core.helpers.TimeKeeper import formatted_time
 from buildcontrol.common.BuildInfo import BuildInfo
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from datetime import datetime
 import calendar
+from core.helpers.TimeUtils import formatted_time
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""

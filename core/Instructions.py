@@ -27,7 +27,7 @@ from core.Settings import Settings
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
 from copy import deepcopy, copy
-from core.helpers.TimeKeeper import TimeKeeper, formatted_time
+from core.helpers.TimeKeeper import TimeKeeper
 
 class Instructions( MObject ):
 	"""
