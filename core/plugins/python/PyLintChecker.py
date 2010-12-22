@@ -139,11 +139,11 @@ class PyLintChecker( Analyzer ):
 	def getHtmlOutputPath( self ):
 		return self.__htmlPath
 
-	def performPreFlightCheck( self ):
+	def preFlightCheck( self ):
 		pyConf = self.getInstructions()
 		if not isinstance( pyConf, PythonConfiguration ):
 			raise MomError( 'A PyUnitTester can only be assigned to a PythonConfiguration!' )
-		return Analyzer.performPreFlightCheck( self )
+		return Analyzer.preFlightCheck( self )
 
 	def setup( self ):
 		action = _PyLintCheckerAction( self )

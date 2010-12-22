@@ -72,7 +72,7 @@ class PyUnitTester( TestProvider ):
 			score = total
 		return score, total
 
-	def performPreFlightCheck( self ):
+	def preFlightCheck( self ):
 		# check if instructions object is of correct type
 		pyConf = self.getInstructions()
 		if not isinstance( pyConf, PythonConfiguration ):

@@ -178,10 +178,10 @@ class Build( MApplication ):
 		super( Build, self ).setup()
 
 	def runPreFlightChecks( self ):
-		if self.getSettings().get( Settings.ScriptRunMode ) in ( Settings.RunMode_Build, Settings.RunMode_Describe ):
-			return super( Build, self ).runExecute()
-		# no pre-flight check in query and print modes
-		return None
+		if self.getSettings().get( Settings.ScriptRunMode ) in ( Settings.RunMode_Query, Settings.RunMode_Print ):
+			return # no pre-flight check in query and print modes, do nothing
+
+		super( Build, self ).runPreFlightChecks() # run base class' implementation
 
 	def runExecute( self ):
 		if self.getSettings().get( Settings.ScriptRunMode ) == Settings.RunMode_Describe:
