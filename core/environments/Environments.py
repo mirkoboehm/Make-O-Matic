@@ -91,6 +91,7 @@ class Environments( ConfigurationBase ):
 		'''Prepare method, overloaded.'''
 		# discover matching environments:
 		buildType = mApp().getSettings().get( Settings.ProjectBuildType, True ).lower()
+		runMode = mApp().getSettings().get( Settings.ScriptRunMode )
 		# FIXME (Kevin, what do you think?) this may have to be a property, so that the expansion mode can be added to the build report 
 		mode = Settings.EnvironmentExpansionMode_Ignore
 		if buildType in mApp().getSettings().get( Settings.EnvironmentsExpansionModeMapping ):
@@ -106,7 +107,7 @@ class Environments( ConfigurationBase ):
 				if self.isOptional():
 					mApp().message( self, '{0}, continuing.'.format( self.getObjectStatus() ) )
 				else:
-					if buildType == Settings.RunMode_Build:
+					if runMode == Settings.RunMode_Build:
 						raise ConfigurationError( 'No environment found that matches the project requirements!' )
 					else:
 						pass
