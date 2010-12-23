@@ -7,8 +7,10 @@ from core.MApplication import MApplication
 import sys
 from xml.dom.minidom import Document, parseString
 
+TARGET_FORMATS = ["text", "html"]
+
 def usage():
-	print_stderr( "Usage: {0} INPUT_FILE".format( sys.argv[0] ) )
+	print_stderr( "Usage: {0} INPUT_FILE [text|html]".format( sys.argv[0] ) )
 
 def print_stderr( message ):
 	print( message, file = sys.stderr )
@@ -24,14 +26,27 @@ def main():
 		usage()
 		return 1
 
+	# check if second parameter in TARGET_FORMATS, if unset: use text
+	try:
+		if sys.argv[2] in TARGET_FORMATS:
+			targetFormat = sys.argv[2]
+		else:
+			usage()
+			return 1
+	except IndexError:
+		targetFormat = "text"
+
 	# start IO
 	fin = open( inputFile )
 	xmlReport = XmlReport( fin.read() )
 	fin.close
 
-	# start converting
 	converter = XmlReportConverter( xmlReport )
-	print( converter.convertToText() )
+	if targetFormat == "text":
+		print( converter.convertToTextSummary() )
+		print( converter.convertToText() )
+	elif targetFormat == "html":
+		print( converter.convertToHtml() )
 
 if __name__ == "__main__":
 	main()
