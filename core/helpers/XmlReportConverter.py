@@ -423,7 +423,7 @@ class XmlReportConverter( MObject ):
 				name = element.attrib["name"]
 
 			# show description if any
-			description = element.find( "objectdescription" ).text
+			description = element.find( "objectstatus" ).text
 			if description:
 				out += wrapper.wrap( "{0}: {1}".format( name, description ) )
 			else:
@@ -460,7 +460,7 @@ class XmlReportConverter( MObject ):
 
 			out += wrapper.wrap( "Environments: {0} ({1})".format( 
 					name,
-					element.find( "objectdescription" ).text
+					element.find( "objectstatus" ).text
 			) )
 
 			# if there are no configurations attached: hide environments content, stop recursion here

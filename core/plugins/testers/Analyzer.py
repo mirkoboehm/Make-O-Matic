@@ -65,7 +65,7 @@ class Analyzer( Plugin ):
 		# is: return bool ((score / maxScore ) >= requiredMinimumScore)
 		return ( ( self.getScore()[0] / self.getScore()[1] ) >= self.getRequiredMinimumSuccessRate() )
 
-	def getObjectDescription( self ):
+	def getObjectStatus( self ):
 		if not self.getInstructions().getStep( "conf-make-test" ).isEnabled():
 			return "Step disabled"
 

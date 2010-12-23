@@ -64,7 +64,7 @@ class Environment( ConfigurationBase ):
 	def makeDescription( self ):
 		names = []
 		for dep in self.getDependencies():
-			names.append( dep.getObjectDescription() )
+			names.append( dep.getObjectStatus() )
 		return ' - '.join( names )
 
 	def runPreFlightChecks( self ):

@@ -176,7 +176,7 @@ class Preprocessor( Plugin ):
 		self.setStep( step )
 		self.setProject( project )
 
-	def getObjectDescription( self ):
+	def getObjectStatus( self ):
 		return "{0} -> {1}".format( os.path.basename( str( self.getInputFilename() ) ),
 								os.path.basename( str( self.getOutputFilename() ) ) )
 

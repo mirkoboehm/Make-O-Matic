@@ -36,7 +36,7 @@ class RSyncPublisher( Plugin ):
 		self.setLocalDir( localDir )
 		self.setStep( 'project-upload-packages' )
 
-	def getObjectDescription( self ):
+	def getObjectStatus( self ):
 		return "Upload location: {0}".format( self.getUploadLocation() )
 
 	def setUploadLocation( self, location ):

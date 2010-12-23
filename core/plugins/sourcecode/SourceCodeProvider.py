@@ -38,7 +38,7 @@ class SourceCodeProvider( Plugin ):
 		self.__srcDir = None
 		self.__mapper = SCMUidMapper( self )
 
-	def getObjectDescription( self ):
+	def getObjectStatus( self ):
 		return self.getUrl()
 
 	def getIdentifier( self ):

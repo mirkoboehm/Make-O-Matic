@@ -36,7 +36,7 @@ class Plugin( MObject ):
 
 	\section reports Reporting functionality
 	Each plugin can provide a short textual description which is shown in all report formats
-	\see getObjectDescription
+	\see getObjectStatus
 
 	\subsection plain-text Plain text
 	Each plugin can register its own templating function which will be shown in the plain text output

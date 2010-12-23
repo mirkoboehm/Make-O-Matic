@@ -68,6 +68,6 @@ class ConsoleLogger( Logger ):
 		if level > 0:
 			mApp().debug( self, 'debug level is {0}'.format( level ) )
 
-	def getObjectDescription( self ):
+	def getObjectStatus( self ):
 		debugLevel = mApp().getSettings().get( Settings.ScriptLogLevel, True )
 		return "Debug level: {0}".format( debugLevel )

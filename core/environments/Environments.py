@@ -87,7 +87,7 @@ class Environments( ConfigurationBase ):
 		for environment in environments:
 			environment.cloneConfigurations( configs )
 
-	def getObjectDescription( self ):
+	def getObjectStatus( self ):
 		return "Dependencies: {0}".format( ', '.join( self.getDependencies() ) )
 
 	def prepare( self ):

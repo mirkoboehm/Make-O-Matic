@@ -122,7 +122,7 @@ class Dependency( MObject ):
 			elif descriptionLine:
 				description = str( descriptionLine.group( 2 ) )
 				self.setObjectDescription( description )
-				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getObjectDescription() ) )
+				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getObjectStatus() ) )
 				return True
 			elif scoreLine:
 				score = str( scoreLine.group( 2 ) )
@@ -199,8 +199,8 @@ class Dependency( MObject ):
 				mApp().debugN( self, 4, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
 				return False
 
-	def getObjectDescription( self ):
-		description = super( Dependency, self ).getObjectDescription()
+	def getObjectStatus( self ):
+		description = super( Dependency, self ).getObjectStatus()
 		if description:
 			return description
 		else:
