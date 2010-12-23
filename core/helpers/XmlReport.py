@@ -28,10 +28,19 @@ class XmlReport( object ):
 
 	\see Plugin for more information about extending the default report output"""
 
-	def __init__( self, instructions ):
-		assert isinstance( instructions, Instructions )
-		self.__instructions = instructions
-		self.__doc = xml.dom.minidom.Document()
+	def __init__( self, parameter ):
+		"""Overloaded constructor
+		
+		\param parameter Can be a Instructions object (e.g. mApp()) or a string"""
+
+		if isinstance( parameter, Instructions ):
+			self.__instructions = parameter
+			self.__doc = xml.dom.minidom.Document()
+		elif isinstance( parameter, basestring ):
+			self.__instructions = None
+			self.__doc = xml.dom.minidom.parseString( parameter )
+		else:
+			raise AttributeError( "Parameter must be an Instructions object or string" )
 
 	def getReport( self ):
 		return self.__doc.toxml()
