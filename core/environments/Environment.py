@@ -50,12 +50,14 @@ class Environment( ConfigurationBase ):
 		assert dep not in self.__deps
 		self.__deps.append( dep )
 
+	def __applyDependencies( self ):
+		for dep in self.getDependencies():
+			dep.apply()
+
 	def _executeStepRecursively( self, instructions, name ):
 		'''Apply the environment, call the base class method, restore the environment.'''
 		with EnvironmentSaver():
-			# apply environment:
-			for dep in self.getDependencies():
-				dep.apply()
+			self.__applyDependencies()
 			# build configuration (error handling is done in the configuration)
 			ConfigurationBase._executeStepRecursively( self, instructions, name )
 
@@ -65,3 +67,9 @@ class Environment( ConfigurationBase ):
 			names.append( dep.getObjectDescription() )
 		return ' - '.join( names )
 
+	def runPreFlightChecks( self ):
+		'''Apply the environments in preFlightChecks, so that tools provided by the 
+		dependencies can be detected.'''
+		with EnvironmentSaver():
+			self.__applyDependencies()
+			super( Environment, self ).runPreFlightChecks()
