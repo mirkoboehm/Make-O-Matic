@@ -102,7 +102,6 @@ class MApplication( Instructions ):
 			# only if there was no previous error:
 			self.__returnCode = code
 			self.debugN( self, 2, 'return code {0} registered'.format( code ) )
-			self.debugN( self, 5, 'printing stack trace for debugging purposes:\n' + ''.join( traceback.format_stack() ) )
 		else:
 			self.debugN( self, 3, 'new return code {0} ignored, return code is already set to {1}.'
 						.format( code, self.getReturnCode() ) )
@@ -110,8 +109,20 @@ class MApplication( Instructions ):
 	def getReturnCode( self ):
 		return self.__returnCode
 
-	def setException( self, exception ):
+	def registerException( self, exception ):
+		"""Registers exception with traceback
+
+		\param exception Tuple of (Exception, result of traceback.format_tb())"""
+
+
+		if self.__exception:
+			self.debugN( self, 3, "not registering new exception {0}, already set to {1}"
+						.format( exception[0], self.getException()[0] ) )
+			return
+
 		self.__exception = exception
+		self.debugN( self, 2, "exception registered: {0} ".format( exception[0] ) )
+		self.debugN( self, 5, "printing traceback:\n{0}".format( "".join( exception[1] ) ) )
 
 	def getException( self ):
 		return self.__exception
@@ -150,12 +161,14 @@ class MApplication( Instructions ):
 			self.runSetups()
 			self.runExecute()
 			self.runWrapups()
-		except Exception as e:
+		except Exception, e:
+			innerTraceback = traceback.format_tb( sys.exc_info()[2] )
+			self.registerException( ( e, innerTraceback ) )
+
 			if isinstance( e, MomException ):
 				self.registerReturnCode( e.getReturnCode() )
 			else:
 				self.registerReturnCode( 42 )
-			self.setException( ( e, traceback.format_exc() ) )
 			raise # re-throw exception
 		finally:
 			self.runShutDowns()
