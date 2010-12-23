@@ -29,6 +29,8 @@ from core.helpers.TimeKeeper import formatted_time_delta
 import xml.etree.ElementTree
 from StringIO import StringIO
 from core.executomat.Step import Step
+import traceback
+import sys
 
 try:
 	from lxml import etree
@@ -227,17 +229,26 @@ class XmlReportConverter( MObject ):
 		return ( etree.__name__ == "lxml.etree" )
 
 	def convertToHtml( self ):
-		"""Converts the report to HTML using the XSL stylesheet for HTML"""
+		"""Converts the report to HTML using the XSL stylesheet for HTML
+
+		\note Be very sure to catch all exceptions here!"""
 
 		if not self.hasXsltSupport():
 			mApp().debugN( self, 5, "Cannot convert to HTML. Lacking support for XSLT transformations. Please install the python-lxml package." )
 			return None
 
-		transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
-		return str( transform( etree.XML( self.__xmlReport.getReport() ) ) )
+		try:
+			transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
+			result = str( transform( etree.XML( self.__xmlReport.getReport() ) ) )
+		except Exception, e:
+			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
+			result = "Could not create HTML report. Caught exception:\n {0}\nTraceback:\n{1}".format( e, innerTraceback )
+		return result
 
 	def convertToText( self, short = False ):
-		"""Converts the report to plain text using the recursive _toText() method"""
+		"""Converts the report to plain text using the recursive _toText() method
+
+		\note Be very sure to catch all exceptions here!"""
 
 		wrapper = _MyTextWrapper( width = 80 )
 
@@ -246,11 +257,28 @@ class XmlReportConverter( MObject ):
 		else:
 			ignoredTags = []
 
-		return "\n".join( self._toText( self.__elementTree.getroot(), wrapper, ignoredTags ) )
+		try:
+			result = "\n".join( self._toText( self.__elementTree.getroot(), wrapper, ignoredTags ) )
+		except Exception, e:
+			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
+			result = "Could not create report. Caught exception:\n {0}\nTraceback:\n{1}".format( e, innerTraceback )
+		return result
 
 	def convertToTextSummary( self ):
+		"""Converts the report to plain text summary by using the _non-recursive_ _toTextSummary() method
+
+		\note Be very sure to catch all exceptions here!"""
+
 		wrapper = _MyTextWrapper( replace_whitespace = False, drop_whitespace = False, width = 80 )
 
+		try:
+			result = self._toTextSummary( wrapper )
+		except Exception, e:
+			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
+			result = "Could not create report summary. Caught exception:\n {0}\nTraceback:\n{1}".format( e, innerTraceback )
+		return result
+
+	def _toTextSummary( self, wrapper ):
 		element = self.__elementTree.getroot()
 
 		# calculate round trip time from commit to report
@@ -285,7 +313,7 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrap( "Description:  {0}".format( string_from_node( element, "exception/description" ) ) )
 
 		# show client information
-		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
+		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-platform-details"] ) )
 
 		# only show detailed summary on success or build error
 		returnCode = int ( element.attrib["returncode"] )
@@ -368,7 +396,7 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrap( "Build: {0}".format( element.attrib["name"] ) )
 			out += " "
 			wrapper.indent()
-			out += wrapper.wrap( "Platform:     {0} ({1})".format( element.attrib["sys-platform"], element.attrib["sys-version"] ) )
+			out += wrapper.wrap( "Platform:     {0} ({1})".format( element.attrib["sys-platform"], element.attrib["sys-platform-details"] ) )
 			out += wrapper.wrap( "Architecture: {0}".format( element.attrib["sys-architecture"] ) )
 			out += wrapper.wrap( "Node name:    {0}".format( element.attrib["sys-nodename"] ) )
 			out += " "
@@ -396,7 +424,7 @@ class XmlReportConverter( MObject ):
 
 			# show description if any
 			description = element.find( "objectdescription" ).text
-			if description is not None:
+			if description:
 				out += wrapper.wrap( "{0}: {1}".format( name, description ) )
 			else:
 				out += wrapper.wrap( name )
@@ -430,9 +458,9 @@ class XmlReportConverter( MObject ):
 			else:
 				name = element.attrib["name"]
 
-			out += wrapper.wrap( "Environments: {0} (Depends on: {1})".format( 
+			out += wrapper.wrap( "Environments: {0} ({1})".format( 
 					name,
-					element.find( "dependencies" ).text
+					element.find( "objectdescription" ).text
 			) )
 
 			# if there are no configurations attached: hide environments content, stop recursion here

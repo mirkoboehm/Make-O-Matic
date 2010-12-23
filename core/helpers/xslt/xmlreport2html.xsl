@@ -41,7 +41,8 @@
 		</xsl:variable>
 
 		<span class="{$stepResultClassName}">
-			<xsl:value-of select="@status"/>
+			<xsl:value-of select="@status"/>,
+			<xsl:value-of select="@result"/>
 		</span>
 
 	</xsl:template>
@@ -156,6 +157,12 @@ h5 {
 		</div>
 	</xsl:template>
 	
+	<xsl:template match="objectdescription">
+		<xsl:if test="string-length(.) > 0">
+			<xsl:value-of select="."/>
+		</xsl:if>
+	</xsl:template>
+	
 	<xsl:template match="build">
 		<h1>Build Report for: <xsl:value-of select="@name" /></h1>
 		<div class="tag-build">
@@ -193,7 +200,6 @@ h5 {
 			<xsl:if test="@isEnabled = 'False'">
 				[Disabled]
 			</xsl:if>
-			(Depends on: <xsl:value-of select="dependencies" />)
 		</h2>
 		<xsl:if test="count(./configuration) > 0">
 			<div class="tag-environments">
@@ -254,8 +260,8 @@ h5 {
 			<xsl:if test="@isOptional = 'True'">
 				[Optional]
 			</xsl:if>
-			<xsl:if test="string-length(plugindescription) > 0">
-				(<xsl:value-of select="plugindescription"/>)
+			<xsl:if test="string-length(objectdescription) > 0">
+				(<xsl:value-of select="objectdescription"/>)
 			</xsl:if>
 		</h5>
 		<!-- TODO: Doesn't work for some reason, why?
@@ -266,7 +272,7 @@ h5 {
 			<xsl:when test="@name = 'placeholder'" />
 		</xsl:choose>
 		<!--</div>-->
-		</xsl:template>
+	</xsl:template>
 
 	<xsl:template match="step">
 		<!-- Hide if no actions registered -->

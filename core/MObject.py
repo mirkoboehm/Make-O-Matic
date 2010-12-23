@@ -96,7 +96,7 @@ class MObject( object ):
 
 		node = document.createElement( self.getTagName() )
 		node.attributes["name"] = self.getName()
-		create_child_node( document, node, "objectdescription", str( self.getObjectDescription() ) )
-		create_child_node( document, node, "objectstatus", str( self.getObjectStatus() ) )
+		create_child_node( document, node, "objectdescription", self.getObjectDescription() if self.getObjectDescription() else "" )
+		create_child_node( document, node, "objectstatus", self.getObjectStatus() if self.getObjectStatus() else "" )
 
 		return node

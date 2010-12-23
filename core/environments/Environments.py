@@ -88,7 +88,7 @@ class Environments( ConfigurationBase ):
 			environment.cloneConfigurations( configs )
 
 	def getObjectDescription( self ):
-		return ', '.join( self.getDependencies() )
+		return "Dependencies: {0}".format( ', '.join( self.getDependencies() ) )
 
 	def prepare( self ):
 		'''Prepare method, overloaded.'''
@@ -248,5 +248,4 @@ class Environments( ConfigurationBase ):
 		node = super( Environments, self ).createXmlNode( document )
 		node.attributes["isOptional"] = str( self.isOptional() )
 		node.attributes["isEnabled"] = str( self.getChildren() > 0 ) # no configurations as children => disabled
-		create_child_node( document, node, "dependencies", ', '.join( self.getDependencies() ) )
 		return node
