@@ -17,15 +17,19 @@ def main():
 	# instantiate MApplication, required for debug() calls
 	app = MApplication()
 
+	# check if first parameter is set
 	try:
 		inputFile = sys.argv[1]
 	except IndexError:
 		usage()
 		return 1
 
-	#print_stderr( "Opening file: {0}".format( inputFile ) )
+	# start IO
 	fin = open( inputFile )
 	xmlReport = XmlReport( fin.read() )
+	fin.close
+
+	# start converting
 	converter = XmlReportConverter( xmlReport )
 	print( converter.convertToText() )
 
