@@ -27,7 +27,7 @@ from subprocess import Popen, PIPE
 class RunModeDescribeTests( MomTestCase ):
 
 	_THISFILEPATH = os.path.realpath( os.path.dirname( __file__ ) )
-	_BUILDSCRIPT = os.path.join( _THISFILEPATH, '..', 'buildscripts', 'example_charm.py' )
+	_BUILDSCRIPT = os.path.join( _THISFILEPATH, '..', 'buildscripts', 'example_mom_buildscript.py' )
 
 	def testDescribe( self ):
 		with DirectoryCompare( os.getcwd() ):

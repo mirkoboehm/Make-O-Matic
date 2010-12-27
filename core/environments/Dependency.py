@@ -121,7 +121,7 @@ class Dependency( MObject ):
 				return True
 			elif descriptionLine:
 				description = str( descriptionLine.group( 2 ) )
-				self.setObjectDescription( description )
+				self.setObjectStatus( description )
 				mApp().debugN( self, 3, '>description< "{0}"'.format( self.getObjectStatus() ) )
 				return True
 			elif scoreLine:
