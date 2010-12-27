@@ -50,7 +50,7 @@ class XmlReport( object ):
 		exception = mApp().getException()
 		if exception:
 			rootNode = mApp().createXmlNode( self.__doc, recursive = False )
-			rootNode.appendChild( create_exception_xml_node( self.__doc, exception[0], exception[1] ) )
+			rootNode.appendChild( create_exception_xml_node( self.__doc, exception[0], "".join( exception[1] ) ) )
 		else:
 			try:
 				rootNode = self._createNode( self.__instructions )
