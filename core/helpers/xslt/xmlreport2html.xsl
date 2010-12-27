@@ -201,13 +201,10 @@ h5 {
 				[Disabled]
 			</xsl:if>
 		</h2>
-		<xsl:if test="count(./configuration) > 0">
-			<div class="tag-environments">
-				<xsl:apply-templates/>
-			</div>
-		</xsl:if>
+		<div class="tag-environments">
+			<xsl:apply-templates/>
+		</div>
 	</xsl:template>
-	<xsl:template match="dependencies"/> <!-- do not show this tag -->
 
 	<xsl:template match="environment">
 		<h2>Environment: <xsl:value-of select="@name" /> (<xsl:call-template name="showBuildInstructionsStatus"/>)</h2>
