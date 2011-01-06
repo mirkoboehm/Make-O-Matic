@@ -34,6 +34,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 	myFilePath = os.path.realpath( __file__ )
 	myDirectory = os.path.split( myFilePath )[0]
 	testMomEnvironments = os.path.abspath( os.path.join( myDirectory , '..', 'cases', 'test-mom-environments' ) )
+	testDataDirectory = os.path.abspath( os.path.join( myDirectory , '..', 'data' ) )
 
 	def setUp( self, useScm = False, useEnvironments = False ):
 		MomTestCase.setUp( self, False )

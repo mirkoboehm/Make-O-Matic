@@ -95,7 +95,9 @@ class SCMSubversion( SourceCodeProvider ):
 			( info.committerName, info.commitMessage, info.revision, info.commitTime, info.commitTimeReadable ) = results
 
 			if self.getSCMUidMapper():
-				info.committerEmail = self.getSCMUidMapper().getEmail( info.committerName )
+				email = self.getSCMUidMapper().getEmail( info.committerName )
+				mApp().debugN( self, 5, "E-Mail address for {0} from SCM uid mapper: {1}".format( info.committerName, email ) )
+				info.committerEmail = email
 
 		# add to cache. do not add 'HEAD'
 		if self.getRevision():

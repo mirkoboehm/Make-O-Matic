@@ -1,0 +1,2 @@
+mirko = Mirko Boehm <mirko.boehm@kdab.com>
+kevin.funk = Kevin Funk <kevin.funk@kdab.com>

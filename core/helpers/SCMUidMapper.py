@@ -32,7 +32,7 @@ class SCMUidDictMap( SCMUidMap ):
 		self._dict = dictMap
 
 	def getEmail( self, uid ):
-		if uid in self._dict:
+		if uid in self._dict.keys():
 			return self._dict[uid]
 		else:
 			return None
@@ -49,7 +49,7 @@ class SCMUidSvnAuthorsFileMap( SCMUidDictMap ):
 		f = open( self.__filePath, 'r' )
 		content = f.read()
 
-		rx = re.compile( '(\w+) = \w+ <(.+)>', re.MULTILINE )
+		rx = re.compile( '(\S+)\s*=\s*.+ <(.+)>', re.MULTILINE )
 		matches = rx.findall( content )
 		for match in matches:
 			self._dict[match[0]] = match[1]

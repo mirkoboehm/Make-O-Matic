@@ -20,6 +20,8 @@
 import unittest
 from datetime import datetime
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
+from core.helpers.SCMUidMapper import SCMUidSvnAuthorsFileMap
+import os.path
 
 class ScmModulesTests ( MomBuildMockupTestCase ):
 
@@ -51,6 +53,15 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertNotEquals( info.commitTime, None )
 		self.assertNotEquals( info.commitTimeReadable, None )
 		self.assertNotEquals( info.revision, None )
+
+	def testScmUidMapperWithAuthorsMap( self ):
+		self._initialize( self.SVN_EXAMPLE )
+		scm = self.project.getScm()
+		mapper = scm.getSCMUidMapper()
+		fileMap = SCMUidSvnAuthorsFileMap( os.path.join( self.testDataDirectory, 'svn-authors-map-example.txt' ) )
+		mapper.addMapping( fileMap )
+		email = mapper.getEmail( "kevin.funk" )
+		self.assertNotEquals( email, None )
 
 	def testScmGit( self ):
 		self._initialize( self.GIT_EXAMPLE )

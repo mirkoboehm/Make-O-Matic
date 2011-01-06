@@ -24,6 +24,7 @@ from core.helpers.XmlUtils import create_child_node
 from core.helpers.XmlReportConverter import ReportFormat
 from core.helpers.SCMUidMapper import SCMUidMapper
 from buildcontrol.common.BuildInfo import BuildInfo
+from core.helpers.GlobalMApp import mApp
 
 class SourceCodeProvider( Plugin ):
 
@@ -127,7 +128,10 @@ class SourceCodeProvider( Plugin ):
 		raise NotImplementedError()
 
 	def prepare( self ):
-		for mapping in self.getSetting( self.DefaultUidMappings, False ) or []:
+		# add mappings set from config files
+		mappings = self.getSetting( self.DefaultUidMappings, False ) or []
+		mApp().debugN( self, 5, "Adding uid mappings for source code provider. Mappings found: {0}".format( len( mappings ) ) )
+		for mapping in mappings:
 			self.getSCMUidMapper().addMapping( mapping )
 
 		# We need to check for the SCM here to error if the SCM can't be found for checkout.
