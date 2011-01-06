@@ -58,7 +58,7 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self._initialize( self.SVN_EXAMPLE )
 		scm = self.project.getScm()
 		mapper = scm.getSCMUidMapper()
-		fileMap = SCMUidSvnAuthorsFileMap( os.path.join( self.testDataDirectory, 'svn-authors-map-example.txt' ) )
+		fileMap = SCMUidSvnAuthorsFileMap( os.path.join( self.TEST_DATA_DIRECTORY, 'svn-authors-map-example.txt' ) )
 		mapper.addMapping( fileMap )
 		email = mapper.getEmail( "kevin.funk" )
 		self.assertNotEquals( email, None )

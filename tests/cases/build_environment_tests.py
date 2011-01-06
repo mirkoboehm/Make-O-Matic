@@ -28,15 +28,15 @@ from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 
 class BuildEnvironmentTests( MomBuildMockupTestCase ):
 
-	myFilePath = os.path.realpath( __file__ )
-	myDirectory = os.path.split( myFilePath )[0]
-	testMomEnvironments = os.path.join( myDirectory , 'test-mom-environments' )
+	MY_FILE_PATH = os.path.realpath( __file__ )
+	MY_DIRECTORY = os.path.split( MY_FILE_PATH )[0]
+	TEST_MOM_ENVIRONMENTS = os.path.join( MY_DIRECTORY , 'test-mom-environments' )
 
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self, useEnvironments = True )
 
 		mApp().getSettings().set( Settings.ScriptLogLevel, 1 )
-		mApp().getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
+		mApp().getSettings().set( Settings.EnvironmentsBaseDir, self.TEST_MOM_ENVIRONMENTS )
 		mApp().addLogger( ConsoleLogger() )
 
 	def testTryFindNonExistantEnv( self ):
@@ -70,7 +70,7 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 				allPaths.append( dependency.getFolder() )
 
 	def testApplyPackageConfiguration( self ):
-		packageFolder = os.path.join( self.testMomEnvironments, 'dep-a-1.1.0' )
+		packageFolder = os.path.join( self.TEST_MOM_ENVIRONMENTS, 'dep-a-1.1.0' )
 		packageFile = os.path.join( packageFolder, Dependency._ControlFileName )
 		self.assertTrue( os.path.exists( packageFile ) )
 		dep = Dependency()
@@ -84,7 +84,7 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 			self.assertTrue( os.environ['PATH'].startswith( 'example_path' ) )
 
 	def testApplyDisabledPackageConfiguration( self ):
-		packageFolder = os.path.join( self.testMomEnvironments, 'dep-a-1.2.0' )
+		packageFolder = os.path.join( self.TEST_MOM_ENVIRONMENTS, 'dep-a-1.2.0' )
 		packageFile = os.path.join( packageFolder, Dependency._ControlFileName )
 		self.assertTrue( os.path.exists( packageFile ) )
 		dep = Dependency()

@@ -31,11 +31,6 @@ from core.plugins.DoxygenGenerator import DoxygenGenerator
 class MomBuildMockupTestCase( MomTestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''
 
-	myFilePath = os.path.realpath( __file__ )
-	myDirectory = os.path.split( myFilePath )[0]
-	testMomEnvironments = os.path.abspath( os.path.join( myDirectory , '..', 'cases', 'test-mom-environments' ) )
-	testDataDirectory = os.path.abspath( os.path.join( myDirectory , '..', 'data' ) )
-
 	def setUp( self, useScm = False, useEnvironments = False ):
 		MomTestCase.setUp( self, False )
 
@@ -62,7 +57,7 @@ class MomBuildMockupTestCase( MomTestCase ):
 		Configuration( 'Debug', environments )
 		Configuration( 'Release', environments )
 
-		build.getSettings().set( Settings.EnvironmentsBaseDir, self.testMomEnvironments )
+		build.getSettings().set( Settings.EnvironmentsBaseDir, self.TEST_MOM_ENVIRONMENTS )
 
 		self.build = build
 		self.project = project

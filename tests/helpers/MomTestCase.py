@@ -32,6 +32,11 @@ class MomTestCase( unittest.TestCase ):
 
 	ENV_KEY = "MOM_TESTS_RUNNING"
 
+	MY_FILE_PATH = os.path.realpath( __file__ )
+	MY_DIRECTORY = os.path.split( MY_FILE_PATH )[0]
+	TEST_MOM_ENVIRONMENTS = os.path.abspath( os.path.join( MY_DIRECTORY , '..', 'cases', 'test-mom-environments' ) )
+	TEST_DATA_DIRECTORY = os.path.abspath( os.path.join( MY_DIRECTORY , '..', 'data' ) )
+
 	def __init__( self, methodName = 'runTest' ):
 		unittest.TestCase.__init__( self, methodName )
 
