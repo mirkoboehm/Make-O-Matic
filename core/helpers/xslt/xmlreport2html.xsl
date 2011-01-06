@@ -257,8 +257,8 @@ h5 {
 			<xsl:if test="@isOptional = 'True'">
 				[Optional]
 			</xsl:if>
-			<xsl:if test="string-length(objectdescription) > 0">
-				(<xsl:value-of select="objectdescription"/>)
+			<xsl:if test="string-length(objectstatus) > 0">
+				(<xsl:value-of select="objectstatus"/>)
 			</xsl:if>
 		</h5>
 		<!-- TODO: Doesn't work for some reason, why?
