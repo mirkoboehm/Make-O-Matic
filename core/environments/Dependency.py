@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.MObject import MObject
 import os
 from core.helpers.GlobalMApp import mApp
@@ -34,6 +35,7 @@ class Dependency( MObject ):
 		MObject.__init__( self, name )
 		self.__commands = []
 		self.setFolder( folder )
+		self.setObjectStatus( os.path.split( folder )[1] if folder else None )
 		self._setValid( False )
 		self.setEnabled( False )
 		self.setScore( 0 )
@@ -198,10 +200,3 @@ class Dependency( MObject ):
 			else:
 				mApp().debugN( self, 4, '{0} is not a MOM dependency folder'.format( str( self.getFolder() ) ) )
 				return False
-
-	def getObjectStatus( self ):
-		description = super( Dependency, self ).getObjectStatus()
-		if description:
-			return description
-		else:
-			return os.path.split( self.getFolder() )[1]
