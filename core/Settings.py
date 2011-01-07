@@ -73,7 +73,10 @@ class Settings( Defaults ):
 					continue
 				mApp().debugN( self, 2, 'Loading configuration file "{0}"'.format( configFile ) )
 				try:
-					currentGlobals = { 'application' : mApp() }
+					currentGlobals = {
+						'__file__' : configFile,
+						'application' : mApp()
+					}
 					with open( configFile ) as f:
 						code = f.read()
 						exec( code, currentGlobals )
