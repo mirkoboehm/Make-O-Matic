@@ -227,7 +227,7 @@ h5 {
 					<tr>
 						<th width="500px">Steps: <xsl:value-of select="@name" /></th>
 						<th width="200px">Timing</th>
-						<th width="300px">Status</th>
+						<th width="300px">Status, Result</th>
 					</tr>
 				</thead>
 				<tbody>

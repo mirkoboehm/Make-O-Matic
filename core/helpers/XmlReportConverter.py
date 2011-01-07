@@ -300,7 +300,7 @@ class XmlReportConverter( MObject ):
 
 		# show failed steps if any
 		failedSteps = set( [] )
-		for node in find_nodes_with_attribute_and_value( element, "step", "failed", "True" ):
+		for node in find_nodes_with_attribute_and_value( element, "step", "result", "Failure" ):
 			failedSteps.add( node.attrib["name"] )
 
 		out += wrapper.wrap( "Build status: {0} {1}".format( 
