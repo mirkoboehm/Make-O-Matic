@@ -171,14 +171,20 @@ class SCMGit( SourceCodeProvider ):
 
 	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
+
 		assert self.getInstructions()
 		step = self.getInstructions().getStep( 'project-checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
+
 		updateCommand = [ self.getCommand(), 'clone', '--local', '--depth', '1', self._getHiddenClonePath(), "." ]
+		# fix 'failed to create link' errors on windows, seems like windows does not like cross-device (hard) links 
+		if sys.platform == 'win32':
+			updateCommand.append( '--no-hardlinks' )
 		updateClone = ShellCommandAction( updateCommand, searchPaths = self.getCommandSearchPaths() )
 		updateClone.setWorkingDirectory( self.getSrcDir() )
 		step.addMainAction( updateClone )
+
 		checkoutCommand = [ self.getCommand(), 'checkout', self.getTreeish() ]
 		checkout = ShellCommandAction( checkoutCommand, searchPaths = self.getCommandSearchPaths() )
 		checkout.setWorkingDirectory( self.getSrcDir() )
