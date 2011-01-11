@@ -52,7 +52,7 @@ class LocalSourceDirectory( SourceCodeProvider ):
 		if not os.path.isdir( folder ):
 			raise ConfigurationError( 'The local source directory "{0}" does not exist!'.format( folder ) )
 		project = self.getInstructions()
-		project.setSourceDir( folder )
+		project.setSourceDir( os.path.abspath( folder ) )
 
 	def fetchRepositoryFolder( self, remotePath ):
 		raise MomError( 'Remote building cannot be used with a local source directory!' )
