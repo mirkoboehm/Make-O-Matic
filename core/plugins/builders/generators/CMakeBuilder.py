@@ -19,6 +19,9 @@
 
 from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
 import sys
+from core.helpers.GlobalMApp import mApp
+from core.plugins.builders.maketools.NMakeTool import NMakeTool
+from core.plugins.builders.maketools import JomTool
 
 def getCMakeSearchPaths():
 	searchPaths = []
@@ -64,6 +67,20 @@ class CMakeVariable( object ):
 class CMakeBuilder( MakefileGeneratorBuilder ):
 	'''CMakeBuilder generates the actions to build a project with cmake.'''
 
+	def getCMakeGeneratorSwitch( self ):
+		"""\see http://cmake.org/Wiki/CMake_Generator_Specific_Information"""
+
+		if not self.getMakeTool():
+			return None
+
+		# do not escape or quote here, it does not work for some reason
+		if isinstance( self.getMakeTool(), NMakeTool ):
+			return '-GNMake Makefiles'
+		elif isinstance( self.getMakeTool(), JomTool ):
+			return '-GNMake Makefiles JOM'
+		else:
+			return None
+
 	def __init__( self, name = None, inSourceBuild = False ):
 		MakefileGeneratorBuilder.__init__( self, name )
 		self._setCommand( 'cmake' )
@@ -85,8 +102,15 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 		configuration = self.getInstructions()
 		self.addCMakeVariable( CMakeVariable( 'CMAKE_INSTALL_PREFIX', configuration.getTargetDir() ) )
 		arguments = []
+
+		generatorSwitch = self.getCMakeGeneratorSwitch()
+		if generatorSwitch:
+			mApp().debugN( self, 5, 'adding cmake generator switch: {0}'.format( generatorSwitch ) )
+			arguments.append( generatorSwitch )
+
 		for variable in self.getCMakeVariables():
 			arguments.append( '-D{0}'.format( variable ) )
+
 		arguments.append( configuration.getProject().getSourceDir() )
 		self._setCommandArguments( arguments )
 		MakefileGeneratorBuilder.createConfigureActions( self )
