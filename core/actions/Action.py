@@ -135,9 +135,12 @@ class Action( MObject ):
 						self._setResult( int( result ) )
 						self._finished()
 					except MomException as e:
+						innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
 						self._aborted()
 						mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
-						mApp().debugN( self, 2, traceback.format_exc() )
+						mApp().debugN( self, 2, innerTraceback )
+
+						self._setStdErr( "{0}:\n\n{1}".format( e, innerTraceback ) )
 
 						self._setResult( e.getReturnCode() )
 					if step.getLogfileName():

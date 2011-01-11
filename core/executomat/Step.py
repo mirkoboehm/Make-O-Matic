@@ -35,7 +35,7 @@ class Step( MObject ):
 
 	class Status( Enum ):
 		'''Enumerated values representing the status of a step.'''
-		New, Skipped_Disabled, Started, Finished, Skipped_Error = range( 5 )
+		New, Skipped_Disabled, Started, Finished, Skipped_PreviousError = range( 5 )
 		_Descriptions = [ 'new', 'skipped (disabled)', 'started', 'finished', 'skipped (previous error)' ]
 
 	"""An individual step of an Executomat run."""
@@ -53,7 +53,7 @@ class Step( MObject ):
 
 	def setStatus( self, status ):
 		if status in ( Step.Status.New, Step.Status.Skipped_Disabled, Step.Status.Started,
-					Step.Status.Finished, Step.Status.Skipped_Error ):
+					Step.Status.Finished, Step.Status.Skipped_PreviousError ):
 			self.__status = status
 		else:
 			raise MomError( 'Unknown step status {0}'.format( status ) )
@@ -142,8 +142,7 @@ class Step( MObject ):
 	def _logEnvironment( self, executomat ):
 		mApp().debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )
 		for key in os.environ:
-			if key == "PATH":
-				mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
+			mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
 
 	def execute( self, instructions ):
 		"""Execute the step"""
@@ -154,7 +153,7 @@ class Step( MObject ):
 			return True
 		# (usually) abort if another step has failed for this Instructions object:
 		if not instructions._stepsShouldExecute() and not self.getExecuteOnFailure():
-			self.setStatus( Step.Status.Skipped_Error )
+			self.setStatus( Step.Status.Skipped_PreviousError )
 			return True
 		with self.getTimeKeeper():
 			self._logEnvironment( instructions )
@@ -180,7 +179,7 @@ class Step( MObject ):
 						if result != 0:
 							self.setResult( Step.Result.Failure )
 					else:
-						self.setStatus( Step.Status.Skipped_Error )
+						self.setStatus( Step.Status.Skipped_PreviousError )
 					mApp().debugN( self, 3, '{0}: "{1}" {2}'.format( phase, action.getLogDescription(), resultText ) )
 			self.setStatus( Step.Status.Finished )
 			return self.getResult() != Step.Result.Failure
