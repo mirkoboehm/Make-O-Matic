@@ -121,7 +121,7 @@ class MApplication( Instructions ):
 			return
 
 		self.__exception = exception
-		self.debugN( self, 2, "exception registered: {0} ".format( exception[0] ) )
+		self.debugN( self, 2, "exception registered: {0}".format( exception[0] ) )
 		self.debugN( self, 5, "printing traceback:\n{0}".format( "".join( exception[1] ) ) )
 
 	def getException( self ):

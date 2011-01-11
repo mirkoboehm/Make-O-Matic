@@ -45,7 +45,13 @@ class ConsoleLogger( Logger ):
 			pass # no base directory set yet		
 		if not text.endswith( '\n' ):
 			text = text + '\n'
-		pieces = [ self.timeStampPrefix(), self.messagePrefix() or None, '[{0}]'.format( mobject.getName() ), text ]
+
+		if mobject.__class__.__name__ == mobject.getName():
+			typeName = '[{0}]'.format( mobject.__class__.__name__ )
+		else:
+			typeName = '[{0}: {1}]'.format( mobject.__class__.__name__, mobject.getName() )
+
+		pieces = [ self.timeStampPrefix(), self.messagePrefix() or None, typeName, text ]
 		pieces = filter( lambda x: x, pieces )
 		fulltext = ' '.join( pieces )
 		# fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )

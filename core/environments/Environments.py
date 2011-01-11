@@ -36,6 +36,8 @@ class Environments( ConfigurationBase ):
 		'''Constructor.'''
 		ConfigurationBase.__init__( self, name, parent )
 		self._setDependencies( dependencies )
+		if dependencies:
+			self.setObjectStatus( "Dependencies: {0}".format( ", ".join( dependencies ) ) )
 		self.setOptional( False )
 
 	def _setDependencies( self, deps ):
@@ -86,9 +88,6 @@ class Environments( ConfigurationBase ):
 		for environment in environments:
 			environment.cloneConfigurations( configs )
 
-	def getObjectStatus( self ):
-		return "Dependencies: {0}".format( ', '.join( self.getDependencies() ) )
-
 	def prepare( self ):
 		'''Prepare method, overloaded.'''
 		# discover matching environments:
@@ -106,6 +105,7 @@ class Environments( ConfigurationBase ):
 			if not environments:
 				status = 'optional' if self.isOptional() else 'required'
 				self.setObjectStatus( 'no environments found ({0})'.format( status ) )
+				mApp().message( self, self.getObjectStatus() )
 				if self.isOptional():
 					mApp().message( self, '{0}, continuing.'.format( self.getObjectStatus() ) )
 				else:
@@ -157,6 +157,8 @@ class Environments( ConfigurationBase ):
 		matches = []
 		if not folders:
 			return None
+
+		mApp().debugN( self, 3, 'trying to find matching environments for {0}'.format( ", ".join( self.getDependencies() ) ) )
 		folder = folders[0]
 		for dep in remainingDependencies:
 			for item in os.listdir( folder ):
@@ -179,6 +181,8 @@ class Environments( ConfigurationBase ):
 					else:
 						# yay, all dependencies have been found
 						matches.append( newPackages )
+				else:
+					mApp().debugN( self, 4, 'dependency {0} does not match {1}'.format( item, dep ) )
 		return matches
 
 	def __ensureDependencyOrder( self, unsortedMatches, dependencies ):

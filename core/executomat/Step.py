@@ -142,13 +142,12 @@ class Step( MObject ):
 	def _logEnvironment( self, executomat ):
 		mApp().debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )
 		for key in os.environ:
-			mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
+			if key == "PATH":
+				mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
 
 	def execute( self, instructions ):
 		"""Execute the step"""
 		check_for_nonempty_string( self.getName(), "Cannot execute a step with no name!" )
-		if not self.isEmpty():
-			mApp().debugN( self, 2, 'starting step "{0}"'.format( self.getName() ) )
 		self.setStatus( Step.Status.Started )
 		if not self.isEnabled():
 			self.setStatus( Step.Status.Skipped_Disabled )
@@ -171,6 +170,8 @@ class Step( MObject ):
 			for phase, actions in phases:
 				if not actions:
 					mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
+				else:
+					mApp().debugN( self, 3, 'phase "{0}" has {1} actions registered, starting execution'.format( phase, len( actions ) ) )
 				for action in actions:
 					resultText = 'skipped'
 					if self.getResult() != Step.Result.Failure or action.getIgnorePreviousFailure():
