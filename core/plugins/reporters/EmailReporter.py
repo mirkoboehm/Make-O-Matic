@@ -89,6 +89,7 @@ class EmailReporter( Reporter ):
 		reporterConfigurationErrorRecipients = mApp().getSettings().get( Settings.EmailReporterConfigurationErrorRecipients, False )
 		reporterMomErrorRecipients = mApp().getSettings().get( Settings.EmailReporterMomErrorRecipients, False )
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
+		reporterUseCompression = mApp().getSettings().get( Settings.EmailReporterUseCompressionForAttachments, False )
 
 		# get revision info, do not crash here
 		info = instructions.getProject().getScm().getRevisionInfo()
@@ -151,8 +152,8 @@ class EmailReporter( Reporter ):
 		# attachments
 		exception = mApp().getException()
 		if exception:
-			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], exception[1] ), "build.log", useCompression = True )
+			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], exception[1] ), "build.log", useCompression = reporterUseCompression )
 		elif returnCode != 0:
-			email.addTextAttachment( converter.convertToFailedStepsLog(), "failed-steps.log", useCompression = True )
+			email.addTextAttachment( converter.convertToFailedStepsLog(), "failed-steps.log", useCompression = reporterUseCompression )
 
 		return email

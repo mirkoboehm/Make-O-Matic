@@ -93,6 +93,7 @@ class Defaults( MObject ):
 	EmailReporterConfigurationErrorRecipients = 'emailreporter.configurationerrorrecipients'
 	EmailReporterMomErrorRecipients = 'emailreporter.momerrorrecipients'
 	EmailReporterNotifyCommitterOnFailure = 'emailreporter.notifycommitteronfailure'
+	EmailReporterUseCompressionForAttachments = 'emailreporter.usecompressionforattachments'
 	# ----- Emailer settings:
 	EmailerSmtpServer = 'emailer.smtpserver'
 	EmailerServerPort = 'emailer.serverport'
@@ -174,6 +175,7 @@ class Defaults( MObject ):
 		# ----- EmailReporter settings:
 		defaultSettings[ Defaults.EmailReporterMomErrorRecipients] = None
 		defaultSettings[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
+		defaultSettings[ Defaults.EmailReporterUseCompressionForAttachments ] = False
 		# ----- simple_ci settings:
 		defaultSettings[ Defaults.SimpleCIBuildJobCap ] = 8
 		defaultSettings[ Defaults.SimpleCIScriptDebugLevel ] = 0
