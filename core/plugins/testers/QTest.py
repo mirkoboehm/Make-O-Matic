@@ -37,17 +37,11 @@ class QTest( TestProvider ):
 	def preFlightCheck( self ):
 		self.getMakeTool().checkVersion()
 
-	def saveReport( self ):
-		mApp().debugN( self, 3, "Saving unit test report" )
-
-		stdout = self.getAction()._getRunner().getStdOut()
-		if not stdout:
-			return
-
+	def _parseReport( self, report ):
 		totalPassed = 0
 		totalFailed = 0
 		totalSkipped = 0
-		for line in stdout.split( '\n' ):
+		for line in report.split( '\n' ):
 			match = re.match( '^Totals: (.+) passed, (.+) failed, (.+) skipped$', line )
 			if match:
 				passed = match.group( 1 )
@@ -56,8 +50,20 @@ class QTest( TestProvider ):
 				totalFailed += int( failed )
 				skipped = match.group( 3 )
 				totalSkipped += int( skipped )
+		return totalPassed, totalFailed, totalSkipped
+
+	def saveReport( self ):
+		mApp().debugN( self, 3, "Saving unit test report" )
+
+		stdout = self.getAction()._getRunner().getStdOut()
+		if not stdout:
+			return
+
+		totalPassed, totalFailed, totalSkipped = self._parseReport( stdout )
 
 		report = "{0} tests passed".format( totalPassed )
+		if totalSkipped:
+			report += " ({0} skipped)".format( totalSkipped )
 		total = totalPassed + totalFailed
 		self._setReport( report )
 		self._setScore( total - totalFailed, total )

@@ -54,6 +54,7 @@ from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
 from core.plugins.python.PyLintChecker import PyLintChecker
 from core.MApplication import MApplication
 from tests.cases.analyzer_tests import AnalyzerTest
+from tests.cases.qtest_tests import QTestTests
 
 CLASSES = [
 	# self tests first
@@ -79,7 +80,8 @@ CLASSES = [
 	ScmFactoryTests,
 	ScmModulesTests,
 	XmlReportTests,
-	SettingsTests
+	SettingsTests,
+	QTestTests
 ]
 
 DEPENDENCIES = [
