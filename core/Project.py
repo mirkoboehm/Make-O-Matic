@@ -48,7 +48,7 @@ class Project( BuildInstructions ):
 		assert isinstance( self.getParent(), Build )
 		return self.getParent()
 
-	def createScm( self, url, branch, tag, revision ):
+	def createScm( self, url, branch = None, tag = None, revision = None ):
 		scm = getScm( url )
 		scm.setSrcDir( PathResolver( self.getSourceDir ) )
 		scm.setBranch( branch )
