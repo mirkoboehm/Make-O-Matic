@@ -55,11 +55,11 @@ class ProxyBuilder( MApplication ):
 		# if location, branch or tag parameters are not specified on the command line, add the settings from 
 		# the invoking script to the arguments:
 		if not self.getParameters().getScmLocation() and location:
-			options.extend( [ '-u', location] )
+			options = [ '-u', location] + options
 		if not self.getParameters().getBranch() and branch:
-			options.extend( [ '--branch', branch ] )
+			options = [ '--branch', branch ] + options
 		if not self.getParameters().getTag() and tag:
-			options.extend( [ '--tag', tag] )
+			options = [ '--tag', tag] + options
 		runner = builder.invokeBuild( options )
 		rc = runner.getReturnCode()
 		self.registerReturnCode( rc )
