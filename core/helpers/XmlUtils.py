@@ -38,7 +38,7 @@ def create_exception_xml_node( document, exception, traceback ):
 		node.attributes["type"] = returncode_to_description( exception.getReturnCode() )
 		node.attributes["returncode"] = str( exception.getReturnCode() )
 	else:
-		node.attributes["type"] = "An unhandled exception occured"
+		node.attributes["type"] = "An unhandled exception occurred"
 		node.attributes["returncode"] = str( None )
 
 	return node
