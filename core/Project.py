@@ -48,12 +48,12 @@ class Project( BuildInstructions ):
 		assert isinstance( self.getParent(), Build )
 		return self.getParent()
 
-	def createScm( self, url ):
+	def createScm( self, url, branch, tag, revision ):
 		scm = getScm( url )
 		scm.setSrcDir( PathResolver( self.getSourceDir ) )
-		scm.setRevision( mApp().getParameters().getRevision() )
-		scm.setBranch( mApp().getParameters().getBranch() )
-		scm.setTag( mApp().getParameters().getTag() )
+		scm.setBranch( branch )
+		scm.setTag( tag )
+		scm.setRevision( revision )
 		self.setScm( scm )
 
 	def setScm( self, scm ):

@@ -61,7 +61,7 @@ def getProject( build, name, url, version, revision, branch, tag, versionName ):
 	mApp().getSettings().set( Settings.ProjectRevision, revision )
 	mApp().getSettings().set( Settings.ProjectBranch, branch )
 	mApp().getSettings().set( Settings.ProjectTag, tag )
-	project.createScm( url )
+	project.createScm( url, branch, tag, revision )
 	build.setProject( project )
 	return project
 
