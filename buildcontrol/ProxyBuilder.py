@@ -27,13 +27,15 @@ class ProxyBuilder( MApplication ):
 	'''ProxyBuilder takes a few arguments that describe a remote build script, 
 	and then executes that build script using a RemoteBuilder.'''
 
-	def __init__( self, location, path = 'admin', script = 'buildscript.py' ):
+	def __init__( self, location, branch = None, tag = None, path = 'admin', script = 'buildscript.py' ):
 		MApplication.__init__( self, name = 'proxybuilder' )
 		self.addLogger( ConsoleLogger() )
 		self.__params = Parameters()
 		self.__params.parse()
 		self.getSettings().set( Settings.ScriptLogLevel, self.__params.getDebugLevel() )
 		self.__location = location
+		self.__branch = branch
+		self.__tag = tag
 		self.__path = path
 		self.__script = script
 
@@ -44,11 +46,20 @@ class ProxyBuilder( MApplication ):
 		return self.__params
 
 	def execute( self ):
-		builder = RemoteBuilder( location = self.__location, path = self.__path, script = self.__script )
+		location = self.getParameters().getScmLocation() or self.__location
+		branch = self.getParameters().getBranch() or self.__branch
+		tag = self.getParameters().getTag() or self.__tag
+		builder = RemoteBuilder( location = location, branch = branch, tag = tag, path = self.__path, script = self.__script )
 		builder.setRevision( self.getParameters().getRevision() )
-		if self.getParameters().getScmLocation():
-			builder.setLocation( self.getParameters().getScmLocation() )
 		options = sys.argv[1:]
+		# if location, branch or tag parameters are not specified on the command line, add the settings from 
+		# the invoking script to the arguments:
+		if not self.getParameters().getScmLocation() and location:
+			options.extend( [ '-u', location] )
+		if not self.getParameters().getBranch() and branch:
+			options.extend( [ '--branch', branch ] )
+		if not self.getParameters().getTag() and tag:
+			options.extend( [ '--tag', tag] )
 		runner = builder.invokeBuild( options )
 		rc = runner.getReturnCode()
 		self.registerReturnCode( rc )

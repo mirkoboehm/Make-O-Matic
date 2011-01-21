@@ -23,11 +23,13 @@ from core.plugins.sourcecode import getScm
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 
 class RemoteBuilder( MObject ):
-	def __init__( self, revision = None, location = None, path = None, script = None, name = None ):
+	def __init__( self, revision = None, location = None, branch = None, tag = None, path = None, script = None, name = None ):
 		MObject.__init__( self, name )
 		self.setRevision( revision )
 		self.setBuildscript( script )
 		self.setLocation( location )
+		self.setBranch( branch )
+		self.setTag( tag )
 		self.setPath( path )
 
 	def setRevision( self, revision ):
@@ -41,6 +43,18 @@ class RemoteBuilder( MObject ):
 
 	def getLocation( self ):
 		return self.__location
+
+	def setBranch( self, branch ):
+		self.__branch = branch
+
+	def getBranch( self ):
+		return self.__branch
+
+	def setTag( self, tag ):
+		self.__tag = tag
+
+	def getTag( self ):
+		return self.__tag
 
 	def setPath( self, path ):
 		self.__path = path
@@ -57,6 +71,8 @@ class RemoteBuilder( MObject ):
 	def fetchBuildScript( self ):
 		# create SCM implementation:
 		scm = getScm( self.getLocation() )
+		scm.setBranch( self.getBranch() )
+		scm.setTag( self.getTag() )
 		scm.setRevision( self.getRevision() )
 		path = scm.fetchRepositoryFolder( self.getPath() )
 		localBuildscript = os.path.join( path, self.getBuildscript() )
