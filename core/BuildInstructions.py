@@ -64,7 +64,7 @@ class BuildInstructions( Instructions ):
 		createStep = self.getStep( 'create-folders' )
 		createStep.addMainAction( MkDirAction( self.getBaseDir() ) )
 		# add action to delete the base directory (but not the log directory):
-		cleanupStep = self.getStep( 'build-cleanup' )
+		cleanupStep = self.getStep( 'cleanup' )
 		cleanupStep.prependMainAction( RmDirAction( self.getBaseDir() ) )
 		# create the log directory
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )

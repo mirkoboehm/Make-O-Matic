@@ -63,7 +63,7 @@ class DoxygenGenerator( Plugin ):
 			step.addMainAction( MkDirAction( docsDir ) )
 
 			# cleanup
-			step = self.getInstructions().getStep( 'build-cleanup' )
+			step = self.getInstructions().getStep( 'cleanup' )
 			step.addMainAction( RmDirAction( docsDir ) )
 
 		# run doxygen

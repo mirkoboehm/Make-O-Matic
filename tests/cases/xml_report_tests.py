@@ -175,13 +175,13 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		def failed_new( self ):
 			return Step.Result.Failure
 
-		step = self.project.getStep( 'build-cleanup' )
+		step = self.project.getStep( 'cleanup' )
 		replace_bound_method( step, step.getResult, failed_new )
 
 		converter = XmlReportConverter( self.getXmlReport() )
 		logText = converter.convertToFailedStepsLog()
 
-		self.assertTrue( "build-cleanup" in logText )
+		self.assertTrue( "cleanup" in logText )
 
 	def testXmlReportOnException( self ):
 		# Covers runSetups phase
