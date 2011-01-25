@@ -128,7 +128,7 @@ class Defaults( MObject ):
 			[ 'checkout', 'mcgdhpsf', False ],
 			[ 'export-sources', 'mcgdhpsf', False ],
 			[ 'configure', 'mcgdhpsf', False ],
-			[ 'conf-make', 'mcgdhpsf', False ],
+			[ 'build', 'mcgdhpsf', False ],
 			[ 'conf-make-test', 'mcgdhpsf', False ],
 			[ 'conf-make-install', 'mcgdhpsf', False ],
 			[ 'conf-package', 'dsfp', False ],

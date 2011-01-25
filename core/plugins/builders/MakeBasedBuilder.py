@@ -49,7 +49,7 @@ class MakeBasedBuilder( Builder ):
 		command.extend( tool.getArguments() )
 		action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
 		action.setWorkingDirectory( self._getBuildDir() )
-		step = self.getInstructions().getStep( 'conf-make' )
+		step = self.getInstructions().getStep( 'build' )
 		step.addMainAction( action )
 
 	def createConfMakeInstallActions( self ):
