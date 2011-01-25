@@ -134,7 +134,7 @@ class Defaults( MObject ):
 			[ 'create-packages', 'dsfp', False ],
 			[ 'create-docs', 'mcgdhpsf', False ],
 			[ 'upload-packages', 'dsf', False ],
-			[ 'project-cleanup-packages', 'cdsf', True ],
+			[ 'cleanup-packages', 'cdsf', True ],
 			[ 'build-cleanup', 'mcdsf', True ] ]
 		defaultSettings[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
 			'e' : 'Empty build. All build steps are disabled. Useful for debugging build scripts.',
