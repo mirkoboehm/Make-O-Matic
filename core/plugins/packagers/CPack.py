@@ -176,7 +176,7 @@ class CPack( PackageProvider ):
 	def makePackageStep( self ):
 		"""Create packages for the project using CPack."""
 		configuration = self.getInstructions()
-		step = configuration.getStep( 'conf-package' )
+		step = configuration.getStep( 'create-packages' )
 		project = configuration.getProject()
 		if self._sourcePackage:
 			packagedDirectory = os.path.join( project.getSourceDir(), configuration.getSourcePrefix() )

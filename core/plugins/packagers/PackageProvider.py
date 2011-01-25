@@ -29,7 +29,7 @@ class PackageProvider( Plugin ):
 		"""Create package for the project."""
 		if self.getCommandArguments() == None:
 			raise NotImplementedError()
-		step = self.getInstructions().getStep( 'conf-package' )
+		step = self.getInstructions().getStep( 'create-packages' )
 		command = [ self.getCommand() ]
 		command.extend( self.getCommandArguments() )
 		makePackage = ShellCommandAction( command, searchPaths = self.getCommandSearchPaths() )
