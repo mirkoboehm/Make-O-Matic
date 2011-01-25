@@ -19,14 +19,22 @@
 
 from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
 import os
+from core.helpers.GlobalMApp import mApp
 
 class QMakeBuilder( MakefileGeneratorBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
 
 	def __init__( self, name = None, projectFile = None ):
 		MakefileGeneratorBuilder.__init__( self, name )
+		self.enableInstallation( False )
 		self._projectFile = projectFile
 		self._setCommand( "qmake" )
+
+	def enableInstallation( self, onoff ):
+		self.__install = onoff
+
+	def installEnabled( self ):
+		return self.__install
 
 	def createConfigureActions( self ):
 		if not self.getInSourceBuild():
@@ -42,4 +50,8 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 
 	def createConfMakeInstallActions( self ):
 		# Stupidly, QMake doesn't have a standard way of installing to a prefix so just disable this
-		pass
+		if self.installEnabled():
+			super( QMakeBuilder, self ).createConfMakeInstallActions()
+		else:
+			mApp().debugN( self, 3, 'Installation is not implemented by the project, not generating any actions.' )
+			pass
