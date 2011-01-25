@@ -130,7 +130,7 @@ class Defaults( MObject ):
 			[ 'configure', 'mcgdhpsf', False ],
 			[ 'build', 'mcgdhpsf', False ],
 			[ 'test', 'mcgdhpsf', False ],
-			[ 'conf-make-install', 'mcgdhpsf', False ],
+			[ 'install', 'mcgdhpsf', False ],
 			[ 'conf-package', 'dsfp', False ],
 			[ 'project-create-docs', 'mcgdhpsf', False ],
 			[ 'project-package', 'dsf', False ],

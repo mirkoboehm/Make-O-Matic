@@ -60,5 +60,5 @@ class MakeBasedBuilder( Builder ):
 		command.append( mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) )
 		action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
 		action.setWorkingDirectory( self._getBuildDir() )
-		step = self.getInstructions().getStep( 'conf-make-install' )
+		step = self.getInstructions().getStep( 'install' )
 		step.addMainAction( action )
