@@ -26,7 +26,7 @@ from core.Exceptions import ConfigurationError
 class SettingsTests ( MomTestCase ):
 
 	def testSetBuildStepEnabled( self ):
-		step = 'project-upload-packages'
+		step = 'upload-packages'
 		self.assertFalse( mApp().getSettings().getBuildStepEnabled( step, 'c' ) )
 		mApp().getSettings().setBuildStepEnabled( step, 'c', True )
 		self.assertTrue( mApp().getSettings().getBuildStepEnabled( step, 'c' ) )

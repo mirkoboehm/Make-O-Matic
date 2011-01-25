@@ -34,7 +34,7 @@ class RSyncPublisher( Plugin ):
 		self._setCommandSearchPaths( searchPaths )
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
-		self.setStep( 'project-upload-packages' )
+		self.setStep( 'upload-packages' )
 
 	def getObjectStatus( self ):
 		return "Upload location: {0}".format( self.getUploadLocation() )
@@ -111,7 +111,7 @@ class RSyncPackagesPublisher( RSyncPublisher ):
 		RSyncPublisher.__init__( self, name,
 			uploadLocation = mApp().getSettings().get( Settings.PublisherPackageUploadLocation ),
 			localDir = PathResolver( mApp().getPackagesDir ) )
-		self.setStep( 'project-upload-packages' )
+		self.setStep( 'upload-packages' )
 
 # FIXME the reports publisher needs to be called after the build finished 
 # (chicken and egg problem, the report can only be created once the build is done)
