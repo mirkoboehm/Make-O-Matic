@@ -133,7 +133,6 @@ class Defaults( MObject ):
 			[ 'install', 'mcgdhpsf', False ],
 			[ 'create-packages', 'dsfp', False ],
 			[ 'create-docs', 'mcgdhpsf', False ],
-			[ 'project-package', 'dsf', False ],
 			[ 'project-upload-packages', 'dsf', False ],
 			[ 'project-cleanup-packages', 'cdsf', True ],
 			[ 'build-cleanup', 'mcdsf', True ] ]
