@@ -126,7 +126,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.ProjectBuildSequence] = [ # name, modes, execute-on-failure
 			[ 'create-folders', 'mcgdhpsf', False ],
 			[ 'checkout', 'mcgdhpsf', False ],
-			[ 'conf-export-sources', 'mcgdhpsf', False ],
+			[ 'export-sources', 'mcgdhpsf', False ],
 			[ 'conf-configure', 'mcgdhpsf', False ],
 			[ 'conf-make', 'mcgdhpsf', False ],
 			[ 'conf-make-test', 'mcgdhpsf', False ],

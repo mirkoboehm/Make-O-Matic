@@ -51,7 +51,7 @@ class Builder( Plugin ):
 			source = os.path.join( configuration.getProject().getSourceDir(), configuration.getSourcePrefix() )
 			build = configuration.getBuildDir()
 			ignore = ['.svn/', '.git/']
-			step = self.getInstructions().getStep( 'conf-export-sources' )
+			step = self.getInstructions().getStep( 'export-sources' )
 			step.addMainAction( DirectoryTreeCopyAction( source, build, ignore ) )
 		else:
 			if not self.__outOfSourceBuildSupported:
