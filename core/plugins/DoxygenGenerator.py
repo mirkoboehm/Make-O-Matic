@@ -67,7 +67,7 @@ class DoxygenGenerator( Plugin ):
 			step.addMainAction( RmDirAction( docsDir ) )
 
 		# run doxygen
-		step = self.getInstructions().getStep( 'project-create-docs' )
+		step = self.getInstructions().getStep( 'create-docs' )
 		cmd = [ self.getCommand(), str( self.getDoxygenFile() ) ]
 		doxygenCall = ShellCommandAction( cmd, searchPaths = self.getCommandSearchPaths() )
 		doxygenCall.setWorkingDirectory( docsDir )

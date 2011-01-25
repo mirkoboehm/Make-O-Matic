@@ -132,7 +132,7 @@ class Defaults( MObject ):
 			[ 'test', 'mcgdhpsf', False ],
 			[ 'install', 'mcgdhpsf', False ],
 			[ 'create-packages', 'dsfp', False ],
-			[ 'project-create-docs', 'mcgdhpsf', False ],
+			[ 'create-docs', 'mcgdhpsf', False ],
 			[ 'project-package', 'dsf', False ],
 			[ 'project-upload-packages', 'dsf', False ],
 			[ 'project-cleanup-packages', 'cdsf', True ],
