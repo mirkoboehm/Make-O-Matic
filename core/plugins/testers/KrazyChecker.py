@@ -82,6 +82,6 @@ class KrazyChecker( Analyzer ):
 
 		action = CallbackShellCommandAction( self.getCommandWithArguments(), combineOutput = False, callback = self.runMethod )
 		action.setWorkingDirectory( self.getInstructions().getSourceDir() )
-		step = self.getInstructions().getStep( 'conf-make-test' )
+		step = self.getInstructions().getStep( 'test' )
 		step.addMainAction( action )
 		return Analyzer.setup( self )

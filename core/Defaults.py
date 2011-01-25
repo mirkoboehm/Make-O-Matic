@@ -129,7 +129,7 @@ class Defaults( MObject ):
 			[ 'export-sources', 'mcgdhpsf', False ],
 			[ 'configure', 'mcgdhpsf', False ],
 			[ 'build', 'mcgdhpsf', False ],
-			[ 'conf-make-test', 'mcgdhpsf', False ],
+			[ 'test', 'mcgdhpsf', False ],
 			[ 'conf-make-install', 'mcgdhpsf', False ],
 			[ 'conf-package', 'dsfp', False ],
 			[ 'project-create-docs', 'mcgdhpsf', False ],

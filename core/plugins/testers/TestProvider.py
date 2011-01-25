@@ -56,7 +56,7 @@ class TestProvider( Analyzer ):
 
 	def makeTestStep( self ):
 		"""Run tests for the project."""
-		step = self.getInstructions().getStep( 'conf-make-test' )
+		step = self.getInstructions().getStep( 'test' )
 		makeTest = self.createAction( self.getCommandWithArguments() )
 		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
 		step.addMainAction( makeTest )

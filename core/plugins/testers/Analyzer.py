@@ -66,7 +66,7 @@ class Analyzer( Plugin ):
 		return ( ( self.getScore()[0] / self.getScore()[1] ) >= self.getRequiredMinimumSuccessRate() )
 
 	def getObjectStatus( self ):
-		if not self.getInstructions().getStep( "conf-make-test" ).isEnabled():
+		if not self.getInstructions().getStep( "test" ).isEnabled():
 			return "Step disabled"
 
 		scoreText = " out of ".join( [str( x ) for x in self.getScore()] ) if self.getScore() else "N/A"

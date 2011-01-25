@@ -148,6 +148,6 @@ class PyLintChecker( Analyzer ):
 	def setup( self ):
 		action = _PyLintCheckerAction( self )
 		action.setWorkingDirectory( self.getInstructions().getProject().getSourceDir() )
-		step = self.getInstructions().getStep( 'conf-make-test' )
+		step = self.getInstructions().getStep( 'test' )
 		step.addMainAction( action )
 		return Analyzer.setup( self )
