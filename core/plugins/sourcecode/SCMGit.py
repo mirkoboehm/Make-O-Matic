@@ -173,7 +173,7 @@ class SCMGit( SourceCodeProvider ):
 		"""Create steps to check out the source code"""
 
 		assert self.getInstructions()
-		step = self.getInstructions().getStep( 'project-checkout' )
+		step = self.getInstructions().getStep( 'checkout' )
 		updateHiddenCloneAction = _UpdateHiddenCloneAction( self )
 		step.addMainAction( updateHiddenCloneAction )
 

@@ -164,12 +164,12 @@ class _PreprocessorAction( Action ):
 class Preprocessor( Plugin ):
 	'''Preprocessor takes a textual input file, applies variables from various dictionaries, and produces an output file.
 	The preprocessor generates an action that performs the conversion of the input file, and adds it as a post action to a step. 
-	By default, the action is added to the project-checkout step. It can be changed by setting the step property of the 
+	By default, the action is added to the checkout step. It can be changed by setting the step property of the 
 	preprocessor.
 	The preprocessor searches place holders in the format of @@(variable-name) in the input file, and replaces them with the 
 	content provided by the internal dictionary. A place holder in the form of @@(@@) resolves to @@.'''
 
-	def __init__( self, project, name = None, inputFilename = None, outputFilename = None, step = 'project-checkout' ):
+	def __init__( self, project, name = None, inputFilename = None, outputFilename = None, step = 'checkout' ):
 		Plugin.__init__( self, name )
 		self.setInputFilename( inputFilename )
 		self.setOutputFilename( outputFilename )
