@@ -61,7 +61,7 @@ class BuildInstructions( Instructions ):
 		Creates actions to create the build base directory for this object, and creates the packages and log directories.'''
 		super( BuildInstructions, self ).setup()
 		# add actions to create the base directory:
-		createStep = self.getStep( 'build-create-folders' )
+		createStep = self.getStep( 'create-folders' )
 		createStep.addMainAction( MkDirAction( self.getBaseDir() ) )
 		# add action to delete the base directory (but not the log directory):
 		cleanupStep = self.getStep( 'build-cleanup' )

@@ -62,7 +62,7 @@ class Configuration( ConfigurationBase ):
 		super( Configuration, self ).setup()
 		settings = mApp().getSettings()
 		folders = [ settings.get( Settings.ConfigurationBuildDir ), settings.get( Settings.ConfigurationTargetDir ) ]
-		create = self.getStep( 'build-create-folders' )
+		create = self.getStep( 'create-folders' )
 		cleanup = self.getStep( 'build-cleanup' )
 		for folder in folders:
 			create.addMainAction( MkDirAction( PathResolver( self.getBaseDir, folder ) ) )

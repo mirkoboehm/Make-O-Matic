@@ -95,7 +95,7 @@ class Project( BuildInstructions ):
 		assert len( buildType ) == 1
 		mApp().debug( self, 'build type: {0} ({1})'
 			.format( buildType.upper(), mApp().getSettings().getBuildTypeDescription( buildType ) ) )
-		create = self.getStep( 'build-create-folders' )
+		create = self.getStep( 'create-folders' )
 		for folder in ( self.getSourceDir(), self.getDocsDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
 
