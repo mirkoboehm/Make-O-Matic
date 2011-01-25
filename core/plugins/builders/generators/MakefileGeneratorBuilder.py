@@ -37,5 +37,5 @@ class MakefileGeneratorBuilder( MakeBasedBuilder ):
 		command.extend( self.getCommandArguments() )
 		action = ShellCommandAction( command, searchPaths = self.getCommandSearchPaths() )
 		action.setWorkingDirectory( self._getBuildDir() )
-		step = self.getInstructions().getStep( 'conf-configure' )
+		step = self.getInstructions().getStep( 'configure' )
 		step.addMainAction( action )

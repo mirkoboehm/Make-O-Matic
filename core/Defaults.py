@@ -127,7 +127,7 @@ class Defaults( MObject ):
 			[ 'create-folders', 'mcgdhpsf', False ],
 			[ 'checkout', 'mcgdhpsf', False ],
 			[ 'export-sources', 'mcgdhpsf', False ],
-			[ 'conf-configure', 'mcgdhpsf', False ],
+			[ 'configure', 'mcgdhpsf', False ],
 			[ 'conf-make', 'mcgdhpsf', False ],
 			[ 'conf-make-test', 'mcgdhpsf', False ],
 			[ 'conf-make-install', 'mcgdhpsf', False ],
