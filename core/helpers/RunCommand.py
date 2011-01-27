@@ -69,7 +69,7 @@ class _CommandRunner( Thread ):
 		else:
 			self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False,
 				cwd = self._getRunner().getWorkingDir() )
-                        self._process.wait()
+			self._process.wait()
 			returnCode = self._process.returncode
 			self._getRunner().setReturnCode( returnCode )
 			self._getRunner().setStdOut( None )
