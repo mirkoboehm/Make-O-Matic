@@ -24,6 +24,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths
 import os.path
 import sys
+import copy
 from core.Exceptions import ConfigurationError
 from core.Settings import Settings
 
@@ -171,7 +172,8 @@ class RunCommand( MObject ):
 		if fpath:
 			return
 
-		paths = self.__searchPaths
+		paths = copy.deepcopy( self.__searchPaths )
+
 		paths += os.environ["PATH"].split( os.pathsep )
 
 		# These paths have been added by the local configuration so complain when we can't find them
