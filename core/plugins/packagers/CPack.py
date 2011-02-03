@@ -127,14 +127,16 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 
 		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
 
-		source_generators = 'TBZ2;ZIP'
+		source_generators = { 'WINDOWS':'NSIS;ZIP',
+		                      'APPLE':  'TBZ2',
+		                      'ELSE':   'TBZ2' }
 		binary_generators = { 'WINDOWS':'NSIS;ZIP',
 		                      'APPLE':  'DragNDrop;TBZ2',
 		                      'ELSE':   'STGZ;TBZ2' }
 
 		for platform in ( 'WINDOWS', 'APPLE', 'ELSE' ):
 			if self._sourcePackage:
-				generator = source_generators
+				generator = source_generators[ platform ]
 			else:
 				generator = binary_generators[ platform ]
 			config = config.replace( "@CPACK_GENERATOR_%s@" % platform, generator )
