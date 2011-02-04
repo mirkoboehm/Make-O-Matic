@@ -120,10 +120,11 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 		licenseFile = self._licenseFile
 
 		if not licenseFile:
-			licenseFile = "CPackGeneratedLicense.txt"
-			licenseFilePath = os.path.join( self.getWorkingDirectory(), licenseFile )
-			with open( licenseFilePath, 'w' ) as license:
+			licenseFile = os.path.join( self.getWorkingDirectory(), "CPackGeneratedLicense.txt" )
+			with open( licenseFile, 'w' ) as license:
 				license.write( '{0} - Copyright {1}, All Rights Reserved.'.format( packageName, datetime.now().year ) )
+		else:
+			licenseFile = os.path.join( self._directory, licenseFile ) # NSIS apparently requires an absolute path to find the license file
 
 		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
 
