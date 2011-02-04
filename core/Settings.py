@@ -18,9 +18,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Defaults import Defaults
 import os, sys
-from socket import gethostname
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
+from core.helpers.NodeName import getNodeName
 from core.helpers.TypeCheckers import check_for_nonempty_string
 
 class Settings( Defaults ):
@@ -63,7 +63,7 @@ class Settings( Defaults ):
 
 	def evalConfigurationFiles( self, toolName = None ):
 		folders = [ self.globalFolder( toolName ), self.userFolder( toolName ) ]
-		hostConfigFile = '{0}.py'.format( gethostname() )
+		hostConfigFile = '{0}.py'.format( getNodeName() )
 		files = [ 'config.py', hostConfigFile ]
 		for folder in folders:
 			for fileName in files:

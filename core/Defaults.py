@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.MObject import MObject
-from socket import gethostname
+from core.helpers.NodeName import getNodeName
 import os
 
 class Defaults( MObject ):
@@ -115,7 +115,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.MomVersionNumber ] = '0.5.0'
 		# ----- script settings:
 		defaultSettings[ Defaults.ScriptLogLevel ] = 0
-		defaultSettings[ Defaults.ScriptClientName ] = gethostname()
+		defaultSettings[ Defaults.ScriptClientName ] = getNodeName()
 		defaultSettings[ Defaults.ScriptRunMode ] = Defaults.RunMode_Build
 		defaultSettings[ Defaults.ScriptIgnoreCommitMessageCommands ] = False
 		# ----- internal settings
