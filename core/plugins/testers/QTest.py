@@ -37,6 +37,9 @@ class QTest( TestProvider ):
 	def preFlightCheck( self ):
 		self.getMakeTool().checkVersion()
 
+	def resolveCommand( self ):
+		self.getMakeTool().resolveCommand()
+
 	def _parseReport( self, report ):
 		totalPassed = 0
 		totalFailed = 0
