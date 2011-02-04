@@ -30,6 +30,8 @@ class Defaults( MObject ):
 	RunMode_Print = 'print'
 	RunMode_Describe = 'describe'
 	RunModes = [ RunMode_Build, RunMode_Query, RunMode_Print, RunMode_Describe ]
+
+	# ----- environment settings:
 	EnvironmentExpansionMode_Ignore = 1
 	EnvironmentExpansionMode_BuildHighestScoring = 2
 	EnvironmentExpansionMode_BuildAll = 3
@@ -86,7 +88,9 @@ class Defaults( MObject ):
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- Ppublisher settings (should be set in .mom/config.py):
 	PublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
+	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
 	PublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
+	PublisherReportsBaseHttpURL = 'publisher.basehttpurl.reports'
 	# ----- EmailReporter settings:
 	EmailReporterSender = 'emailreporter.sender'
 	EmailReporterDefaultRecipients = 'emailreporter.defaultrecipients'
@@ -156,6 +160,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.ConfigurationBuildDir ] = 'build'
 		defaultSettings[ Defaults.ConfigurationTargetDir ] = 'install'
 		defaultSettings[ Defaults.MakeBuilderInstallTarget ] = 'install'
+		# ----- environments settings:
 		defaultSettings[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
 		defaultSettings[ Defaults.EnvironmentsExpansionModeMapping ] = {
 			'c' : Defaults.EnvironmentExpansionMode_BuildHighestScoring,
@@ -171,6 +176,9 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.SystemShortName ] = None
 		# ----- Build settings:
 		defaultSettings[ Defaults.BuildMoveOldDirectories ] = True
+		# ----- Publisher settings:
+		defaultSettings[ Defaults.PublisherPackageBaseHttpURL ] = None
+		defaultSettings[ Defaults.PublisherReportsBaseHttpURL ] = None
 		# ----- EmailReporter settings:
 		defaultSettings[ Defaults.EmailReporterMomErrorRecipients] = None
 		defaultSettings[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True

@@ -113,6 +113,13 @@ class RSyncPackagesPublisher( RSyncPublisher ):
 			localDir = PathResolver( mApp().getPackagesDir ) )
 		self.setStep( 'upload-packages' )
 
+	def getObjectStatus( self ):
+		baseUrl = mApp().getSettings().get( Settings.PublisherPackageBaseHttpURL, False )
+		if baseUrl:
+			return "Location: {0}".format( baseUrl )
+
+		super( RSyncPackagesPublisher, self ).getObjectStatus()
+
 # FIXME the reports publisher needs to be called after the build finished 
 # (chicken and egg problem, the report can only be created once the build is done)
 # implement uploading in wrapUp()?
@@ -124,3 +131,9 @@ class RSyncReportsPublisher( RSyncPublisher ):
 			uploadLocation = mApp().getSettings().get( Settings.PublisherReportsUploadLocation ),
 			localDir = PathResolver( mApp().getLogDir ) )
 
+	def getObjectStatus( self ):
+		baseUrl = mApp().getSettings().get( Settings.PublisherReportsBaseHttpURL, False )
+		if baseUrl:
+			return "Location: {0}".format( baseUrl )
+
+		super( RSyncReportsPublisher, self ).getObjectStatus()
