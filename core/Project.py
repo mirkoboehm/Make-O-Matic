@@ -29,6 +29,7 @@ from core.actions.filesystem.MkDirAction import MkDirAction
 from core.BuildInstructions import BuildInstructions
 from core.plugins.sourcecode import getScm
 from core.helpers.TypeCheckers import check_for_path_or_none
+from core.actions.filesystem.RmDirAction import RmDirAction
 
 class Project( BuildInstructions ):
 	"""A Project represents an entity to build. 
@@ -98,4 +99,5 @@ class Project( BuildInstructions ):
 		create = self.getStep( 'create-folders' )
 		for folder in ( self.getSourceDir(), self.getDocsDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
-
+		packageCleanup = self.getStep( 'cleanup-packages' )
+		packageCleanup.addMainAction( RmDirAction( self.getPackagesDir() ) )
