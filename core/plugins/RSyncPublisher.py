@@ -72,7 +72,10 @@ class RSyncPublisher( Plugin ):
 		step = self.getInstructions().getStep( self.getStep() )
 		if str( self.getLocalDir() ):
 			fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-			cmd = [ self.getCommand(), '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ]
+			args = [ '-avz', '-e', 'ssh -o "BatchMode yes"', fromDir, uploadLocation ]
+			if 'Windows' in platform.platform(): #On windows, fake source permissions to be 755
+				args = [ '--chmod=ugo=rwx' ] + args
+			cmd = [ self.getCommand() ] + args
 			action = ShellCommandAction( cmd, 7200, searchPaths = self.getCommandSearchPaths() )
 			action.setWorkingDirectory( self.getInstructions().getBaseDir() )
 			step.addMainAction( action )
