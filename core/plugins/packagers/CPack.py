@@ -25,6 +25,7 @@ from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 import re
 from datetime import datetime
+from core.actions.Action import Action
 
 _CPackConfig = '''SET(CPACK_PACKAGE_NAME "@CPACK_PACKAGE_NAME@")
 SET(CPACK_PACKAGE_NAME_SIMPLIFIED "@CPACK_PACKAGE_NAME_SIMPLIFIED@")
@@ -95,13 +96,19 @@ class _CPackMovePackageAction( FilesMoveAction ):
 		return FilesMoveAction.run( self )
 
 
-class _CPackGenerateConfigurationAction( FilesMoveAction ):
-	def __init__( self, sourcePackage, licenseFile, config, directory ):
-		FilesMoveAction.__init__( self )
+class _CPackGenerateConfigurationAction( Action ):
+	def __init__( self, sourcePackage, licenseFile, config, directory, sourceGenerators, binaryGenerators ):
+		Action.__init__( self )
 		self._sourcePackage = sourcePackage
 		self._licenseFile = licenseFile
 		self._directory = directory
 		self._config = config
+		self._sourceGenerators = sourceGenerators
+		self._binaryGenerators = binaryGenerators
+
+	def getLogDescription( self ):
+		"""Provide a textual description for the Action that can be added to the execution log file."""
+		return self.getName()
 
 	def _formattedConfiguration( self ):
 		config = _CPackConfig
@@ -126,22 +133,15 @@ class _CPackGenerateConfigurationAction( FilesMoveAction ):
 			with open( licenseFile, 'w' ) as license:
 				license.write( '{0} - Copyright {1}, All Rights Reserved.'.format( packageName, datetime.now().year ) )
 		else:
-			licenseFile = os.path.join( self._directory, licenseFile ) # NSIS apparently requires an absolute path to find the license file
+			licenseFile = os.path.abspath( licenseFile ) # NSIS apparently requires an absolute path to find the license file
 
 		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
 
-		source_generators = { 'WINDOWS':'NSIS;ZIP',
-		                      'APPLE':  'TBZ2',
-		                      'ELSE':   'TBZ2' }
-		binary_generators = { 'WINDOWS':'NSIS;ZIP',
-		                      'APPLE':  'DragNDrop;TBZ2',
-		                      'ELSE':   'STGZ;TBZ2' }
-
 		for platform in ( 'WINDOWS', 'APPLE', 'ELSE' ):
 			if self._sourcePackage:
-				generator = source_generators[ platform ]
+				generator = self._sourceGenerators[ platform ]
 			else:
-				generator = binary_generators[ platform ]
+				generator = self._binaryGenerators[ platform ]
 			config = config.replace( "@CPACK_GENERATOR_%s@" % platform, generator )
 
 		if self._sourcePackage:
@@ -178,6 +178,9 @@ class CPack( PackageProvider ):
 		self._setCommandArguments( [ "--verbose", "--config", self.__configFile ] )
 		self._licenseFile = licenseFile
 
+	def _setLicenseFile( self, licenseFile ):
+		self._licenseFile = licenseFile
+
 	def makePackageStep( self ):
 		"""Create packages for the project using CPack."""
 		configuration = self.getInstructions()
@@ -187,10 +190,21 @@ class CPack( PackageProvider ):
 			packagedDirectory = os.path.join( project.getSourceDir(), configuration.getSourcePrefix() )
 		else:
 			packagedDirectory = configuration.getTargetDir()
-		generateConfig = _CPackGenerateConfigurationAction( self._sourcePackage, self._licenseFile, self.__configFile, packagedDirectory )
+		generateConfig = _CPackGenerateConfigurationAction( self._sourcePackage, self._licenseFile, self.__configFile,
+		                                                    packagedDirectory, self.sourceGenerators(), self.binaryGenerators() )
 		generateConfig.setWorkingDirectory( configuration.getBuildDir() )
 		step.addMainAction( generateConfig )
 		makePackage = PackageProvider.makePackageStep( self )
 		movePackageDestination = self.getInstructions().getPackagesDir()
 		movePackage = _CPackMovePackageAction( makePackage, movePackageDestination )
 		step.addMainAction( movePackage )
+
+	def sourceGenerators( self ):
+		return { 'WINDOWS':'ZIP',
+		         'APPLE':  'TBZ2',
+		         'ELSE':   'TBZ2' }
+
+	def binaryGenerators( self ):
+		return { 'WINDOWS':'NSIS;ZIP',
+		         'APPLE':  'DragNDrop;TBZ2',
+		         'ELSE':   'STGZ;TBZ2' }
