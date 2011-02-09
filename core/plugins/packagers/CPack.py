@@ -71,6 +71,7 @@ SET(CPACK_PACKAGE_INSTALL_DIRECTORY "${CPACK_PACKAGE_FILE_NAME}")
 SET(CPACK_RESOURCE_FILE_LICENSE "@CPACK_RESOURCE_FILE_LICENSE@")
 SET(CPACK_IGNORE_FILES "/\\\\.svn/;/\\\\.git/")
 SET(CPACK_PACKAGE_DESCRIPTION "")
+@CPACK_OPTIONAL_EXTRA_LOGIC@
 '''
 
 class _CPackMovePackageAction( FilesMoveAction ):
@@ -97,7 +98,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 
 
 class _CPackGenerateConfigurationAction( Action ):
-	def __init__( self, sourcePackage, licenseFile, config, directory, sourceGenerators, binaryGenerators ):
+	def __init__( self, sourcePackage, licenseFile, config, directory, sourceGenerators, binaryGenerators, extraCPackLogic ):
 		Action.__init__( self )
 		self._sourcePackage = sourcePackage
 		self._licenseFile = licenseFile
@@ -105,6 +106,7 @@ class _CPackGenerateConfigurationAction( Action ):
 		self._config = config
 		self._sourceGenerators = sourceGenerators
 		self._binaryGenerators = binaryGenerators
+		self._extraCPackLogic = extraCPackLogic
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
@@ -125,6 +127,11 @@ class _CPackGenerateConfigurationAction( Action ):
 		config = config.replace( "@CPACK_PACKAGE_VERSION_MINOR@", versionList[1] or 0, 1 )
 		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
 		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", self._directory, 1 )
+
+		if self._extraCPackLogic:
+			config = config.replace( "@CPACK_OPTIONAL_EXTRA_LOGIC@\n", self._extraCPackLogic )
+		else:
+			config = config.replace( "@CPACK_OPTIONAL_EXTRA_LOGIC@\n", '' )
 
 		licenseFile = self._licenseFile
 
@@ -165,7 +172,7 @@ class _CPackGenerateConfigurationAction( Action ):
 
 class CPack( PackageProvider ):
 
-	def __init__( self, sourcePackage = False, licenseFile = None, name = None ):
+	def __init__( self, sourcePackage = False, licenseFile = None, extraCPackLogic = None, name = None ):
 		PackageProvider.__init__( self, name )
 		self._setCommand( "cpack" )
 		self._setCommandSearchPaths( getCMakeSearchPaths() )
@@ -177,6 +184,7 @@ class CPack( PackageProvider ):
 		self._sourcePackage = sourcePackage
 		self._setCommandArguments( [ "--verbose", "--config", self.__configFile ] )
 		self._licenseFile = licenseFile
+		self._extraCPackLogic = extraCPackLogic
 
 	def _setLicenseFile( self, licenseFile ):
 		self._licenseFile = licenseFile
@@ -191,7 +199,8 @@ class CPack( PackageProvider ):
 		else:
 			packagedDirectory = configuration.getTargetDir()
 		generateConfig = _CPackGenerateConfigurationAction( self._sourcePackage, self._licenseFile, self.__configFile,
-		                                                    packagedDirectory, self.sourceGenerators(), self.binaryGenerators() )
+		                                                    packagedDirectory, self.sourceGenerators(), self.binaryGenerators(),
+		                                                    self._extraCPackLogic )
 		generateConfig.setWorkingDirectory( configuration.getBuildDir() )
 		step.addMainAction( generateConfig )
 		makePackage = PackageProvider.makePackageStep( self )
