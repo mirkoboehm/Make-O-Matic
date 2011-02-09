@@ -99,5 +99,7 @@ class Project( BuildInstructions ):
 		create = self.getStep( 'create-folders' )
 		for folder in ( self.getSourceDir(), self.getDocsDir(), self.getTempDir() ):
 			create.addMainAction( MkDirAction( folder ) )
-		packageCleanup = self.getStep( 'cleanup-packages' )
-		packageCleanup.addMainAction( RmDirAction( self.getPackagesDir() ) )
+		packagesDir = self.getPackagesDir()
+		if packagesDir != None:
+			packageCleanup = self.getStep( 'cleanup-packages' )
+			packageCleanup.addMainAction( RmDirAction( packagesDir ) )
