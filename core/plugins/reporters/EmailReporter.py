@@ -80,6 +80,12 @@ class EmailReporter( Reporter ):
 		except Exception as e:
 			mApp().debug( self, 'Sending E-Mail failed: {0}'.format( e ) )
 
+	def getObjectStatus( self ):
+		if not XmlReportConverter.hasXsltSupport():
+			return "Cannot generate HTML, probably due to missing python-lxml package"
+		else:
+			return ""
+
 	def createEmail( self ):
 		instructions = mApp()
 		assert isinstance( instructions, Build )

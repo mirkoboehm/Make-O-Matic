@@ -225,6 +225,7 @@ class XmlReportConverter( MObject ):
 
 		return self.__xslTemplateSnippets[destinationReportFormat]
 
+	@classmethod
 	def hasXsltSupport( self ):
 		return ( etree.__name__ == "lxml.etree" )
 
