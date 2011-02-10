@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import sys, re
+import string, sys
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.Settings import Settings
@@ -40,7 +40,7 @@ class ConsoleLogger( Logger ):
 		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
 		try:
 			basedir = mApp().getBaseDir()
-			text = re.sub( basedir, '$BASE', text )
+			text = string.replace( text, basedir, '$BASE' )
 		except MomException:
 			pass # no base directory set yet		
 		if not text.endswith( '\n' ):
