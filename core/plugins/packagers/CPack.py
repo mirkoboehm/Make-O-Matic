@@ -74,6 +74,9 @@ SET(CPACK_PACKAGE_DESCRIPTION "")
 @CPACK_OPTIONAL_EXTRA_LOGIC@
 '''
 
+def fixCMakeWindowsPaths( path ):
+	return path.replace( '\\', '\\\\' )
+
 class _CPackMovePackageAction( FilesMoveAction ):
 	def __init__( self, cpackAction, destination ):
 		FilesMoveAction.__init__( self )
@@ -126,7 +129,8 @@ class _CPackGenerateConfigurationAction( Action ):
 		config = config.replace( "@CPACK_PACKAGE_VERSION_MAJOR@", versionList[0] or 1, 1 )
 		config = config.replace( "@CPACK_PACKAGE_VERSION_MINOR@", versionList[1] or 0, 1 )
 		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
-		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", self._directory, 1 )
+		installDirectory = fixCMakeWindowsPaths( self._directory )
+		config = config.replace( "@CPACK_INSTALL_DIRECTORY@", installDirectory, 1 )
 
 		if self._extraCPackLogic:
 			config = config.replace( "@CPACK_OPTIONAL_EXTRA_LOGIC@\n", self._extraCPackLogic )
@@ -141,6 +145,7 @@ class _CPackGenerateConfigurationAction( Action ):
 				license.write( '{0} - Copyright {1}, All Rights Reserved.'.format( packageName, datetime.now().year ) )
 		else:
 			licenseFile = os.path.abspath( licenseFile ) # NSIS apparently requires an absolute path to find the license file
+		licenseFile = self.fixCMakeWindowsPaths( licenseFile )
 
 		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
 
