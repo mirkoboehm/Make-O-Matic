@@ -145,7 +145,7 @@ class _CPackGenerateConfigurationAction( Action ):
 				license.write( '{0} - Copyright {1}, All Rights Reserved.'.format( packageName, datetime.now().year ) )
 		else:
 			licenseFile = os.path.abspath( licenseFile ) # NSIS apparently requires an absolute path to find the license file
-		licenseFile = self.fixCMakeWindowsPaths( licenseFile )
+		licenseFile = fixCMakeWindowsPaths( licenseFile )
 
 		config = config.replace( "@CPACK_RESOURCE_FILE_LICENSE@", licenseFile )
 
