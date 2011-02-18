@@ -23,6 +23,7 @@ import os.path
 from core.Exceptions import ConfigurationError
 from core.helpers.XmlReportConverter import ReportFormat, XmlReportConverter
 import codecs
+from core.helpers.GlobalMApp import mApp
 
 class XmlReportGenerator( Plugin ):
 	"""
@@ -49,9 +50,13 @@ class XmlReportGenerator( Plugin ):
 		report = XmlReport( self.getInstructions() )
 		report.prepare()
 
-		self._openReportFile()
-		self._writeReport( report )
-		self._saveReportFile()
+		try:
+			self._openReportFile()
+			self._writeReport( report )
+			self._saveReportFile()
+		except ConfigurationError as e:
+			# Catch ConfigurationError, since we are in shutdown. Print warning message:
+			mApp().message( self, "An error occurred while creating the report: {0}".format( e ) )
 
 	def getObjectStatus( self ):
 		if not self.__failed:
