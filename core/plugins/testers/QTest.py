@@ -26,15 +26,16 @@ class QTest( TestProvider ):
 
 	def __init__( self, name = None ):
 		TestProvider.__init__( self, name )
-		self.__makeTool = maketools.getMakeTool()
-		self._setCommand( self.__makeTool.getCommand() )
-		self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
+		self.__makeTool = None
 		self._setCommandArguments( [ 'test' ] )
 
 	def getMakeTool( self ):
 		return self.__makeTool
 
 	def preFlightCheck( self ):
+		self.__makeTool = maketools.getMakeTool()
+		self._setCommand( self.__makeTool.getCommand() )
+		self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
 		self.getMakeTool().checkVersion()
 
 	def resolveCommand( self ):

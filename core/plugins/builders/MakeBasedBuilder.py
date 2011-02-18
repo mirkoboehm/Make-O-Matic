@@ -29,11 +29,12 @@ class MakeBasedBuilder( Builder ):
 
 	def __init__( self, name = None ):
 		Builder.__init__( self, name )
+		self.__makeTool = None
+
+	def preFlightCheck( self ):
 		self.__makeTool = maketools.getMakeTool()
 		self._setCommand( self.__makeTool.getCommand() )
 		self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
-
-	def preFlightCheck( self ):
 		self.getMakeTool().checkVersion()
 
 	def _getBuildDir( self ):
