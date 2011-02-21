@@ -44,22 +44,26 @@ class MakeBasedBuilder( Builder ):
 		return self.__makeTool
 
 	def createConfMakeActions( self ):
-		tool = self.__makeTool
-		tool.setJobs( multiprocessing.cpu_count() )
-		command = [ tool.getCommand() ]
-		command.extend( tool.getArguments() )
-		action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
-		action.setWorkingDirectory( self._getBuildDir() )
-		step = self.getInstructions().getStep( 'build' )
-		step.addMainAction( action )
+		tool = self.getMakeTool()
+		# The make tool is discovered during pre-flight check. It is not set in query and describe mode, so don't assume it is. 
+		if tool:
+			tool.setJobs( multiprocessing.cpu_count() )
+			command = [ tool.getCommand() ]
+			command.extend( tool.getArguments() )
+			action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
+			action.setWorkingDirectory( self._getBuildDir() )
+			step = self.getInstructions().getStep( 'build' )
+			step.addMainAction( action )
 
 	def createConfMakeInstallActions( self ):
-		tool = self.__makeTool
-		# There's often problems with more than one make install job and it's I/O bound anyway
-		tool.setJobs( 1 )
-		command = [ tool.getCommand() ]
-		command.append( mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) )
-		action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
-		action.setWorkingDirectory( self._getBuildDir() )
-		step = self.getInstructions().getStep( 'install' )
-		step.addMainAction( action )
+		tool = self.getMakeTool()
+		# The make tool is discovered during pre-flight check. It is not set in query and describe mode, so don't assume it is. 
+		if tool:
+			# There's often problems with more than one make install job and it's I/O bound anyway
+			tool.setJobs( 1 )
+			command = [ tool.getCommand() ]
+			command.append( mApp().getSettings().get( Settings.MakeBuilderInstallTarget ) )
+			action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
+			action.setWorkingDirectory( self._getBuildDir() )
+			step = self.getInstructions().getStep( 'install' )
+			step.addMainAction( action )

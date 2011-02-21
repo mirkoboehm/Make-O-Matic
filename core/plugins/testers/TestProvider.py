@@ -57,10 +57,11 @@ class TestProvider( Analyzer ):
 	def makeTestStep( self ):
 		"""Run tests for the project."""
 		step = self.getInstructions().getStep( 'test' )
-		makeTest = self.createAction( self.getCommandWithArguments() )
-		makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
-		step.addMainAction( makeTest )
-		self.__action = makeTest # save
+		if self.getCommand():
+			makeTest = self.createAction( self.getCommandWithArguments() )
+			makeTest.setWorkingDirectory( self.getInstructions().getBuildDir() )
+			step.addMainAction( makeTest )
+			self.__action = makeTest # save
 
 	def setup( self ):
 		"""Setup is called after the test steps have been generated, and the command line 
