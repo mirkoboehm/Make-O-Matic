@@ -21,9 +21,10 @@ import signal
 class MomException( Exception ):
 	"""MomException encapsulates an error that occurs during a build script run."""
 
-	def __init__( self, value ):
+	def __init__( self, value, details = None ):
 		Exception.__init__( self )
 		self.value = value
+		self.details = details
 
 	def __str__( self ):
 		return str( self.value ).rstrip()
@@ -34,6 +35,9 @@ class MomException( Exception ):
 
 	def getObjectDescription( self ):
 		return self.__doc__
+
+	def getDetails( self ):
+		return self.details
 
 class BuildError( MomException ):
 	"""A build error is raised if the build fails due to a problem caused by the project."""

@@ -185,6 +185,10 @@ class MApplication( Instructions ):
 			return self.getReturnCode()
 		except MomException as e:
 			self.message( self, 'Error, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )
+			if e.getDetails():
+				messages = e.getDetails().splitlines()
+				for message in messages:
+					self.message( self, message )
 			return e.getReturnCode()
 		except KeyboardInterrupt:
 			self.message( self, 'Interrupted. Have a nice day.' )

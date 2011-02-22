@@ -110,7 +110,8 @@ class Environments( ConfigurationBase ):
 					mApp().message( self, '{0}, continuing.'.format( self.getObjectStatus() ) )
 				else:
 					if runMode == Settings.RunMode_Build:
-						raise ConfigurationError( 'No environment found that matches the project requirements!' )
+						details = 'Missing environment: {0}'.format( ', '.join( self.getDependencies() ) )
+						raise ConfigurationError( 'No environment found that matches the project requirements!', details )
 					else:
 						pass
 			if mode == Settings.EnvironmentExpansionMode_BuildHighestScoring and environments:
