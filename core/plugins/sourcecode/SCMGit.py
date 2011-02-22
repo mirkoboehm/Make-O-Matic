@@ -239,7 +239,7 @@ class SCMGit( SourceCodeProvider ):
 			if runner.getReturnCode() == 0:
 				mApp().debugN( self, 2, 'Created a hidden clone at "{0}"'.format( hiddenClone ) )
 			else:
-				if runner.getStdOut().find( "unknown option `mirror'" ):
+				if runner.getStdOut().find( "unknown option `mirror'" ) != -1:
 					raise ConfigurationError( 'Please install newer version of Git that supports the "--mirror" option' )
 				raise MomError( 'cannot create clone of "{0}" at "{1}"'.format( self.getUrl(), hiddenClone ) )
 
