@@ -33,8 +33,10 @@ class MakeBasedBuilder( Builder ):
 
 	def preFlightCheck( self ):
 		self.__makeTool = maketools.getMakeTool()
-		self._setCommand( self.__makeTool.getCommand() )
-		self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
+		if not self.getCommand():
+			self._setCommand( self.__makeTool.getCommand() )
+		if not self.getCommandSearchPaths():
+			self._setCommandSearchPaths( self.__makeTool.getCommandSearchPaths() )
 		self.getMakeTool().checkVersion()
 
 	def _getBuildDir( self ):
