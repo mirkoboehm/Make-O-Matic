@@ -84,6 +84,7 @@ class Defaults( MObject ):
 	BuildMoveOldDirectories = 'build.moveolddirectories'
 	# ----- Builder settings
 	MakeBuilderInstallTarget = 'configuration.builder.make.installtarget'
+	MakeBuilderJobsCount = 'configuration.builder.make.jobscount'
 	# ----- CMake Builder settings
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- Ppublisher settings (should be set in .mom/config.py):
@@ -160,6 +161,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.ConfigurationBuildDir ] = 'build'
 		defaultSettings[ Defaults.ConfigurationTargetDir ] = 'install'
 		defaultSettings[ Defaults.MakeBuilderInstallTarget ] = 'install'
+		defaultSettings[ Defaults.MakeBuilderJobsCount ] = None
 		# ----- environments settings:
 		defaultSettings[ Defaults.EnvironmentsBaseDir ] = os.path.join( home, 'MomEnvironments' )
 		defaultSettings[ Defaults.EnvironmentsExpansionModeMapping ] = {

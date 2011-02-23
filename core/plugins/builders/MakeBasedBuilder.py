@@ -45,11 +45,16 @@ class MakeBasedBuilder( Builder ):
 	def getMakeTool( self ):
 		return self.__makeTool
 
+	@staticmethod
+	def getJobsCount():
+		jobsCountOverride = mApp().getSettings().get( Settings.MakeBuilderJobsCount, False )
+		return jobsCountOverride if jobsCountOverride else multiprocessing.cpu_count()
+
 	def createConfMakeActions( self ):
 		tool = self.getMakeTool()
 		# The make tool is discovered during pre-flight check. It is not set in query and describe mode, so don't assume it is. 
 		if tool:
-			tool.setJobs( multiprocessing.cpu_count() )
+			tool.setJobs( self.getJobsCount() )
 			command = [ tool.getCommand() ]
 			command.extend( tool.getArguments() )
 			action = ShellCommandAction( command, searchPaths = getMakeTool().getCommandSearchPaths() )
