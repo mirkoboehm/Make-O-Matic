@@ -31,7 +31,7 @@ class Logger( Plugin ):
 		raise NotImplementedError()
 
 	def debug( self, mapp, mobject, msg ):
-		raise NotImplementedError()
+		self.debugN( mapp, mobject, 1, msg )
 
 	def debugN( self, mapp, mobject, level , msg ):
 		raise NotImplementedError()
