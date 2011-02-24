@@ -110,7 +110,6 @@ class XmlReportTests( MomBuildMockupTestCase ):
 			self.assertEquals( xmlString, None )
 			return # quit test case, to HTML conversion is not possible here
 
-		# TODO: Add more _useful_ tests 
 		doc = etree.XML( xmlString )
 		self.assertEqual( doc.tag, "{http://www.w3.org/1999/xhtml}html" ) # root
 		self.assertNotEquals( doc.find( ".//{http://www.w3.org/1999/xhtml}table" ), None )
@@ -132,7 +131,6 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		converter = XmlReportConverter( self.getXmlReport() )
 		text = converter.convertToText()
 
-		# TODO: Add more _useful_ tests
 		self.assertTrue( len( text ) > 1000 )
 
 	def testConvertXmlReportToTextSummary( self ):
@@ -141,7 +139,6 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		converter = XmlReportConverter( self.getXmlReport() )
 		text = converter.convertToTextSummary()
 
-		# TODO: Add more useful tests
 		self.assertTrue( len( text ) > 100 )
 
 	def testXmlReportGenerator( self ):

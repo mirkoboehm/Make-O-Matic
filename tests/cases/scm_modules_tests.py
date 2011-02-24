@@ -47,7 +47,6 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.build.runSetups()
 
 	def _validateRevisionInfoContent( self, info ):
-		# TODO: Add better tests
 		self.assertNotEquals( info.committerName, None )
 		self.assertNotEquals( info.commitMessage, None )
 		self.assertNotEquals( info.commitTime, None )
@@ -108,7 +107,6 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self._validateRevisionInfoContent( info )
 
 	def testScmSvnBranch( self ):
-		# FIXME Mike: The branch "release-1.5" that this was referring to is gone!
 		self._initialize( self.SVN_EXAMPLE, branch = "unsupported-vc6-port" )
 
 		info = self.project.getScm().getRevisionInfo()

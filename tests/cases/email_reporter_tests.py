@@ -97,8 +97,5 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		email = self.reporter.createEmail()
 		self.assertTrue( "N/A" in email.getSubject() )
 
-	# TODO: Implement at some point
-	#def testCreateEmailBody( self ):
-
 if __name__ == "__main__":
 	unittest.main()
