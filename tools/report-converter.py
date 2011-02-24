@@ -24,7 +24,7 @@ def main():
 		inputFile = sys.argv[1]
 	except IndexError:
 		usage()
-		return 1
+		sys.exit( 1 )
 
 	# check if second parameter in TARGET_FORMATS, if unset: use text
 	try:
@@ -32,7 +32,7 @@ def main():
 			targetFormat = sys.argv[2]
 		else:
 			usage()
-			return 1
+			sys.exit( 1 )
 	except IndexError:
 		targetFormat = "text"
 
