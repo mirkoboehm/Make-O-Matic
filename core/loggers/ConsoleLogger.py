@@ -24,13 +24,6 @@ from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import MomException
 
-try:
-	from colorama import Fore, init
-	init( autoreset = True )
-	HAVE_COLORAMA = True
-except ImportError:
-	HAVE_COLORAMA = False
-
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
 
@@ -42,19 +35,8 @@ class ConsoleLogger( Logger ):
 		check_for_nonnegative_int( verbosity, "The debug level needs to be an integer of zero or more" )
 		return verbosity
 
-	@staticmethod
-	def _coloredText( text, level ):
-		if HAVE_COLORAMA:
-			if level == -1:  color = Fore.CYAN
-			elif level == 5: color = Fore.GREEN
-			else:            color = ''
-			return color + text
-
-		return text
-
-	def write( self, mapp, mobject, level, msg ):
+	def message( self, mapp, mobject, msg ):
 		text = str( msg )
-
 		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
 		try:
 			basedir = mApp().getBaseDir()
@@ -69,25 +51,28 @@ class ConsoleLogger( Logger ):
 		else:
 			typeName = '[{0}: {1}]'.format( mobject.__class__.__name__, mobject.getName() )
 
-		pieces = [ self.timeStampPrefix(), self.messagePrefix() or None, typeName, self._coloredText( text, level ) ]
+		pieces = [ self.timeStampPrefix(), self.messagePrefix() or None, typeName, text ]
 		pieces = filter( lambda x: x, pieces )
 		fulltext = ' '.join( pieces )
+		# fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
+		sys.stderr.write( fulltext )
 
-		sys.stdout.write( fulltext )
-
-	def message( self, mapp, mobject, msg ):
-		self.write( mapp, mobject, -1, msg )
+	def debug( self, mapp, mobject, msg ):
+		text = str( msg )
+		if self.__getLevel( mapp ) > 0:
+			self.message( mapp, mobject, 'DEBUG: ' + str( text ) )
 
 	def debugN( self, mapp, mobject, level , msg ):
 		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )
 		verbosity = self.__getLevel( mapp )
 		if verbosity >= level:
-			self.write( mapp, mobject, level, msg )
+			self.debug( mapp, mobject, msg )
 
 	def preFlightCheck( self ):
 		level = mApp().getSettings().get( Settings.ScriptLogLevel, True )
 		check_for_nonnegative_int( level, 'The debug level must be a non-negative integer!' )
-		mApp().debug( self, 'debug level is {0}'.format( level ) )
+		if level > 0:
+			mApp().debug( self, 'debug level is {0}'.format( level ) )
 
 	def getObjectStatus( self ):
 		debugLevel = mApp().getSettings().get( Settings.ScriptLogLevel, True )
