@@ -173,8 +173,8 @@ class Action( MObject ):
 		node.attributes["returncode"] = str( self.getResult() )
 
 		stderr, stdout = self._getOutput()
-		create_child_node( document, node, "stderr", stderr )
-		create_child_node( document, node, "stdout", stdout )
+		create_child_node( document, node, "stderr", unicode( stderr ) )
+		create_child_node( document, node, "stdout", unicode( stdout ) )
 		create_child_node( document, node, "logdescription", self.getLogDescription() )
 
 		return node

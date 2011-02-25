@@ -27,7 +27,7 @@ class MomException( Exception ):
 		self.details = details
 
 	def __str__( self ):
-		return str( self.value ).rstrip()
+		return self.value.rstrip()
 
 	@staticmethod
 	def getReturnCode():

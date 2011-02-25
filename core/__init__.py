@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 def check_python_version():
 	# in this case, hard coded values make sense, because we do not even want to initialize the Settings object before 
 	# verifying the Python version:

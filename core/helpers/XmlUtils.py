@@ -24,29 +24,29 @@ from core.Exceptions import MomException, returncode_to_description
 
 def create_child_node( document, parentNode, tagName, text ):
 	elementNode = document.createElement( tagName )
-	textNode = document.createTextNode( str( text ) )
+	textNode = document.createTextNode( text )
 	elementNode.appendChild( textNode )
 	parentNode.appendChild( elementNode )
 	return elementNode
 
 def create_exception_xml_node( document, exception, traceback ):
 	node = document.createElement( "exception" )
-	create_child_node( document, node, "description", exception )
-	create_child_node( document, node, "traceback", traceback )
+	create_child_node( document, node, "description", unicode( exception ) )
+	create_child_node( document, node, "traceback", unicode( traceback ) )
 
 	if isinstance( exception, MomException ):
 		node.attributes["type"] = returncode_to_description( exception.getReturnCode() )
-		node.attributes["returncode"] = str( exception.getReturnCode() )
+		node.attributes["returncode"] = unicode( exception.getReturnCode() )
 	else:
 		node.attributes["type"] = "An unhandled exception occurred"
-		node.attributes["returncode"] = str( None )
+		node.attributes["returncode"] = unicode( None )
 
 	return node
 
 def string_from_node_attribute( element, node, attribute ):
 	for el in element.getiterator( node ):
 		if attribute in el.attrib:
-			return str( el.attrib[attribute] )
+			return unicode( el.attrib[attribute] )
 	return "N/A"
 
 #	# lxml compatible code

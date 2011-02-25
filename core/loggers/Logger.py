@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from datetime import datetime
 from core.Plugin import Plugin
 from buildcontrol.SubprocessHelpers import get_debug_prefix

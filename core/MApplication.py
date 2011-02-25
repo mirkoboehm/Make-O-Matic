@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import sys
 from core.loggers.Logger import Logger
 from core.Exceptions import MomError, MomException, InterruptedException
@@ -116,13 +118,15 @@ class MApplication( Instructions ):
 
 
 		if self.__exception:
-			self.debugN( self, 3, "not registering new exception {0}, already set to {1}"
+			self.debugN( self, 3, u"not registering new exception {0}, already set to {1}"
 						.format( exception[0], self.getException()[0] ) )
 			return
 
 		self.__exception = exception
 		self.debugN( self, 2, "exception registered: {0}".format( exception[0] ) )
-		self.debugN( self, 5, "printing traceback:\n{0}".format( "".join( exception[1] ) ) )
+
+		tracebackToUnicode = u"".join( [x.decode( "utf-8" ) for x in exception[1] ] )
+		self.debugN( self, 5, "printing traceback:\n{0}".format( tracebackToUnicode ) )
 
 	def getException( self ):
 		return self.__exception
@@ -150,7 +154,7 @@ class MApplication( Instructions ):
 				for key in settings:
 					print( '{0}: {1}'.format( key, settings[key] ) )
 		except Exception as e:
-			print( 'Error: {0}'.format( str( e ) ) )
+			print( 'Error: {0}'.format( unicode( e ) ) )
 			self.registerReturnCode( 1 )
 
 	def _buildAndReturn( self ):
@@ -163,7 +167,7 @@ class MApplication( Instructions ):
 			self.runWrapups()
 		except Exception, e:
 			innerTraceback = traceback.format_tb( sys.exc_info()[2] )
-			self.registerException( ( e, innerTraceback ) )
+			self.registerException( ( e , innerTraceback ) )
 
 			if isinstance( e, MomException ):
 				self.registerReturnCode( e.getReturnCode() )
@@ -184,7 +188,7 @@ class MApplication( Instructions ):
 			self.message( self, 'Returning, return code {0}'.format( self.getReturnCode() ) )
 			return self.getReturnCode()
 		except MomException as e:
-			self.message( self, 'Error, return code {0}: {1}'.format( e.getReturnCode() , str( e ) ) )
+			self.message( self, 'Error, return code {0}: {1}'.format( e.getReturnCode() , unicode( e ) ) )
 			if e.getDetails():
 				messages = e.getDetails().splitlines()
 				for message in messages:

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from core.Instructions import Instructions
 import traceback
 from core.helpers.XmlUtils import create_exception_xml_node
@@ -50,7 +52,8 @@ class XmlReport( object ):
 		exception = mApp().getException()
 		if exception:
 			rootNode = mApp().createXmlNode( self.__doc, recursive = False )
-			rootNode.appendChild( create_exception_xml_node( self.__doc, exception[0], "".join( exception[1] ) ) )
+			tracebackToUnicode = u"".join( [x.decode( "utf-8" ) for x in exception[1] ] )
+			rootNode.appendChild( create_exception_xml_node( self.__doc, exception[0], tracebackToUnicode ) )
 		else:
 			try:
 				rootNode = self._createNode( self.__instructions )
