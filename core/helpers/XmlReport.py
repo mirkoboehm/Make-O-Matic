@@ -59,7 +59,8 @@ class XmlReport( object ):
 				rootNode = self._createNode( self.__instructions )
 			except Exception as e:
 				rootNode = mApp().createXmlNode( self.__doc, recursive = False )
-				rootNode.appendChild( create_exception_xml_node( self.__doc, e, traceback.format_exc() ) )
+				tracebackToUnicode = u"".join( [x.decode( "utf-8" ) for x in exception[1] ] )
+				rootNode.appendChild( create_exception_xml_node( self.__doc, e, tracebackToUnicode ) )
 		self.__doc.appendChild( rootNode )
 
 	def _createNode( self, instructions ):

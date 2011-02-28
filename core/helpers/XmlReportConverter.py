@@ -29,7 +29,6 @@ from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, 
 from datetime import datetime
 from core.helpers.TimeKeeper import formatted_time_delta
 import xml.etree.ElementTree
-from StringIO import StringIO
 from core.executomat.Step import Step
 import traceback
 import sys
@@ -125,7 +124,9 @@ class XmlReportConverter( MObject ):
 			mApp().debug( self, "Lacking support for XSLT transformations. Support for HTML conversion not available. Please install the python-lxml package." )
 
 		self.__xmlReport = xmlReport
-		self.__elementTree = xml.etree.ElementTree.parse( StringIO( xmlReport.getReport().encode( "utf-8" ) ) ) # cache ElementTree object
+
+		# ElementTree.fromstring requires encoded data, fails otherwise
+		self.__elementTree = xml.etree.ElementTree.fromstring( xmlReport.getReport().encode( "utf-8" ) ) # cache ElementTree object
 
 		self.__xslTemplateSnippets = {}
 		self.__xmlTemplateFunctions = {}
@@ -261,7 +262,7 @@ class XmlReportConverter( MObject ):
 			ignoredTags = []
 
 		try:
-			result = "\n".join( self._toText( self.__elementTree.getroot(), wrapper, ignoredTags ) )
+			result = "\n".join( self._toText( self.__elementTree, wrapper, ignoredTags ) )
 		except Exception, e:
 			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
 			result = "Could not create report. Caught exception:\n {0}\nTraceback:\n{1}".format( e, innerTraceback )
@@ -282,7 +283,7 @@ class XmlReportConverter( MObject ):
 		return result
 
 	def _toTextSummary( self, wrapper ):
-		element = self.__elementTree.getroot()
+		element = self.__elementTree
 
 		# calculate round trip time from commit to report
 		startTime = float_from_node_attribute( element, "plugin", "commitTime" )
@@ -349,7 +350,7 @@ class XmlReportConverter( MObject ):
 		# no wrapper needed
 
 		out = []
-		element = self.__elementTree.getroot()
+		element = self.__elementTree
 
 		failedSteps = find_nodes_with_attribute_and_value( element, "step", "result", "Failure" )
 		for step in failedSteps:

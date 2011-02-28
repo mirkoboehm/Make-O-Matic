@@ -31,6 +31,8 @@ from core.helpers.XmlUtils import xml_compare
 from tests.helpers.TestUtils import replace_bound_method
 from core.executomat.Step import Step
 from core.Plugin import Plugin
+import sys
+from core.helpers.RunCommand import RunCommand
 
 try:
 	from lxml import etree
@@ -260,6 +262,17 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		text = converter.convertToText()
 
 		self.assertTrue( u"äöü" in text )
+
+	def testXmlReportOnUnicodeFromApplicationOutput( self ):
+		Helper = os.path.join( self.MY_DIRECTORY, '..', 'helpers', 'print_unicode_output.py' )
+
+		cmd = [ sys.executable, Helper]
+		runner = RunCommand( cmd, timeoutSeconds = 2, captureOutput = True )
+		rc = runner.run()
+
+		print runner.getStdErr()
+
+		self.assertTrue( rc == 0 )
 
 	def testXmlReportOnExceptionInXmlReportGeneration( self ):
 		# inject invalid XML template function into plugin

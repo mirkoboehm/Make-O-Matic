@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import string, sys
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
@@ -36,7 +38,7 @@ class ConsoleLogger( Logger ):
 		return verbosity
 
 	def message( self, mapp, mobject, msg ):
-		text = str( msg )
+		text = msg
 		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
 		try:
 			basedir = mApp().getBaseDir()
@@ -55,12 +57,12 @@ class ConsoleLogger( Logger ):
 		pieces = filter( lambda x: x, pieces )
 		fulltext = ' '.join( pieces )
 		# fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
-		sys.stderr.write( fulltext )
+		sys.stderr.write( fulltext.encode( "utf-8" ) )
 
 	def debug( self, mapp, mobject, msg ):
-		text = str( msg )
+		text = msg
 		if self.__getLevel( mapp ) > 0:
-			self.message( mapp, mobject, 'DEBUG: ' + str( text ) )
+			self.message( mapp, mobject, 'DEBUG: ' + text )
 
 	def debugN( self, mapp, mobject, level , msg ):
 		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )

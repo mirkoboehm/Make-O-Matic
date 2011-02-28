@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Exceptions import MomException, returncode_to_description
+from core.helpers.StringUtils import to_unicode_or_bust
 
 # *** Note ***
 # This module should only use stuff from Python's xml.* package, do not depend on external packages for now 
@@ -31,8 +32,9 @@ def create_child_node( document, parentNode, tagName, text ):
 
 def create_exception_xml_node( document, exception, traceback ):
 	node = document.createElement( "exception" )
-	create_child_node( document, node, "description", unicode( exception ) )
-	create_child_node( document, node, "traceback", unicode( traceback ) )
+
+	create_child_node( document, node, "description", to_unicode_or_bust( exception ) )
+	create_child_node( document, node, "traceback", to_unicode_or_bust( traceback ) )
 
 	if isinstance( exception, MomException ):
 		node.attributes["type"] = returncode_to_description( exception.getReturnCode() )

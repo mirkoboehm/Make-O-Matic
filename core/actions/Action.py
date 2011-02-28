@@ -26,6 +26,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.XmlUtils import create_child_node
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
+from core.helpers.StringUtils import to_unicode_or_bust
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -173,8 +174,8 @@ class Action( MObject ):
 		node.attributes["returncode"] = str( self.getResult() )
 
 		stderr, stdout = self._getOutput()
-		create_child_node( document, node, "stderr", unicode( stderr ) )
-		create_child_node( document, node, "stdout", unicode( stdout ) )
+		create_child_node( document, node, "stderr", to_unicode_or_bust( stderr ) )
+		create_child_node( document, node, "stdout", to_unicode_or_bust( stdout ) )
 		create_child_node( document, node, "logdescription", self.getLogDescription() )
 
 		return node
