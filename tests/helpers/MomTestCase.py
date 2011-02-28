@@ -50,7 +50,7 @@ class MomTestCase( unittest.TestCase ):
 			# do not try this at home!
 			MApplication.instance = None
 		if createBuild:
-			self.build = Build()
+			self.build = Build( name = "TestBuild" )
 
 	def tearDown( self ):
 		MApplication.instance = None
