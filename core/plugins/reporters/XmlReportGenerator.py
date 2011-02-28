@@ -87,7 +87,7 @@ class XmlReportGenerator( Plugin ):
 			convertedText = self.convert( report )
 
 			if convertedText:
-				self.__fileHandle.write( convertedText.decode( "utf-8" ) )
+				self.__fileHandle.write( convertedText )
 			else:
 				self.__failed = True
 

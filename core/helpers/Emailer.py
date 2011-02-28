@@ -84,12 +84,12 @@ class Email( MObject ):
 	def addTextAttachment( self, text, filename, useCompression = False ):
 		if useCompression:
 			part = MIMEBase( 'application', 'bzip2' )
-			part.set_payload( bz2.compress( text ) )
+			part.set_payload( bz2.compress( text.encode( "utf-8" ) ) )
 			Encoders.encode_base64( part )
 			filename += ".bz2"
 		else:
 			part = MIMEText( 'plain' )
-			part.set_payload( text )
+			part.set_payload( text.encode( "utf-8" ) )
 		part.add_header( 'Content-Disposition', 'attachment; filename={0}'.format( filename ) )
 		self.__mixedPart.attach( part )
 
