@@ -64,7 +64,6 @@ class Settings( Defaults ):
 	def evalConfigurationFiles( self, toolName = None ):
 		folders = [ self.globalFolder( toolName ), self.userFolder( toolName ) ]
 		hostConfigFile = '{0}.py'.format( getNodeName() )
-		print getNodeName()
 		files = [ 'config.py', hostConfigFile ]
 		for folder in folders:
 			for fileName in files:

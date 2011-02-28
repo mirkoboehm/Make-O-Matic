@@ -65,7 +65,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		mApp().getSettings().set( Settings.ScriptLogLevel, 5 )
 		mApp().getSettings().set( Settings.ProjectBuildType, type )
 
-		self.build.addLogger( ConsoleLogger() )
+		#self.build.addLogger( ConsoleLogger() )
 		self.build.buildAndReturn()
 
 	def getXmlReport( self ):
