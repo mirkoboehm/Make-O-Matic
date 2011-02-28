@@ -37,10 +37,14 @@ class EmailerTest( MomTestCase ):
 
 		email.setSubject( 'EmailerTest email' )
 
+		s = u"PLAäöü"
+		print( type( s ) )
+		email.attachTextPart( s )
+
 		email.attachAlternativeTextPart( 
-		'''\
+		u'''\
 		This is a test email sent by Make-O-Matic.
-		Check it out at http://github.com/KDAB/Make-O-Matic
+		Check it out at http://github.com/KDAB/Make-O-Maticä
 		''',
 		"""\
 		<html>
@@ -53,7 +57,7 @@ class EmailerTest( MomTestCase ):
 		</html>
 		""" )
 
-		attachmentText = "TEST:\n" + "\n".join( sys.path )
+		attachmentText = u"TEST:\n" + "\n".join( sys.path )
 		email.addTextAttachment( attachmentText, "testfile1.txt", False )
 		email.addTextAttachment( attachmentText, "testfile2.txt", True )
 

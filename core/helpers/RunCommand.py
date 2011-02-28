@@ -27,6 +27,7 @@ import sys
 import copy
 from core.Exceptions import ConfigurationError
 from core.Settings import Settings
+from core.helpers.StringUtils import to_unicode_or_bust
 
 class _CommandRunner( Thread ):
 
@@ -61,11 +62,11 @@ class _CommandRunner( Thread ):
 			self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False,
 				cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
 			output, error = self._process.communicate()
-			self._getRunner().setStdOut( output )
-			self._getRunner().setStdErr( error )
-			mApp().debugN( self._getRunner(), 5, "STDOUT:\n{0}".format( self._getRunner().getStdOut() ) )
+			self._getRunner().setStdOut( to_unicode_or_bust( output ) )
+			self._getRunner().setStdErr( to_unicode_or_bust( error ) )
+			mApp().debugN( self._getRunner(), 5, u"STDOUT:\n{0}".format( self._getRunner().getStdOut() ) )
 			if not self.__combineOutput:
-				mApp().debugN( self._getRunner(), 5, "STDERR:\n{0}".format( self._getRunner().getStdErr() ) )
+				mApp().debugN( self._getRunner(), 5, u"STDERR:\n{0}".format( self._getRunner().getStdErr() ) )
 			self._getRunner().setReturnCode( self._process.returncode )
 		else:
 			self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False,

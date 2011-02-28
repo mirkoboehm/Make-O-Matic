@@ -60,9 +60,8 @@ class ConsoleLogger( Logger ):
 		sys.stderr.write( fulltext.encode( "utf-8" ) )
 
 	def debug( self, mapp, mobject, msg ):
-		text = msg
 		if self.__getLevel( mapp ) > 0:
-			self.message( mapp, mobject, 'DEBUG: ' + text )
+			self.message( mapp, mobject, 'DEBUG: {0}'.format( msg ) )
 
 	def debugN( self, mapp, mobject, level , msg ):
 		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )

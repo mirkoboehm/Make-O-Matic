@@ -27,6 +27,7 @@ from core.helpers.XmlUtils import create_child_node
 from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
 from core.helpers.StringUtils import to_unicode_or_bust
+import codecs
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -146,14 +147,9 @@ class Action( MObject ):
 						self._setResult( e.getReturnCode() )
 					if step.getLogfileName():
 						try:
-							with open( step.getLogfileName(), 'a' ) as f:
+							with codecs.open( step.getLogfileName(), 'a', 'utf-8' ) as f:
 								if self.getStdOut():
-									if sys.version_info < ( 3, 0 ):
-										f.writelines( str( self.getStdOut() ) )
-									else:
-										# TODO:decoding the byte array doesnt really work, why?
-										# See XML report output, no newlines with this here. At least do not error out for now.
-										f.writelines( self.getStdOut().decode() )
+									f.writelines( self.getStdOut() )
 								else:
 									f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
 						except Exception as e:

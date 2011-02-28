@@ -107,7 +107,7 @@ class SCMGit( SourceCodeProvider ):
 		info = RevisionInfo( "GitRevisionInfo" )
 
 		if runner.getReturnCode() == 0:
-			infos = runner.getStdOut().decode( "utf-8" ).split( sep )
+			infos = runner.getStdOut().split( sep )
 			info.committerName = infos[0]
 			info.committerEmail = infos[1]
 			info.commitMessage = infos[2].rstrip()

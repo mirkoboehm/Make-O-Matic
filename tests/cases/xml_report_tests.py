@@ -31,8 +31,7 @@ from core.helpers.XmlUtils import xml_compare
 from tests.helpers.TestUtils import replace_bound_method
 from core.executomat.Step import Step
 from core.Plugin import Plugin
-import sys
-from core.helpers.RunCommand import RunCommand
+from core.actions.ShellCommandAction import ShellCommandAction
 
 try:
 	from lxml import etree
@@ -66,7 +65,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		mApp().getSettings().set( Settings.ScriptLogLevel, 5 )
 		mApp().getSettings().set( Settings.ProjectBuildType, type )
 
-		#self.build.addLogger( ConsoleLogger() )
+		self.build.addLogger( ConsoleLogger() )
 		self.build.buildAndReturn()
 
 	def getXmlReport( self ):
@@ -264,29 +263,36 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertTrue( u"äöü" in text )
 
 	def testXmlReportOnUnicodeFromApplicationOutput( self ):
-		Helper = os.path.join( self.MY_DIRECTORY, '..', 'helpers', 'print_unicode_output.py' )
 
-		cmd = [ sys.executable, Helper]
-		runner = RunCommand( cmd, timeoutSeconds = 2, captureOutput = True )
-		rc = runner.run()
+		class TestPlugin( Plugin ):
+			EXECUTABLE = os.path.join( self.MY_DIRECTORY, '..', 'helpers', 'print_unicode_output.py' )
 
-		print runner.getStdErr()
+			def setup( self ):
+				step = self.getInstructions().getStep( 'cleanup' )
+				action = ShellCommandAction( command = [self.EXECUTABLE] )
+				step.addMainAction( action )
 
-		self.assertTrue( rc == 0 )
+		self.build.addPlugin( TestPlugin() )
+		self._build()
+
+		converter = XmlReportConverter( self.getXmlReport() )
+		converter.convertToText() # test if conversion does not crash something
+
+		self.assertTrue( self.build.getReturnCode() == 0 )
 
 	def testXmlReportOnExceptionInXmlReportGeneration( self ):
 		# inject invalid XML template function into plugin
-		def command_new( self, arg1, arg2 ):
+		def command_new( self ):
 			raise MomError( "Test Error" )
 		logger = ConsoleLogger()
 		self.build.addPlugin( logger )
-		replace_bound_method( logger, logger.getXmlTemplate, command_new )
+		replace_bound_method( logger, logger.getObjectStatus, command_new )
 
 		self._build()
 
 		converter = XmlReportConverter( self.getXmlReport() )
 		text = converter.convertToText()
-		self.assertTrue( "ConsoleLogger" in text )
+
 		self.assertTrue( "Exception" in text )
 
 if __name__ == "__main__":
