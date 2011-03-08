@@ -62,8 +62,15 @@ class _CommandRunner( Thread ):
 			self._process = subprocess.Popen ( self._getRunner().getCommand(), shell = False,
 				cwd = self._getRunner().getWorkingDir(), stdout = subprocess.PIPE, stderr = stderrValue )
 			output, error = self._process.communicate()
-			self._getRunner().setStdOut( to_unicode_or_bust( output ) )
-			self._getRunner().setStdErr( to_unicode_or_bust( error ) )
+
+			# override encoding for windows
+			if sys.platform == 'win32':
+				encoding = 'cp850'
+			else:
+				encoding = 'utf-8'
+			self._getRunner().setStdOut( to_unicode_or_bust( output, encoding ) )
+			self._getRunner().setStdErr( to_unicode_or_bust( error, encoding ) )
+
 			mApp().debugN( self._getRunner(), 5, u"STDOUT:\n{0}".format( self._getRunner().getStdOut() ) )
 			if not self.__combineOutput:
 				mApp().debugN( self._getRunner(), 5, u"STDERR:\n{0}".format( self._getRunner().getStdErr() ) )
@@ -217,7 +224,7 @@ class RunCommand( MObject ):
 		getStdOut = checkVersionCommand.getStdOut()
 
 		if returnCode == expectedReturnCode:
-			version = getStdOut.decode().splitlines()[ lineNumber ].strip()
+			version = getStdOut.splitlines()[ lineNumber ].strip()
 			mApp().debugN( self, 1, 'RunCommand found: "{0}"'.format( version ) )
 			return version
 		else:
