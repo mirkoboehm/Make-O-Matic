@@ -265,11 +265,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportOnUnicodeFromApplicationOutput( self ):
 
 		class TestPlugin( Plugin ):
-			EXECUTABLE = os.path.join( self.MY_DIRECTORY, '..', 'helpers', 'print_unicode_output.py' )
+			EXECUTABLE = ['python', os.path.join( self.MY_DIRECTORY, '..', 'helpers', 'print_unicode_output.py' )]
 
 			def setup( self ):
 				step = self.getInstructions().getStep( 'cleanup' )
-				action = ShellCommandAction( command = [self.EXECUTABLE] )
+				action = ShellCommandAction( command = self.EXECUTABLE )
 				step.addMainAction( action )
 
 		self.build.addPlugin( TestPlugin() )
