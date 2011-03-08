@@ -96,10 +96,10 @@ class SCMGit( SourceCodeProvider ):
 
 	def getRevisionInfo( self ):
 		self.updateHiddenClone()
-		sep = chr( 0x0A ) + chr( 0x03 ) # use some ASCII codes as separator, to avoid clashes in commit messages
-		formatStr = "%cn{0}%ce{0}%s\n\n%b{0}%ct{0}%ci{0}%H{0}%h".format( sep )
+		sep = "%n" #take something that does not show up in git logging case
+		formatStr = "%cn{0}%ce{0}%ct{0}%ci{0}%H{0}%h{0}%s{0}%b".format( sep )
 
-		cmd = [ self.getCommand(), 'log', '--pretty=format:{0}'.format( formatStr ), '{0}^..{0}'.format( self.getTreeish() )]
+		cmd = [ self.getCommand(), '--no-pager', 'log', '--pretty=format:{0}'.format( formatStr ), '{0}~1..{0}'.format( self.getTreeish() )]
 		runner = RunCommand( cmd, 3600, searchPaths = self.getCommandSearchPaths() )
 		runner.setWorkingDir( self._getHiddenClonePath() )
 		runner.run()
@@ -107,14 +107,14 @@ class SCMGit( SourceCodeProvider ):
 		info = RevisionInfo( "GitRevisionInfo" )
 
 		if runner.getReturnCode() == 0:
-			infos = runner.getStdOut().split( sep )
+			infos = runner.getStdOut().split( '\n' )
 			info.committerName = infos[0]
 			info.committerEmail = infos[1]
-			info.commitMessage = infos[2].rstrip()
-			info.commitTime = infos[3]
-			info.commitTimeReadable = infos[4]
-			info.revision = infos[5]
-			info.shortRevision = infos[6]
+			info.commitTime = infos[2]
+			info.commitTimeReadable = infos[3]
+			info.revision = infos[4]
+			info.shortRevision = infos[5]
+			info.commitMessage = u"{0}\n\n{1}".format( infos[6].rstrip(), infos[7:] )
 
 		return info
 
