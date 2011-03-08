@@ -24,7 +24,6 @@ from smtplib import SMTP, SMTPHeloError, SMTPAuthenticationError, SMTPException
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
-from email.utils import COMMASPACE
 from email.header import Header
 from email.mime.base import MIMEBase
 import bz2
@@ -107,11 +106,18 @@ class Email( MObject ):
 		alternativePart.attach( part2 )
 		self.__mixedPart.attach( alternativePart )
 
-	def getMessageText( self ):
-		# finalize Email at the end, the 'To'-field can only be set once
-		self._getMessage()['To'] = COMMASPACE.join( self.__recipients )
+	def getMessageText( self, recipient ):
+		"""Get final message text for recipient
 
-		return self._getMessage().as_string()
+		\param recipient is a string containing an E-Mail address"""
+
+		message = self._getMessage()
+
+		# finalize Email at the end, the 'To'-field can only be set once
+		del message['To'] # must be deleted before being re-set
+		message['To'] = recipient
+
+		return message.as_string()
 
 class Emailer( MObject ):
 
@@ -141,8 +147,11 @@ class Emailer( MObject ):
 			self.__server.ehlo()
 
 	def send( self, email ):
-		if email.getFromAddress() and len( email.getToAddresses() ) > 0:
-			self.__server.sendmail( email.getFromAddress(), email.getToAddresses(), email.getMessageText() )
+		addresses = email.getToAddresses()
+		if email.getFromAddress() and len( addresses ) > 0:
+			# for each address send out an unique mail with only one 'To' recipient
+			for address in addresses:
+				self.__server.sendmail( email.getFromAddress(), address, email.getMessageText( address ) )
 		else:
 			raise ConfigurationError( 'Sender/recipient addresses missing, cannot send mail!' )
 
