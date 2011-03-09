@@ -313,7 +313,7 @@ class XmlReportConverter( MObject ):
 				) )
 
 		# only show exception description if there actually is an exception 
-		if element.find( "exception" ):
+		if element.find( "exception" ) != None:
 			out += wrapper.wrap( "Description:  {0}".format( string_from_node( element, "exception/description" ) ) )
 
 		# show client information
