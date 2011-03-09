@@ -114,7 +114,11 @@ class SCMGit( SourceCodeProvider ):
 			info.commitTimeReadable = infos[3]
 			info.revision = infos[4]
 			info.shortRevision = infos[5]
-			info.commitMessage = u"{0}\n\n{1}".format( infos[6].rstrip(), infos[7:] )
+			info.commitMessage = infos[6].rstrip()
+
+			bodyMessage = u"\n".join( infos[7:] )
+			if bodyMessage:
+				info.commitMessage += u"\n\n" + bodyMessage.rstrip()
 
 		return info
 

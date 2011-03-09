@@ -69,6 +69,22 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self._validateRevisionInfoContent( info )
 		self.assertNotEquals( info.shortRevision, None, "Git should have a short revision" )
 
+	def testScmGitOneLineCommitMessage( self ):
+		self._initialize( self.GIT_EXAMPLE, revision = "a01b256f848e362efbf9f65cc4118c6ebe521539" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+		self.assertEquals( len( info.commitMessage.split( '\n' ) ), 1, "Commit message is not properly aligned" )
+		self.assertTrue( isinstance( info.commitMessage, basestring ) )
+
+	def testScmGitMultiLineCommitMessage( self ):
+		self._initialize( self.GIT_EXAMPLE, revision = "f4ac3b0233ed1622e75643882c073d26ee5971d5" )
+
+		info = self.project.getScm().getRevisionInfo()
+		self._validateRevisionInfoContent( info )
+		self.assertEquals( len( info.commitMessage.split( '\n' ) ), 6, "Commit message is not properly aligned" )
+		self.assertTrue( isinstance( info.commitMessage, basestring ) )
+
 	def testScmGitRevision( self ):
 		self._initialize( self.GIT_EXAMPLE, revision = "c2e575fa09b2e90a9108" )
 
