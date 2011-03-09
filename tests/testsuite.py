@@ -176,8 +176,6 @@ def main():
 	sys.stderr.flush()
 	sys.stdout.flush()
 
-	print( "ä" )
-
 	if result.wasSuccessful():
 		print( 'Tests completed successfully.' )
 		sys.exit( 0 )
