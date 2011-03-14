@@ -85,12 +85,13 @@ class DaytonaReporter( Reporter ):
 		type = mApp().getSettings().get( Settings.ProjectBuildType )
 
 		# build header
-		text = '{0} {1} ({2}), {3}, {4}'.format( 
+		text = '{0} {1} ({2}), {3}, {4} by {5}'.format( 
 				status,
 				instructions.getName(),
 				type,
 				instructions.getSystemShortName(),
-				revision
+				revision,
+				info.committerName
 				)
 		
 		msg["text"] = text
