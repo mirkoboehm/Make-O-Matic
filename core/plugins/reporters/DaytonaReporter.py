@@ -32,9 +32,9 @@ import urllib2
 def sendMessage( msg, url ):
 	msg = json.dumps( msg )
 	opener = urllib2.build_opener( urllib2.HTTPHandler )
-	request = urllib2.Request( 'http://localhost:8080/daytona/notify?format=json', data=msg )
+	request = urllib2.Request( url, data=msg )
 	request.get_method = lambda: 'PUT'
-	url = opener.open( request )
+	req_url = opener.open( request )
 
 class DaytonaReporter( Reporter ):
 	"""
