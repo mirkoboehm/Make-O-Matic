@@ -148,8 +148,12 @@ class Action( MObject ):
 					if step.getLogfileName():
 						try:
 							with codecs.open( step.getLogfileName(), 'a', 'utf-8' ) as f:
-								if self.getStdOut():
-									f.writelines( self.getStdOut() )
+								if self.getStdOut() or self.getStdErr():
+									f.writelines( 'Output from action "{0}":\n'.format( self.getLogDescription() ) )
+									if self.getStdOut():
+										f.writelines( '\n=== Standard output ===\n' + self.getStdOut() ) 
+									if self.getStdErr():
+										f.writelines( '\n=== Error output ===\n' + self.getStdErr() ) 
 								else:
 									f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
 						except Exception as e:
