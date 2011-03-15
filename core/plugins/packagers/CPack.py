@@ -19,6 +19,7 @@
 
 from core.plugins.packagers.PackageProvider import PackageProvider
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
+from core.Exceptions import BuildError
 from core.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
 import os
 from core.helpers.GlobalMApp import mApp
@@ -86,6 +87,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 	def run( self ):
 		"""Finds the names of the CPack generated packages and moves them."""
 		if ( self.__action.getResult() != 0 ):
+			self._setStdErr( ( 'CPack failed: %s' % self.__action.getStdErr() ).encode() )
 			return 1
 		lines = self.__action.getStdOut().splitlines()
 		# This might break with newer versions. Tested with CPack 2.8.2 and 2.8.3

@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.actions.Action import Action
+from core.Exceptions import BuildError
 from shutil import move, Error
 from core.helpers.GlobalMApp import mApp
 from os.path import isdir
@@ -53,12 +54,18 @@ class FilesMoveAction( Action ):
 	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
 		if not isdir( str( self.__destination ) ):
+			err = 'Could not move file from {0} to {1}: {1} is not a directory.'.format( sourceFile, self.__destination )
+			self._setStdErr( err.encode() )
+			mApp().debug( self, err )
 			return 1
 
 		for sourceFile in self.__sourceFiles:
 			try:
 				mApp().debugN( self, 4, 'moving file from "{0}" to "{1}'.format( sourceFile, self.__destination ) )
 				move( sourceFile, self.__destination )
-			except Error:
+			except Error as e:
+				err = 'Could not move file from {0} to {1}: {2}'.format( sourceFile, self.__destination, str( e ) )
+				self._setStdErr( err.encode() )
+				mApp().debug( self, err )
 				return 1
 		return 0
