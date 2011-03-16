@@ -49,7 +49,7 @@ from core.plugins.testers.CTest import CTest
 from core.plugins.packagers.CPack import CPack
 from core.plugins.sourcecode.SCMGit import SCMGit
 from core.plugins.DoxygenGenerator import DoxygenGenerator
-from core.plugins.RSyncPublisher import RSyncPublisher
+from core.plugins.publishers.RSyncPublisher import RSyncPublisher
 from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
 from core.plugins.python.PyLintChecker import PyLintChecker
 from core.MApplication import MApplication
