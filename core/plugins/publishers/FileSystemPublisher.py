@@ -68,7 +68,7 @@ class FileSystemPublisher( Plugin ):
 				return
 		step = self.getInstructions().getStep( self.getStep() )
 		if str( self.getLocalDir() ):
-			action = DirectoryTreeCopyAction( str( self.getLocalDir() ), self.getUploadLocation() )
+			action = DirectoryTreeCopyAction( str( self.getLocalDir() ), self.getUploadLocation(), overwrite = True )
 			step.addMainAction( action )
 		else:
 			mApp().debugN( self, 2, 'No local directory specified, not generating action' )
