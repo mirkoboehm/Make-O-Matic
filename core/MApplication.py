@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 import sys
 from core.loggers.Logger import Logger
-from core.Exceptions import MomError, MomException, InterruptedException
+from core.Exceptions import MomError, MomException, InterruptedException, AbortBuildException
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
 from core.Instructions import Instructions
@@ -175,7 +175,8 @@ class MApplication( Instructions ):
 				self.registerReturnCode( 42 )
 			raise # re-throw exception
 		finally:
-			self.runShutDowns()
+			if self.getReturnCode() != AbortBuildException.getReturnCode():
+				self.runShutDowns()
 
 	def buildAndReturn( self ):
 		'''buildAndReturn executes the build and returns the exit code of the script.
@@ -187,6 +188,9 @@ class MApplication( Instructions ):
 			self._buildAndReturn()
 			self.message( self, 'Returning, return code {0}'.format( self.getReturnCode() ) )
 			return self.getReturnCode()
+		except AbortBuildException as e:
+			self.message( self, "Aborted (no error): {0}".format( unicode( e ) ) )
+			return 0
 		except MomException as e:
 			self.message( self, 'Error, return code {0}: {1}'.format( e.getReturnCode() , unicode( e ) ) )
 			if e.getDetails():

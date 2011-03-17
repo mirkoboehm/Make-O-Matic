@@ -59,9 +59,18 @@ class MomError( MomException ):
 	"""A MomError is raised if an error was detected that was caused by make-o-matic itself.
 	MomErrors need to be fixed by the make-o-matic developers."""
 
+
 	@staticmethod
 	def getReturnCode():
 		return 3
+
+class AbortBuildException( MomException ):
+	"""Use AbortBuildException to indicate that the build should be aborted without raising an error, 
+	and without proceeding to later phases."""
+
+	@staticmethod
+	def getReturnCode():
+		return 4
 
 class InterruptedException( MomError ):
 	"""This class is not used directly by MOM, it only defines the correct return code."""
