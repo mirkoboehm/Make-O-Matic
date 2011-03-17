@@ -22,7 +22,8 @@ from core.Exceptions import ConfigurationError
 import re
 
 class Selector( Plugin ):
-
+	"""Selector is the base class for the platform WhiteLister and BlackLister classes.
+	These classes are used to prevent or allow builds under specific circumstances without raising errors."""
 	def __init__( self, variable = None, pattern = None, required = None , name = None ):
 		Plugin.__init__( self, name )
 		self.setVariableName( variable )

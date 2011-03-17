@@ -20,6 +20,8 @@ from core.plugins.platforms.Selector import Selector
 from core.Exceptions import AbortBuildException
 
 class BlackLister( Selector ):
+	"""BlackLister is used to prevent builds on specific blacklisted platforms.
+	If the specified environment variable matches the pattern, the build is aborted during the prepare phase without an error."""
 
 	def __init__( self, variable = None, pattern = None, name = None ):
 		Selector.__init__( self, variable = variable, pattern = pattern, name = name )
