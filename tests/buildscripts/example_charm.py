@@ -22,7 +22,7 @@
 from core.helpers.BoilerPlate import BuildProject
 from core.Configuration import Configuration
 from core.helpers.PathResolver import PathResolver
-from core.plugins.RSyncPublisher import RSyncPublisher
+from core.plugins.publishers.RSyncPublisher import RSyncPublisher
 from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder, CMakeVariable
 from core.plugins.packagers.CPack import CPack
 from core.plugins.testers.CTest import CTest
