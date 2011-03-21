@@ -23,7 +23,6 @@ from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 from core.Exceptions import ConfigurationError, MomError, BuildError
-from core.Plugin import Plugin
 from tests.helpers.TestUtils import replace_bound_method
 
 class EmailReporterTest( MomBuildMockupTestCase ):
