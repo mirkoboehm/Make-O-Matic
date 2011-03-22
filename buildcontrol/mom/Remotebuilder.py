@@ -90,6 +90,7 @@ class RemoteBuilder( MObject ):
 		buildName = iface.querySetting( Settings.ScriptBuildName )
 		mApp().getSettings().set( Settings.ScriptBuildName, buildName )
 		scm = getScm( location )
+		scm.setParseBranchCommits( True )
 		scm._handlePrintCommands( command, options )
 
 	def invokeBuild( self, args, timeout = None ):

@@ -38,6 +38,7 @@ class SourceCodeProvider( Plugin ):
 		self.__tag = None
 		self.__srcDir = None
 		self.__mapper = SCMUidMapper( self )
+		self.__parseBranchCommits = False
 
 	def getObjectStatus( self ):
 		return self.getUrl()
@@ -79,9 +80,14 @@ class SourceCodeProvider( Plugin ):
 	def getTag( self ):
 		return self.__tag
 
+	def doParseBranchCommits( self ):
+		return self.__parseBranchCommits
+
+	def setParseBranchCommits( self, onOff ):
+		self.__parseBranchCommits = onOff
+
 	def getRevisionInfo( self ):
 		"""Returns a RevisionInfo object"""
-
 		raise NotImplementedError
 
 	def _handlePrintCommands( self, command, options ):
@@ -110,7 +116,9 @@ class SourceCodeProvider( Plugin ):
 		if len( options ) == 2:
 			cap = int( options[1] )
 
-		buildInfos = self._getRevisionsSince( buildInfo, cap )
+		buildInfos = self._getRevisionsSinceAllBranches( buildInfo, cap ) \
+			if self.doParseBranchCommits() \
+			else self._getRevisionsSince( buildInfo, cap )
 		lines = []
 		for buildInfo in buildInfos:
 			assert isinstance( buildInfo, BuildInfo )
@@ -118,8 +126,12 @@ class SourceCodeProvider( Plugin ):
 			lines.append( line )
 		return '\n'.join( lines )
 
+	def _getRevisionsSinceAllBranches( self, revision, cap = None ):
+		"""Return revisions committed since the specified revision, for all branches."""
+		raise NotImplementedError
+
 	def _getRevisionsSince( self, revision, cap = None ):
-		"""Return revisions committed since the specified revision."""
+		"""Return revisions committed since the specified revision for the selected branch."""
 		raise NotImplementedError
 
 	def printCurrentRevision( self, options ):
@@ -127,11 +139,17 @@ class SourceCodeProvider( Plugin ):
 		if options:
 			raise MomError( 'print current-revision does not understand any extra options!' )
 
-		revision = self._getCurrentRevision()
+		revision = self._getCurrentRevisionAllBranches() \
+			if self.doParseBranchCommits() \
+			else self._getCurrentRevision()
 		return revision
 
+	def _getCurrentRevisionAllBranches( self ):
+		'''Return the identifier of the current revisions for all branches.'''
+		raise NotImplementedError
+
 	def _getCurrentRevision( self ):
-		'''Return the identifier of the current revisions.'''
+		'''Return the identifier of the current revisions for the selected branch.'''
 		raise NotImplementedError
 
 	def makeCheckoutStep( self ):
