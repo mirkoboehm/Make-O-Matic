@@ -30,8 +30,10 @@ class ProxyBuilder( MApplication ):
 	def __init__( self, location, branch = None, tag = None, path = 'admin', script = 'buildscript.py' ):
 		MApplication.__init__( self, name = 'proxybuilder' )
 		self.addLogger( ConsoleLogger() )
+		self.setDoBranchBuilds( False )
 		self.__params = Parameters()
 		self.__params.parse()
+		self.__params.apply( self.getSettings() )
 		self.getSettings().set( Settings.ScriptLogLevel, self.__params.getDebugLevel() )
 		self.__location = location
 		self.__branch = branch
@@ -44,6 +46,12 @@ class ProxyBuilder( MApplication ):
 
 	def getParameters( self ):
 		return self.__params
+
+	def setDoBranchBuilds( self, onOff ):
+		self.__doBranchBuilds = onOff
+
+	def doBranchBuilds( self ):
+		return self.__doBranchBuilds
 
 	def execute( self ):
 		location = self.getParameters().getScmLocation() or self.__location
@@ -60,6 +68,12 @@ class ProxyBuilder( MApplication ):
 			options = [ '--branch', branch ] + options
 		if not self.getParameters().getTag() and tag:
 			options = [ '--tag', tag] + options
-		runner = builder.invokeBuild( options )
-		rc = runner.getReturnCode()
-		self.registerReturnCode( rc )
+		mode = self.getSettings().get( Settings.ScriptRunMode )
+		if mode == Settings.RunMode_Print and self.doBranchBuilds():
+			command = self.getParameters().getArgs()[2]
+			options = self.getParameters().getArgs()[3:]
+			builder.getRevisionsSinceForBranchBuilds( command, options, location, branch, tag )
+		else:
+			runner = builder.invokeBuild( options )
+			rc = runner.getReturnCode()
+			self.registerReturnCode( rc )

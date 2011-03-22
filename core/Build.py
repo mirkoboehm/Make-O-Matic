@@ -85,18 +85,7 @@ class Build( MApplication ):
 			raise MomError( 'Please specify parameter to print!' )
 		command = self.getParameters().getArgs()[2]
 		options = self.getParameters().getArgs()[3:]
-		commands = {
-			'revisions-since' : [ self.getProject().getScm().printRevisionsSince, 'print revisions committed since specified revision' ],
-			'current-revision': [ self.getProject().getScm().printCurrentRevision, 'print current revision' ]
-		}
-		if command in commands:
-			method = commands[ command ][0]
-			print( method( options ) )
-		else:
-			text = 'Unknown command "{0}" for run mode "print". Known commands are:'.format( command )
-			for cmd in commands:
-				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
-			raise ConfigurationError( text )
+		self.getProject().getScm()._handlePrintCommands( command, options )
 
 	def prepare( self ):
 		'''Execute the prepare phase for builds.'''

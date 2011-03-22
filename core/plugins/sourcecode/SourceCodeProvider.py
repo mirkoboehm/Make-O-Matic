@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import MomError
+from core.Exceptions import MomError, ConfigurationError
 from core.helpers.TypeCheckers import check_for_path
 from core.Plugin import Plugin
 from core.helpers.XmlUtils import create_child_node
@@ -83,6 +83,21 @@ class SourceCodeProvider( Plugin ):
 		"""Returns a RevisionInfo object"""
 
 		raise NotImplementedError
+
+	def _handlePrintCommands( self, command, options ):
+		commands = {
+			'revisions-since' : [ self.printRevisionsSince, 'print revisions committed since specified revision' ],
+			'current-revision': [ self.printCurrentRevision, 'print current revision' ]
+		}
+		if command in commands:
+			method = commands[ command ][0]
+			print( method( options ) )
+		else:
+			text = 'Unknown command "{0}" for run mode "print". Known commands are:'.format( command )
+			for cmd in commands:
+				text += '\n   {0}: {1}'.format( cmd, commands[ cmd ][1] )
+			raise ConfigurationError( text )
+
 
 	def printRevisionsSince( self, options ):
 		"""Print revisions committed since the specified buildInfo."""

@@ -21,6 +21,8 @@ from core.MObject import MObject
 from core.Exceptions import ConfigurationError
 from core.plugins.sourcecode import getScm
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
+from core.helpers.GlobalMApp import mApp
+from core.Settings import Settings
 
 class RemoteBuilder( MObject ):
 	def __init__( self, revision = None, location = None, branch = None, tag = None, path = None, script = None, name = None ):
@@ -81,6 +83,14 @@ class RemoteBuilder( MObject ):
 		else:
 			raise ConfigurationError( 'The build script {0} was not found at the path {1} in the repository at revision {2}'.format( 
 				self.getBuildscript(), self.getPath(), self.getRevision() ) )
+
+	def getRevisionsSinceForBranchBuilds( self, command, options, location, branch, tag ):
+		path = self.fetchBuildScript()
+		iface = BuildScriptInterface( path )
+		buildName = iface.querySetting( Settings.ScriptBuildName )
+		mApp().getSettings().set( Settings.ScriptBuildName, buildName )
+		scm = getScm( location )
+		scm._handlePrintCommands( command, options )
 
 	def invokeBuild( self, args, timeout = None ):
 		path = self.fetchBuildScript()
