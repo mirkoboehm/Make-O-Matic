@@ -34,6 +34,8 @@ from core.helpers.GlobalMApp import mApp
 from datetime import datetime
 import calendar
 from core.helpers.TimeUtils import formatted_time
+import re
+from core.Defaults import Defaults
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -117,12 +119,14 @@ class SCMSubversion( SourceCodeProvider ):
 		"""Return revisions committed since the specified revision, for all branches."""
 		revision = int( revision )
 		assert revision
-		xmlLog = self.__getXmlSvnLog( self.__getRootUrl(), revision, cap )
+		url = self.__getRootUrl()
+		xmlLog = self.__getXmlSvnLog( url, revision, cap )
 		buildInfos = self.__getXmlSvnLogEntries( xmlLog, revision, cap )
-		# FIXME break down into commits in different branches and tags
-		# ...
-		# FIXME classify commits according to the location of the branch or tag
-		raise NotImplementedError
+		locationMap = mApp().getSettings().get( Defaults.SCMSvnLocationBuildTypeMap, True )
+		branchBuildInfos = []
+		for buildInfo in buildInfos:
+			diff = self.__getSummarizedDiffForRevision( url, buildInfo.getRevision() )
+			branchBuildInfos.extend( self._splitIntoBuildInfos( buildInfo, diff, locationMap ) )
 		return buildInfos
 
 	def __getXmlSvnLog( self, url, revision, cap ):
@@ -147,7 +151,7 @@ class SCMSubversion( SourceCodeProvider ):
 			if int( result[2] ) != startRevision: # svn log always spits out the last revision
 				info = BuildInfo()
 				info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
-				info.setBuildType( 'C' ) # the default, FIXME add classifiers
+				info.setBuildType( 'C' )
 				info.setRevision( int( result[2] ) )
 				info.setUrl( self.__getRootUrl() )
 				# FIXME only trunk is supported this way
@@ -158,6 +162,51 @@ class SCMSubversion( SourceCodeProvider ):
 			return revisions[-cap:]
 		else:
 			return revisions
+
+	def _splitIntoBuildInfos( self, buildInfo, diff, locationBuildTypeMapping ):
+		changes = {}
+		url = buildInfo.getUrl()
+		for line in diff:
+			line = line.strip()
+			if re.match( '^[A-Z]+\s+', line ):
+				location = re.sub( '^[A-Z]+\s+', '', line ).strip()
+				# remove url: 
+				location = location[len( url ):]
+				for match, [ locationType, buildType ] in locationBuildTypeMapping.iteritems():
+					if location.startswith( match ):
+						info = BuildInfo()
+						info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
+						info.setBuildType( buildType )
+						info.setRevision( buildInfo.getRevision() )
+						info.setUrl( self.__getRootUrl() )
+						locationDepth = len( match.split( '/' ) ) + 1
+						paths = location.split( '/' )
+						if len( paths ) < locationDepth and locationType != Defaults.BranchType_Master:
+							continue # skip lines like 'A	 branches' in old diffs 
+						branchName = paths[locationDepth - 1].strip()
+						key = '/'.join( [ self.__getRootUrl(), match, branchName ] )
+						if locationType == Defaults.BranchType_Master:
+							key = self.__getRootUrl() + '/MASTER' # the actual key does not matter, as long as it is in the map
+						elif locationType == Defaults.BranchType_Branch:
+							info.setBranch( branchName )
+						elif locationType == Defaults.BranchType_Tag:
+							info.setTag( branchName )
+						if not changes.has_key( key ):
+							changes[key] = info
+						break
+		return changes.values()
+
+	def __getSummarizedDiffForRevision( self, url, revision ):
+		previous = revision - 1
+		cmd = [ self.getCommand(), 'diff', '--summarize', '-r', str( previous ) + ':' + str( revision ), url ]
+		runner = RunCommand( cmd, 3600, searchPaths = self.getCommandSearchPaths() )
+		runner.run()
+		if runner.getReturnCode() != 0:
+			# maybe the location did not exist earlier on: 
+			mApp().debugN( self, 2, 'cannot retrieve summarized diff for revision "{0}"'.format( revision ) )
+			return None
+		else:
+			return runner.getStdOut().split( '\n' )
 
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''

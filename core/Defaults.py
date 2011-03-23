@@ -30,7 +30,10 @@ class Defaults( MObject ):
 	RunMode_Print = 'print'
 	RunMode_Describe = 'describe'
 	RunModes = [ RunMode_Build, RunMode_Query, RunMode_Print, RunMode_Describe ]
-
+	BranchType_Master = 'master'
+	BranchType_Branch = 'branch'
+	BranchType_Tag = 'tag'
+	BranchTypes = [ BranchType_Master, BranchType_Branch, BranchType_Tag ]
 	# ----- environment settings:
 	EnvironmentExpansionMode_Ignore = 1
 	EnvironmentExpansionMode_BuildHighestScoring = 2
@@ -80,6 +83,8 @@ class Defaults( MObject ):
 	# ----- System path settings:
 	SystemExtraPaths = 'system.extrapaths'
 	SystemShortName = 'system.shortname'
+	# ----- Subversion Settings:
+	SCMSvnLocationBuildTypeMap = 'scm.svn.locationbuildtypemap'
 	# ----- Build settings:
 	BuildMoveOldDirectories = 'build.moveolddirectories'
 	# ----- Builder settings
@@ -189,5 +194,12 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.SimpleCIBuildJobCap ] = 8
 		defaultSettings[ Defaults.SimpleCIScriptDebugLevel ] = 0
 		defaultSettings[ Defaults.SimpleCIBuildDirectory ] = None
-
+		# ----- Subversion Defaults
+		defaultSettings[ Defaults.SCMSvnLocationBuildTypeMap ] = {
+			'/trunk' : [ Defaults.BranchType_Master, 'C' ],
+			'/branches/work' : [ Defaults.BranchType_Branch, 'C' ],
+			'/branches/release' : [ Defaults.BranchType_Branch, 'S' ],
+			'/branches' : [ Defaults.BranchType_Branch, 'C' ],
+			'/tags' : [ Defaults.BranchType_Tag, 'S' ]
+		}
 		return defaultSettings

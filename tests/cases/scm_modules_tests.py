@@ -22,6 +22,8 @@ from datetime import datetime
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from core.helpers.SCMUidMapper import SCMUidSvnAuthorsFileMap
 import os.path
+from core.Defaults import Defaults
+from buildcontrol.common.BuildInfo import BuildInfo
 
 class ScmModulesTests ( MomBuildMockupTestCase ):
 
@@ -154,6 +156,102 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertEqual( info1.commitTime, info2.commitTime )
 		self.assertEqual( info1.commitTimeReadable, info2.commitTimeReadable )
 		self.assertEqual( info1.revision, info2.revision )
+
+	def __scmSvnBranchCommitParserTestHelper( self, summarizedDiff ):
+		# temp: location to branch name mapping
+		# FIXME temp: 
+		LocationBuildTypeMap = {
+			'/trunk' : [ Defaults.BranchType_Master, 'C' ],
+			'/branches/work' : [ Defaults.BranchType_Branch, 'C' ],
+			'/branches/release' : [ Defaults.BranchType_Branch, 'S' ],
+			'/branches' : [ Defaults.BranchType_Branch, 'C' ],
+			'/tags' : [ Defaults.BranchType_Tag, 'S' ]
+		}
+		url = 'file:///repo/project'
+		self._initialize( self.SVN_EXAMPLE )
+		scm = self.project.getScm()
+		scm.setUrl( url )
+		# set up input BuildInfo object:
+		buildInfo = BuildInfo()
+		buildInfo.setProjectName( 'scm_modules_test' )
+		buildInfo.setBuildType( 'C' )
+		buildInfo.setRevision( 4711 )
+		buildInfo.setUrl( url )
+		return buildInfo, scm._splitIntoBuildInfos( buildInfo, summarizedDiff, LocationBuildTypeMap )
+
+	def testScmSvnBranchCommitParsingOneFileTrunk( self ):
+		summarizedDiff = [ 'M    file:///repo/project/trunk/README' ]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		self.assertEqual( len( buildInfos ), 1 )
+		info = buildInfos[0]
+		self.assertTrue( isinstance( info, BuildInfo ) )
+		self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+		self.assertEqual( info.getBranch(), None )
+		self.assertEqual( info.getTag(), None )
+
+	def testScmSvnBranchCommitParsingOneFileBranchA( self ):
+		summarizedDiff = [ 'M    file:///repo/project/branches/A/README' ]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		self.assertEqual( len( buildInfos ), 1 )
+		info = buildInfos[0]
+		self.assertTrue( isinstance( info, BuildInfo ) )
+		self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+		self.assertEqual( info.getBranch(), 'A' )
+		self.assertEqual( info.getTag(), None )
+
+	def testScmSvnBranchCommitParsingOneFileBranchReleaseA( self ):
+		summarizedDiff = [ 'M    file:///repo/project/branches/release/A/README' ]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		self.assertEqual( len( buildInfos ), 1 )
+		info = buildInfos[0]
+		self.assertTrue( isinstance( info, BuildInfo ) )
+		self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+		self.assertEqual( info.getBranch(), 'release/A' )
+		self.assertEqual( info.getTag(), None )
+
+	def testScmSvnBranchCommitParsingOneFileTagA( self ):
+		summarizedDiff = [ 'M    file:///repo/project/tags/A-1.0.0/README' ]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		self.assertEqual( len( buildInfos ), 1 )
+		info = buildInfos[0]
+		self.assertTrue( isinstance( info, BuildInfo ) )
+		self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+		self.assertEqual( info.getBranch(), None )
+		self.assertEqual( info.getTag(), 'A-1.0.0' )
+
+	def testScmSvnBranchCommitParsingFourFilesTrunk( self ):
+		summarizedDiff = [
+			'M    file:///repo/project/trunk/README',
+			'M    file:///repo/project/trunk/admin/buildscript.py',
+			'M    file:///repo/project/trunk/src/SomeClass.h',
+			'M    file:///repo/project/trunk/src/SomeClass.cpp'
+		]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		self.assertEqual( len( buildInfos ), 1 )
+		info = buildInfos[0]
+		self.assertTrue( isinstance( info, BuildInfo ) )
+		self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+		self.assertEqual( info.getBranch(), None )
+		self.assertEqual( info.getTag(), None )
+
+	def testScmSvnBranchCommitParsingFourFilesThreeLocations( self ):
+		summarizedDiff = [
+			'M    file:///repo/project/trunk/README',
+			'M    file:///repo/project/tags/A-1.0.0/README',
+			'M    file:///repo/project/branches/A/README'
+		]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		self.assertEqual( len( buildInfos ), 3 )
+		# test common attributes (the other should be tested individually in other tests):
+		for info in buildInfos:
+			self.assertTrue( isinstance( info, BuildInfo ) )
+			self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+			self.assertEqual( info.getUrl(), buildInfo.getUrl() )
 
 if __name__ == "__main__":
 	unittest.main()
