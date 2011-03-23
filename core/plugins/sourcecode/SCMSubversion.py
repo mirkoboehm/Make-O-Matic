@@ -107,41 +107,57 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def _getRevisionsSince( self, revision, cap = None ):
 		"""Print revisions committed since the specified revision."""
-
 		revision = int( revision )
 		assert revision
+		xmlLog = self.__getXmlSvnLog( self.getUrl(), revision, cap )
+		buildInfos = self.__getXmlSvnLogEntries( xmlLog, revision, cap )
+		return buildInfos
 
+	def _getRevisionsSinceAllBranches( self, revision, cap = None ):
+		"""Return revisions committed since the specified revision, for all branches."""
+		revision = int( revision )
+		assert revision
+		xmlLog = self.__getXmlSvnLog( self.__getRootUrl(), revision, cap )
+		buildInfos = self.__getXmlSvnLogEntries( xmlLog, revision, cap )
+		# FIXME break down into commits in different branches and tags
+		# ...
+		# FIXME classify commits according to the location of the branch or tag
+		raise NotImplementedError
+		return buildInfos
+
+	def __getXmlSvnLog( self, url, revision, cap ):
 		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml' ]
 		if revision == 0:
 			cmd.extend( ['--limit', '1' ] )
-		cmd.extend( ['-rHEAD:{0}'.format( str( revision ).strip() ), self.getUrl() ] )
+		cmd.extend( ['-rHEAD:{0}'.format( str( revision ).strip() ), url ] )
 		runner = RunCommand( cmd, 3600, searchPaths = self.getCommandSearchPaths() )
 		runner.run()
-
 		if runner.getReturnCode() == 0:
-			revisions = []
-			xmldoc = minidom.parseString( runner.getStdOut() )
-			logentries = xmldoc.getElementsByTagName( 'logentry' )
-			for entry in logentries:
-				result = parse_log_entry( entry )
-				if int( result[2] ) != revision: # svn log always spits out the last revision
-					info = BuildInfo()
-					info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
-					info.setBuildType( 'C' ) # the default, FIXME add classifiers
-					info.setRevision( int( result[2] ) )
-					info.setUrl( self.__getRootUrl() )
-					# FIXME only trunk is supported this way
-					info.setBranch( None )
-					info.setTag( None )
-					revisions.append( info )
-			if cap:
-				return revisions[-cap:]
-			else:
-				return revisions
+			return minidom.parseString( runner.getStdOut() )
 		elif runner.getTimedOut() == True:
 			raise ConfigurationError( 'Getting svn log for "{0}" timed out.'.format( self.getUrl() ) )
 		else:
 			raise ConfigurationError( 'Getting svn log failed, is there no svn in the path?' )
+
+	def __getXmlSvnLogEntries( self, xmlLog, startRevision, cap ):
+		revisions = []
+		logentries = xmlLog.getElementsByTagName( 'logentry' )
+		for entry in logentries:
+			result = parse_log_entry( entry )
+			if int( result[2] ) != startRevision: # svn log always spits out the last revision
+				info = BuildInfo()
+				info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
+				info.setBuildType( 'C' ) # the default, FIXME add classifiers
+				info.setRevision( int( result[2] ) )
+				info.setUrl( self.__getRootUrl() )
+				# FIXME only trunk is supported this way
+				info.setBranch( None )
+				info.setTag( None )
+				revisions.append( info )
+		if cap:
+			return revisions[-cap:]
+		else:
+			return revisions
 
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
@@ -158,6 +174,10 @@ class SCMSubversion( SourceCodeProvider ):
 		else:
 			raise ConfigurationError( 'cannot get log for "{0}"'
 				.format( self.getUrl() ) )
+
+	def _getCurrentRevisionAllBranches( self ):
+		'''Return the identifier of the current revisions for all branches.'''
+		raise NotImplementedError
 
 	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
