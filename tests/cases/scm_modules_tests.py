@@ -158,15 +158,15 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertEqual( info1.revision, info2.revision )
 
 	def __scmSvnBranchCommitParserTestHelper( self, summarizedDiff ):
-		# temp: location to branch name mapping
-		# FIXME temp: 
-		LocationBuildTypeMap = {
-			'/trunk' : [ Defaults.BranchType_Master, 'C' ],
-			'/branches/work' : [ Defaults.BranchType_Branch, 'C' ],
-			'/branches/release' : [ Defaults.BranchType_Branch, 'S' ],
-			'/branches' : [ Defaults.BranchType_Branch, 'C' ],
-			'/tags' : [ Defaults.BranchType_Tag, 'S' ]
-		}
+		# locsl location to build type mapping for the test:
+		LocationBuildTypeMap = [
+			[ '/trunk', [ Defaults.BranchType_Master, 'C' ] ],
+			[ '/branches/work', [ Defaults.BranchType_Branch, 'C' ] ],
+			[ '/branches/release', [ Defaults.BranchType_Branch, 'S' ] ],
+			[ '/branches', [ Defaults.BranchType_Branch, 'C' ] ],
+			[ '/tags/old', [ Defaults.BranchType_Tag, 'C' ] ],
+			[ '/tags', [ Defaults.BranchType_Tag, 'S' ] ]
+		]
 		url = 'file:///repo/project'
 		self._initialize( self.SVN_EXAMPLE )
 		scm = self.project.getScm()
@@ -211,6 +211,37 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
 		self.assertEqual( info.getBranch(), 'release/A' )
 		self.assertEqual( info.getTag(), None )
+
+	def testScmSvnBranchCommitParsingNoFileBranch( self ):
+		summarizedDiff = [ 'M    file:///repo/project/branches' ] # branches needs to be created at some point, too :-)
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		buildInfo = buildInfo # make checker happy
+		self.assertEqual( len( buildInfos ), 0 )
+
+	def testScmSvnBranchCommitParsingOneFileTagOldA( self ):
+		summarizedDiff = [ 'M    file:///repo/project/tags/old/A/README' ]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		self.assertEqual( len( buildInfos ), 1 )
+		info = buildInfos[0]
+		self.assertTrue( isinstance( info, BuildInfo ) )
+		self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+		self.assertEqual( info.getBranch(), None )
+		self.assertEqual( info.getTag(), 'old/A' )
+
+	def testScmSvnBranchCommitParsingOneFileTagDeprecatedB( self ):
+		'''Failing test: 'rotten' is not a configured tag prefix. Therefore the correctly detected tag name is 'rotten', 
+		not 'rotten/B'.'''
+		summarizedDiff = [ 'M    file:///repo/project/tags/rotten/B/README' ]
+		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
+		buildInfo = buildInfo # make checker happy 
+		self.assertEqual( len( buildInfos ), 1 )
+		info = buildInfos[0]
+		self.assertTrue( isinstance( info, BuildInfo ) )
+		self.assertEqual( info.getRevision(), buildInfo.getRevision() )
+		self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+		self.assertEqual( info.getBranch(), None )
+		self.assertEqual( info.getTag(), 'rotten' )
 
 	def testScmSvnBranchCommitParsingOneFileTagA( self ):
 		summarizedDiff = [ 'M    file:///repo/project/tags/A-1.0.0/README' ]

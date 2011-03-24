@@ -36,6 +36,7 @@ import calendar
 from core.helpers.TimeUtils import formatted_time
 import re
 from core.Defaults import Defaults
+from test.test_iterlen import len
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -127,7 +128,7 @@ class SCMSubversion( SourceCodeProvider ):
 		for buildInfo in buildInfos:
 			diff = self.__getSummarizedDiffForRevision( url, buildInfo.getRevision() )
 			branchBuildInfos.extend( self._splitIntoBuildInfos( buildInfo, diff, locationMap ) )
-		return buildInfos
+		return branchBuildInfos
 
 	def __getXmlSvnLog( self, url, revision, cap ):
 		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml' ]
@@ -166,34 +167,59 @@ class SCMSubversion( SourceCodeProvider ):
 	def _splitIntoBuildInfos( self, buildInfo, diff, locationBuildTypeMapping ):
 		changes = {}
 		url = buildInfo.getUrl()
+		branchPrefix = mApp().getSettings().get( Settings.SCMSvnBranchPrefix )
+		tagPrefix = mApp().getSettings().get( Settings.SCMSvnTagPrefix )
 		for line in diff:
 			line = line.strip()
-			if re.match( '^[A-Z]+\s+', line ):
-				location = re.sub( '^[A-Z]+\s+', '', line ).strip()
-				# remove url: 
-				location = location[len( url ):]
-				for match, [ locationType, buildType ] in locationBuildTypeMapping.iteritems():
-					if location.startswith( match ):
-						info = BuildInfo()
-						info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
-						info.setBuildType( buildType )
-						info.setRevision( buildInfo.getRevision() )
-						info.setUrl( self.__getRootUrl() )
-						locationDepth = len( match.split( '/' ) ) + 1
-						paths = location.split( '/' )
-						if len( paths ) < locationDepth and locationType != Defaults.BranchType_Master:
-							continue # skip lines like 'A	 branches' in old diffs 
-						branchName = paths[locationDepth - 1].strip()
-						key = '/'.join( [ self.__getRootUrl(), match, branchName ] )
-						if locationType == Defaults.BranchType_Master:
-							key = self.__getRootUrl() + '/MASTER' # the actual key does not matter, as long as it is in the map
-						elif locationType == Defaults.BranchType_Branch:
-							info.setBranch( branchName )
-						elif locationType == Defaults.BranchType_Tag:
-							info.setTag( branchName )
-						if not changes.has_key( key ):
-							changes[key] = info
-						break
+			if not re.match( '^[A-Z]+\s+', line ): continue
+			strippedLocation = re.sub( '^[A-Z]+\s+', '', line ).strip()
+			location = strippedLocation[len( url ):] # remove URL
+			for match, [ locationType, buildType ] in locationBuildTypeMapping:
+				if not location.startswith( match ): continue
+				info = BuildInfo()
+				info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
+				info.setBuildType( buildType )
+				info.setRevision( buildInfo.getRevision() )
+				info.setUrl( self.__getRootUrl() )
+
+				def getBranchName( paths, prefix, match ):
+					pathParts = paths.split( '/' )
+					prefixParts = prefix.split( '/' )
+					matchParts = match.split( '/' )
+					itemsToInclude = len( matchParts ) - len( prefixParts ) + 1 # plus branch name
+					if len( pathParts ) <= len( matchParts ): return None # ignore lines like 'A	 branches' in old diffs 
+					firstIndex = len( prefixParts )
+					branchNameParts = pathParts[ firstIndex : firstIndex + itemsToInclude ]
+					branchName = '/'.join( branchNameParts )
+					return branchName
+
+				if locationType == Defaults.BranchType_Master:
+					key = self.__getRootUrl() + '/MASTER' # the actual key does not matter, as long as it is in the map
+				elif locationType == Defaults.BranchType_Branch:
+					if not match.startswith( branchPrefix ):
+						details = 'A location mapping of the branch type needs to be located in the branches folder ' \
+							+ 'in the Subversion.repository'
+						raise ConfigurationError( 
+							'The Subversion location mapping "{0}" does not begin with the configured branch prefix "{1}".'
+							.format( match, branchPrefix ), details )
+					branchName = getBranchName( location, branchPrefix, match )
+					if not branchName: continue # this line changed the branches folders, nothing else
+					info.setBranch( branchName )
+					key = '/'.join( [ self.__getRootUrl(), branchPrefix, branchName ] )
+				elif locationType == Defaults.BranchType_Tag:
+					if not match.startswith( tagPrefix ):
+						details = 'A location mapping of the tag type needs to be located in the tags folder ' \
+							+ 'in the Subversion.repository'
+						raise ConfigurationError( 
+							'The Subversion location mapping "{0}" does not begin with the configured tag prefix "{1}".'
+							.format( match, branchPrefix ), details )
+					branchName = getBranchName( location, tagPrefix, match )
+					if not branchName: continue # this line changed the tags folders, nothing else
+					info.setTag( branchName )
+					key = '/'.join( [ self.__getRootUrl(), tagPrefix, branchName ] )
+				if not changes.has_key( key ):
+					changes[key] = info
+				break
 		return changes.values()
 
 	def __getSummarizedDiffForRevision( self, url, revision ):

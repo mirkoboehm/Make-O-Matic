@@ -85,6 +85,9 @@ class Defaults( MObject ):
 	SystemShortName = 'system.shortname'
 	# ----- Subversion Settings:
 	SCMSvnLocationBuildTypeMap = 'scm.svn.locationbuildtypemap'
+	SCMSvnBranchPrefix = 'scm.svn.prefix.branch'
+	SCMSvnTagPrefix = 'scm.svn.prefix.tag'
+	SCMSvnTrunkPrefix = 'scm.svn.prefix.trunk'
 	# ----- Build settings:
 	BuildMoveOldDirectories = 'build.moveolddirectories'
 	# ----- Builder settings
@@ -195,11 +198,15 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.SimpleCIScriptDebugLevel ] = 0
 		defaultSettings[ Defaults.SimpleCIBuildDirectory ] = None
 		# ----- Subversion Defaults
-		defaultSettings[ Defaults.SCMSvnLocationBuildTypeMap ] = {
-			'/trunk' : [ Defaults.BranchType_Master, 'C' ],
-			'/branches/work' : [ Defaults.BranchType_Branch, 'C' ],
-			'/branches/release' : [ Defaults.BranchType_Branch, 'S' ],
-			'/branches' : [ Defaults.BranchType_Branch, 'C' ],
-			'/tags' : [ Defaults.BranchType_Tag, 'S' ]
-		}
+		defaultSettings[ Defaults.SCMSvnLocationBuildTypeMap ] = [
+			[ '/trunk', [ Defaults.BranchType_Master, 'C' ] ],
+			[ '/branches/work', [ Defaults.BranchType_Branch, 'C' ] ],
+			[ '/branches/release', [ Defaults.BranchType_Branch, 'S' ] ],
+			[ '/branches', [ Defaults.BranchType_Branch, 'C' ] ],
+			['/tags', [ Defaults.BranchType_Tag, 'S' ] ]
+		]
+		defaultSettings[ Defaults.SCMSvnBranchPrefix ] = '/branches'
+		defaultSettings[ Defaults.SCMSvnTagPrefix ] = '/tags'
+		defaultSettings[ Defaults.SCMSvnTrunkPrefix ] = '/trunk'
+		# ----- done
 		return defaultSettings
