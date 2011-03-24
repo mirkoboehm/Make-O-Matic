@@ -24,6 +24,8 @@ from core.helpers.SCMUidMapper import SCMUidSvnAuthorsFileMap
 import os.path
 from core.Defaults import Defaults
 from buildcontrol.common.BuildInfo import BuildInfo
+from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 
 class ScmModulesTests ( MomBuildMockupTestCase ):
 
@@ -160,12 +162,12 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 	def __scmSvnBranchCommitParserTestHelper( self, summarizedDiff ):
 		# locsl location to build type mapping for the test:
 		LocationBuildTypeMap = [
-			[ '/trunk', [ Defaults.BranchType_Master, 'C' ] ],
-			[ '/branches/work', [ Defaults.BranchType_Branch, 'C' ] ],
-			[ '/branches/release', [ Defaults.BranchType_Branch, 'S' ] ],
-			[ '/branches', [ Defaults.BranchType_Branch, 'C' ] ],
-			[ '/tags/old', [ Defaults.BranchType_Tag, 'C' ] ],
-			[ '/tags', [ Defaults.BranchType_Tag, 'S' ] ]
+			[ '/trunk', Defaults.BranchType_Master, 'C' ],
+			[ '/branches/work', Defaults.BranchType_Branch, 'C' ],
+			[ '/branches/release', Defaults.BranchType_Branch, 'S' ],
+			[ '/branches', Defaults.BranchType_Branch, 'C' ],
+			[ '/tags/old', Defaults.BranchType_Tag, 'C' ],
+			[ '/tags', Defaults.BranchType_Tag, 'S' ]
 		]
 		url = 'file:///repo/project'
 		self._initialize( self.SVN_EXAMPLE )
@@ -283,6 +285,44 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 			self.assertTrue( isinstance( info, BuildInfo ) )
 			self.assertEqual( info.getRevision(), buildInfo.getRevision() )
 			self.assertEqual( info.getUrl(), buildInfo.getUrl() )
+
+	def __branchnameBuildtypeMappingTestHelper( self, branchType, branchName ):
+		mapping = [
+			# branch type, name regular expression, build type
+			[ Defaults.BranchType_Branch, '.+-release$', 'S' ],
+			[ Defaults.BranchType_Branch, '.+-work$', 'C' ]
+		]
+		mApp().getSettings().set( Settings.SCMSvnBranchNameBuildTypeMap, mapping )
+		url = 'file:///repo/project'
+		self._initialize( self.SVN_EXAMPLE )
+		scm = self.project.getScm()
+		scm.setUrl( url )
+		buildInfo = BuildInfo()
+		buildInfo.setProjectName( 'scm_modules_test' )
+		buildInfo.setBuildType( 'E' )
+		buildInfo.setRevision( 4711 )
+		buildInfo.setBranch( branchName )
+		buildInfo.setUrl( url )
+		scm._applyBranchnameBuildtypeMapping( branchType, buildInfo )
+		return buildInfo
+
+	def testScmSvnBranchnameBuildtypeMappingRelease( self ):
+		buildInfo = self.__branchnameBuildtypeMappingTestHelper( Defaults.BranchType_Branch, 'a-1.0.0-release' )
+		self.assertEqual( buildInfo.getBuildType(), 'S' )
+
+	def testScmSvnBranchnameBuildtypeMappingWork( self ):
+		buildInfo = self.__branchnameBuildtypeMappingTestHelper( Defaults.BranchType_Branch, 'a-0.9.7-work' )
+		self.assertEqual( buildInfo.getBuildType(), 'C' )
+
+	def testScmSvnBranchnameBuildtypeMappingTag( self ):
+		# there is no mapping for tags, so nothing should be applied 
+		buildInfo = self.__branchnameBuildtypeMappingTestHelper( Defaults.BranchType_Tag, 'a-1.0.0-release' )
+		self.assertEqual( buildInfo.getBuildType(), 'E' )
+
+	def testScmSvnBranchnameBuildtypeMappingTrunk( self ):
+		# build types are not applied for the master branch, so nothing should be applied 
+		buildInfo = self.__branchnameBuildtypeMappingTestHelper( Defaults.BranchType_Master, 'a-1.0.0-release' )
+		self.assertEqual( buildInfo.getBuildType(), 'E' )
 
 if __name__ == "__main__":
 	unittest.main()

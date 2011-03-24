@@ -37,6 +37,7 @@ from core.helpers.TimeUtils import formatted_time
 import re
 from core.Defaults import Defaults
 from test.test_iterlen import len
+from compiler.ast import Pass
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -174,7 +175,7 @@ class SCMSubversion( SourceCodeProvider ):
 			if not re.match( '^[A-Z]+\s+', line ): continue
 			strippedLocation = re.sub( '^[A-Z]+\s+', '', line ).strip()
 			location = strippedLocation[len( url ):] # remove URL
-			for match, [ locationType, buildType ] in locationBuildTypeMapping:
+			for match, locationType, buildType in locationBuildTypeMapping:
 				if not location.startswith( match ): continue
 				info = BuildInfo()
 				info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
@@ -218,9 +219,23 @@ class SCMSubversion( SourceCodeProvider ):
 					info.setTag( branchName )
 					key = '/'.join( [ self.__getRootUrl(), tagPrefix, branchName ] )
 				if not changes.has_key( key ):
+					self._applyBranchnameBuildtypeMapping( locationType, info )
 					changes[key] = info
 				break
 		return changes.values()
+
+	def _applyBranchnameBuildtypeMapping( self, branchType, buildInfo ):
+		mappings = mApp().getSettings().get( Settings.SCMSvnBranchNameBuildTypeMap )
+		if branchType == Defaults.BranchType_Master:
+			# patterns are only applied to branches and tags:
+			return
+		for mappingBranchType, rx, buildType in mappings:
+			if branchType != mappingBranchType:
+				# do not apply this mapping to this buildInfo
+				continue
+			name = buildInfo.getBranch() if branchType == Defaults.BranchType_Branch else buildInfo.getTag()
+			if re.match( rx, name ):
+				buildInfo.setBuildType( buildType )
 
 	def __getSummarizedDiffForRevision( self, url, revision ):
 		previous = revision - 1
