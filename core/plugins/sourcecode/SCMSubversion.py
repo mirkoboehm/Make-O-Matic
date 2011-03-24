@@ -236,7 +236,14 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
-		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', self.getUrl() ]
+		return self.__getCurrentRevisionOfUrl( self.getUrl() )
+
+	def _getCurrentRevisionAllBranches( self ):
+		'''Return the identifier of the current revisions for all branches.'''
+		return self.__getCurrentRevisionOfUrl( self.__getRootUrl() )
+
+	def __getCurrentRevisionOfUrl( self, url ):
+		cmd = [ self.getCommand(), '--non-interactive', 'log', '--xml', '--limit', '1', url ]
 		runner = RunCommand( cmd, searchPaths = self.getCommandSearchPaths() )
 		runner.run()
 
@@ -247,12 +254,7 @@ class SCMSubversion( SourceCodeProvider ):
 			result = parse_log_entry( logentries[0] )
 			return result[2]
 		else:
-			raise ConfigurationError( 'cannot get log for "{0}"'
-				.format( self.getUrl() ) )
-
-	def _getCurrentRevisionAllBranches( self ):
-		'''Return the identifier of the current revisions for all branches.'''
-		raise NotImplementedError
+			raise ConfigurationError( 'cannot get log for "{0}"'.format( url ) )
 
 	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
