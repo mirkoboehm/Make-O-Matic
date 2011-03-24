@@ -36,8 +36,6 @@ import calendar
 from core.helpers.TimeUtils import formatted_time
 import re
 from core.Defaults import Defaults
-from test.test_iterlen import len
-from compiler.ast import Pass
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
@@ -119,6 +117,7 @@ class SCMSubversion( SourceCodeProvider ):
 
 	def _getRevisionsSinceAllBranches( self, revision, cap = None ):
 		"""Return revisions committed since the specified revision, for all branches."""
+		mApp().debugN( self, 3, 'Retrieving revisions for all branches since {0}'.format( revision ) )
 		revision = int( revision )
 		assert revision
 		url = self.__getRootUrl()
@@ -170,7 +169,7 @@ class SCMSubversion( SourceCodeProvider ):
 		url = buildInfo.getUrl()
 		branchPrefix = mApp().getSettings().get( Settings.SCMSvnBranchPrefix )
 		tagPrefix = mApp().getSettings().get( Settings.SCMSvnTagPrefix )
-		for line in diff:
+		for line in diff or []:
 			line = line.strip()
 			if not re.match( '^[A-Z]+\s+', line ): continue
 			strippedLocation = re.sub( '^[A-Z]+\s+', '', line ).strip()
@@ -219,6 +218,7 @@ class SCMSubversion( SourceCodeProvider ):
 					info.setTag( branchName )
 					key = '/'.join( [ self.__getRootUrl(), tagPrefix, branchName ] )
 				if not changes.has_key( key ):
+					mApp().debugN( self, 2, 'New build information for revision {0}, {1}'.format( buildInfo.getRevision(), key ) )
 					self._applyBranchnameBuildtypeMapping( locationType, info )
 					changes[key] = info
 				break
@@ -235,6 +235,8 @@ class SCMSubversion( SourceCodeProvider ):
 				continue
 			name = buildInfo.getBranch() if branchType == Defaults.BranchType_Branch else buildInfo.getTag()
 			if re.match( rx, name ):
+				mApp().debugN( 2, 'Setting the build type to {0} for revision {1}, because the branch name matches {2}' \
+					.format( buildType, buildInfo.getRevision(), rx ) )
 				buildInfo.setBuildType( buildType )
 
 	def __getSummarizedDiffForRevision( self, url, revision ):
