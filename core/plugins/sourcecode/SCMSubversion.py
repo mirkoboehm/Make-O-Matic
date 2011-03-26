@@ -235,7 +235,7 @@ class SCMSubversion( SourceCodeProvider ):
 				continue
 			name = buildInfo.getBranch() if branchType == Defaults.BranchType_Branch else buildInfo.getTag()
 			if re.match( rx, name ):
-				mApp().debugN( 2, 'Setting the build type to {0} for revision {1}, because the branch name matches {2}' \
+				mApp().debugN( self, 2, 'Setting the build type to {0} for revision {1}, because the branch name matches {2}' \
 					.format( buildType, buildInfo.getRevision(), rx ) )
 				buildInfo.setBuildType( buildType )
 
