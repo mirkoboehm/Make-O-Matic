@@ -19,7 +19,7 @@
 
 from __future__ import unicode_literals
 
-import string, sys
+import string, sys, os
 from core.loggers.Logger import Logger
 from core.helpers.TypeCheckers import check_for_nonnegative_int
 from core.Settings import Settings
@@ -45,8 +45,8 @@ class ConsoleLogger( Logger ):
 			text = string.replace( text, basedir, '$BASE' )
 		except MomException:
 			pass # no base directory set yet		
-		if not text.endswith( '\n' ):
-			text = text + '\n'
+		if not text.endswith( os.linesep ):
+			text = text + os.linesep
 
 		if mobject.__class__.__name__ == mobject.getName():
 			typeName = '[{0}]'.format( mobject.__class__.__name__ )
