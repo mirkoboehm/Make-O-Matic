@@ -16,8 +16,11 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.plugins.platforms.Selector import Selector
 from core.Exceptions import AbortBuildException
+from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 
 class BlackLister( Selector ):
 	"""BlackLister is used to prevent builds on specific blacklisted platforms.
@@ -27,6 +30,11 @@ class BlackLister( Selector ):
 		Selector.__init__( self, variable = variable, pattern = pattern, name = name )
 
 	def prepare( self ):
+		currentMode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if currentMode != Settings.RunMode_Build:
+			mApp().debug( self , "Not in build mode, not checking platform" )
+			return
+
 		if self._isMatch():
 			text = 'BlackLister aborted build because variable "{0}" matches regex "{1}"'\
 				.format( self.getVariableName(), self.getValuePattern() )
