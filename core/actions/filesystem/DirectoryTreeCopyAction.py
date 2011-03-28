@@ -57,26 +57,31 @@ class DirectoryTreeCopyAction( Action ):
 			ignored_names = set()
 
 		if not os.path.exists( dst ):
-			os.makedirs( dst )
-		errors = []
+			try:
+				os.makedirs( dst )
+			except OSError as e:
+				err = 'Could not create Directory {0}: {1}'.format( dst, str( e ) )
+				self._setStdErr( err.encode() )
+				mApp().debug( self, err )
+				return 1
 		for name in names:
 			if name in ignored_names:
 				continue
 			srcname = os.path.join( src, name )
 			dstname = os.path.join( dst, name )
-			try:
-				if os.path.isdir( srcname ):
-					self.mycopytree( srcname, dstname, ignore )
-				else:
-					if self.__overwrite or not os.path.isfile( dstname ):
+
+			if os.path.isdir( srcname ):
+				self.mycopytree( srcname, dstname, ignore )
+			else:
+				if self.__overwrite or not os.path.isfile( dstname ):
+					try:
 						shutil.copy2( srcname, dstname )
-					# XXX What about devices, sockets etc.?
-			except ( IOError, os.error ), why:
-				errors.append( ( srcname, dstname, str( why ) ) )
-				# catch the Error from the recursive copytree so that we can
-				# continue with other files
-			except Error, err:
-				errors.extend( err.args[0] )
+					except IOError as e:
+						err = 'Could not copy file from {0} to {1}: {2}'.format( srcname, dstname, str( e ) )
+						self._setStdErr( err.encode() )
+						mApp().debug( self, err )
+						return 1
+				# XXX What about devices, sockets etc.?
 		try:
 			shutil.copystat( src, dst )
 		except OSError, why:
@@ -84,14 +89,17 @@ class DirectoryTreeCopyAction( Action ):
 			# Copying file access times may fail on Windows
 				pass
 			else:
-				errors.extend( ( src, dst, str( why ) ) )
-		if errors:
-			raise Error, errors
+				err = 'Could not copy stat from {0} to {1}: {2}'.format( src, dst, str( why ) )
+				self._setStdErr( err.encode() )
+				mApp().debug( self, err )
+				return 1
+		return 0
 
 	def run( self ):
 		"""Copies the directory tree."""
 
-		self.mycopytree( self.__source, self.__destination, shutil.ignore_patterns( *self.__ignorePatterns ), self.__overwrite )
+		ret = self.mycopytree( self.__source, self.__destination, shutil.ignore_patterns( *self.__ignorePatterns ), self.__overwrite )
 
-		mApp().debugN( self, 2, 'copied directory tree "{0}" to "{1}".'.format( self.__source, self.__destination ) )
-		return 0
+		if ret == 0:
+			mApp().debugN( self, 2, 'copied directory tree "{0}" to "{1}".'.format( self.__source, self.__destination ) )
+		return ret
