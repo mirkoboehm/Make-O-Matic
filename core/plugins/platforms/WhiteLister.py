@@ -18,6 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.plugins.platforms.Selector import Selector
 from core.Exceptions import AbortBuildException
+from core.helpers.GlobalMApp import mApp
+from core.Settings import Settings
 
 class WhiteLister( Selector ):
 	"""WhiteLister is used to allow builds only on specific whitelisted platforms.
@@ -28,6 +30,11 @@ class WhiteLister( Selector ):
 		Selector.__init__( self, variable = variable, pattern = pattern, name = name )
 
 	def prepare( self ):
+		currentMode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if currentMode != Settings.RunMode_Build:
+			mApp().debugN( self, 2, "Not in build mode, not checking platform" )
+			return
+
 		if self._isMatch():
 			pass # all platforms with matching variables are selected
 		else:

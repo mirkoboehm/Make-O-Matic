@@ -32,7 +32,7 @@ class BlackLister( Selector ):
 	def prepare( self ):
 		currentMode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if currentMode != Settings.RunMode_Build:
-			mApp().debug( self , "Not in build mode, not checking platform" )
+			mApp().debugN( self, 2, "Not in build mode, not checking platform" )
 			return
 
 		if self._isMatch():
