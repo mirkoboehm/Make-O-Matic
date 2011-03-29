@@ -132,7 +132,7 @@ class SCMGit( SourceCodeProvider ):
 
 		if runner.getReturnCode() == 0:
 			revisions = []
-			lines = runner.getStdOut().decode().splitlines()
+			lines = runner.getStdOut().splitlines()
 			for line in lines:
 				if re.match( '^commit.+', line ):
 					parts = line.split( ' ' )
