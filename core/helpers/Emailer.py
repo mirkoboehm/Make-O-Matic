@@ -131,6 +131,9 @@ class Emailer( MObject ):
 			raise ConfigurationError( 'No emailer SMTP server specified, please check configuration!' )
 		self.__server = SMTP( server )
 		#self.__server.set_debuglevel( 3 )
+		if mApp().getSettings().get( Settings.EmailerUseTls, False ):
+			self.__server.starttls()
+			self.__server.ehlo()
 		if mApp().getSettings().get( Settings.EmailerDoLogin, False ):
 			user = mApp().getSettings().get( Settings.EmailerUsername )
 			password = mApp().getSettings().get( Settings.EmailerPassword )
@@ -142,9 +145,7 @@ class Emailer( MObject ):
 				raise ConfigurationError( 'Emailer error, login failed: {0}'.format( e ) )
 			except SMTPException as e:
 				raise ConfigurationError( 'Emailer error, no suitable authentication method was found: {0}'.format( e ) )
-		if mApp().getSettings().get( Settings.EmailerUseTls, False ):
-			self.__server.starttls()
-			self.__server.ehlo()
+
 
 	def send( self, email ):
 		addresses = email.getToAddresses()
