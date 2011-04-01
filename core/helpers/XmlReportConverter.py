@@ -287,10 +287,17 @@ class XmlReportConverter( MObject ):
 
 		# calculate round trip time from commit to report
 		startTime = float_from_node_attribute( element, "plugin", "commitTime" )
-		if startTime > 0:
-			roundTripTime = formatted_time_delta( datetime.utcnow() - datetime.utcfromtimestamp( startTime ) )
+		timeDelta = datetime.utcnow() - datetime.utcfromtimestamp( startTime )
+
+		# TODO: Replace this by timedelta.total_seconds() once we're depending on Python 2.7
+		# This is a work around for Python < 2.7 to get the total seconds of a timedelta
+		total_seconds = timeDelta.days * 86400 + timeDelta.seconds
+
+		if total_seconds > 0:
+			roundTripTime = formatted_time_delta( timeDelta )
 		else:
-			roundTripTime = -1
+			# something went wrong calculating the RTT. is the systime correct?
+			roundTripTime = "N/A"
 
 		out = []
 
@@ -334,12 +341,9 @@ class XmlReportConverter( MObject ):
 
 		wrapper.dedent()
 
-		if roundTripTime > 0:
-			out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
-					string_from_node_attribute( element, "build", "timing" ),
-					roundTripTime ), '*' )
-		else:
-			out += wrapper.wrap( "*" * wrapper.width )
+		out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
+				string_from_node_attribute( element, "build", "timing" ),
+				roundTripTime ), '*' )
 		# END: Summary
 
 		out += " "
