@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.MObject import MObject
-import sqlite3, os
+import sqlite3, os, sys
 from buildcontrol.common.BuildInfo import BuildInfo
 from core.Exceptions import ConfigurationError
 from core.Settings import Settings
@@ -199,7 +199,10 @@ where id=?'''\
 		"""Start a build process for a new revision. baseDir is the directory where all builds go. To build 
 		different revisions and build types under it, subdirectories have to be used."""
 		buildType = buildInfo.getBuildType().lower()
-		rev = buildInfo.getRevision()
+		# Under windows we have the problem that paths need to be short, so take only 7 digists of the git hash
+		# this is also done for svn revision numbers, but these should not be so long
+		if sys.platform == 'win32':
+			rev = buildInfo.getRevision()[0:7]
 		name = make_foldername_from_string( buildInfo.getProjectName() )
 		# find suitable names for the different build dirs:
 		baseDir = os.path.join( os.getcwd(), 'builds' )
