@@ -203,6 +203,8 @@ where id=?'''\
 		# this is also done for svn revision numbers, but these should not be so long
 		if sys.platform == 'win32':
 			rev = buildInfo.getRevision()[0:7]
+		else:
+			rev = buildInfo.getRevision()
 		name = make_foldername_from_string( buildInfo.getProjectName() )
 		# find suitable names for the different build dirs:
 		baseDir = os.path.join( os.getcwd(), 'builds' )
