@@ -65,7 +65,7 @@ class EmailReporter( Reporter ):
 
 		check_for_string( settings.get( Settings.EmailReporterSender ), "EmailReporterSender Must be a valid email address" )
 
-	def shutDown( self ):
+	def sendReport( self ):
 		email = self.createEmail()
 
 		if len( email.getToAddresses() ) == 0:

@@ -51,7 +51,7 @@ class DaytonaReporter( Reporter ):
 		settings = mApp().getSettings()
 		check_for_string( settings.get( DaytonaReporter.PostUrlKey ), "DaytonaPostUrl must be a valid URL" )
 
-	def shutDown( self ):
+	def sendReport( self ):
 		msg = self._createMessage()
 
 		# send message

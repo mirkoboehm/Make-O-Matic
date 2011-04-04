@@ -28,7 +28,7 @@ class ConsoleReporter( Reporter ):
 
 		self.__finished = False
 
-	def shutDown( self ):
+	def sendReport( self ):
 		if self.__finished:
 			return
 

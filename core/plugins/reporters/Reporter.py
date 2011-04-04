@@ -16,9 +16,20 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Plugin import Plugin
 
 class Reporter( Plugin ):
 
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
+
+	def sendReport( self ):
+		"""Implement this for creating and sending your report
+
+		\note This is run during the shutdown phase"""
+
+		raise NotImplementedError()
+
+	def shutDown( self ):
+		self.sendReport()
