@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.MObject import MObject
 import optparse
 import sys
@@ -23,6 +24,7 @@ from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_nonempty_string
 from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
+from core.helpers.StringUtils import IndentedHelpFormatterWithNL
 
 class Parameters( MObject ):
 	'''Parameters parses and stores the command line parameters (arguments) of a script.'''
@@ -40,21 +42,25 @@ class Parameters( MObject ):
 		return self.__args
 
 	def _getOptionParser( self ):
-		usage = "usage: %prog [options] build|describe|query <setting>|print"
+		usage = "usage: %prog [options] [build|describe|query <setting>|print]"
 		version = 'Make-O-Matic {0}'.format( mApp().getMomVersion() )
 		description = '''\
-This is a Make-O-Matic build script. Build scripts can be executed in the following run modes 
-(if no run mode is specified, build is used): "build", to execute a build.
-"query" to query a Make-O-Matic setting by name (e.g. "query script.buildname"). "print", to 
-print information about the project's main repository. Use "describe" to get an human readable
-description of the build process.
+This is a Make-O-Matic build script.
+
+Build scripts can be executed in the following run modes:
+* build:    Execute a build (default)
+* query:    Query a Make-O-Matic setting by name
+            (e.g. "query script.buildname")
+* print:    Print information about the project's main repository.
+* describe: Get an human readable description of the build process.
 '''
 		epilog = '''\
 https://github.com/KDAB/Make-O-Matic
-http://docs.kdab.com/make-o-matic/0.5.0/html
+http://docs.kdab.com/make-o-matic/{0}/html
 
-'''
-		parser = optparse.OptionParser( usage = usage, version = version, description = description, epilog = epilog )
+'''.format( mApp().getMomVersion() )
+
+		parser = optparse.OptionParser( usage = usage, version = version, description = description, epilog = epilog, formatter = IndentedHelpFormatterWithNL() )
 		parser.add_option( '-r', '--revision', action = 'store', dest = 'revision',
 			help = 'repository revision to be built' )
 		parser.add_option( '--tag', action = 'store', dest = 'tag',
@@ -68,7 +74,7 @@ http://docs.kdab.com/make-o-matic/0.5.0/html
 		parser.add_option( '-m', '--ignore-commit-message', action = 'store_true', dest = 'ignoreCommitMessage',
 			help = 'ignore commit message commands (like "MOM:BuildType=S")' )
 		parser.add_option( '--ignore-configuration-files', action = 'store_true', dest = "ignoreConfigurationFiles",
-			help = "Ignore settings" )
+			help = "Ignore settings provided by configuration files" )
 		parser.add_option( '-s', '--build-steps', action = 'store', dest = 'buildSteps',
 			help = """enable or disable individual builds steps on top of the defaults for the build type,
 			e.g.: -s disable-cleanup,enable-create-packages""" )
@@ -179,4 +185,3 @@ http://docs.kdab.com/make-o-matic/0.5.0/html
 				if not found:
 					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
 			mApp().debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
-
