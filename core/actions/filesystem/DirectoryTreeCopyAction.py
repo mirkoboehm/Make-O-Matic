@@ -21,12 +21,11 @@
 from core.actions.Action import Action
 from core.helpers.GlobalMApp import mApp
 import shutil
-from core.Exceptions import ConfigurationError
 from core.helpers.TypeCheckers import check_for_list_of_strings
 import os
 
 class Error( EnvironmentError ):
-    pass
+	pass
 
 class DirectoryTreeCopyAction( Action ):
 	"""DirectoryTreeCopyAction encapsulates the copying of a directory tree 

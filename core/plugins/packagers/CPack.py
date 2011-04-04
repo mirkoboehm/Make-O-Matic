@@ -19,7 +19,6 @@
 
 from core.plugins.packagers.PackageProvider import PackageProvider
 from core.actions.filesystem.FilesMoveAction import FilesMoveAction
-from core.Exceptions import BuildError
 from core.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
 import os
 from core.helpers.GlobalMApp import mApp

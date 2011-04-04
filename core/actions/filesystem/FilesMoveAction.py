@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.actions.Action import Action
-from core.Exceptions import BuildError
 from shutil import move, Error
 from core.helpers.GlobalMApp import mApp
 from os.path import isdir

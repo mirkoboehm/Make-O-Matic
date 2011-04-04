@@ -19,7 +19,6 @@
 from core.Plugin import Plugin
 from core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none, check_for_string
-import platform, os, re
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
