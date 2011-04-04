@@ -23,7 +23,7 @@ from core.helpers.RunCommand import RunCommand
 from core.actions.ShellCommandAction import ShellCommandAction
 import time
 from xml.dom import minidom
-from core.plugins.sourcecode.RevisionInfo import RevisionInfo
+from core.helpers.RevisionInfo import RevisionInfo
 import os
 import tempfile
 from core.helpers.FilesystemAccess import make_foldername_from_string

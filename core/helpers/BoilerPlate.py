@@ -25,7 +25,7 @@ from core.Exceptions import MomException
 import sys
 from core.Project import Project
 from core.plugins.reporters.ConsoleReporter import ConsoleReporter
-from core.plugins.reporters.XmlReportGenerator import XmlReportGenerator
+from core.helpers.XmlReportGenerator import XmlReportGenerator
 from core.Configuration import Configuration
 
 def getBuild( name, minimumMomVersion ):

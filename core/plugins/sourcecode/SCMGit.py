@@ -26,7 +26,7 @@ import os, sys
 from core.helpers.FilesystemAccess import make_foldername_from_string
 import re
 from core.helpers.GlobalMApp import mApp
-from core.plugins.sourcecode.RevisionInfo import RevisionInfo
+from core.helpers.RevisionInfo import RevisionInfo
 from core.Settings import Settings
 from buildcontrol.common.BuildInfo import BuildInfo
 
