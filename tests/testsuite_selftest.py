@@ -23,13 +23,14 @@ import os
 import sys
 
 def main():
+	# use the testsuite module from our checkout, not the one in PYTHONPATH
 	filePath = os.path.realpath( os.path.dirname( __file__ ) )
 	momDirectory = os.path.abspath( os.path.join( filePath, '..' ) )
 
 	sys.path.insert( 0, momDirectory )
 	print "Using sys.path: {0}".format( sys.path )
 
-	# important: import testsuite after modifing sys.path to load the correct module!
+	# important: import testsuite module *after* modifying sys.path to load the correct module!
 	import testsuite
 	testsuite.main()
 
