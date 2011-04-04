@@ -18,6 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
+from core.helpers.GlobalMApp import mApp
+from core.Settings import Settings
 
 class Reporter( Plugin ):
 
@@ -32,4 +34,9 @@ class Reporter( Plugin ):
 		raise NotImplementedError()
 
 	def shutDown( self ):
+		reportingEnabled = mApp().getSettings().get( Settings.ScriptEnableReporting )
+		if not reportingEnabled:
+			mApp().debug( self, "Not sending report, disabled by settings (Settings.ScriptEnableReporting)" )
+			return
+
 		self.sendReport()
