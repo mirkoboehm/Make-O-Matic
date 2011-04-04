@@ -54,7 +54,7 @@ class FilesMoveAction( Action ):
 	def run( self ):
 		"""Executes the shell command. Needs a command to be set."""
 		if not isdir( str( self.__destination ) ):
-			err = 'Could not move file from {0} to {1}: {1} is not a directory.'.format( sourceFile, self.__destination )
+			err = 'Could not move files to {0}: {0} is not a directory.'.format( self.__destination )
 			self._setStdErr( err.encode() )
 			mApp().debug( self, err )
 			return 1
