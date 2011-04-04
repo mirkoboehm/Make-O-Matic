@@ -18,13 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.reporters.Reporter import Reporter
-from core.helpers.XmlReport import XmlReport
 from core.helpers.GlobalMApp import mApp
-from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Build import Build
 from core.Settings import Settings
-from core.Exceptions import MomError, BuildError, ConfigurationError
-from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
+from core.helpers.TypeCheckers import check_for_string
 
 import json
 import urllib2
@@ -32,9 +29,9 @@ import urllib2
 def sendMessage( msg, url ):
 	msg = json.dumps( msg )
 	opener = urllib2.build_opener( urllib2.HTTPHandler )
-	request = urllib2.Request( url, data=msg )
+	request = urllib2.Request( url, data = msg )
 	request.get_method = lambda: 'PUT'
-	req_url = opener.open( request )
+	opener.open( request )
 
 class DaytonaReporter( Reporter ):
 	"""
@@ -52,8 +49,8 @@ class DaytonaReporter( Reporter ):
 	def preFlightCheck( self ):
 		# check settings, may fail
 		settings = mApp().getSettings()
-		check_for_string( settings.get( DaytonaReporter.PostUrlKey ), "DaytonaPostUrl Must be a valid URL" )
-	
+		check_for_string( settings.get( DaytonaReporter.PostUrlKey ), "DaytonaPostUrl must be a valid URL" )
+
 	def shutDown( self ):
 		msg = self._createMessage()
 
@@ -93,11 +90,11 @@ class DaytonaReporter( Reporter ):
 				revision,
 				info.committerName
 				)
-		
+
 		msg["text"] = text
 		msg["MOM-Build-Name"] = mApp().getName()
 		msg["MOM-Version"] = mApp().getMomVersion()
-		msg["MOM-Success"] = "true" if returnCode == 0 else "false" 
+		msg["MOM-Success"] = "true" if returnCode == 0 else "false"
 		msg["MOM-Project"] = instructions.getName()
 		msg["sender"] = "make-o-matic"
 
