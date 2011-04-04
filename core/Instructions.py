@@ -116,6 +116,8 @@ class Instructions( MObject ):
 		return self.__plugins
 
 	def addPlugin( self, plugin ):
+		mApp().debugN( self, 4, "Adding plugin: {0}".format( plugin.getName() ) )
+
 		plugin.setInstructions( self )
 		self.__plugins.append( plugin )
 
