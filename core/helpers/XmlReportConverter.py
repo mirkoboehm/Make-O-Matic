@@ -334,7 +334,7 @@ class XmlReportConverter( MObject ):
 		buildNode = self.__elementTree.find( "build" )
 
 		# calculate round trip time from commit to report
-		startTime = float_from_node_attribute( buildNode, "plugin", "commitTime" )
+		startTime = float_from_node_attribute( buildNode, "pluginInfo", "commitTime" )
 		timeDelta = datetime.utcnow() - datetime.utcfromtimestamp( startTime )
 
 		# TODO: Replace this by timedelta.total_seconds() once we're depending on Python 2.7
@@ -378,10 +378,10 @@ class XmlReportConverter( MObject ):
 		returnCode = int ( buildNode.attrib["returncode"] )
 		if returnCode in ( 0, BuildError.getReturnCode() ):
 			out += wrapper.wrap( "Commit:       {0}, revision: {1}".format( 
-					string_from_node_attribute( buildNode, "plugin", "committerName" ),
-					string_from_node_attribute( buildNode, "plugin", "revision" ) ) )
+					string_from_node_attribute( buildNode, "pluginInfo", "committerName" ),
+					string_from_node_attribute( buildNode, "pluginInfo", "revision" ) ) )
 			out += wrapper.wrap( "Time:         {0}".format( 
-					string_from_node_attribute( buildNode, "plugin", "commitTimeReadable" ) ) )
+					string_from_node_attribute( buildNode, "pluginInfo", "commitTimeReadable" ) ) )
 
 			wrapper.indent( indentString = "| " )
 			out += wrapper.wrapMultiLine( string_from_node( buildNode, "commitMessage" ), drop_empty_lines = False )
@@ -496,12 +496,15 @@ class XmlReportConverter( MObject ):
 				out += wrapper.wrap( name )
 
 			# evaluate plugin specific getXmlTemplate method here to show extra information
+			pluginInfo = element.find( "pluginInfo" )
+
 			if name in self.__xmlTemplateFunctions:
 				wrapper.indent()
 				try:
-					text = self.__xmlTemplateFunctions[name]( element, wrapper )
-				except Exception:
-					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}".format( name ) )
+					text = self.__xmlTemplateFunctions[name]( pluginInfo, wrapper )
+				except Exception, e:
+					mApp().debug( self, "Exception in getXmlTemplate function for plugin {0}: {1}".format( name, e ) )
+					mApp().debug( self, traceback.format_exc() )
 					text = wrapper.wrap( "(Exception while getting plugin report, see log)" )
 				wrapper.dedent()
 

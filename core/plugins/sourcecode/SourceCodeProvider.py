@@ -222,10 +222,10 @@ class SourceCodeProvider( Plugin ):
 	def getXslTemplates( self ):
 		return { ReportFormat.HTML:
 			"""
-			Revision: <xsl:value-of select="@revision"/><br/>
-			Committer: <xsl:value-of select="@committerName"/> &lt;<xsl:value-of select="@committerEmail"/>&gt;<br/>
-			Time: <xsl:value-of select="@commitTimeReadable"/><br/>
-			Message: <pre><xsl:value-of select="commitMessage"/></pre>
+			Revision: <xsl:value-of select="pluginInfo/@revision"/><br/>
+			Committer: <xsl:value-of select="pluginInfo/@committerName"/> &lt;<xsl:value-of select="pluginInfo/@committerEmail"/>&gt;<br/>
+			Time: <xsl:value-of select="pluginInfo/@commitTimeReadable"/><br/>
+			Message: <pre><xsl:value-of select="pluginInfo/commitMessage"/></pre>
 			""" }
 
 	def getXmlTemplate( self, element, wrapper ):
@@ -234,8 +234,8 @@ class SourceCodeProvider( Plugin ):
 		out += wrapper.wrap( "Revision: {0}".format( element.attrib["revision"] ) )
 		out += wrapper.wrap( "Committer: {0} <{1}>".format( element.attrib["committerName"], element.attrib["committerEmail"] ) )
 		out += wrapper.wrap( "Time: {0}".format( element.attrib["commitTimeReadable"] ) )
-		out += wrapper.wrap( "Commit message following:" )
 
+		out += wrapper.wrap( "Commit message following:" )
 		wrapper.indent()
 		out += wrapper.wrapMultiLine( element.find( "commitMessage" ).text )
 		wrapper.dedent()
@@ -243,15 +243,17 @@ class SourceCodeProvider( Plugin ):
 		return out
 
 	def createXmlNode( self, document ):
-		node = Plugin.createXmlNode( self, document )
+		node = super( SourceCodeProvider, self ).createXmlNode( document )
 
+		pluginInfo = document.createElement( "pluginInfo" )
 		info = self.getRevisionInfo()
-		node.attributes["revision"] = unicode( info.revision )
-		node.attributes["committerName"] = unicode( info.committerName )
-		node.attributes["committerEmail"] = unicode( info.committerEmail )
-		node.attributes["commitTime"] = unicode( info.commitTime )
-		node.attributes["commitTimeReadable"] = unicode( info.commitTimeReadable )
-		create_child_node( document, node, "commitMessage", unicode( info.commitMessage ) )
+		pluginInfo.attributes["revision"] = unicode( info.revision )
+		pluginInfo.attributes["committerName"] = unicode( info.committerName )
+		pluginInfo.attributes["committerEmail"] = unicode( info.committerEmail )
+		pluginInfo.attributes["commitTime"] = unicode( info.commitTime )
+		pluginInfo.attributes["commitTimeReadable"] = unicode( info.commitTimeReadable )
+		create_child_node( document, pluginInfo, "commitMessage", unicode( info.commitMessage ) )
+		node.appendChild( pluginInfo )
 
 		return node
 

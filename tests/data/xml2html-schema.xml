@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+<xs:schema
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+>
+
+<!--
+A quite comprehensive XSD tutorial is available here:
+http://www.liquid-technologies.com/Tutorials/XmlSchemas/XsdTutorial_01.aspx
+ -->
+
+<xs:complexType name="objectsType">
+  <xs:sequence>
+    <xs:element name="objectdescription" type="xs:string"/>
+    <xs:element name="objectstatus" type="xs:string"/>
+  </xs:sequence>
+</xs:complexType>
+
+<xs:complexType name="instructionsType">
+  <xs:complexContent>
+    <xs:extension base="objectsType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="plugins" type="pluginsContainer"/>
+        <xs:element name="steps" type="stepsContainer"/>
+      </xs:choice>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="exceptionType">
+  <xs:sequence>
+    <xs:element name="description" type="xs:string"/>
+    <xs:element name="traceback" type="xs:string"/>
+  </xs:sequence>
+  <xs:anyAttribute processContents="lax"/>
+</xs:complexType>
+
+<xs:complexType name="momReportType">
+  <xs:sequence>
+    <xs:element name="build" type="buildType"/>
+  </xs:sequence>
+  <xs:anyAttribute processContents="lax"/>
+</xs:complexType>
+
+<xs:complexType name="buildType">
+  <xs:complexContent>
+    <xs:extension base="instructionsType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="project" type="projectType"/>
+        <xs:element name="exception" type="exceptionType"/>
+      </xs:choice>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="environmentsType">
+  <xs:complexContent>
+    <xs:extension base="instructionsType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="configuration" type="configurationType"/>
+        <xs:element name="environment" type="environmentType"/>
+      </xs:choice>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="configurationType">
+  <xs:complexContent>
+    <xs:extension base="instructionsType">
+      <xs:sequence>
+      </xs:sequence>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="environmentType">
+  <xs:complexContent>
+    <xs:extension base="instructionsType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="configuration" type="configurationType"/>
+      </xs:choice>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="projectType">
+  <xs:complexContent>
+    <xs:extension base="instructionsType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="environments" type="environmentsType"/>
+      </xs:choice>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="pluginType">
+  <xs:complexContent>
+    <xs:extension base="objectsType">
+        <xs:choice minOccurs="0" maxOccurs="1">
+          <xs:element name="pluginInfo" type="pluginInfoType"/>
+        </xs:choice>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="pluginInfoType">
+  <xs:choice minOccurs="0" maxOccurs="unbounded">
+    <xs:any minOccurs="0" processContents="lax"/>
+  </xs:choice>
+  <xs:anyAttribute processContents="lax"/>
+</xs:complexType>
+
+<xs:complexType name="stepType">
+  <xs:complexContent>
+    <xs:extension base="objectsType">
+      <xs:choice minOccurs="0" maxOccurs="unbounded">
+        <xs:element name="action" type="actionType"/>
+      </xs:choice>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="actionType">
+  <xs:complexContent>
+    <xs:extension base="objectsType">
+      <xs:sequence>
+        <xs:element name="stderr" type="xs:string"/>
+        <xs:element name="stdout" type="xs:string"/>
+        <xs:element name="logdescription" type="xs:string"/>
+      </xs:sequence>
+      <xs:anyAttribute processContents="lax"/>
+    </xs:extension>
+  </xs:complexContent>
+</xs:complexType>
+
+<xs:complexType name="pluginsContainer">
+  <xs:choice minOccurs="0" maxOccurs="unbounded">
+    <xs:element name="plugin" type="pluginType"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:complexType name="stepsContainer">
+  <xs:choice minOccurs="0" maxOccurs="unbounded">
+    <xs:element name="step" type="stepType"/>
+  </xs:choice>
+</xs:complexType>
+
+<xs:element name="mom-report" type="momReportType">
+</xs:element>
+
+</xs:schema>

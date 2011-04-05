@@ -24,6 +24,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
 import os.path
+from core.helpers.XmlUtils import create_child_node
 
 class Plugin( MObject ):
 	"""
@@ -258,9 +259,11 @@ class Plugin( MObject ):
 
 	def createXmlNode( self, document ):
 		node = super( Plugin, self ).createXmlNode( document )
+
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["isOptional"] = str( self.isOptional() )
 		node.attributes["pluginType"] = str( self.getPluginType() )
+
 		return node
 
 	def getXmlTemplate( self, element, wrapper ):

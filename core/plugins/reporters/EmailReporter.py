@@ -105,7 +105,7 @@ class EmailReporter( Reporter ):
 			mApp().debug( self, 'Not sending mail, no recipients added' )
 			return
 
-		# send mail
+		# send mail, this may throw an exception
 		e = Emailer()
 		e.setup()
 		e.send( email )

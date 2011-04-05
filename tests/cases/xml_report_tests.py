@@ -61,6 +61,11 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self, useEnvironments = True )
 
+	def tearDown( self ):
+		self._runValidator()
+
+		MomBuildMockupTestCase.tearDown( self )
+
 	def _executeBuild( self, type = 'm' ):
 		mApp().getSettings().set( Settings.ScriptLogLevel, 5 )
 		mApp().getSettings().set( Settings.ProjectBuildType, type )
@@ -75,6 +80,13 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def _getXmlReport( self ):
 		report = InstructionsXmlReport( self.build )
 		return report
+
+	def _runValidator( self ):
+		schemaFileName = os.path.join( self.TEST_DATA_DIRECTORY, "xml2html-schema.xml" )
+		xml = etree.parse( schemaFileName )
+		schema = etree.XMLSchema( xml )
+		parser = etree.XMLParser( schema = schema )
+		etree.XML( self._getXmlReport().getReport(), parser )
 
 	def testCreateXmlReport( self ):
 		self._executeBuild()
