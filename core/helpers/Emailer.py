@@ -141,7 +141,7 @@ class Emailer( MObject ):
 				self.__server.login( user, password )
 			except SMTPHeloError as e:
 				raise ConfigurationError( 'The SMTP server rejected the connection: {0}'.format( e ) )
-			except SMTPAuthenticationError:
+			except SMTPAuthenticationError as e:
 				raise ConfigurationError( 'Emailer error, login failed: {0}'.format( e ) )
 			except SMTPException as e:
 				raise ConfigurationError( 'Emailer error, no suitable authentication method was found: {0}'.format( e ) )

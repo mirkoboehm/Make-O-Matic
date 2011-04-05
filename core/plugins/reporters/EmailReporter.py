@@ -74,13 +74,10 @@ class EmailReporter( Reporter ):
 
 		# send mail
 		e = Emailer()
-		try:
-			e.setup()
-			e.send( email )
-			e.quit()
-			mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( ", ".join( email.getToAddresses() ) ) )
-		except Exception as e:
-			mApp().debug( self, 'Sending E-Mail failed: {0}'.format( e ) )
+		e.setup()
+		e.send( email )
+		e.quit()
+		mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( ", ".join( email.getToAddresses() ) ) )
 
 	def getObjectStatus( self ):
 		if not XmlReportConverter.hasXsltSupport():

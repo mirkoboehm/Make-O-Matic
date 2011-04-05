@@ -58,12 +58,9 @@ class EmailerTest( MomTestCase ):
 		email.addTextAttachment( attachmentText, "testfile2.txt", True )
 
 		e = Emailer( 'Emailer' )
-		try:
-			e.setup()
-			e.send( email )
-			e.quit()
-		except Exception as e:
-			self.fail( 'Sending a test email failed: {0}'.format( e ) )
+		e.setup()
+		e.send( email )
+		e.quit()
 
 if __name__ == "__main__":
 	unittest.main()
