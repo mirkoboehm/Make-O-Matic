@@ -85,10 +85,18 @@ class _CPackMovePackageAction( FilesMoveAction ):
 
 	def run( self ):
 		"""Finds the names of the CPack generated packages and moves them."""
+		lines = self.__action.getStdOut().splitlines()
 		if ( self.__action.getResult() != 0 ):
 			self._setStdErr( ( 'CPack failed: %s' % self.__action.getStdErr() ).encode() )
+			logRegex = re.compile( 'Please check (.*) for errors' )
+			for line in lines:
+				match = logRegex.match( line )
+				if match:
+					logFile = match.group( 1 )
+					f = open( logFile, 'r' )
+					self._setStdErr( ( 'Content of: %s' % logFile ).encode() )
+					self._setStdErr( f.read() )
 			return 1
-		lines = self.__action.getStdOut().splitlines()
 		# This might break with newer versions. Tested with CPack 2.8.2 and 2.8.3
 		packageRegex = re.compile( 'CPack: -? ?[Pp]ackage:? (.*) generated\.' )
 		packageFiles = []
@@ -98,6 +106,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 			if match:
 				packageFiles.append( match.group( 1 ) )
 		self.setFiles( packageFiles )
+		self._setStdOut( 'Destination: {0} packageFiles: {1}'.format( self.getDestination(), packageFiles ) )
 		return FilesMoveAction.run( self )
 
 
