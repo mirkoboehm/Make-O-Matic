@@ -96,6 +96,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 					f = open( logFile, 'r' )
 					self._setStdErr( ( 'Content of: %s' % logFile ).encode() )
 					self._setStdErr( f.read() )
+					f.close()
 			return 1
 		# This might break with newer versions. Tested with CPack 2.8.2 and 2.8.3
 		packageRegex = re.compile( 'CPack: -? ?[Pp]ackage:? (.*) generated\.' )
