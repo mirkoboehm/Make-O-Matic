@@ -30,13 +30,13 @@ class LocalSourceDirectory( SourceCodeProvider ):
 	def getIdentifier( self ):
 		return 'src'
 
-	def getRevisionInfo( self ):
+	def _retrieveRevisionInfo( self ):
 		# check if specified revision is in cache. do not check for 'HEAD'
-		info = RevisionInfo( "SvnRevisionInfo" )
+		info = RevisionInfo( "LocalSourceDirRevisionInfo" )
 		info.commitMessage = 'N/A'
 		info.committerEmail = 'N/A'
 		info.committerName = getpass.getuser()
-		info.commitTime = 'N/A'
+		info.commitTime = 0
 		info.commitTimeReadable = 'N/A'
 		info.revision = 'WIP'
 		return info

@@ -66,6 +66,8 @@ class Defaults( MObject ):
 	ProjectBuildSequence = 'project.buildsequence'
 	ProjectSourceLocation = 'project.sourcelocation'
 	ProjectRevision = 'project.revision'
+	ProjectShortRevision = 'project.revision.short'
+	ProjectRevisionWithTime = 'project.revision.withtime'
 	ProjectTag = 'project.tag'
 	ProjectBranch = 'project.branch'
 	ProjectSourceDir = 'project.srcdir'
@@ -102,6 +104,8 @@ class Defaults( MObject ):
 	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
 	PublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
 	PublisherReportsBaseHttpURL = 'publisher.basehttpurl.reports'
+	FileSystemPublisherPackageUploadLocation = 'publisher.filesystem.uploadlocation.packages'
+	FileSystemPublisherReportsUploadLocation = 'publisher.filesystem.uploadlocation.reports'
 	# ----- EmailReporter settings:
 	EmailReporterSender = 'emailreporter.sender'
 	EmailReporterDefaultRecipients = 'emailreporter.defaultrecipients'

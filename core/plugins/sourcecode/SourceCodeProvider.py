@@ -25,6 +25,8 @@ from core.helpers.XmlReportConverter import ReportFormat
 from core.helpers.SCMUidMapper import SCMUidMapper
 from buildcontrol.common.BuildInfo import BuildInfo
 from core.helpers.GlobalMApp import mApp
+from core.Settings import Settings
+import datetime
 
 class SourceCodeProvider( Plugin ):
 
@@ -39,6 +41,7 @@ class SourceCodeProvider( Plugin ):
 		self.__srcDir = None
 		self.__mapper = SCMUidMapper( self )
 		self.__parseBranchCommits = False
+		self.__revisionInfo = None
 
 	def getObjectStatus( self ):
 		return self.getUrl()
@@ -88,6 +91,25 @@ class SourceCodeProvider( Plugin ):
 
 	def getRevisionInfo( self ):
 		"""Returns a RevisionInfo object"""
+		if not self.__revisionInfo:
+			info = self._retrieveRevisionInfo()
+			if not info:
+				raise ConfigurationError( 'Unable to retrieve revision information. Is the SCM reachable?' )
+			self.__revisionInfo = info
+			mApp().getSettings().set( Settings.ProjectRevision, info.revision )
+			mApp().getSettings().set( Settings.ProjectShortRevision, info.shortRevision )
+			dateAndRevision = 'Local-Build-HEAD'
+			if info.commitTime:
+				commitTime = datetime.datetime.utcfromtimestamp( int( info.commitTime ) )
+				dateAndRevision = commitTime.strftime( '%Y-%m-%d_%H-%M_{0:_>8}' ).format( info.shortRevision )
+			mApp().getSettings().set( Settings.ProjectRevisionWithTime, dateAndRevision )
+		return self.__revisionInfo
+
+	def _resetRevisionInfo( self ):
+		'''This should only be necessary in special cases, like tests.'''
+		self.__revisionInfo = None
+
+	def _retrieveRevisionInfo( self ):
 		raise NotImplementedError
 
 	def _handlePrintCommands( self, command, options ):
@@ -170,6 +192,11 @@ class SourceCodeProvider( Plugin ):
 		# We need to check for the SCM here to error if the SCM can't be found for checkout.
 		if self.getCommand():
 			self.resolveCommand()
+
+	def preFlightCheck( self ):
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode in ( Settings.RunMode_Build, Settings.RunMode_Print ):
+			self.getRevisionInfo()
 
 	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 

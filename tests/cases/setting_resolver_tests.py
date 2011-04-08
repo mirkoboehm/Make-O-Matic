@@ -48,5 +48,12 @@ class SettingResolverTest( MomTestCase ):
 		except ConfigurationError:
 			pass
 
+	def testWithPattern( self ):
+		name = 'DummyTestName'
+		pattern = 'test-{0}'
+		resolver = SettingResolver( Settings.ScriptBuildName, pattern = pattern )
+		mApp().getSettings().set( Settings.ScriptBuildName, name )
+		self.assertEqual( pattern.format( name ), str( resolver ) )
+
 if __name__ == "__main__":
 	unittest.main()

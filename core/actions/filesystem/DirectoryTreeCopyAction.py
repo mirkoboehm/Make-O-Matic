@@ -43,7 +43,7 @@ class DirectoryTreeCopyAction( Action ):
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
-		return "copytree {0} {1}, ignoring {2}".format( self.__source, self.__destination, self.__ignorePatterns )
+		return "copytree {0} {1}, ignoring {2}".format( str( self.__source ), str( self.__destination ), self.__ignorePatterns )
 
 	def mycopytree( self, src, dst, ignore = None , overwrite = False ):
 		"""Copies the directory tree."""
@@ -97,7 +97,8 @@ class DirectoryTreeCopyAction( Action ):
 	def run( self ):
 		"""Copies the directory tree."""
 
-		ret = self.mycopytree( self.__source, self.__destination, shutil.ignore_patterns( *self.__ignorePatterns ), self.__overwrite )
+		ret = self.mycopytree( str( self.__source ) , str( self.__destination ),
+					shutil.ignore_patterns( *self.__ignorePatterns ), self.__overwrite )
 
 		if ret == 0:
 			mApp().debugN( self, 2, 'copied directory tree "{0}" to "{1}".'.format( self.__source, self.__destination ) )

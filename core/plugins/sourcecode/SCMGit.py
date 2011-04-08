@@ -60,7 +60,6 @@ class SCMGit( SourceCodeProvider ):
 		self._setCommandSearchPaths( searchPaths )
 		self.__cloneArmy = self._findCloneArmyDir()
 		self.__cachedCheckoutsDir = self._findCachedCheckoutsDir()
-		self.__revisionInfo = RevisionInfo()
 
 	def getIdentifier( self ):
 		return 'git'
@@ -94,7 +93,7 @@ class SCMGit( SourceCodeProvider ):
 	def getCachedCheckoutsDir( self ):
 		return self.__cachedCheckoutsDir
 
-	def getRevisionInfo( self ):
+	def _retrieveRevisionInfo( self ):
 		self.updateHiddenClone()
 		sep = "%n" #take something that does not show up in git logging case
 		formatStr = "%cn{0}%ce{0}%ct{0}%ci{0}%H{0}%h{0}%s{0}%b".format( sep )

@@ -16,6 +16,27 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from core.Exceptions import ConfigurationError
 
 class StringResolver( object ):
-	pass
+
+	def __init__( self, pattern = None ):
+		self.__pattern = pattern
+
+	def setPattern( self, pattern ):
+		self.__pattern = pattern
+
+	def getPattern( self ):
+		return self.__pattern
+
+	def __str__( self ):
+		value = self._asString()
+		if not self.getPattern():
+			return str( value )
+		else:
+			try:
+				result = self.getPattern().format( value )
+				return result
+			except ValueError:
+				raise ConfigurationError( 'The StringResolver "{0}" pattern needs to contain exactly one place holder like this: '\
+					.format( self.getPattern() ) + '"pattern-{0}"' )

@@ -77,7 +77,7 @@ class SCMSubversion( SourceCodeProvider ):
 	def getIdentifier( self ):
 		return 'svn'
 
-	def getRevisionInfo( self ):
+	def _retrieveRevisionInfo( self ):
 		# check if specified revision is in cache. do not check for 'HEAD'
 		if self.getRevision() in self.__revisionInfoCache:
 			return self.__revisionInfoCache[self.getRevision()]

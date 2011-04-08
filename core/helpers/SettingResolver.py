@@ -27,7 +27,8 @@ class SettingResolver( StringResolver ):
 	If the setting is not defined, the default value is returned. 
 	If no default value is defined, an empty string will be returned.'''
 
-	def __init__( self, setting, required = False, defaultValue = None ):
+	def __init__( self, setting, pattern = None, required = False, defaultValue = None ):
+		StringResolver.__init__( self, pattern )
 		self.setSetting( setting )
 		self.setDefaultValue( defaultValue )
 		self.setRequired( required )
@@ -50,7 +51,7 @@ class SettingResolver( StringResolver ):
 	def getDefaultValue( self ):
 		return self.__defaultValue
 
-	def __str__( self ):
+	def _asString( self ):
 		settings = mApp().getSettings()
 		if self.getRequired():
 			if not self.getSetting():

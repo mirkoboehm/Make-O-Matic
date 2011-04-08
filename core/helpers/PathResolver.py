@@ -25,6 +25,7 @@ class PathResolver( StringResolver ):
 	It calls a function that must return a path, and extends that path with the filename.'''
 
 	def __init__( self, function, filename = None ):
+		StringResolver.__init__( self )
 		self.setFunction( function )
 		self.setFilename( filename )
 
@@ -42,7 +43,7 @@ class PathResolver( StringResolver ):
 	def getFunction( self ):
 		return self.__function
 
-	def __str__( self ):
+	def _asString( self ):
 		filename = self.getFilename()
 		path = self.getFunction()()
 		if not filename and not path:
