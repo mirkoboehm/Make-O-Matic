@@ -122,7 +122,7 @@ class Settings( Defaults ):
 				return buildType in modes
 		raise ConfigurationError( 'The specified build type "{0}" is undefined!'.format( buildType ) )
 
-	def get( self, name, required = True ):
+	def get( self, name, required = True, defaultValue = None ):
 		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
 		try:
 			return self.getSettings()[ name ]
@@ -130,7 +130,7 @@ class Settings( Defaults ):
 			if required:
 				raise ConfigurationError( 'The required setting "{0}" is undefined!'.format( name ) )
 			else:
-				return None
+				return defaultValue
 
 	def set( self, name, value ):
 		check_for_nonempty_string( name, 'The setting name must be a nonempty string!' )
