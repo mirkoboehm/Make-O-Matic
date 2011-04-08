@@ -21,7 +21,7 @@
 from __future__ import print_function
 import sys
 
-# This file simply returns the integer return code it gets as a paremeter. 
+# This file simply returns the integer return code it gets as a parameter. 
 # It is used to test the RunCommand class.
 if len( sys.argv ) != 2:
 	print( 'Integer argument required!' )
