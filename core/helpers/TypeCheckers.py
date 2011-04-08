@@ -55,9 +55,9 @@ def check_for_nonempty_string_or_none( expression, description ):
 	check_for_nonempty_string( expression, description )
 
 def check_for_path( expression, description ):
-	# import locally, because PathResolver uses the type checkers as well
-	from core.helpers.PathResolver import PathResolver
-	if not isinstance( expression, PathResolver ):
+	# import locally, because the resolvers uses the type checkers as well
+	from core.helpers.StringResolver import StringResolver
+	if not isinstance( expression, StringResolver ):
 		check_for_nonempty_string( expression, description )
 
 def check_for_path_or_none( expression, description ):
