@@ -55,6 +55,7 @@ from core.plugins.python.PyLintChecker import PyLintChecker
 from core.MApplication import MApplication
 from tests.cases.analyzer_tests import AnalyzerTest
 from tests.cases.qtest_tests import QTestTests
+from tests.cases.setting_resolver_tests import SettingResolverTest
 
 CLASSES = [
 	# self tests first
@@ -81,7 +82,8 @@ CLASSES = [
 	ScmModulesTests,
 	XmlReportTests,
 	SettingsTests,
-	QTestTests
+	QTestTests,
+	SettingResolverTest
 ]
 
 DEPENDENCIES = [
