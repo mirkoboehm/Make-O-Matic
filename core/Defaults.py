@@ -102,7 +102,7 @@ class Defaults( MObject ):
 	# ----- Publisher settings (should be set in .mom/config.py):
 	RSyncPublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
 	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
-	PublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
+	RSyncPublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
 	PublisherReportsBaseHttpURL = 'publisher.basehttpurl.reports'
 	FileSystemPublisherPackageUploadLocation = 'publisher.filesystem.uploadlocation.packages'
 	FileSystemPublisherReportsUploadLocation = 'publisher.filesystem.uploadlocation.reports'
