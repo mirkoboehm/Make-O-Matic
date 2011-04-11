@@ -131,7 +131,7 @@ class RSyncReportsPublisher( RSyncPublisher ):
 
 	def __init__( self, name = None ):
 		RSyncPublisher.__init__( self, name,
-			uploadLocation = mApp().getSettings().get( Settings.PublisherReportsUploadLocation ),
+			uploadLocation = mApp().getSettings().get( Settings.RSyncPublisherReportsUploadLocation ),
 			localDir = PathResolver( mApp().getLogDir ) )
 
 	def getObjectStatus( self ):
