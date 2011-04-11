@@ -48,6 +48,8 @@ class _CreateUploadDirectoryAction( Action ):
 			else:
 				mApp().debugN( self, 3, 'Created extra sub directories {0} on the upload server.'.format( path ) )
 				return 0
+		else:
+			return 0
 
 class _RSyncUploadAction( Action ):
 	'''RSyncUploadAction uses RSync to publish data from the local directory to the upload location.
