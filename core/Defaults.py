@@ -99,7 +99,7 @@ class Defaults( MObject ):
 	MakeBuilderJobsCount = 'configuration.builder.make.jobscount'
 	# ----- CMake Builder settings
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
-	# ----- Ppublisher settings (should be set in .mom/config.py):
+	# ----- Publisher settings (should be set in .mom/config.py):
 	PublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
 	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
 	PublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
