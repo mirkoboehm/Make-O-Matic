@@ -63,7 +63,7 @@ class RSyncPublisher( Plugin ):
 	def setup( self ):
 		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
-			defaultLocation = mApp().getSettings().get( Settings.PublisherPackageUploadLocation, False )
+			defaultLocation = mApp().getSettings().get( Settings.RSyncPublisherPackageUploadLocation, False )
 			mApp().debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
 			uploadLocation = defaultLocation
 			if not uploadLocation:
@@ -112,7 +112,7 @@ class RSyncPackagesPublisher( RSyncPublisher ):
 
 	def __init__( self, name = None ):
 		RSyncPublisher.__init__( self, name,
-			uploadLocation = mApp().getSettings().get( Settings.PublisherPackageUploadLocation ),
+			uploadLocation = mApp().getSettings().get( Settings.RSyncPublisherPackageUploadLocation ),
 			localDir = PathResolver( mApp().getPackagesDir ) )
 		self.setStep( 'upload-packages' )
 

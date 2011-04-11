@@ -100,7 +100,7 @@ class Defaults( MObject ):
 	# ----- CMake Builder settings
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- Publisher settings (should be set in .mom/config.py):
-	PublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
+	RSyncPublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
 	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
 	PublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
 	PublisherReportsBaseHttpURL = 'publisher.basehttpurl.reports'
