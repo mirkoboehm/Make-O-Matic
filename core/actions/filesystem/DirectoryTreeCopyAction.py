@@ -84,7 +84,7 @@ class DirectoryTreeCopyAction( Action ):
 		try:
 			shutil.copystat( src, dst )
 		except OSError, why:
-			if WindowsError is not None and isinstance( why, WindowsError ):
+			if WindowsError is not None and isinstance( why, WindowsError ): #@UndefinedVariable
 			# Copying file access times may fail on Windows
 				pass
 			else:
