@@ -16,19 +16,70 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Plugin import Plugin
-from core.actions.ShellCommandAction import ShellCommandAction
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_path_or_none, check_for_string
-import platform, os, re
+import platform, os, re, tempfile
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
+from core.actions.Action import Action
+from core.helpers.RunCommand import RunCommand
+from core.plugins.publishers.Publisher import Publisher
 
-class RSyncPublisher( Plugin ):
+class _CreateUploadDirectoryAction( Action ):
+	def __init__( self, publisher ):
+		Action.__init__( self )
+		self.__publisher = publisher
+
+	def getLogDescription( self ):
+		return 'Create rsync upload target path if extra subdirectories are specified.'
+
+	def run( self ):
+		if self.__publisher.getExtraUploadSubDirs():
+			path = os.path.join( *self.__publisher._getExtraUploadSubdirsAsString() )
+			tempDir = tempfile.mkdtemp( prefix = 'mom_buildscript-', suffix = '-rsync-path' )
+			fullpath = os.path.join( tempDir, path )
+			os.makedirs( fullpath )
+			uploadLocation = self.__publisher._getUploadLocationOrDefault()
+			args = [ '-avz', '-e', 'ssh -o BatchMode=yes', tempDir + os.sep, uploadLocation ]
+			cmd = [ self.__publisher.getCommand() ] + args
+			runner = RunCommand( cmd, timeoutSeconds = 1200, searchPaths = self.__publisher.getCommandSearchPaths() )
+			if runner.run() != 0:
+				mApp().debugN( self, 1, 'Creating extra sub directories {0} on the upload server failed!'.format( path ) )
+				return runner.getReturnCode()
+			else:
+				mApp().debugN( self, 3, 'Created extra sub directories {0} on the upload server.'.format( path ) )
+				return 0
+
+class _RSyncUploadAction( Action ):
+	'''RSyncUploadAction uses RSync to publish data from the local directory to the upload location.
+	It determines the local and target location at execution time.'''
+	def __init__( self, publisher ):
+		Action.__init__( self )
+		self.__publisher = publisher
+
+	def getLogDescription( self ):
+		return 'Upload files to "{0}"'.format( self.__publisher._getUploadLocationOrDefault() )
+
+	def run( self ):
+		fromDir = self.__publisher._makeCygwinPathForRsync( '{0}{1}'.format( self.__publisher.getLocalDir(), os.sep ) )
+		toDir = os.path.join( self.__publisher._getUploadLocationOrDefault(), *self.__publisher._getExtraUploadSubdirsAsString() )
+		args = [ '-avz', '-e', 'ssh -o BatchMode=yes', fromDir, toDir ]
+		if 'Windows' in platform.platform(): #On windows, fake source permissions to be 755
+			args = [ '--chmod=ugo=rwx' ] + args
+		cmd = [ self.__publisher.getCommand() ] + args
+		runner = RunCommand( cmd, timeoutSeconds = 7200, searchPaths = self.__publisher.getCommandSearchPaths() )
+		if runner.run() != 0:
+			mApp().debugN( self, 1, 'Uploading from "{0}" to "{1}" failed!'.format( fromDir, toDir ) )
+			return runner.getReturnCode()
+		else:
+			mApp().debugN( self, 3, 'Uploaded "{0}" to "{1}".'.format( fromDir, toDir ) )
+			return 0
+
+
+class RSyncPublisher( Publisher ):
 	'''A publisher that uses RSync to send results to a remote site.'''
 
 	def __init__( self, name = None, uploadLocation = None, localDir = None ):
-		Plugin.__init__( self, name )
+		Publisher.__init__( self, name )
 		searchPaths = [ "C:/Program Files/cwRsync/bin" ]
 		self._setCommand( "rsync" )
 		self._setCommandSearchPaths( searchPaths )
@@ -36,54 +87,29 @@ class RSyncPublisher( Plugin ):
 		self.setLocalDir( localDir )
 		self.setStep( 'upload-packages' )
 
-	def getObjectStatus( self ):
-		return "Upload location: {0}".format( self.getUploadLocation() )
-
-	def setUploadLocation( self, location ):
-		check_for_nonempty_string_or_none( location, 'The rsync upload location must be a nonempty string!' )
-		self.__uploadLocation = location
-
-	def getUploadLocation( self ):
-		return self.__uploadLocation
-
-	def setLocalDir( self, localDir ):
-		check_for_path_or_none( localDir, 'The local directory must be a nonempty string!' )
-		self.__localDir = localDir
-
-	def getLocalDir( self ):
-		return self.__localDir
-
-	def setStep( self, step ):
-		check_for_string( step, 'The step for the rsync publisher must be a string representing a step name!' )
-		self.__step = step
-
-	def getStep( self ):
-		return self.__step
-
-	def setup( self ):
+	def _getUploadLocationOrDefault( self ):
 		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
 			defaultLocation = mApp().getSettings().get( Settings.RSyncPublisherPackageUploadLocation, False )
 			mApp().debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
 			uploadLocation = defaultLocation
-			if not uploadLocation:
-				mApp().message( self, 'Upload location is empty. Not generating any actions.' )
-				return
+		return uploadLocation
+
+	def setup( self ):
+		uploadLocation = self._getUploadLocationOrDefault()
+		if not uploadLocation:
+			mApp().message( self, 'Upload location is empty. Not generating any actions.' )
+			return
 		step = self.getInstructions().getStep( self.getStep() )
 		if str( self.getLocalDir() ):
-			fromDir = self.__makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-			args = [ '-avz', '-e', 'ssh -o BatchMode=yes', fromDir, uploadLocation ]
-			if 'Windows' in platform.platform(): #On windows, fake source permissions to be 755
-				args = [ '--chmod=ugo=rwx' ] + args
-			cmd = [ self.getCommand() ] + args
-			action = ShellCommandAction( cmd, 7200, searchPaths = self.getCommandSearchPaths() )
-			action.setWorkingDirectory( self.getInstructions().getBaseDir() )
-			step.addMainAction( action )
+			subdirsAction = _CreateUploadDirectoryAction( self )
+			step.addMainAction( subdirsAction )
+			uploadAction = _RSyncUploadAction( self )
+			step.addMainAction( uploadAction )
 		else:
 			mApp().debugN( self, 2, 'No local directory specified, not generating action' )
 
-
-	def __makeCygwinPathForRsync( self, directory ):
+	def _makeCygwinPathForRsync( self, directory ):
 		"""This function generates a path understood by Cygwin from a Windows  
 		path that contains a drive letter. Rsync otherwise interprets the letter 
 		before the colon as a target hostname. On all other platforms, this function does nothing."""

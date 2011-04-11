@@ -60,8 +60,11 @@ class Publisher( Plugin ):
 	def getExtraUploadSubDirs( self ):
 		return self.__extraUploadSubDirs
 
+	def _getExtraUploadSubdirsAsString( self ):
+		paths = map( str, self.getExtraUploadSubDirs() )
+		return paths
+
 	def _getFullUploadLocation( self ):
 		'''Create the full upload path from the location and the extra sub directories and return it.'''
-		paths = [ self.getUploadLocation()] + map( str, self.getExtraUploadSubDirs() )
-		complete = os.path.join( *paths )
+		complete = os.path.join( self.getUploadLocation(), *self._getExtraUploadSubdirsAsString() )
 		return complete
