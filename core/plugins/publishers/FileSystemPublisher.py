@@ -53,8 +53,9 @@ class FileSystemPublisher( Publisher ):
 class FileSystemPackagesPublisher( FileSystemPublisher ):
 	'''A filesystem publisher that is pre-configured to publish the packages structure to the default location.'''
 
-	def __init__( self, name = None, uploadLocation = None, localDir = None ):
-		FileSystemPublisher.__init__( self, name, uploadLocation, localDir )
+	def __init__( self, name = None ):
+		FileSystemPublisher.__init__( self, name, uploadLocation = mApp().getSettings().get( Settings.FileSystemPublisherPackageUploadLocation ),
+			localDir = PathResolver( mApp().getPackagesDir ) )
 		self.setStep( 'upload-packages' )
 
 	def getObjectStatus( self ):
@@ -70,9 +71,10 @@ class FileSystemPackagesPublisher( FileSystemPublisher ):
 class FileSystemReportsPublisher( FileSystemPublisher ):
 	'''A filesystem publisher that is pre-configured to publish the reports structure to the default location.'''
 
-	def __init__( self, name = None, uploadLocation = None, localDir = None ):
+	def __init__( self, name = None ):
 
-		FileSystemPublisher.__init__( self, name, uploadLocation, localDir )
+		FileSystemPublisher.__init__( self, name, uploadLocation = mApp().getSettings().get( Settings.FileSystemPublisherReportsUploadLocation ),
+			localDir = PathResolver( mApp().getLogDir ) )
 
 	def getObjectStatus( self ):
 		baseUrl = mApp().getSettings().get( Settings.PublisherReportsBaseHttpURL, False )
