@@ -231,8 +231,9 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		self.assertEqual( info.getTag(), 'old/A' )
 
 	def testScmSvnBranchCommitParsingOneFileTagDeprecatedB( self ):
-		'''Failing test: 'rotten' is not a configured tag prefix. Therefore the correctly detected tag name is 'rotten', 
-		not 'rotten/B'.'''
+		# Failing test: 'rotten' is not a configured tag prefix.
+		# Therefore the correctly detected tag name is 'rotten', not 'rotten/B'.'''
+
 		summarizedDiff = [ 'M    file:///repo/project/tags/rotten/B/README' ]
 		buildInfo, buildInfos = self.__scmSvnBranchCommitParserTestHelper( summarizedDiff )
 		buildInfo = buildInfo # make checker happy 
