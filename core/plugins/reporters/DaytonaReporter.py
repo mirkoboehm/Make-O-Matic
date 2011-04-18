@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.reporters.Reporter import Reporter
+from core.plugins.reporters.Reporter import RemoteReporter
 from core.helpers.GlobalMApp import mApp
 from core.Build import Build
 from core.Settings import Settings
@@ -33,7 +33,7 @@ def sendMessage( msg, url ):
 	request.get_method = lambda: 'PUT'
 	opener.open( request )
 
-class DaytonaReporter( Reporter ):
+class DaytonaReporter( RemoteReporter ):
 	"""
 	This plugin enables reporting build reports to a Daytona Bot specified in the settings.
 	

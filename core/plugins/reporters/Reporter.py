@@ -21,7 +21,8 @@ from core.Plugin import Plugin
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 
-class Reporter( Plugin ):
+class _ReporterBase( Plugin ):
+	"""Internal Reporter base class, do not use directly"""
 
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
@@ -34,9 +35,16 @@ class Reporter( Plugin ):
 		raise NotImplementedError()
 
 	def shutDown( self ):
-		reportingEnabled = mApp().getSettings().get( Settings.ScriptEnableReporting )
+		self.sendReport()
+
+class RemoteReporter( _ReporterBase ):
+
+	def shutDown( self ):
+		reportingEnabled = mApp().getSettings().get( Settings.ScriptEnableRemoteReporting )
 		if not reportingEnabled:
-			mApp().debug( self, "Not sending report, disabled by settings (Settings.ScriptEnableReporting)" )
+			mApp().debug( self, "Not sending report, disabled by settings (Settings.ScriptEnableRemoteReporting)" )
 			return
 
-		self.sendReport()
+class LocalReporter( _ReporterBase ):
+
+	pass

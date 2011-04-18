@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.reporters.Reporter import Reporter
+from core.plugins.reporters.Reporter import LocalReporter
 from core.helpers.XmlReport import XmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 
-class ConsoleReporter( Reporter ):
+class ConsoleReporter( LocalReporter ):
 
 	def __init__( self, name = None ):
-		Reporter.__init__( self, name )
+		LocalReporter.__init__( self, name )
 
 		self.__finished = False
 
