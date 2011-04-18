@@ -118,7 +118,6 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 
 		info = self.project.getScm().getRevisionInfo()
 		self._validateRevisionInfoContent( info )
-		self.assertEquals( info.shortRevision, None, "Subversion should not have a short revision" )
 
 	def testScmSvnRevision( self ):
 		self._initialize( self.SVN_EXAMPLE, revision = "246" )
