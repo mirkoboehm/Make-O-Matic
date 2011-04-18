@@ -477,7 +477,10 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "environment":
 			out += " "
-			out += wrapper.wrap( "Environment: {0}".format( element.attrib["name"] ) )
+			out += wrapper.wrap( "Environment: {0} [{1}]".format(
+					element.attrib["name"],
+					"success" if element.attrib["failed"] == "False" else "FAILED"
+			) )
 
 		elif element.tag == "steps": # container element
 			if len( element.getchildren() ) > 0:
