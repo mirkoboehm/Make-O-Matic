@@ -48,6 +48,7 @@ class Defaults( MObject ):
 	# Constants (setting variable names)
 	# ----- script settings:
 	ScriptLogLevel = 'script.loglevel'
+	ScriptEnableLogEnvironment = 'script.enablelogenvironment'
 	ScriptClientName = 'script.clientname'
 	ScriptIgnoreCommitMessageCommands = 'script.ignorecommitmessagecommands'
 	ScriptRunMode = 'script.runmode'
@@ -134,6 +135,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.MomVersionNumber ] = '0.5.0'
 		# ----- script settings:
 		defaultSettings[ Defaults.ScriptLogLevel ] = 0
+		defaultSettings[ Defaults.ScriptEnableLogEnvironment ] = True
 		defaultSettings[ Defaults.ScriptClientName ] = getNodeName()
 		defaultSettings[ Defaults.ScriptRunMode ] = Defaults.RunMode_Build
 		defaultSettings[ Defaults.ScriptIgnoreCommitMessageCommands ] = False

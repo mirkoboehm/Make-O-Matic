@@ -25,6 +25,7 @@ from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_strin
 from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 from core.helpers.Enum import Enum
+from core.Settings import Settings
 
 class Step( MObject ):
 
@@ -140,6 +141,9 @@ class Step( MObject ):
 			container.append( action )
 
 	def _logEnvironment( self, executomat ):
+		if not mApp().getSettings().get( Settings.ScriptEnableLogEnvironment ):
+			return
+
 		mApp().debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )
 		for key in os.environ:
 			mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
