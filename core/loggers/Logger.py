@@ -29,6 +29,9 @@ class Logger( Plugin ):
 	def __init__( self, name ):
 		Plugin.__init__( self, name )
 
+	def error( self, mapp, mobject, msg ):
+		raise NotImplementedError()
+
 	def message( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 

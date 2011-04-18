@@ -37,6 +37,9 @@ class ConsoleLogger( Logger ):
 		check_for_nonnegative_int( verbosity, "The debug level needs to be an integer of zero or more" )
 		return verbosity
 
+	def error( self, mapp, mobject, msg ):
+		self.debug( mapp, mobject, '*** ERROR: {0}'.format( msg ) )
+
 	def message( self, mapp, mobject, msg ):
 		text = msg
 		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
