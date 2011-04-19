@@ -44,6 +44,7 @@ class RemoteReporter( _ReporterBase ):
 		if not reportingEnabled:
 			mApp().debug( self, "Not sending report, disabled by settings (Settings.ScriptEnableRemoteReporting)" )
 			return
+		super( RemoteReporter, self ).shutDown()
 
 class LocalReporter( _ReporterBase ):
 
