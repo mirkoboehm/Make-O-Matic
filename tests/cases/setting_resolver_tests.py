@@ -23,6 +23,7 @@ from core.helpers.SettingResolver import SettingResolver
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
+from core.helpers.FilesystemAccess import make_foldername_from_string
 
 class SettingResolverTest( MomTestCase ):
 
@@ -54,6 +55,14 @@ class SettingResolverTest( MomTestCase ):
 		resolver = SettingResolver( Settings.ScriptBuildName, pattern = pattern )
 		mApp().getSettings().set( Settings.ScriptBuildName, name )
 		self.assertEqual( pattern.format( name ), str( resolver ) )
+
+	def testWithConvertToFolderName( self ):
+		name = 'Dummy Test Name'
+		result = make_foldername_from_string( name )
+		resolver = SettingResolver( Settings.ScriptBuildName, convertToFolderName = True )
+		mApp().getSettings().set( Settings.ScriptBuildName, name )
+		self.assertEqual( result, str( resolver ) )
+
 
 if __name__ == "__main__":
 	unittest.main()

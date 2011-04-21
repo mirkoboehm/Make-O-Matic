@@ -27,8 +27,8 @@ class SettingResolver( StringResolver ):
 	If the setting is not defined, the default value is returned. 
 	If no default value is defined, an empty string will be returned.'''
 
-	def __init__( self, setting, pattern = None, required = False, defaultValue = None ):
-		StringResolver.__init__( self, pattern )
+	def __init__( self, setting, pattern = None, required = False, defaultValue = None, convertToFolderName = False ):
+		StringResolver.__init__( self, pattern = pattern, convertToFolderName = convertToFolderName )
 		self.setSetting( setting )
 		self.setDefaultValue( defaultValue )
 		self.setRequired( required )

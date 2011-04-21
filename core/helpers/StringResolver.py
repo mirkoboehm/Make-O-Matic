@@ -17,11 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Exceptions import ConfigurationError
+from core.helpers.FilesystemAccess import make_foldername_from_string
 
 class StringResolver( object ):
 
-	def __init__( self, pattern = None ):
-		self.__pattern = pattern
+	def __init__( self, pattern = None, convertToFolderName = False ):
+		self.setPattern( pattern )
+		self.setConvertToFolderName( convertToFolderName )
 
 	def setPattern( self, pattern ):
 		self.__pattern = pattern
@@ -29,8 +31,16 @@ class StringResolver( object ):
 	def getPattern( self ):
 		return self.__pattern
 
+	def setConvertToFolderName( self, onOff ):
+		self.__convertToFolderName = onOff
+
+	def getConvertToFolderName( self ):
+		return self.__convertToFolderName
+
 	def __str__( self ):
 		value = self._asString()
+		if self.getConvertToFolderName():
+			value = make_foldername_from_string( value )
 		if not self.getPattern():
 			return str( value )
 		else:
