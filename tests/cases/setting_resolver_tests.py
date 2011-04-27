@@ -49,6 +49,16 @@ class SettingResolverTest( MomTestCase ):
 		except ConfigurationError:
 			pass
 
+	def testWithMissingRequiredValueDescribeMode( self ):
+		var = 'UndefinedVariable_123456'
+		defaultValue = 'defaultValue value'
+		resolver = SettingResolver( var, required = True, defaultValue = defaultValue )
+		mApp().getSettings().set( Settings.ScriptRunMode, Settings.RunMode_Describe )
+		try:
+			str( resolver )
+		except ConfigurationError:
+			self.fail( 'resolving an undefined setting in describe mode should not raise a ConfigurationError!' )
+
 	def testWithPattern( self ):
 		name = 'DummyTestName'
 		pattern = 'test-{0}'

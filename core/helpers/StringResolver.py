@@ -18,6 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.Exceptions import ConfigurationError
 from core.helpers.FilesystemAccess import make_foldername_from_string
+from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 
 class StringResolver( object ):
 
@@ -38,7 +40,15 @@ class StringResolver( object ):
 		return self.__convertToFolderName
 
 	def __str__( self ):
-		value = self._asString()
+		value = '[unresolved string]'
+		try:
+			value = self._asString()
+		except ConfigurationError:
+			# strings may remain unresolved if the script is not really executed:
+			if mApp().getSettings().get( Settings.ScriptRunMode ) != Settings.RunMode_Build:
+				pass
+			else:
+				raise
 		if self.getConvertToFolderName():
 			value = make_foldername_from_string( value )
 		if not self.getPattern():
