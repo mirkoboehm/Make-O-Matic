@@ -155,7 +155,7 @@ class Defaults( MObject ):
 			[ 'install', 'mcgdhpsf', False ],
 			[ 'create-packages', 'dsfp', False ],
 			[ 'create-docs', 'mcgdhpsf', False ],
-			[ 'upload-packages', 'dsf', False ],
+			[ 'upload-packages', 'dsf', True ],
 			[ 'cleanup-packages', 'cdsf', True ],
 			[ 'cleanup', 'mcdsf', True ] ]
 		defaultSettings[ Defaults.ProjectBuildTypeDescriptions ] = { # build type to descriptive text
