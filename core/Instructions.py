@@ -150,6 +150,10 @@ class Instructions( MObject ):
 		return [step for step in self.getSteps() if step.getResult() == Step.Result.Failure]
 
 	def hasFailed( self ):
+		"""Returns True if this instructions instance has failed steps"""
+		return len( self.getFailedSteps() ) > 0
+
+	def hasFailedRecursively( self ):
 		'''Returns True in the following cases:
 		* if any step for this object has failed
 		* or if any instance of the children has failed'''
@@ -158,7 +162,7 @@ class Instructions( MObject ):
 			if child.hasFailed():
 				return True
 
-		return len( self.getFailedSteps() ) > 0
+		return self.hasFailed()
 
 	def __hasStep( self, stepName ):
 		'''Returns True if a step with the specified name already exists.'''
@@ -219,7 +223,7 @@ class Instructions( MObject ):
 
 		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
 		# FIXME Kevin: better use Step.getStatus() and Step.getResult()
-		node.attributes["failed"] = str( self.hasFailed() )
+		node.attributes["failed"] = str( self.hasFailedRecursively() )
 
 		if recursive:
 			# loop through plugins
