@@ -112,6 +112,7 @@ class _CPackMovePackageAction( FilesMoveAction ):
 
 
 class _CPackGenerateConfigurationAction( Action ):
+
 	def __init__( self, sourcePackage, licenseFile, config, directory, sourceGenerators, binaryGenerators, extraCPackLogic ):
 		Action.__init__( self )
 		self._sourcePackage = sourcePackage
@@ -126,6 +127,18 @@ class _CPackGenerateConfigurationAction( Action ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
 		return self.getName()
 
+	@classmethod
+	def _getVersionInformation( self ):
+		"""Get the version information from this project
+
+		\return A list in the form of [str, str, str] containing major, minor and patch version"""
+
+		versionList = ['x', 'x', 'x'] # major, minor, patch version (default values)
+		projectVersionList = mApp().getSettings().get( Settings.ProjectVersionNumber ).split( '.', 2 )
+		for i in range( 0, len( projectVersionList ) ):
+			versionList[i] = str( projectVersionList[i] )
+		return versionList
+
 	def _formattedConfiguration( self ):
 		config = _CPackConfig
 		# Can't do this with str.format because of CMake's variable escaping conflicting
@@ -136,7 +149,7 @@ class _CPackGenerateConfigurationAction( Action ):
 		config = config.replace( "@CPACK_PACKAGE_NAME@", packageName, 1 )
 		config = config.replace( "@CPACK_PACKAGE_NAME_SIMPLIFIED@", packageNameSimplified, 1 )
 
-		versionList = mApp().getSettings().get( Settings.ProjectVersionNumber ).split( '.', 2 )
+		versionList = self._getVersionInformation()
 		config = config.replace( "@CPACK_PACKAGE_VERSION_MAJOR@", versionList[0] or 1, 1 )
 		config = config.replace( "@CPACK_PACKAGE_VERSION_MINOR@", versionList[1] or 0, 1 )
 		config = config.replace( "@CPACK_PACKAGE_VERSION_PATCH@", versionList[2] or 0, 1 )
