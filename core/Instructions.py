@@ -152,7 +152,14 @@ class Instructions( MObject ):
 		return None
 
 	def hasFailed( self ):
-		'''Returns True if any action of the build steps for this object has failed.'''
+		'''Returns True in the following cases:
+		* if any step for this object has failed
+		* or if any instance of the children has failed'''
+
+		for child in self.getChildren():
+			if child.hasFailed():
+				return True
+
 		return self.getFailedStep() != None
 
 	def __hasStep( self, stepName ):
