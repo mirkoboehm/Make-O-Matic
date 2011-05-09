@@ -90,7 +90,7 @@ class SCMSubversion( SourceCodeProvider ):
 		runner.run()
 
 		if runner.getReturnCode() == 0:
-			xmldoc = minidom.parseString( runner.getStdOut() )
+			xmldoc = minidom.parseString( runner.getStdOut().encode( "utf-8" ) )
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			assert len( logentries ) == 1
 			results = parse_log_entry( logentries[0] )
@@ -139,7 +139,7 @@ class SCMSubversion( SourceCodeProvider ):
 		runner = RunCommand( cmd, 3600, searchPaths = self.getCommandSearchPaths() )
 		runner.run()
 		if runner.getReturnCode() == 0:
-			return minidom.parseString( runner.getStdOut() )
+			return minidom.parseString( runner.getStdOut().encode( "utf-8" ) )
 		elif runner.getTimedOut() == True:
 			raise ConfigurationError( 'Getting svn log for "{0}" timed out.'.format( self.getUrl() ) )
 		else:
@@ -250,7 +250,7 @@ class SCMSubversion( SourceCodeProvider ):
 			mApp().debugN( self, 2, 'cannot retrieve summarized diff for revision "{0}"'.format( revision ) )
 			return None
 		else:
-			return runner.getStdOut().split( '\n' )
+			return runner.getStdOut().encode( "utf-8" ).split( '\n' )
 
 	def _getCurrentRevision( self ):
 		'''Return the identifier of the current revisions.'''
@@ -266,7 +266,7 @@ class SCMSubversion( SourceCodeProvider ):
 		runner.run()
 
 		if runner.getReturnCode() == 0:
-			xmldoc = minidom.parseString( runner.getStdOut() )
+			xmldoc = minidom.parseString( runner.getStdOut().encode( "utf-8" ) )
 			logentries = xmldoc.getElementsByTagName( 'logentry' )
 			assert len( logentries ) == 1
 			result = parse_log_entry( logentries[0] )
