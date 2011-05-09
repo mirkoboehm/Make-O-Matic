@@ -42,6 +42,9 @@ class Action( MObject ):
 		A return value or zero indicates success. Any value different from zero is considered an error.'''
 		raise NotImplementedError()
 
+	def getObjectDescription( self ):
+		return self.getLogDescription()
+
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
 		raise NotImplementedError()
@@ -151,9 +154,9 @@ class Action( MObject ):
 								if self.getStdOut() or self.getStdErr():
 									f.writelines( 'Output from action "{0}":\n'.format( self.getLogDescription() ) )
 									if self.getStdOut():
-										f.writelines( '\n=== Standard output ===\n' + self.getStdOut() ) 
+										f.writelines( '\n=== Standard output ===\n' + self.getStdOut() )
 									if self.getStdErr():
-										f.writelines( '\n=== Error output ===\n' + self.getStdErr() ) 
+										f.writelines( '\n=== Error output ===\n' + self.getStdErr() )
 								else:
 									f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
 						except Exception as e:

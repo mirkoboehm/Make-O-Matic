@@ -189,13 +189,15 @@ class Step( MObject ):
 			return self.getResult() != Step.Result.Failure
 
 	def describe( self, prefix, details = None, replacePatterns = True ):
-		if not self.isEmpty():
-			MObject.describe( self, prefix, details, replacePatterns )
-			for phase in [ [ ' pre', self.getPreActions() ],
-							[ 'main', self.getMainActions() ],
-							[ 'post', self.getPostActions() ] ]:
-				for action in phase[1]:
-					action.describe( prefix, details = phase[0] )
+		if self.isEmpty():
+			return
+
+		MObject.describe( self, prefix, details, replacePatterns )
+		for phase in [ [ ' pre', self.getPreActions() ],
+						[ 'main', self.getMainActions() ],
+						[ 'post', self.getPostActions() ] ]:
+			for action in phase[1]:
+				action.describe( prefix, details = phase[0] )
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
@@ -205,16 +207,10 @@ class Step( MObject ):
 		node.attributes["result"] = str( self.Result.getKey( self.getResult() ) )
 		node.attributes["status"] = str( self.Status.getKey( self.getStatus() ) )
 
-		if self.getPreActions():
-			for action in self.getPreActions():
-				element = action.createXmlNode( document )
-				node.appendChild( element )
-		if self.getMainActions():
-			for action in self.getMainActions():
-				element = action.createXmlNode( document )
-				node.appendChild( element )
-		if self.getPostActions():
-			for action in self.getPostActions():
+		for actions in [self.getPreActions(), self.getMainActions(), self.getPostActions()]:
+			if not actions:
+				continue
+			for action in actions:
 				element = action.createXmlNode( document )
 				node.appendChild( element )
 
