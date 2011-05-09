@@ -104,7 +104,7 @@ class Environments( ConfigurationBase ):
 		if mode in ( Settings.EnvironmentExpansionMode_BuildAll, Settings.EnvironmentExpansionMode_BuildHighestScoring ):
 			if not environments:
 				status = 'optional' if self.isOptional() else 'REQUIRED'
-				self.setObjectStatus( 'No environments found [{0}]'.format( status ) )
+				self.setObjectStatus( 'No environments found ({0}) [{1}]'.format( self.getObjectStatus(), status ) )
 				mApp().message( self, self.getObjectStatus() )
 				if self.isOptional():
 					mApp().message( self, '{0}, continuing.'.format( self.getObjectStatus() ) )
