@@ -110,8 +110,9 @@ class Plugin( MObject ):
 		if self.isOptional():
 			try:
 				findCommandAndPreFlightCheck()
-			except ( MomException, ConfigurationError ):
-				mApp().message( self, 'pre flight check failed, disabling the plugin because it is marked as optional.' )
+			except ( MomException, ConfigurationError ), e:
+				mApp().message( self, 'pre flight check failed, disabling the plugin because it is marked as optional: {0}'.format( e ) )
+				self.setObjectDescription( unicode( e ) )
 				self.setEnabled( False )
 		else:
 			findCommandAndPreFlightCheck()
