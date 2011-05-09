@@ -141,15 +141,13 @@ class Instructions( MObject ):
 				.format( instructions.getName(), self.getName() ) )
 
 	def getTimeKeeper( self ):
-		'''Return the TimeKeeper object to measure execution time.'''
+		'''\return TimeKeeper object to measure execution time.'''
 		return self.__timeKeeper
 
-	def getFailedStep( self ):
-		'''Return the first step that failed during execution, or None.'''
-		for step in self.getSteps():
-			if step.getResult() == Step.Result.Failure:
-				return step
-		return None
+	def getFailedSteps( self ):
+		'''\return List of steps that failed during execution'''
+
+		return [step for step in self.getSteps() if step.getResult() == Step.Result.Failure]
 
 	def hasFailed( self ):
 		'''Returns True in the following cases:
@@ -160,7 +158,7 @@ class Instructions( MObject ):
 			if child.hasFailed():
 				return True
 
-		return self.getFailedStep() != None
+		return len( self.getFailedSteps() ) > 0
 
 	def __hasStep( self, stepName ):
 		'''Returns True if a step with the specified name already exists.'''
