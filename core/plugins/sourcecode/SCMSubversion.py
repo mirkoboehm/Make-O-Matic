@@ -37,6 +37,9 @@ from core.helpers.TimeUtils import formatted_time
 import re
 from core.Defaults import Defaults
 
+if sys.platform == "win32":
+	from core.helpers.RegistryHelper import getPathsFromRegistry
+
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""
 
@@ -44,7 +47,6 @@ class SCMSubversion( SourceCodeProvider ):
 		SourceCodeProvider.__init__( self, name )
 		searchPaths = []
 		if sys.platform == "win32":
-			from core.helpers.RegistryHelper import getPathsFromRegistry
 			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion"
 				+ "\\Uninstall\\CollabNet Subversion Client\\UninstallString" ]
 			searchPaths += getPathsFromRegistry( keys, ".." )
@@ -172,11 +174,13 @@ class SCMSubversion( SourceCodeProvider ):
 		tagPrefix = mApp().getSettings().get( Settings.SCMSvnTagPrefix )
 		for line in diff or []:
 			line = line.strip()
-			if not re.match( '^[A-Z]+\s+', line ): continue
+			if not re.match( '^[A-Z]+\s+', line ):
+				continue
 			strippedLocation = re.sub( '^[A-Z]+\s+', '', line ).strip()
 			location = strippedLocation[len( url ):] # remove URL
 			for match, locationType, buildType in locationBuildTypeMapping:
-				if not location.startswith( match ): continue
+				if not location.startswith( match ):
+					continue
 				info = BuildInfo()
 				info.setProjectName( mApp().getSettings().get( Settings.ScriptBuildName ) )
 				info.setBuildType( buildType )
@@ -188,7 +192,8 @@ class SCMSubversion( SourceCodeProvider ):
 					prefixParts = prefix.split( '/' )
 					matchParts = match.split( '/' )
 					itemsToInclude = len( matchParts ) - len( prefixParts ) + 1 # plus branch name
-					if len( pathParts ) <= len( matchParts ): return None # ignore lines like 'A	 branches' in old diffs 
+					if len( pathParts ) <= len( matchParts ):
+						return None # ignore lines like 'A	 branches' in old diffs 
 					firstIndex = len( prefixParts )
 					branchNameParts = pathParts[ firstIndex : firstIndex + itemsToInclude ]
 					branchName = '/'.join( branchNameParts )
@@ -204,7 +209,8 @@ class SCMSubversion( SourceCodeProvider ):
 							'The Subversion location mapping "{0}" does not begin with the configured branch prefix "{1}".'
 							.format( match, branchPrefix ), details )
 					branchName = getBranchName( location, branchPrefix, match )
-					if not branchName: continue # this line changed the branches folders, nothing else
+					if not branchName:
+						continue # this line changed the branches folders, nothing else
 					info.setBranch( branchName )
 					key = '/'.join( [ self.__getRootUrl(), branchPrefix, branchName ] )
 				elif locationType == Defaults.BranchType_Tag:
@@ -215,7 +221,8 @@ class SCMSubversion( SourceCodeProvider ):
 							'The Subversion location mapping "{0}" does not begin with the configured tag prefix "{1}".'
 							.format( match, branchPrefix ), details )
 					branchName = getBranchName( location, tagPrefix, match )
-					if not branchName: continue # this line changed the tags folders, nothing else
+					if not branchName:
+						continue # this line changed the tags folders, nothing else
 					info.setTag( branchName )
 					key = '/'.join( [ self.__getRootUrl(), tagPrefix, branchName ] )
 				if not changes.has_key( key ):

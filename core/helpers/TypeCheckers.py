@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Exceptions import ConfigurationError
 
 def check_for_list_of_paths( expression, description ):
@@ -93,4 +94,3 @@ def check_for_callable_or_none( expression, description ):
 def check_for_callable( expression, description ):
 	if not callable( expression ):
 		raise ConfigurationError( description )
-

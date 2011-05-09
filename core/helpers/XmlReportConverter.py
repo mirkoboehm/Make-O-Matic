@@ -375,6 +375,7 @@ class XmlReportConverter( MObject ):
 
 		return "\n".join( out )
 
+	@classmethod
 	def _statesToStringList( self, element ):
 		states = []
 		if element.attrib["isEnabled"] == "False":
@@ -477,7 +478,7 @@ class XmlReportConverter( MObject ):
 
 		elif element.tag == "environment":
 			out += " "
-			out += wrapper.wrap( "Environment: {0} [{1}]".format(
+			out += wrapper.wrap( "Environment: {0} [{1}]".format( 
 					element.attrib["name"],
 					"success" if element.attrib["failed"] == "False" else "FAILED"
 			) )

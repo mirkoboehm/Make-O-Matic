@@ -20,6 +20,8 @@
 import textwrap
 from optparse import IndentedHelpFormatter
 
+# not our code, let pylint ignore this
+# pylint: disable-all
 class IndentedHelpFormatterWithNL( IndentedHelpFormatter ):
 	"""Workaround for optparse not accepting newlines in the description string
 

@@ -20,6 +20,7 @@
 def mApp():
 	from core.MApplication import MApplication
 	from core.Exceptions import MomError
+
 	if not MApplication.instance:
 		raise MomError( 'mApp may only be called after the MApplication object has been created!' )
 	return MApplication.instance

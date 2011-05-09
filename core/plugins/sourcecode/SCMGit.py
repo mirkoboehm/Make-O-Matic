@@ -30,6 +30,9 @@ from core.helpers.RevisionInfo import RevisionInfo
 from core.Settings import Settings
 from buildcontrol.common.BuildInfo import BuildInfo
 
+if sys.platform == "win32":
+	from core.helpers.RegistryHelper import getPathsFromRegistry
+
 class _UpdateHiddenCloneAction( Action ):
 
 	def __init__( self, scmgit ):
@@ -53,7 +56,6 @@ class SCMGit( SourceCodeProvider ):
 		SourceCodeProvider.__init__( self, name )
 		searchPaths = []
 		if sys.platform == "win32":
-			from core.helpers.RegistryHelper import getPathsFromRegistry
 			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\Git_is1\\Inno Setup: App Path" ]
 			searchPaths += getPathsFromRegistry( keys, "bin" )
 		self._setCommand( "git" )

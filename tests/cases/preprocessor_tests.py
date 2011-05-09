@@ -34,7 +34,7 @@ class PreprocessorTest( MomTestCase ):
 	def testEmptyInputString( self ):
 		self._runTest( '', '', 'An empty input line should result in an empty output line' )
 
-	def testinputStringWithoutPlaceholders( self ):
+	def testInputStringWithoutPlaceholders( self ):
 		inputString = 'hello world'
 		outputString = inputString
 		self._runTest( inputString, outputString,

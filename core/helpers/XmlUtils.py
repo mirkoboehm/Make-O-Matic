@@ -86,6 +86,8 @@ def string_from_node( element, node ):
 	except AttributeError:
 		return "N/A"
 
+# not our code, ignore
+# pylint: disable-all
 def xml_compare( element1, element2, reporter = False ):
 	"""From formencode package
 
