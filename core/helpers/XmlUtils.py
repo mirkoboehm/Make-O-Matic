@@ -25,7 +25,8 @@ from core.helpers.StringUtils import to_unicode_or_bust
 
 def create_child_node( document, parentNode, tagName, text ):
 	elementNode = document.createElement( tagName )
-	textNode = document.createTextNode( text )
+	# warning: createTextNode does not like None here, be sure to pass a string
+	textNode = document.createTextNode( text or "" )
 	elementNode.appendChild( textNode )
 	parentNode.appendChild( elementNode )
 	return elementNode
