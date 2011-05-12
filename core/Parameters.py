@@ -158,8 +158,9 @@ e.g.: -s disable-cleanup,enable-create-packages""" )
 		return ', '.join( texts )
 
 	def applyBuildSequenceSwitches( self, buildSteps ):
+		msg = self.__getBuildSequenceDescription( buildSteps )
 		mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'
-			.format( self.__getBuildSequenceDescription( buildSteps ) ) )
+			.format( msg ), compareTo = msg )
 		switches = self.getBuildSteps()
 		if switches:
 			customSteps = switches.split( ',' )

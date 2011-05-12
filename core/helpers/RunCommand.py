@@ -225,7 +225,7 @@ class RunCommand( MObject ):
 
 		if returnCode == expectedReturnCode:
 			version = getStdOut.splitlines()[ lineNumber ].strip()
-			mApp().debugN( self, 1, 'external tool detected: "{0}"'.format( version ) )
+			mApp().debugN( self, 1, 'external tool detected: "{0}"'.format( version ), compareTo = self.getCommand() )
 			return version
 		else:
 			raise ConfigurationError( "RunCommand::checkVersion: {0} returned {1}, expected: {2}."

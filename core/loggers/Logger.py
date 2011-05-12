@@ -16,9 +16,6 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-from __future__ import unicode_literals
-
 from datetime import datetime
 from core.Plugin import Plugin
 from buildcontrol.SubprocessHelpers import get_debug_prefix
@@ -28,27 +25,32 @@ class Logger( Plugin ):
 
 	def __init__( self, name ):
 		Plugin.__init__( self, name )
+		self.__cachedMessages = {}
 
-	def error( self, mapp, mobject, msg ):
-		return self.logError( mapp, mobject, msg )
+	def error( self, mapp, mobject, msg, compareTo = None ):
+		if not self._checkForDuplicateMessage( msg, compareTo ):
+			return self.logError( mapp, mobject, msg )
 
 	def logError( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
-	def message( self, mapp, mobject, msg ):
-		return self.logMessage( mapp, mobject, msg )
+	def message( self, mapp, mobject, msg, compareTo = None ):
+		if not self._checkForDuplicateMessage( msg, compareTo ):
+			return self.logMessage( mapp, mobject, msg )
 
 	def logMessage( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
-	def debug( self, mapp, mobject, msg ):
-		return self.logDebug( mapp, mobject, msg )
+	def debug( self, mapp, mobject, msg, compareTo = None ):
+		if not self._checkForDuplicateMessage( msg, compareTo ):
+			return self.logDebug( mapp, mobject, msg )
 
 	def logDebug( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
-	def debugN( self, mapp, mobject, level , msg ):
-		return self.logDebugN( mapp, mobject, level, msg )
+	def debugN( self, mapp, mobject, level , msg, compareTo = None ):
+		if not self._checkForDuplicateMessage( msg, compareTo ):
+			return self.logDebugN( mapp, mobject, level, msg )
 
 	def logDebugN( self, mapp, mobject, level , msg ):
 		raise NotImplementedError()
@@ -58,3 +60,15 @@ class Logger( Plugin ):
 
 	def messagePrefix( self ):
 		return get_debug_prefix()
+
+	def _checkForDuplicateMessage( self, msg, compareTo ):
+		if not compareTo:
+			return False
+		try:
+			if self.__cachedMessages.has_key( msg ):
+				if self.__cachedMessages[ msg ] == compareTo:
+					return True
+				else:
+					return False
+		finally:
+			self.__cachedMessages[msg] = compareTo

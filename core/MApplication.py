@@ -131,17 +131,17 @@ class MApplication( Instructions ):
 	def getException( self ):
 		return self.__exception
 
-	def error( self, mobject, text ):
-		[ logger.error( self, mobject, text ) for logger in self.getLoggers() ]
+	def error( self, mobject, text, compareTo = None ):
+		[ logger.error( self, mobject, text, compareTo ) for logger in self.getLoggers() ]
 
-	def message( self, mobject, text ):
-		[ logger.message( self, mobject, text ) for logger in self.getLoggers() ]
+	def message( self, mobject, text, compareTo = None ):
+		[ logger.message( self, mobject, text, compareTo ) for logger in self.getLoggers() ]
 
-	def debug( self, mobject, text ):
-		[ logger.debug( self, mobject, text ) for logger in self.getLoggers() ]
+	def debug( self, mobject, text, compareTo = None ):
+		[ logger.debug( self, mobject, text, compareTo ) for logger in self.getLoggers() ]
 
-	def debugN( self, mobject, level, text ):
-		[ logger.debugN( self, mobject, level, text ) for logger in self.getLoggers() ]
+	def debugN( self, mobject, level, text, compareTo = None ):
+		[ logger.debugN( self, mobject, level, text, compareTo ) for logger in self.getLoggers() ]
 
 	def _queryAndPrintSettings( self, names = None ):
 		try:
