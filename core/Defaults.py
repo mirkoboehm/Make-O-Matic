@@ -87,6 +87,9 @@ class Defaults( MObject ):
 	# ----- System path settings:
 	SystemExtraPaths = 'system.extrapaths'
 	SystemShortName = 'system.shortname'
+	# ----- SourceCodeProvider Settings:
+	SourceCodeProviderVersionName = 'scm.branchname'
+	SourceCodeProviderBranchPrefix = 'scm.branchprefix'
 	# ----- Subversion Settings:
 	SCMSvnLocationBuildTypeMap = 'scm.svn.locationbuildtypemap'
 	SCMSvnBranchNameBuildTypeMap = 'scm.svn.branchnamebuildtypemap'
@@ -206,6 +209,10 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.SimpleCIBuildJobCap ] = 8
 		defaultSettings[ Defaults.SimpleCIScriptDebugLevel ] = 0
 		defaultSettings[ Defaults.SimpleCIBuildDirectory ] = None
+		# ----- SourceCodeProvider Settings:
+		# These settings are saved by the source code provider during the prepare phase:
+		defaultSettings[ Defaults.SourceCodeProviderVersionName ] = None
+		defaultSettings[ Defaults.SourceCodeProviderBranchPrefix ] = None
 		# ----- Subversion Defaults
 		defaultSettings[ Defaults.SCMSvnLocationBuildTypeMap ] = [
 			# location under project root, branch type, build type

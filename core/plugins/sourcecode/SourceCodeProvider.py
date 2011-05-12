@@ -188,10 +188,22 @@ class SourceCodeProvider( Plugin ):
 		mApp().debugN( self, 5, "Adding uid mappings for source code provider. Mappings found: {0}".format( len( mappings ) ) )
 		for mapping in mappings:
 			self.getSCMUidMapper().addMapping( mapping )
-
 		# We need to check for the SCM here to error if the SCM can't be found for checkout.
 		if self.getCommand():
 			self.resolveCommand()
+		# save tag or branch to the settings, so that the values can be used later in other modules:
+		settings = mApp().getSettings()
+		name = ''
+		if self.getBranch():
+			name = str( self.getBranch() )
+			settings.set( Settings.SourceCodeProviderBranchPrefix, 'branches' )
+		elif self.getTag():
+			name = str( self.getTag() )
+			settings.set( Settings.SourceCodeProviderBranchPrefix, 'tags' )
+		else:
+			name = 'master'
+			settings.set( Settings.SourceCodeProviderBranchPrefix, '' )
+		settings.set( Settings.SourceCodeProviderVersionName, name )
 
 	def preFlightCheck( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
