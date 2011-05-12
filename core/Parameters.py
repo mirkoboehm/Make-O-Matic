@@ -159,8 +159,7 @@ e.g.: -s disable-cleanup,enable-create-packages""" )
 
 	def applyBuildSequenceSwitches( self, buildSteps ):
 		msg = self.__getBuildSequenceDescription( buildSteps )
-		mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'
-			.format( msg ), compareTo = msg )
+		mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'.format( msg ), compareTo = msg )
 		switches = self.getBuildSteps()
 		if switches:
 			customSteps = switches.split( ',' )
@@ -185,4 +184,5 @@ e.g.: -s disable-cleanup,enable-create-packages""" )
 						break
 				if not found:
 					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
-			mApp().debug( self, 'build sequence: {0}'.format( self.__getBuildSequenceDescription( buildSteps ) ) )
+			msg = self.__getBuildSequenceDescription( buildSteps )
+			mApp().debug( self, 'build sequence: {0}'.format( msg ), compareTo = msg )
