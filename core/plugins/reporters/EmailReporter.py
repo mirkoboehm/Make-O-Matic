@@ -61,9 +61,11 @@ class EmailReporter( RemoteReporter ):
 					Settings.EmailReporterConfigurationErrorRecipients,
 					Settings.EmailReporterMomErrorRecipients
 					]:
-			check_for_list_of_strings_or_none( settings.get( setting, False ), "Must be a list of valid email addresses" )
+			value = settings.get( setting, False )
+			check_for_list_of_strings_or_none( settings.get( setting, False ),
+				"{0} must be a list of valid email addresses, not \"{1}\"".format( setting, value ) )
 
-		check_for_string( settings.get( Settings.EmailReporterSender ), "EmailReporterSender Must be a valid email address" )
+		check_for_string( settings.get( Settings.EmailReporterSender ), "EmailReporterSender must be a valid email address" )
 
 	def sendReport( self ):
 		email = self.createEmail()
