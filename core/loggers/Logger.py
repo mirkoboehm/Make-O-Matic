@@ -30,15 +30,27 @@ class Logger( Plugin ):
 		Plugin.__init__( self, name )
 
 	def error( self, mapp, mobject, msg ):
+		return self.logError( mapp, mobject, msg )
+
+	def logError( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
 	def message( self, mapp, mobject, msg ):
+		return self.logMessage( mapp, mobject, msg )
+
+	def logMessage( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
 	def debug( self, mapp, mobject, msg ):
+		return self.logDebug( mapp, mobject, msg )
+
+	def logDebug( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
 	def debugN( self, mapp, mobject, level , msg ):
+		return self.logDebugN( mapp, mobject, level, msg )
+
+	def logDebugN( self, mapp, mobject, level , msg ):
 		raise NotImplementedError()
 
 	def timeStampPrefix( self ):

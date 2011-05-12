@@ -37,10 +37,10 @@ class ConsoleLogger( Logger ):
 		check_for_nonnegative_int( verbosity, "The debug level needs to be an integer of zero or more" )
 		return verbosity
 
-	def error( self, mapp, mobject, msg ):
+	def logError( self, mapp, mobject, msg ):
 		self.debug( mapp, mobject, '*** ERROR: {0}'.format( msg ) )
 
-	def message( self, mapp, mobject, msg ):
+	def logMessage( self, mapp, mobject, msg ):
 		text = msg
 		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
 		try:
@@ -62,11 +62,11 @@ class ConsoleLogger( Logger ):
 		# fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
 		sys.stderr.write( fulltext.encode( "utf-8" ) )
 
-	def debug( self, mapp, mobject, msg ):
+	def logDebug( self, mapp, mobject, msg ):
 		if self.__getLevel( mapp ) > 0:
 			self.message( mapp, mobject, 'DEBUG: {0}'.format( msg ) )
 
-	def debugN( self, mapp, mobject, level , msg ):
+	def logDebugN( self, mapp, mobject, level , msg ):
 		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )
 		verbosity = self.__getLevel( mapp )
 		if verbosity >= level:
