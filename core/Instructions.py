@@ -329,7 +329,7 @@ class Instructions( MObject ):
 		'''Execute one individual step.
 		This method does not recurse to child objects.'''
 
-		mApp().debug( self, "Executing step: {0}".format( stepName ) )
+		mApp().debugN( self, 2, "Executing step: {0}".format( stepName ) )
 		step = self.getStep( stepName )
 		try:
 			if not step.execute( self ):
