@@ -105,11 +105,15 @@ class Defaults( MObject ):
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- Publisher settings (should be set in .mom/config.py):
 	RSyncPublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
+	RSyncPublisherPackageCleanup = 'publisher.cleanup.packages'
 	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
 	RSyncPublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
+	RSyncPublisherReportsCleanup = 'publisher.cleanup.reports'
 	PublisherReportsBaseHttpURL = 'publisher.basehttpurl.reports'
 	FileSystemPublisherPackageUploadLocation = 'publisher.filesystem.uploadlocation.packages'
+	FileSystemPublisherPackageCleanup = 'publisher.filesystem.cleanup.packages'
 	FileSystemPublisherReportsUploadLocation = 'publisher.filesystem.uploadlocation.reports'
+	FileSystemPublisherReportsCleanup = 'publisher.filesystem.cleanup.reports'
 	# ----- EmailReporter settings:
 	EmailReporterSender = 'emailreporter.sender'
 	EmailReporterDefaultRecipients = 'emailreporter.defaultrecipients'
@@ -205,6 +209,11 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.EmailReporterMomErrorRecipients] = None
 		defaultSettings[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
 		defaultSettings[ Defaults.EmailReporterUseCompressionForAttachments ] = False
+		# ----- Publisher settings:
+		defaultSettings[ Defaults.RSyncPublisherPackageCleanup ] = True
+		defaultSettings[ Defaults.RSyncPublisherReportsCleanup ] = True
+		defaultSettings[ Defaults.FileSystemPublisherPackageCleanup ] = True
+		defaultSettings[ Defaults.FileSystemPublisherReportsCleanup ] = True
 		# ----- simple_ci settings:
 		defaultSettings[ Defaults.SimpleCIBuildJobCap ] = 8
 		defaultSettings[ Defaults.SimpleCIScriptDebugLevel ] = 0

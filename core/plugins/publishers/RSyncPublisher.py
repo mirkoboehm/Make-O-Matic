@@ -23,6 +23,7 @@ from core.helpers.PathResolver import PathResolver
 from core.actions.Action import Action
 from core.helpers.RunCommand import RunCommand
 from core.plugins.publishers.Publisher import Publisher
+from core.actions.filesystem.RmDirAction import RmDirAction
 
 class _CreateUploadDirectoryAction( Action ):
 	def __init__( self, publisher ):
@@ -151,6 +152,12 @@ class RSyncPackagesPublisher( RSyncPublisher ):
 
 		super( RSyncPackagesPublisher, self ).getObjectStatus()
 
+	def setup( self ):
+		super( RSyncPackagesPublisher, self ).setup()
+		if ( mApp().getSettings().get( Settings.RSyncPublisherPackageCleanup ) ):
+			step = self.getInstructions().getStep( self.getStep() )
+			step.addMainAction( RmDirAction( PathResolver( mApp().getPackagesDir ) ) )
+
 # FIXME the reports publisher needs to be called after the build finished 
 # (chicken and egg problem, the report can only be created once the build is done)
 # implement uploading in wrapUp()?
@@ -168,3 +175,9 @@ class RSyncReportsPublisher( RSyncPublisher ):
 			return "Location: {0}".format( baseUrl )
 
 		super( RSyncReportsPublisher, self ).getObjectStatus()
+
+	def setup( self ):
+		super( RSyncReportsPublisher, self ).setup()
+		if ( mApp().getSettings().get( Settings.RSyncPublisherReportsCleanup ) ):
+			step = self.getInstructions().getStep( self.getStep() )
+			step.addMainAction( RmDirAction( PathResolver( mApp().getLogDir ) ) )

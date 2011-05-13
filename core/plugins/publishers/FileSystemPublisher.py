@@ -21,6 +21,7 @@ from core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAct
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
+from core.actions.filesystem.RmDirAction import RmDirAction
 
 class FileSystemPublisher( Publisher ):
 	'''A publisher that copies the files in the file system.'''
@@ -65,6 +66,12 @@ class FileSystemPackagesPublisher( FileSystemPublisher ):
 
 		super( FileSystemPackagesPublisher, self ).getObjectStatus()
 
+	def setup( self ):
+		super( FileSystemPackagesPublisher, self ).setup()
+		if ( mApp().getSettings().get( Settings.FileSystemPublisherPackageCleanup ) ):
+			step = self.getInstructions().getStep( self.getStep() )
+			step.addMainAction( RmDirAction( PathResolver( mApp().getPackagesDir ) ) )
+
 # FIXME the reports publisher needs to be called after the build finished 
 # (chicken and egg problem, the report can only be created once the build is done)
 # implement uploading in wrapUp()?
@@ -82,3 +89,9 @@ class FileSystemReportsPublisher( FileSystemPublisher ):
 			return "Location: {0}".format( baseUrl )
 
 		super( FileSystemReportsPublisher, self ).getObjectStatus()
+
+	def setup( self ):
+		super( FileSystemReportsPublisher, self ).setup()
+		if ( mApp().getSettings().get( Settings.FileSystemPublisherReportsCleanup ) ):
+			step = self.getInstructions().getStep( self.getStep() )
+			step.addMainAction( RmDirAction( PathResolver( mApp().getLogDir ) ) )
