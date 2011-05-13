@@ -74,7 +74,9 @@ class FileSystemPackagesPublisher( FileSystemPublisher ):
 		super( FileSystemPackagesPublisher, self ).setup()
 		if ( mApp().getSettings().get( Settings.FileSystemPublisherPackageCleanup ) ):
 			step = self.getInstructions().getStep( self.getStep() )
-			step.addMainAction( RmDirAction( PathResolver( mApp().getPackagesDir ) ) )
+			#FIXME if the directory is cleared he cannot write logs anymore and fails the build,
+			#so disable for now
+			#step.addMainAction( RmDirAction( PathResolver( mApp().getPackagesDir ) ) )
 
 # FIXME the reports publisher needs to be called after the build finished 
 # (chicken and egg problem, the report can only be created once the build is done)
@@ -98,4 +100,6 @@ class FileSystemReportsPublisher( FileSystemPublisher ):
 		super( FileSystemReportsPublisher, self ).setup()
 		if ( mApp().getSettings().get( Settings.FileSystemPublisherReportsCleanup ) ):
 			step = self.getInstructions().getStep( self.getStep() )
-			step.addMainAction( RmDirAction( PathResolver( mApp().getLogDir ) ) )
+			#FIXME if the directory is cleared he cannot write logs anymore and fails the build,
+			#so disable for now
+			#step.addMainAction( RmDirAction( PathResolver( mApp().getLogDir ) ) )
