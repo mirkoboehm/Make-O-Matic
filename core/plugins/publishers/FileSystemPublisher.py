@@ -18,10 +18,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from core.plugins.publishers.Publisher import Publisher
 from core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
+from core.actions.filesystem.CheckDirectoryExistsAction import CheckDirectoryExistsAction
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
 from core.actions.filesystem.RmDirAction import RmDirAction
+import os
 
 class FileSystemPublisher( Publisher ):
 	'''A publisher that copies the files in the file system.'''
@@ -45,6 +47,8 @@ class FileSystemPublisher( Publisher ):
 			localdir = PathResolver( mApp().getPackagesDir )
 		step = self.getInstructions().getStep( self.getStep() )
 		if str( localdir ):
+			checkaction = CheckDirectoryExistsAction( os.path.dirname( self.getUploadLocation() ) )
+			step.addMainAction( checkaction )
 			action = DirectoryTreeCopyAction( localdir, PathResolver( self._getFullUploadLocation ), overwrite = True )
 			step.addMainAction( action )
 		else:
