@@ -25,7 +25,7 @@ from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 
 class RemoteBuilder( MObject ):
-	def __init__( self, revision = None, location = None, branch = None, tag = None, path = None, script = None, name = None ):
+	def __init__( self, revision = None, location = None, branch = None, tag = None, path = None, script = None, name = None, rootTrunk = False ):
 		MObject.__init__( self, name )
 		self.setRevision( revision )
 		self.setBuildscript( script )
@@ -33,6 +33,7 @@ class RemoteBuilder( MObject ):
 		self.setBranch( branch )
 		self.setTag( tag )
 		self.setPath( path )
+		self.setRootTrunk( rootTrunk )
 
 	def setRevision( self, revision ):
 		self.__revision = revision
@@ -70,12 +71,20 @@ class RemoteBuilder( MObject ):
 	def getBuildscript( self ):
 		return self.__buildscript
 
+	def setRootTrunk( self, rootTrunk ):
+		self.__rootTrunk = rootTrunk
+
+	def rootIsTrunk( self ):
+		return self.__rootTrunk
+
 	def fetchBuildScript( self ):
 		# create SCM implementation:
 		scm = getScm( self.getLocation() )
 		scm.setBranch( self.getBranch() )
 		scm.setTag( self.getTag() )
 		scm.setRevision( self.getRevision() )
+		if ( self.__rootTrunk ):
+			scm.setRootTrunk( True )
 		path = scm.fetchRepositoryFolder( self.getPath() )
 		localBuildscript = os.path.join( path, self.getBuildscript() )
 		if os.path.exists( localBuildscript ):

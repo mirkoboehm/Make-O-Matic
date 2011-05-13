@@ -27,7 +27,7 @@ class ProxyBuilder( MApplication ):
 	'''ProxyBuilder takes a few arguments that describe a remote build script, 
 	and then executes that build script using a RemoteBuilder.'''
 
-	def __init__( self, location, branch = None, tag = None, path = 'admin', script = 'buildscript.py' ):
+	def __init__( self, location, branch = None, tag = None, path = 'admin', script = 'buildscript.py' , rootTrunk = False ):
 		MApplication.__init__( self, name = 'proxybuilder' )
 		self.addLogger( ConsoleLogger() )
 		self.setDoBranchBuilds( False )
@@ -40,6 +40,7 @@ class ProxyBuilder( MApplication ):
 		self.__tag = tag
 		self.__path = path
 		self.__script = script
+		self.__rootTrunk = rootTrunk
 
 	def getToolName( self ):
 		return 'proxybuilder'
@@ -53,11 +54,17 @@ class ProxyBuilder( MApplication ):
 	def doBranchBuilds( self ):
 		return self.__doBranchBuilds
 
+	def setRootTrunk( self, rootTrunk ):
+		self.__rootTrunk = rootTrunk
+
+	def rootIsTrunk( self ):
+		return self.__rootTrunk
+
 	def execute( self ):
 		location = self.getParameters().getScmLocation() or self.__location
 		branch = self.getParameters().getBranch() or self.__branch
 		tag = self.getParameters().getTag() or self.__tag
-		builder = RemoteBuilder( location = location, branch = branch, tag = tag, path = self.__path, script = self.__script )
+		builder = RemoteBuilder( location = location, branch = branch, tag = tag, path = self.__path, script = self.__script, rootTrunk = self.__rootTrunk )
 		builder.setRevision( self.getParameters().getRevision() )
 		options = sys.argv[1:]
 		# if location, branch or tag parameters are not specified on the command line, add the settings from 
