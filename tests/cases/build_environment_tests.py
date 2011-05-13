@@ -94,5 +94,11 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		self.assertEquals( dep.getObjectStatus(), 'Test Disabled MOM Package' )
 		self.assertEquals( dep.getScore(), 120 )
 
+	def testTryFindTwoEnv( self ):
+		dep = [ 'dep-a-1.0.0', 'dep-b' ]
+		environments = Environments( dep )
+		matches = environments.findMatchingEnvironments()
+		self.assertEquals( len( matches ), 2 )
+
 if __name__ == "__main__":
 	unittest.main()
