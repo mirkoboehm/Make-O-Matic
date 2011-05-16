@@ -56,7 +56,7 @@ except ImportError:
 
 class XmlReportTests( MomBuildMockupTestCase ):
 
-	EXCEPTION_LOCATION = "exception"
+	EXCEPTION_LOCATION = ".//exception"
 
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self, useEnvironments = True )
@@ -68,6 +68,10 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		#self.build.addLogger( ConsoleLogger() )
 		self.build.buildAndReturn()
 
+	def _testBasicDocumentAttributes( self, document ):
+		"""\return Build element"""
+		self.assertNotEquals( document.find( "./build" ), None )
+
 	def getXmlReport( self ):
 		report = XmlReport( self.build )
 		report.prepare()
@@ -77,7 +81,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self._build()
 		doc = etree.XML( self.getXmlReport().getReport() )
 
-		self.assertEqual( doc.tag, "build" ) # root
+		self._testBasicDocumentAttributes( doc )
 		self.assertNotEquals( doc.find( './/project' ), None )
 		self.assertNotEquals( doc.find( './/environments' ), None )
 		self.assertNotEquals( doc.find( './/configuration' ), None )
@@ -195,7 +199,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		doc = etree.XML( self.getXmlReport().getReport() )
 
 		e = self.EXCEPTION_LOCATION
-		self.assertEqual( doc.tag, "build" ) # root
+		self._testBasicDocumentAttributes( doc )
 		self.assertNotEquals( doc.find( e ), None )
 		self.assertNotEquals( doc.find( "{0}/description".format( e ) ), None )
 		self.assertNotEquals( doc.find( "{0}/traceback".format( e ) ), None )
@@ -218,7 +222,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		doc = etree.XML( self.getXmlReport().getReport() )
 
 		e = self.EXCEPTION_LOCATION
-		self.assertEqual( doc.tag, "build" ) # root
+		self._testBasicDocumentAttributes( doc )
 		self.assertNotEquals( doc.find( e ), None )
 		self.assertNotEquals( doc.find( "{0}/description".format( e ) ), None )
 		self.assertNotEquals( doc.find( "{0}/traceback".format( e ) ), None )
@@ -242,7 +246,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		# only minor checks, rest already covered in previous tests
 		e = self.EXCEPTION_LOCATION
-		self.assertEqual( doc.tag, "build" ) # root
+		self._testBasicDocumentAttributes( doc )
 		self.assertNotEquals( doc.find( e ), None )
 
 		self.assertTrue( "self.runExecute()" in doc.find( "{0}/traceback".format( e ) ).text )

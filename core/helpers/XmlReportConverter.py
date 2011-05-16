@@ -283,10 +283,10 @@ class XmlReportConverter( MObject ):
 		return result
 
 	def _toTextSummary( self, wrapper ):
-		element = self.__elementTree
+		buildNode = self.__elementTree.find( "build" )
 
 		# calculate round trip time from commit to report
-		startTime = float_from_node_attribute( element, "plugin", "commitTime" )
+		startTime = float_from_node_attribute( buildNode, "plugin", "commitTime" )
 		timeDelta = datetime.utcnow() - datetime.utcfromtimestamp( startTime )
 
 		# TODO: Replace this by timedelta.total_seconds() once we're depending on Python 2.7
@@ -303,46 +303,46 @@ class XmlReportConverter( MObject ):
 
 		# START: Summary
 		out += wrapper.wrapAndFillLine( "*** Build report: {0}, {1}".format( 
-				element.attrib["name"],
-				element.attrib["sys-shortname"] ),
+				buildNode.attrib["name"],
+				buildNode.attrib["sys-shortname"] ),
 				'*' )
 
 		wrapper.indent()
 
 		# show failed steps if any
 		failedSteps = set( [] )
-		for node in find_nodes_with_attribute_and_value( element, "step", "result", "Failure" ):
+		for node in find_nodes_with_attribute_and_value( buildNode, "step", "result", "Failure" ):
 			failedSteps.add( node.attrib["name"] )
 
 		out += wrapper.wrap( "Build status: {0} {1}".format( 
-				"success" if int( element.attrib["returncode"] ) == 0 else "ERROR",
+				"success" if int( buildNode.attrib["returncode"] ) == 0 else "ERROR",
 				"({0} failed)".format( ", ".join( failedSteps ) ) if len ( failedSteps ) > 0 else ""
 				) )
 
 		# only show exception description if there actually is an exception 
-		if element.find( "exception" ) != None:
-			out += wrapper.wrap( "Description:  {0}".format( string_from_node( element, "exception/description" ) ) )
+		if buildNode.find( "exception" ) != None:
+			out += wrapper.wrap( "Description:  {0}".format( string_from_node( buildNode, "exception/description" ) ) )
 
 		# show client information
-		out += wrapper.wrap( "Client:       {0}, {1}".format( element.attrib["sys-platform"], element.attrib["sys-platform-details"] ) )
+		out += wrapper.wrap( "Client:       {0}, {1}".format( buildNode.attrib["sys-platform"], buildNode.attrib["sys-platform-details"] ) )
 
 		# only show detailed summary on success or build error
-		returnCode = int ( element.attrib["returncode"] )
+		returnCode = int ( buildNode.attrib["returncode"] )
 		if returnCode in ( 0, BuildError.getReturnCode() ):
 			out += wrapper.wrap( "Commit:       {0}, revision: {1}".format( 
-					string_from_node_attribute( element, "plugin", "committerName" ),
-					string_from_node_attribute( element, "plugin", "revision" ) ) )
+					string_from_node_attribute( buildNode, "plugin", "committerName" ),
+					string_from_node_attribute( buildNode, "plugin", "revision" ) ) )
 			out += wrapper.wrap( "Time:         {0}".format( 
-					string_from_node_attribute( element, "plugin", "commitTimeReadable" ) ) )
+					string_from_node_attribute( buildNode, "plugin", "commitTimeReadable" ) ) )
 
 			wrapper.indent( indentString = "| " )
-			out += wrapper.wrapMultiLine( string_from_node( element, "commitMessage" ), drop_empty_lines = False )
+			out += wrapper.wrapMultiLine( string_from_node( buildNode, "commitMessage" ), drop_empty_lines = False )
 			wrapper.dedent( indentString = "  " )
 
 		wrapper.dedent()
 
 		out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
-				string_from_node_attribute( element, "build", "timing" ),
+				string_from_node_attribute( buildNode, "build", "timing" ),
 				roundTripTime ), '*' )
 		# END: Summary
 

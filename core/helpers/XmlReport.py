@@ -30,6 +30,8 @@ class XmlReport( object ):
 
 	\see Plugin for more information about extending the default report output"""
 
+	REPORT_XML_VERSION = 1
+
 	def __init__( self, parameter ):
 		"""Overloaded constructor
 		
@@ -48,18 +50,24 @@ class XmlReport( object ):
 		return self.__doc.toxml()
 
 	def prepare( self ):
+		rootNode = self.__doc.createElement( "mom-report" )
+		rootNode.attributes["name"] = "Make-O-Matic report"
+		rootNode.attributes["reportXmlVersion"] = str( self.REPORT_XML_VERSION )
+
 		# fetch exception if any from mApp
 		exception = mApp().getException()
 		if exception:
-			rootNode = mApp().createXmlNode( self.__doc, recursive = False )
+			instructionsNode = mApp().createXmlNode( self.__doc, recursive = False )
 			tracebackToUnicode = u"".join( [x.decode( "utf-8" ) for x in exception[1] ] )
-			rootNode.appendChild( create_exception_xml_node( self.__doc, exception[0], tracebackToUnicode ) )
+			instructionsNode.appendChild( create_exception_xml_node( self.__doc, exception[0], tracebackToUnicode ) )
 		else:
 			try:
-				rootNode = self._createNode( self.__instructions )
+				instructionsNode = self._createNode( self.__instructions )
 			except Exception as e:
-				rootNode = mApp().createXmlNode( self.__doc, recursive = False )
-				rootNode.appendChild( create_exception_xml_node( self.__doc, e, traceback.format_exc() ) )
+				instructionsNode = mApp().createXmlNode( self.__doc, recursive = False )
+				instructionsNode.appendChild( create_exception_xml_node( self.__doc, e, traceback.format_exc() ) )
+
+		rootNode.appendChild( instructionsNode )
 		self.__doc.appendChild( rootNode )
 
 	def _createNode( self, instructions ):
