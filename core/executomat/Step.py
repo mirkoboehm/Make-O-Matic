@@ -51,7 +51,7 @@ class Step( MObject ):
 		self.__preActions = [] # list of preparation actions
 		self.__mainActions = [] # list of main actions
 		self.__postActions = [] # list of post actions
-		self.__logfileName = None
+		self.__logfilePath = None
 
 	def setStatus( self, status ):
 		if status in ( Step.Status.New, Step.Status.Skipped_Disabled, Step.Status.Started,
@@ -88,12 +88,12 @@ class Step( MObject ):
 	def isEmpty( self ):
 		return not self.getPreActions() and not self.getMainActions() and not self.getPostActions()
 
-	def setLogfileName( self, logfileName ):
+	def setLogfilePath( self, logfileName ):
 		check_for_string( logfileName, "The log file parameter must be a string containing a file name." )
-		self.__logfileName = logfileName
+		self.__logfilePath = logfileName
 
-	def getLogfileName( self ):
-		return self.__logfileName
+	def getLogfilePath( self ):
+		return self.__logfilePath
 
 	def getPreActions( self ):
 		return self.__preActions
@@ -177,7 +177,7 @@ class Step( MObject ):
 
 			logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
 			logfileName = os.path.join( instructions.getLogDir(), logfileName )
-			self.setLogfileName( logfileName )
+			self.setLogfilePath( logfileName )
 			self.setResult( Step.Result.Success )
 
 			# execute each action associated to this step

@@ -148,9 +148,9 @@ class Action( MObject ):
 						self._setStdErr( "{0}:\n\n{1}".format( e, innerTraceback ) )
 
 						self._setResult( e.getReturnCode() )
-					if step.getLogfileName():
+					if step.getLogfilePath():
 						try:
-							with codecs.open( step.getLogfileName(), 'a', 'utf-8' ) as f:
+							with codecs.open( step.getLogfilePath(), 'a', 'utf-8' ) as f:
 								if self.getStdOut() or self.getStdErr():
 									f.writelines( 'Output from action "{0}":\n'.format( self.getLogDescription() ) )
 									if self.getStdOut():
@@ -160,7 +160,7 @@ class Action( MObject ):
 								else:
 									f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
 						except Exception as e:
-							raise MomError( 'cannot write to log file "{0}": {1}'.format( step.getLogfileName(), str( e ) ) )
+							raise MomError( 'cannot write to log file "{0}": {1}'.format( step.getLogfilePath(), str( e ) ) )
 					return self.getResult()
 		finally:
 			mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
