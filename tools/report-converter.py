@@ -2,7 +2,7 @@
 
 from __future__ import print_function
 from core.helpers.XmlReportConverter import XmlReportConverter
-from core.helpers.XmlReport import XmlReport
+from core.helpers.XmlReport import StringBasedXmlReport
 from core.MApplication import MApplication
 import sys
 from xml.dom.minidom import Document, parseString
@@ -38,7 +38,7 @@ def main():
 
 	# start IO
 	fin = open( inputFile )
-	xmlReport = XmlReport( fin.read() )
+	xmlReport = StringBasedXmlReport( fin.read() )
 	fin.close
 
 	converter = XmlReportConverter( xmlReport )

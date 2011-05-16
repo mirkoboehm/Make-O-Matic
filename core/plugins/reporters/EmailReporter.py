@@ -20,7 +20,7 @@
 from __future__ import unicode_literals
 
 from core.plugins.reporters.Reporter import RemoteReporter
-from core.helpers.XmlReport import XmlReport
+from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.GlobalMApp import mApp
 from core.helpers.Emailer import Email, Emailer
 from core.helpers.XmlReportConverter import XmlReportConverter
@@ -143,8 +143,7 @@ class EmailReporter( RemoteReporter ):
 				email.addToAddresses( reporterMomErrorRecipients )
 
 		# body
-		report = XmlReport( instructions )
-		report.prepare()
+		report = InstructionsXmlReport( instructions )
 		converter = XmlReportConverter( report )
 
 		# text and html part

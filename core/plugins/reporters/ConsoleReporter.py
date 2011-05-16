@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.plugins.reporters.Reporter import LocalReporter
-from core.helpers.XmlReport import XmlReport
+from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 
 class ConsoleReporter( LocalReporter ):
@@ -32,8 +32,7 @@ class ConsoleReporter( LocalReporter ):
 		if self.__finished:
 			return
 
-		report = XmlReport( self.getInstructions() )
-		report.prepare()
+		report = InstructionsXmlReport( self.getInstructions() )
 		converter = XmlReportConverter( report )
 
 		print( " " )

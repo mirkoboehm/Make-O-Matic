@@ -20,7 +20,7 @@
 from __future__ import unicode_literals
 
 from core.Plugin import Plugin
-from core.helpers.XmlReport import XmlReport
+from core.helpers.XmlReport import InstructionsXmlReport
 import os.path
 from core.Exceptions import ConfigurationError
 from core.helpers.XmlReportConverter import ReportFormat, XmlReportConverter
@@ -49,9 +49,7 @@ class XmlReportGenerator( Plugin ):
 		if self.__finished:
 			return
 
-		report = XmlReport( self.getInstructions() )
-		report.prepare()
-
+		report = InstructionsXmlReport( self.getInstructions() )
 		try:
 			self._openReportFile()
 			self._writeReport( report )

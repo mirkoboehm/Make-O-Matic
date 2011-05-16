@@ -25,60 +25,71 @@ from core.helpers.XmlUtils import create_exception_xml_node
 from core.helpers.GlobalMApp import mApp
 import xml.dom.minidom
 
-class XmlReport( object ):
+class XmlReportInterface( object ):
+
+	def getReport( self ):
+		"""\return String representing a valid Make-O-Matic XML report
+
+		\note Be sure to call this *after* the build run has completed!"""
+
+		raise NotImplementedError()
+
+class StringBasedXmlReport( XmlReportInterface ):
+
+	def __init__( self, xmlString ):
+		self.__doc = xml.dom.minidom.parseString( xmlString )
+
+	def getReport( self ):
+		return self.__doc.toxml()
+
+class InstructionsXmlReport( XmlReportInterface ):
 	"""Represents an report of the current build
 
 	\see Plugin for more information about extending the default report output"""
 
 	REPORT_XML_VERSION = 1
 
-	def __init__( self, parameter ):
+	def __init__( self, instructions ):
 		"""Overloaded constructor
 		
 		\param parameter Can be a Instructions object (e.g. mApp()) or a string"""
 
-		if isinstance( parameter, Instructions ):
-			self.__instructions = parameter
-			self.__doc = xml.dom.minidom.Document()
-		elif isinstance( parameter, basestring ):
-			self.__instructions = None
-			self.__doc = xml.dom.minidom.parseString( parameter )
-		else:
-			raise AttributeError( "Parameter must be an Instructions object or string" )
+		assert isinstance( instructions, Instructions )
+		self.__instructions = instructions
+
 
 	def getReport( self ):
-		return self.__doc.toxml()
-
-	def prepare( self ):
-		rootNode = self.__doc.createElement( "mom-report" )
+		doc = xml.dom.minidom.Document()
+		rootNode = doc.createElement( "mom-report" )
 		rootNode.attributes["name"] = "Make-O-Matic report"
 		rootNode.attributes["reportXmlVersion"] = str( self.REPORT_XML_VERSION )
 
 		# fetch exception if any from mApp
 		exception = mApp().getException()
 		if exception:
-			instructionsNode = mApp().createXmlNode( self.__doc, recursive = False )
+			instructionsNode = mApp().createXmlNode( doc, recursive = False )
 			tracebackToUnicode = u"".join( [x.decode( "utf-8" ) for x in exception[1] ] )
-			instructionsNode.appendChild( create_exception_xml_node( self.__doc, exception[0], tracebackToUnicode ) )
+			instructionsNode.appendChild( create_exception_xml_node( doc, exception[0], tracebackToUnicode ) )
 		else:
 			try:
-				instructionsNode = self._createNode( self.__instructions )
+				instructionsNode = self._createNode( self.__instructions, doc )
 			except Exception as e:
-				instructionsNode = mApp().createXmlNode( self.__doc, recursive = False )
-				instructionsNode.appendChild( create_exception_xml_node( self.__doc, e, traceback.format_exc() ) )
+				instructionsNode = mApp().createXmlNode( doc, recursive = False )
+				instructionsNode.appendChild( create_exception_xml_node( doc, e, traceback.format_exc() ) )
 
 		rootNode.appendChild( instructionsNode )
-		self.__doc.appendChild( rootNode )
+		doc.appendChild( rootNode )
+		return doc.toxml()
 
-	def _createNode( self, instructions ):
+	def _createNode( self, instructions, document ):
 		"""Create XML node from Instructions object
 		
 		Also create nodes from children recursively"""
 
-		node = instructions.createXmlNode( self.__doc )
+		node = instructions.createXmlNode( document )
 
 		for child in instructions.getChildren():
-			childNode = self._createNode( child ) # enter recursion
+			childNode = self._createNode( child, document ) # enter recursion
 			node.appendChild( childNode )
 
 		return node

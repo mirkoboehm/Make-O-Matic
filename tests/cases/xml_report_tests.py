@@ -19,7 +19,7 @@
 
 import unittest
 from core.Exceptions import MomError, ConfigurationError, BuildError
-from core.helpers.XmlReport import XmlReport
+from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.helpers.XmlReportGenerator import XmlReportGenerator
 from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
@@ -73,8 +73,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertNotEquals( document.find( "./build" ), None )
 
 	def _getXmlReport( self ):
-		report = XmlReport( self.build )
-		report.prepare()
+		report = InstructionsXmlReport( self.build )
 		return report
 
 	def testCreateXmlReport( self ):
@@ -115,6 +114,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		else: # cannot convert, should be None
 			self.assertEquals( xmlString, None )
 			return # quit test case, to HTML conversion is not possible here
+
+		print xmlString
 
 		doc = etree.XML( xmlString )
 		self.assertEqual( doc.tag, "{http://www.w3.org/1999/xhtml}html" ) # root
