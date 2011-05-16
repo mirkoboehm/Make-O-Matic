@@ -46,7 +46,7 @@ def main():
 		print( converter.convertToTextSummary() )
 		print( converter.convertToText() )
 	elif targetFormat == "html":
-		print( converter.convertToHtml() )
+		print( converter.convertToHtml( enableCrossLinking = True ) )
 
 if __name__ == "__main__":
 	main()

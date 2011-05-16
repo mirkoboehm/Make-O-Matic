@@ -57,7 +57,6 @@ class InstructionsXmlReport( XmlReportInterface ):
 		assert isinstance( instructions, Instructions )
 		self.__instructions = instructions
 
-
 	def getReport( self ):
 		doc = xml.dom.minidom.Document()
 		rootNode = doc.createElement( "mom-report" )

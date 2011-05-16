@@ -4,6 +4,7 @@
 	xmlns="http://www.w3.org/1999/xhtml">
 
 	<xsl:output method="xml" indent="yes" encoding="UTF-8" />
+	<xsl:param name="enableCrossLinking"/>
 
 	<xsl:template name="showBuildStatus">
 		<xsl:param name="returncode"/>
