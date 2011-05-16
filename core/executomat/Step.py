@@ -95,6 +95,15 @@ class Step( MObject ):
 	def getLogfilePath( self ):
 		return self.__logfilePath
 
+	def getRelativeLogFilePath( self ):
+		"""\return Relative path of log file to the build base dir"""
+
+		if not self.getLogfilePath():
+			return None
+
+		buildBaseDir = mApp().getBaseDir()
+		return os.path.relpath( self.getLogfilePath(), buildBaseDir )
+
 	def getPreActions( self ):
 		return self.__preActions
 
@@ -211,6 +220,7 @@ class Step( MObject ):
 
 	def createXmlNode( self, document ):
 		node = MObject.createXmlNode( self, document )
+		node.attributes["relativeLogFilePath"] = str( self.getRelativeLogFilePath() )
 		node.attributes["isEmpty"] = str ( self.isEmpty() )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )
