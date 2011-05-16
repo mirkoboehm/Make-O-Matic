@@ -61,7 +61,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def setUp( self ):
 		MomBuildMockupTestCase.setUp( self, useEnvironments = True )
 
-	def _build( self, type = 'm' ):
+	def _executeBuild( self, type = 'm' ):
 		mApp().getSettings().set( Settings.ScriptLogLevel, 5 )
 		mApp().getSettings().set( Settings.ProjectBuildType, type )
 
@@ -72,14 +72,14 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		"""\return Build element"""
 		self.assertNotEquals( document.find( "./build" ), None )
 
-	def getXmlReport( self ):
+	def _getXmlReport( self ):
 		report = XmlReport( self.build )
 		report.prepare()
 		return report
 
 	def testCreateXmlReport( self ):
-		self._build()
-		doc = etree.XML( self.getXmlReport().getReport() )
+		self._executeBuild()
+		doc = etree.XML( self._getXmlReport().getReport() )
 
 		self._testBasicDocumentAttributes( doc )
 		self.assertNotEquals( doc.find( './/project' ), None )
@@ -93,21 +93,21 @@ class XmlReportTests( MomBuildMockupTestCase ):
 			self.assertNotEquals( doc.find( './/plugin[@name="DoxygenGenerator"]' ), None )
 
 	def testEnvironmentExpand( self ):
-		self._build( 'c' )
-		doc = etree.XML( self.getXmlReport().getReport() )
+		self._executeBuild( 'c' )
+		doc = etree.XML( self._getXmlReport().getReport() )
 
 		self.assertNotEquals( doc.find( './/environments/environment' ), None, "Did not find matching environments" )
 		self.assertNotEquals( doc.find( './/environment/configuration' ), None )
 
 	def testNoEnvironmentExpand( self ):
-		self._build( 'm' )
-		doc = etree.XML( self.getXmlReport().getReport() )
+		self._executeBuild( 'm' )
+		doc = etree.XML( self._getXmlReport().getReport() )
 
 		self.assertNotEquals( doc.find( './/environments/configuration' ), None, )
 
 	def testConvertXmlReportToHtml( self ):
-		self._build()
-		converter = XmlReportConverter( self.getXmlReport() )
+		self._executeBuild()
+		converter = XmlReportConverter( self._getXmlReport() )
 		xmlString = converter.convertToHtml()
 
 		if converter.hasXsltSupport(): # can convert to HTML
@@ -126,23 +126,23 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		def hasXsltSupport_new( self ):
 			return False
 
-		converter = XmlReportConverter( self.getXmlReport() )
+		converter = XmlReportConverter( self._getXmlReport() )
 		replace_bound_method( converter, converter.hasXsltSupport, hasXsltSupport_new ) # replace method
 
 		xmlString = converter.convertToHtml()
 		self.assertTrue( xmlString == None, "If no XSLT support is available, converting to HTML should not work" )
 
 	def testConvertXmlReportToText( self ):
-		self._build()
-		converter = XmlReportConverter( self.getXmlReport() )
+		self._executeBuild()
+		converter = XmlReportConverter( self._getXmlReport() )
 		text = converter.convertToText()
 
 		self.assertTrue( len( text ) > 1000 )
 
 	def testConvertXmlReportToTextSummary( self ):
 		MomBuildMockupTestCase.setUp( self, useScm = True ) # enable SCM
-		self._build()
-		converter = XmlReportConverter( self.getXmlReport() )
+		self._executeBuild()
+		converter = XmlReportConverter( self._getXmlReport() )
 		text = converter.convertToTextSummary()
 
 		self.assertTrue( len( text ) > 100 )
@@ -150,9 +150,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 	def testXmlReportGenerator( self ):
 		generator = XmlReportGenerator()
 		self.build.addPlugin( generator )
-		self._build()
+		self._executeBuild()
 
-		reportContent = self.getXmlReport().getReport()
+		reportContent = self._getXmlReport().getReport()
 		filePath = generator.getReportFile()
 
 		self.assertTrue( os.path.exists( filePath ), "Log file does not exist" )
@@ -173,7 +173,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertTrue( xml_compare( doc1, doc2 ), "Report file content differs from report output" )
 
 	def testXmlReportOnStepFailure( self ):
-		self._build()
+		self._executeBuild()
 
 		def failed_new( self ):
 			return Step.Result.Failure
@@ -181,7 +181,7 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		step = self.project.getStep( 'cleanup' )
 		replace_bound_method( step, step.getResult, failed_new )
 
-		converter = XmlReportConverter( self.getXmlReport() )
+		converter = XmlReportConverter( self._getXmlReport() )
 		logText = converter.convertToFailedStepsLog()
 
 		self.assertTrue( "cleanup" in logText )
@@ -195,8 +195,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		# inject erroneous method
 		replace_bound_method( self.build, self.build.runSetups, runSetups_new )
 
-		self._build()
-		doc = etree.XML( self.getXmlReport().getReport() )
+		self._executeBuild()
+		doc = etree.XML( self._getXmlReport().getReport() )
 
 		e = self.EXCEPTION_LOCATION
 		self._testBasicDocumentAttributes( doc )
@@ -218,8 +218,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 			raise ConfigurationError( "Test Error" )
 		replace_bound_method( self.build, self.build.runPreFlightChecks, runPreFlightChecks_new )
 
-		self._build()
-		doc = etree.XML( self.getXmlReport().getReport() )
+		self._executeBuild()
+		doc = etree.XML( self._getXmlReport().getReport() )
 
 		e = self.EXCEPTION_LOCATION
 		self._testBasicDocumentAttributes( doc )
@@ -241,8 +241,8 @@ class XmlReportTests( MomBuildMockupTestCase ):
 			raise BuildError( "Test Error" )
 		replace_bound_method( self.build, self.build.runExecute, runExecute_new )
 
-		self._build()
-		doc = etree.XML( self.getXmlReport().getReport() )
+		self._executeBuild()
+		doc = etree.XML( self._getXmlReport().getReport() )
 
 		# only minor checks, rest already covered in previous tests
 		e = self.EXCEPTION_LOCATION
@@ -259,9 +259,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		self.build.addPlugin( TestPlugin() )
 
-		self._build()
+		self._executeBuild()
 
-		converter = XmlReportConverter( self.getXmlReport() )
+		converter = XmlReportConverter( self._getXmlReport() )
 		text = converter.convertToText()
 
 		self.assertTrue( u"äöü" in text )
@@ -277,9 +277,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 				step.addMainAction( action )
 
 		self.build.addPlugin( TestPlugin() )
-		self._build()
+		self._executeBuild()
 
-		converter = XmlReportConverter( self.getXmlReport() )
+		converter = XmlReportConverter( self._getXmlReport() )
 		converter.convertToText() # test if conversion does not crash something
 
 		self.assertTrue( self.build.getReturnCode() == 0 )
@@ -292,9 +292,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.build.addPlugin( logger )
 		replace_bound_method( logger, logger.getObjectStatus, command_new )
 
-		self._build()
+		self._executeBuild()
 
-		converter = XmlReportConverter( self.getXmlReport() )
+		converter = XmlReportConverter( self._getXmlReport() )
 		text = converter.convertToText()
 
 		self.assertTrue( "Exception" in text )
