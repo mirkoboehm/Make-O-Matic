@@ -169,7 +169,7 @@ class Action( MObject ):
 		return "action"
 
 	def createXmlNode( self, document ):
-		node = MObject.createXmlNode( self, document )
+		node = super( Action, self ).createXmlNode( document )
 
 		node.attributes["finished"] = str( self.didFinish() )
 		node.attributes["started"] = str( self.wasStarted() )

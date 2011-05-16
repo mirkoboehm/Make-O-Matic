@@ -219,7 +219,7 @@ class Instructions( MObject ):
 				step.describe( prefix + '    ' )
 
 	def createXmlNode( self, document, recursive = True ):
-		node = MObject.createXmlNode( self, document )
+		node = super( Instructions, self ).createXmlNode( document )
 
 		node.attributes["timing"] = str( self.getTimeKeeper().deltaString() )
 		# FIXME Kevin: better use Step.getStatus() and Step.getResult()

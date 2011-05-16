@@ -219,7 +219,7 @@ class Step( MObject ):
 				action.describe( prefix, details = phase[0] )
 
 	def createXmlNode( self, document ):
-		node = MObject.createXmlNode( self, document )
+		node = super( Step, self ).createXmlNode( document )
 		node.attributes["relativeLogFilePath"] = str( self.getRelativeLogFilePath() )
 		node.attributes["isEmpty"] = str ( self.isEmpty() )
 		node.attributes["isEnabled"] = str( self.isEnabled() )

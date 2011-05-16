@@ -224,7 +224,7 @@ class Plugin( MObject ):
 		return mApp().getSettings().get( "plugin.{0}.{1}".format( cls.__name__ , name ), required )
 
 	def createXmlNode( self, document ):
-		node = MObject.createXmlNode( self, document )
+		node = super( Plugin, self ).createXmlNode( document )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["isOptional"] = str( self.isOptional() )
 		return node
