@@ -28,6 +28,7 @@ from core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
 from copy import deepcopy, copy
 from core.helpers.TimeKeeper import TimeKeeper
+import os
 
 class Instructions( MObject ):
 	"""
@@ -90,6 +91,13 @@ class Instructions( MObject ):
 	def getBaseDir( self ):
 		check_for_nonempty_string( self.__baseDir, 'basedir can only be queried after preFlightCheck!' )
 		return self.__baseDir
+
+	def getRelativeBaseDir( self ):
+		if not self.getBaseDir():
+			return None
+
+		buildBaseDir = mApp().getBaseDir()
+		return os.path.relpath( self.getBaseDir(), buildBaseDir )
 
 	def setLogDir( self, path ):
 		"""Set the directory where all log information is stored."""

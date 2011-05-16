@@ -302,6 +302,15 @@ h5 {
 		<!-- TODO: Doesn't work for some reason, why?
 		<div class="tag-plugin">
 		 -->
+		<xsl:if test="$enableCrossLinking = '1' and @relativeLinkTarget != 'None'">
+			<a>
+				<xsl:attribute name="href">
+					<xsl:value-of select="@relativeLinkTarget"/>
+				</xsl:attribute>
+				<xsl:value-of select="@relativeLinkTargetDescription"/>
+			</a>
+		</xsl:if>
+
 		<xsl:choose>
 			<!-- Plugin templates are inserted here -->
 			<xsl:when test="@name = 'placeholder'" />
@@ -316,9 +325,9 @@ h5 {
 				<td>
 					<span><xsl:value-of select="@name" /></span>
 
-					<xsl:if test="$enableCrossLinking = '1' and @relativeLogFilePath != 'None'">
+					<xsl:if test="$enableCrossLinking = '1' and @relativeLinkTarget != 'None'">
 						<input type="button" value="Show/hide log content">
-							<xsl:attribute name="onClick">toggle_display_file('<xsl:value-of select="@relativeLogFilePath"/>', this.parentNode.getElementsByTagName("pre")[0])</xsl:attribute>
+							<xsl:attribute name="onClick">toggle_display_file('<xsl:value-of select="@relativeLinkTarget"/>', this.parentNode.getElementsByTagName("pre")[0])</xsl:attribute>
 						</input>
 						<pre class="logviewer"></pre>
 					</xsl:if>

@@ -42,3 +42,6 @@ class PackageProvider( Plugin ):
 		options have been applied to them. It can be used to insert actions into the build
 		steps, for example."""
 		self.makePackageStep()
+
+	def getRelativeLinkTarget( self ):
+		return ( self.getInstructions().getPackagesDir(), "Get packages for this configuration" )

@@ -104,6 +104,9 @@ class Step( MObject ):
 		buildBaseDir = mApp().getBaseDir()
 		return os.path.relpath( self.getLogfilePath(), buildBaseDir )
 
+	def getRelativeLinkTarget( self ):
+		return ( self.getRelativeLogFilePath(), None )
+
 	def getPreActions( self ):
 		return self.__preActions
 
@@ -220,7 +223,6 @@ class Step( MObject ):
 
 	def createXmlNode( self, document ):
 		node = super( Step, self ).createXmlNode( document )
-		node.attributes["relativeLogFilePath"] = str( self.getRelativeLogFilePath() )
 		node.attributes["isEmpty"] = str ( self.isEmpty() )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["timing"] = str( self.__timeKeeper.deltaString() )

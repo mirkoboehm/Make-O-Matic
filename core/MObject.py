@@ -89,6 +89,10 @@ class MObject( object ):
 
 		print( line )
 
+
+	def getRelativeLinkTarget( self ):
+		return ( None, None )
+
 	def createXmlNode( self, document, recursive = True ):
 		"""Create XML node for this object
 		
@@ -96,6 +100,8 @@ class MObject( object ):
 
 		node = document.createElement( self.getTagName() )
 		node.attributes["name"] = self.getName()
+		node.attributes["relativeLinkTarget"] = str ( self.getRelativeLinkTarget()[0] )
+		node.attributes["relativeLinkTargetDescription"] = str ( self.getRelativeLinkTarget()[1] )
 		create_child_node( document, node, "objectdescription", self.getObjectDescription() if self.getObjectDescription() else "" )
 		create_child_node( document, node, "objectstatus", self.getObjectStatus() if self.getObjectStatus() else "" )
 
