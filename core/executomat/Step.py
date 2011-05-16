@@ -26,6 +26,7 @@ from core.helpers.TimeKeeper import TimeKeeper
 from core.helpers.GlobalMApp import mApp
 from core.helpers.Enum import Enum
 from core.Settings import Settings
+from core.actions.Action import Action
 
 class Step( MObject ):
 
@@ -130,8 +131,18 @@ class Step( MObject ):
 	def getTimeKeeper( self ):
 		return self.__timeKeeper
 
+	def _getPhases( self ):
+		"""\return List of three (str, [Action]) tuples
+
+		Contains description and list of actions for each phase (pre, main, post)"""
+
+		return [
+			( 'preparatory actions', self.__preActions ),
+			( 'main actions', self.__mainActions ),
+			( 'post actions', self.__postActions )
+		]
+
 	def __addAction( self, container, action, prepend = False ):
-		from core.actions.Action import Action
 		if not isinstance( action, Action ):
 			raise ConfigurationError( 'An action needs to implement the Action class (got {0} instead)!'
 				.format( repr( action ) if action else 'None' ) )
@@ -155,26 +166,27 @@ class Step( MObject ):
 		if not self.isEnabled():
 			self.setStatus( Step.Status.Skipped_Disabled )
 			return True
+
 		# (usually) abort if another step has failed for this Instructions object:
 		if not instructions._stepsShouldExecute() and not self.getExecuteOnFailure():
 			self.setStatus( Step.Status.Skipped_PreviousError )
 			return True
+
 		with self.getTimeKeeper():
 			self._logEnvironment( instructions )
 
 			logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
 			logfileName = os.path.join( instructions.getLogDir(), logfileName )
 			self.setLogfileName( logfileName )
-
-			phases = [ [ 'preparatory actions', self.__preActions ],
-					[ 'main actions', self.__mainActions ],
-					[ 'post actions', self.__postActions ] ]
 			self.setResult( Step.Result.Success )
-			for phase, actions in phases:
+
+			# execute each action associated to this step
+			for phase, actions in self._getPhases():
 				if not actions:
 					mApp().debugN( self, 3, 'phase "{0}" is empty (no actions registered)'.format( phase ) )
-				else:
-					mApp().debugN( self, 3, 'phase "{0}" has {1} actions registered, starting execution'.format( phase, len( actions ) ) )
+					continue
+
+				mApp().debugN( self, 3, 'phase "{0}" has {1} actions registered, starting execution'.format( phase, len( actions ) ) )
 				for action in actions:
 					resultText = 'skipped'
 					if self.getResult() != Step.Result.Failure or action.getIgnorePreviousFailure():
@@ -192,10 +204,8 @@ class Step( MObject ):
 		if self.isEmpty():
 			return
 
-		MObject.describe( self, prefix, details, replacePatterns )
-		for phase in [ [ ' pre', self.getPreActions() ],
-						[ 'main', self.getMainActions() ],
-						[ 'post', self.getPostActions() ] ]:
+		super( Step, self ).describe( prefix, details, replacePatterns )
+		for phase in self._getPhases():
 			for action in phase[1]:
 				action.describe( prefix, details = phase[0] )
 
