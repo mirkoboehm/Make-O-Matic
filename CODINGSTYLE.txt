@@ -1,22 +1,23 @@
-  __,                                   ,_ _    __   ,_ _   
- /  |      ()_|_      |\ o  ,  |)      /| | |  /\_\//| | |  
-|   |      /\ |  |  | |/ | / \_|/\      | | | |    | | | |  
+  __,                                   ,_ _    __   ,_ _
+ /  |      ()_|_      |\ o  ,  |)      /| | |  /\_\//| | |
+|   |      /\ |  |  | |/ | / \_|/\      | | | |    | | | |
  \_/\_/   /(_)|_/ \/|/|_/|/ \/ |  |/    | | |_/\__/  | | |_/
-                   (|                                       
+                   (|
+
 Python coding styles vary, and are widely discussed. We are asking you
-to stick to the following standards: 
+to stick to the following standards:
 
 - Tabs instead of spaces: In a language where indent levels matter, it
-  makes sense to use a single character for every indent. In Pydev,
-  uncheck "General/Editors/Text Editors/Insert spaces for tabs". It
-  makes sense to also check "Show whitespace characters" in the same
-  pane. Also, uncheck "Pydev/Editor/Replace tabs with spaces when
-  typing". 
+  makes sense to use a single character for every indent. Here are some
+  configuration options to adhere to our coding style for the PyDev IDE.
+  - Uncheck "General/Editors/Text Editors/Insert spaces for tabs".
+  - Check "Show whitespace characters" in the same pane. (optional)
+  - Uncheck "Pydev/Editor/Replace tabs with spaces when typing".
 - Longer lines: Use up to 132 character per line.
-- Method and function names:
-  - Class methods: camelCase with first lower ("Pydev/Editor/Code Style").
+- Method and function names
+  - Class methods: camelCase with first lower
   - Global functions: lower_with_underscores
-- Code formatter: Simply check all boxes in "Pydev/Editor/Code
-  Style/Code Formatter".
-
-
+  - Configure in "Pydev/Editor/Code Style"
+    - Simply use "camelCase()" here, global functions' style cant be configured
+- Code formatting
+  - Simply check all boxes in "Pydev/Editor/Code Style/Code Formatter".
