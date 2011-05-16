@@ -75,19 +75,21 @@ function toggle(obj)
 
 }
 
-function toggle_display_file(f, element)
+function toggle_display_file(file, element)
 {
+	toggle(element);
+
+	// try to fetch file contents when element content is still empty
 	var httpRequest = new XMLHttpRequest();
-	httpRequest.open("GET", f, true);
+	httpRequest.open("GET", file, true);
 	httpRequest.send(null);
 	httpRequest.onreadystatechange = function()
 	{
 		element.innerHTML = this.responseText;
 	}
-	toggle(element);
 }
 
-window.onload=function hide()
+window.onload=function onLoad()
 {
 }
 				</script>
@@ -315,7 +317,7 @@ h5 {
 					<span><xsl:value-of select="@name" /></span>
 
 					<xsl:if test="$enableCrossLinking = '1' and @relativeLogFilePath != 'None'">
-						<input type="button" value="Show log content">
+						<input type="button" value="Show/hide log content">
 							<xsl:attribute name="onClick">toggle_display_file('<xsl:value-of select="@relativeLogFilePath"/>', this.parentNode.getElementsByTagName("pre")[0])</xsl:attribute>
 						</input>
 						<pre class="logviewer"></pre>
