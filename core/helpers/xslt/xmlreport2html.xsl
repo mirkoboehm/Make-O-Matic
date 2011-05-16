@@ -151,6 +151,8 @@ h5 {
 		</html>
 	</xsl:template>
 	
+	<xsl:strip-space  elements="*"/>
+
 	<xsl:template match="exception">
 		<div class="tag-exception">
 			Description: <xsl:value-of select="description"/><br/>
@@ -277,7 +279,15 @@ h5 {
 		<xsl:if test="@isEmpty = 'False'">
 			<tr>
 				<td>
-					<xsl:value-of select="@name" />
+					<span><xsl:value-of select="@name" /></span>
+
+					<xsl:if test="$enableCrossLinking = '1' and @relativeLogFilePath != 'None'">
+						<span style="float: right"><a>
+							<xsl:attribute name="href"><xsl:value-of select="@relativeLogFilePath" /></xsl:attribute>
+
+							<xsl:text>(See output)</xsl:text>
+						</a></span>
+					</xsl:if>
 				</td>
 				<td>
 					<xsl:value-of select="@timing" />
