@@ -62,6 +62,35 @@
 	<xsl:template match="/">
 		<html>
 			<head>
+				<script type="text/javascript">
+function toggle(obj)
+{
+	var el = obj;
+	if ( el.style.display != 'block' ) {
+		el.style.display = 'block';
+	}
+	else {
+		el.style.display = 'none';
+	}
+
+}
+
+function toggle_display_file(f, element)
+{
+	var httpRequest = new XMLHttpRequest();
+	httpRequest.open("GET", f, true);
+	httpRequest.send(null);
+	httpRequest.onreadystatechange = function()
+	{
+		element.innerHTML = this.responseText;
+	}
+	toggle(element);
+}
+
+window.onload=function hide()
+{
+}
+				</script>
 				<style type="text/css">
 /*** default tags ***/
 body, table {
@@ -89,6 +118,10 @@ pre {
 	white-space: -o-pre-wrap; /* Opera 7 */
 	word-wrap:
 	break-word; /* Internet Explorer 5.5+ */
+}
+
+pre.logviewer {
+	display: none;
 }
 
 th {
@@ -282,11 +315,10 @@ h5 {
 					<span><xsl:value-of select="@name" /></span>
 
 					<xsl:if test="$enableCrossLinking = '1' and @relativeLogFilePath != 'None'">
-						<span style="float: right"><a>
-							<xsl:attribute name="href"><xsl:value-of select="@relativeLogFilePath" /></xsl:attribute>
-
-							<xsl:text>(See output)</xsl:text>
-						</a></span>
+						<input type="button" value="Show log content">
+							<xsl:attribute name="onClick">toggle_display_file('<xsl:value-of select="@relativeLogFilePath"/>', this.parentNode.getElementsByTagName("pre")[0])</xsl:attribute>
+						</input>
+						<pre class="logviewer"></pre>
 					</xsl:if>
 				</td>
 				<td>
