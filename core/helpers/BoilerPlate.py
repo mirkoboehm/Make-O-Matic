@@ -53,6 +53,10 @@ def getProject( build, name, url, version, revision, branch, tag, versionName ):
 	# the command line parameter takes precedence
 	url = build.getParameters().getScmLocation() or url
 	revision = build.getParameters().getRevision() or revision
+	if build.getParameters().getBranch() or build.getParameters().getTag():
+		# if either branch or tag are specified on the command line, reset both and only use the command line selection:
+		branch = None
+		tag = None
 	branch = build.getParameters().getBranch() or branch
 	tag = build.getParameters().getTag() or tag
 	mApp().getSettings().set( Settings.ProjectVersionNumber, version )
