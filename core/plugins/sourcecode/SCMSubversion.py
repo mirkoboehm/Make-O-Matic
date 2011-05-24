@@ -306,7 +306,7 @@ class SCMSubversion( SourceCodeProvider ):
 		if runner.getReturnCode() == 0:
 			localPath = os.path.join( path, remotePath )
 			if os.path.exists( localPath ):
-				return localPath
+				return localPath, [ path ]
 		raise ConfigurationError( 'The remote path {0} was not found in the repository at revision {1}'.format( 
 				remotePath, self.getRevision() ) )
 

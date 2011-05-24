@@ -254,7 +254,8 @@ class SourceCodeProvider( Plugin ):
 
 	def fetchRepositoryFolder( self, remotePath ):
 		'''Retrieve a remote path from the repository. The path will be retrieved with the revision specified by getRevision(). 
-		The method returns the path where the folder has been stored.'''
+		The method returns the path where the folder has been stored, and a list of temporary directories to be deleted once the 
+		folder is not needed anymore. The list may be empty.'''
 		raise NotImplementedError()
 
 	def describe( self, prefix, details = None, replacePatterns = True ):

@@ -293,7 +293,7 @@ class SCMGit( SourceCodeProvider ):
 		self.updateCachedCheckout()
 		hiddenCheckoutPath = os.path.join( self._getCachedCheckoutPath(), remotePath )
 		if os.path.exists( hiddenCheckoutPath ):
-			return hiddenCheckoutPath
+			return hiddenCheckoutPath, []
 		else:
 			raise ConfigurationError( 'The remote path {0} was not found in the repository at treeish {1}'.format( 
 					remotePath, self.getTreeish() ) )

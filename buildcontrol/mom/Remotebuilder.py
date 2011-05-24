@@ -23,6 +23,7 @@ from core.plugins.sourcecode import getScm
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
+import shutil
 
 class RemoteBuilder( MObject ):
 	def __init__( self, revision = None, location = None, branch = None, tag = None, path = None, script = None, name = None, rootTrunk = False ):
@@ -85,10 +86,10 @@ class RemoteBuilder( MObject ):
 		scm.setRevision( self.getRevision() )
 		if ( self.__rootTrunk ):
 			scm.setRootTrunk( True )
-		path = scm.fetchRepositoryFolder( self.getPath() )
+		path, temps = scm.fetchRepositoryFolder( self.getPath() )
 		localBuildscript = os.path.join( path, self.getBuildscript() )
 		if os.path.exists( localBuildscript ):
-			return localBuildscript
+			return localBuildscript, temps
 		else:
 			raise ConfigurationError( 'The build script {0} was not found at the path {1} in the repository at revision {2}'.format( 
 				self.getBuildscript(), self.getPath(), self.getRevision() ) )
@@ -103,7 +104,12 @@ class RemoteBuilder( MObject ):
 		scm._handlePrintCommands( command, options )
 
 	def invokeBuild( self, args, timeout = None ):
-		path = self.fetchBuildScript()
+		path, tempdirs = self.fetchBuildScript()
 		iface = BuildScriptInterface( path )
 		runner = iface.executeWithArgs( timeout = timeout, args = args )
+		for tempdir in tempdirs:
+			try:
+				shutil.rmtree( tempdir, ignore_errors = True )
+			except:
+				mApp().debug( self, 'Cannot delete temporary directory "{0}" (ignored).'.format( tempdir ) )
 		return runner
