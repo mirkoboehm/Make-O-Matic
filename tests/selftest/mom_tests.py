@@ -43,8 +43,9 @@ class MomTests( MomTestCase ):
 		location = 'git://github.com/KDAB/Make-O-Matic.git'
 		remote = RemoteBuilder( revInfo, location = location, path = path, script = name )
 		try:
-			path = remote.fetchBuildScript()
+			path, temps = remote.fetchBuildScript()
 			self.assertTrue( os.path.exists( path ) )
+			del temps
 		except Exception as e:
 			self.fail( 'fetching the remote build script fails: {0}'.format( e ) )
 

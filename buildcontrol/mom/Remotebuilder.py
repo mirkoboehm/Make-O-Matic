@@ -24,6 +24,7 @@ from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
 import shutil
+from core.helpers.TempFolderDeleter import TempFolderDeleter
 
 class RemoteBuilder( MObject ):
 	def __init__( self, revision = None, location = None, branch = None, tag = None, path = None, script = None, name = None, rootTrunk = False ):
@@ -95,21 +96,18 @@ class RemoteBuilder( MObject ):
 				self.getBuildscript(), self.getPath(), self.getRevision() ) )
 
 	def getRevisionsSinceForBranchBuilds( self, command, options, location, branch, tag ):
-		path = self.fetchBuildScript()
-		iface = BuildScriptInterface( path )
-		buildName = iface.querySetting( Settings.ScriptBuildName )
-		mApp().getSettings().set( Settings.ScriptBuildName, buildName )
-		scm = getScm( location )
-		scm.setParseBranchCommits( True )
-		scm._handlePrintCommands( command, options )
+		path, tempdirs = self.fetchBuildScript()
+		with TempFolderDeleter( tempdirs ):
+			iface = BuildScriptInterface( path )
+			buildName = iface.querySetting( Settings.ScriptBuildName )
+			mApp().getSettings().set( Settings.ScriptBuildName, buildName )
+			scm = getScm( location )
+			scm.setParseBranchCommits( True )
+			scm._handlePrintCommands( command, options )
 
 	def invokeBuild( self, args, timeout = None ):
 		path, tempdirs = self.fetchBuildScript()
-		iface = BuildScriptInterface( path )
-		runner = iface.executeWithArgs( timeout = timeout, args = args )
-		for tempdir in tempdirs:
-			try:
-				shutil.rmtree( tempdir, ignore_errors = True )
-			except:
-				mApp().debug( self, 'Cannot delete temporary directory "{0}" (ignored).'.format( tempdir ) )
-		return runner
+		with TempFolderDeleter( tempdirs ):
+			iface = BuildScriptInterface( path )
+			runner = iface.executeWithArgs( timeout = timeout, args = args )
+			return runner
