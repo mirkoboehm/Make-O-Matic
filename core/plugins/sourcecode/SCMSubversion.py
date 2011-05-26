@@ -145,7 +145,9 @@ class SCMSubversion( SourceCodeProvider ):
 		elif runner.getTimedOut() == True:
 			raise ConfigurationError( 'Getting svn log for "{0}" timed out.'.format( self.getUrl() ) )
 		else:
-			raise ConfigurationError( 'Getting svn log failed, is there no svn in the path?' )
+			msg = runner.getStdErr() or ""
+			msg = msg.strip()
+			raise ConfigurationError( 'Getting svn log failed: "{0}"'.format( msg ) )
 
 	def __getXmlSvnLogEntries( self, xmlLog, startRevision, cap ):
 		revisions = []
