@@ -38,7 +38,7 @@ class ConsoleLogger( Logger ):
 		return verbosity
 
 	def logError( self, mapp, mobject, msg ):
-		self.debug( mapp, mobject, '*** ERROR: {0}'.format( msg ) )
+		self.message( mapp, mobject, '*** ERROR: {0}'.format( msg ) )
 
 	def logMessage( self, mapp, mobject, msg ):
 		text = msg
