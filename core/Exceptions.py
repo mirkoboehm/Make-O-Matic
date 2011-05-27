@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import signal
+from core.helpers.GlobalMApp import mApp
+import inspect
 
 class MomException( Exception ):
 	"""MomException encapsulates an error that occurs during a build script run."""
@@ -25,6 +27,15 @@ class MomException( Exception ):
 		Exception.__init__( self )
 		self.value = value
 		self.details = details
+		self.__phase = mApp().getPhase()
+		curframe = inspect.currentframe()
+		try:
+			calframe = inspect.getouterframes( curframe, 2 )
+			self.__caller = calframe[1][3]
+		except:
+			self.__caller = '<unknown>'
+		finally:
+			del curframe
 
 	def __str__( self ):
 		return self.value.rstrip()
@@ -38,6 +49,20 @@ class MomException( Exception ):
 
 	def getDetails( self ):
 		return self.details
+
+	def getPhase( self ):
+		return self.__phase
+
+	def logErrorDescription( self ):
+		from core.MApplication import MApplication
+		phase = MApplication.Phase.getDescription( self.getPhase() )
+		mApp().error( mApp(), 'error in {0} during {1} phase'.format( self.__caller, phase ) )
+		mApp().error( mApp(), 'return code {0}: {1}'.format( self.getReturnCode() , str( self ).encode( 'utf8' ) ) )
+		if self.getDetails():
+			messages = self.getDetails().splitlines()
+			for message in messages:
+				mApp().message( mApp(), message )
+
 
 class BuildError( MomException ):
 	"""A build error is raised if the build fails due to a problem caused by the project."""

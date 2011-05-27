@@ -27,6 +27,8 @@ from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonem
 from core.Instructions import Instructions
 import traceback
 from core.helpers.MachineInfo import machine_info
+from test.test_iterlen import len
+from core.helpers.Enum import Enum
 
 class MApplication( Instructions ):
 	'''MApplication represents the facilities provided by the currently running script.
@@ -34,6 +36,11 @@ class MApplication( Instructions ):
 	and defines the exit code of the program.'''
 
 	instance = None
+
+	class Phase( Enum ):
+		'''Enumerated values representing the phases of the application run.'''
+		Prepare, PreFlightCheck, Setup, Execute, WrapUp, ShutDown = range ( 6 )
+		_Descriptions = [ 'prepare', 'pre-flight check', 'setup', 'execute', 'wrap-up', 'shutdown' ]
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		Instructions.__init__( self, name, parent )
@@ -46,7 +53,7 @@ class MApplication( Instructions ):
 		self.__settings = Settings()
 		self.__exception = None
 		self.__returnCode = 0
-
+		self.__phase = None
 		self._checkMinimumMomVersion( minimumMomVersion )
 
 	def getMomVersion( self ):
@@ -105,7 +112,7 @@ class MApplication( Instructions ):
 			self.__returnCode = code
 			self.error( self, 'return code {0} registered'.format( code ) )
 		else:
-			self.error( self, 'return code {0} registered - ignored because return code already set to {1}.'
+			self.debug( self, 'return code {0} registered - ignored because return code already set to {1}.'
 						.format( code, self.getReturnCode() ) )
 
 	def getReturnCode( self ):
@@ -130,6 +137,12 @@ class MApplication( Instructions ):
 
 	def getException( self ):
 		return self.__exception
+
+	def _setPhase( self, phase ):
+		self.__phase = phase
+
+	def getPhase( self ):
+		return self.__phase
 
 	def error( self, mobject, text, compareTo = None ):
 		[ logger.error( self, mobject, text, compareTo ) for logger in self.getLoggers() ]
@@ -157,16 +170,21 @@ class MApplication( Instructions ):
 				for key in settings:
 					print( '{0}: {1}'.format( key, settings[key] ) )
 		except Exception as e:
-			print( 'Error: {0}'.format( unicode( e ) ) )
+			print( 'Error {0}'.format( unicode( e ) ) )
 			self.registerReturnCode( 1 )
 
 	def _buildAndReturn( self ):
 		'''Helper method that can be overloaded.'''
 		try:
+			self._setPhase( MApplication.Phase.Prepare )
 			self.runPrepare()
+			self._setPhase( MApplication.Phase.PreFlightCheck )
 			self.runPreFlightChecks()
+			self._setPhase( MApplication.Phase.Setup )
 			self.runSetups()
+			self._setPhase( MApplication.Phase.Execute )
 			self.runExecute()
+			self._setPhase( MApplication.Phase.WrapUp )
 			self.runWrapups()
 		except Exception, e:
 			innerTraceback = traceback.format_tb( sys.exc_info()[2] )
@@ -179,6 +197,7 @@ class MApplication( Instructions ):
 			raise # re-throw exception
 		finally:
 			if self.getReturnCode() != AbortBuildException.getReturnCode():
+				self._setPhase( MApplication.Phase.ShutDown )
 				self.runShutDowns()
 
 	def buildAndReturn( self ):
@@ -195,11 +214,7 @@ class MApplication( Instructions ):
 			self.message( self, "Aborted (no error): {0}".format( unicode( e ) ) )
 			return 0
 		except MomException as e:
-			self.error( self, 'return code {0}: {1}'.format( e.getReturnCode() , unicode( e ) ) )
-			if e.getDetails():
-				messages = e.getDetails().splitlines()
-				for message in messages:
-					self.message( self, message )
+			e.logErrorDescription()
 			return e.getReturnCode()
 		except KeyboardInterrupt:
 			self.message( self, 'Interrupted. Have a nice day.' )

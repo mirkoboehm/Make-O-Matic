@@ -57,6 +57,7 @@ from tests.selftest.simple_project_tests import SimpleProjectTests
 import sys
 import unittest
 #from tests.cases.emailer_tests import EmailerTest
+from tests.cases.mapplication_tests import MApplicationTests
 
 CLASSES = [
 	# self tests first
@@ -85,7 +86,8 @@ CLASSES = [
 	XmlReportTests,
 	SettingsTests,
 	QTestTests,
-	SettingResolverTest
+	SettingResolverTest,
+	MApplicationTests
 ]
 
 DEPENDENCIES = [
