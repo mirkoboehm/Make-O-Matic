@@ -25,10 +25,8 @@ import os
 import sys
 
 class RunCommandTests( MomTestCase ):
-	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
-	Helper = os.path.join( ThisFilePath, '..', 'helpers', 'check_return_value_helper.py' )
-
-	# these are not a windows friendly tests, i guess
+	THIS_FILE_PATH = os.path.realpath( os.path.dirname( __file__ ) )
+	EXECUTABLE = os.path.join( THIS_FILE_PATH, '..', 'scripts', 'check_return_value_helper.py' )
 
 	def testCheckQMakeVersion( self ):
 		# qmake example
@@ -51,7 +49,7 @@ class RunCommandTests( MomTestCase ):
 		for timeout in [ None, 60 ]:
 			for captureOutput in [ False, True ]:
 				for code in range( 16 ):
-					cmd = [ sys.executable, RunCommandTests.Helper, str( code ) ]
+					cmd = [ sys.executable, RunCommandTests.EXECUTABLE, str( code ) ]
 					runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
 					runner.run()
 					self.assertEquals( runner.getReturnCode(), code )
