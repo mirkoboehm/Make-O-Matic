@@ -27,7 +27,6 @@ from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonem
 from core.Instructions import Instructions
 import traceback
 from core.helpers.MachineInfo import machine_info
-from test.test_iterlen import len
 from core.helpers.Enum import Enum
 
 class MApplication( Instructions ):
