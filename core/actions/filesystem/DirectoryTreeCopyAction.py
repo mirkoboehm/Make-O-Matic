@@ -24,9 +24,6 @@ import shutil
 from core.helpers.TypeCheckers import check_for_list_of_strings
 import os
 
-class Error( EnvironmentError ):
-	pass
-
 class DirectoryTreeCopyAction( Action ):
 	"""DirectoryTreeCopyAction encapsulates the copying of a directory tree 
 	to another directory, optionally ignoring some files.
