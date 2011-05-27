@@ -19,43 +19,44 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-import sys
-from tests.cases.preprocessor_tests import PreprocessorTest
-from tests.cases.environment_saver_tests import EnvironmentSaverTest
+from core.Exceptions import ConfigurationError, MomException
+from core.MApplication import MApplication
+from core.plugins.DoxygenGenerator import DoxygenGenerator
+from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder
+from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
+from core.plugins.builders.maketools import getMakeTool, getMakeToolNames
+from core.plugins.packagers.CPack import CPack
+from core.plugins.publishers.RSyncPublisher import RSyncPublisher
+from core.plugins.python.PyLintChecker import PyLintChecker
+from core.plugins.sourcecode.SCMGit import SCMGit
+from core.plugins.sourcecode.SCMSubversion import SCMSubversion
+from core.plugins.testers.CTest import CTest
+from tests.cases.analyzer_tests import AnalyzerTest
+from tests.cases.build_environment_tests import BuildEnvironmentTests
+from tests.cases.buildscript_interface_tests import BuildScriptInterfaceTests
 from tests.cases.buildstatus_persistence_tests import BuildStatusPersistenceTests
+from tests.cases.email_reporter_tests import EmailReporterTest
+from tests.cases.environment_saver_tests import EnvironmentSaverTest
+from tests.cases.filesystem_actions_tests import FileSystemActionsTests
 from tests.cases.path_resolver_tests import PathResolverTest
+from tests.cases.preprocessor_tests import PreprocessorTest
+from tests.cases.pyunittester_tests import PyUnitTesterTest
+from tests.cases.qtest_tests import QTestTests
+from tests.cases.run_mode_describe_tests import RunModeDescribeTests
 from tests.cases.run_mode_print_tests import RunModePrintTests
 from tests.cases.run_timeout_tests import RunWithTimeoutTest
 from tests.cases.scm_factory_tests import ScmFactoryTests
-from tests.cases.buildscript_interface_tests import BuildScriptInterfaceTests
-from tests.cases.build_environment_tests import BuildEnvironmentTests
-from tests.selftest.simple_project_tests import SimpleProjectTests
-from tests.selftest.simple_ci_tests import SimpleCITests
-from tests.selftest.charm_build_tests import CharmBuildTests
-from tests.cases.xml_report_tests import XmlReportTests
 from tests.cases.scm_modules_tests import ScmModulesTests
-from tests.cases.email_reporter_tests import EmailReporterTest
-from tests.cases.run_mode_describe_tests import RunModeDescribeTests
-#from tests.cases.emailer_tests import EmailerTest
-from tests.cases.settings_tests import SettingsTests
-from tests.selftest.environment_setup_tests import EnvironmentSetupTests
-from tests.cases.pyunittester_tests import PyUnitTesterTest
-from core.plugins.builders.maketools import getMakeTool, getMakeToolNames
-from core.Exceptions import ConfigurationError, MomException
-from core.plugins.sourcecode.SCMSubversion import SCMSubversion
-from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder
-from core.plugins.testers.CTest import CTest
-from core.plugins.packagers.CPack import CPack
-from core.plugins.sourcecode.SCMGit import SCMGit
-from core.plugins.DoxygenGenerator import DoxygenGenerator
-from core.plugins.publishers.RSyncPublisher import RSyncPublisher
-from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
-from core.plugins.python.PyLintChecker import PyLintChecker
-from core.MApplication import MApplication
-from tests.cases.analyzer_tests import AnalyzerTest
-from tests.cases.qtest_tests import QTestTests
 from tests.cases.setting_resolver_tests import SettingResolverTest
+from tests.cases.settings_tests import SettingsTests
+from tests.cases.xml_report_tests import XmlReportTests
+from tests.selftest.charm_build_tests import CharmBuildTests
+from tests.selftest.environment_setup_tests import EnvironmentSetupTests
+from tests.selftest.simple_ci_tests import SimpleCITests
+from tests.selftest.simple_project_tests import SimpleProjectTests
+import sys
+import unittest
+#from tests.cases.emailer_tests import EmailerTest
 
 CLASSES = [
 	# self tests first
@@ -72,6 +73,7 @@ CLASSES = [
 #	EmailerTest,
 	EmailReporterTest,
 	EnvironmentSaverTest,
+	FileSystemActionsTests,
 	PathResolverTest,
 	PreprocessorTest,
 	PyUnitTesterTest,
