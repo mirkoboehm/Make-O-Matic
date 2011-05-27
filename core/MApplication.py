@@ -217,7 +217,7 @@ class MApplication( Instructions ):
 			return e.getReturnCode()
 		except KeyboardInterrupt:
 			self.message( self, 'Interrupted. Have a nice day.' )
-			return InterruptedException( '' ).getReturnCode()
+			return InterruptedException.getReturnCode()
 
 	def build( self ):
 		'''build executes the program and exits the process with the correct return code.'''

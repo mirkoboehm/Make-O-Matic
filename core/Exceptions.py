@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import signal
 from core.helpers.GlobalMApp import mApp
 import inspect
@@ -56,8 +57,9 @@ class MomException( Exception ):
 	def logErrorDescription( self ):
 		from core.MApplication import MApplication
 		phase = MApplication.Phase.getDescription( self.getPhase() )
-		mApp().error( mApp(), 'error in {0} during {1} phase'.format( self.__caller, phase ) )
-		mApp().error( mApp(), 'return code {0}: {1}'.format( self.getReturnCode() , str( self ).encode( 'utf8' ) ) )
+		mApp().error( mApp(), u'error in {0} during {1} phase'.format( self.__caller, phase ) )
+		mApp().error( mApp(), u'return code {0}: {1}'.format( self.getReturnCode() , unicode( self ) ) )
+
 		if self.getDetails():
 			messages = self.getDetails().splitlines()
 			for message in messages:
