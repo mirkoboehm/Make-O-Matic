@@ -1,5 +1,7 @@
-# This file is part of Make-O-Matic.
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
+#
+# This file is part of Make-O-Matic.
 # 
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 # Author: Mirko Boehm <mirko@kdab.com>
@@ -16,6 +18,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from buildcontrol.mom.MomRemoteRunner import MomRemoteRunner
 
 if __name__ == "__main__":
