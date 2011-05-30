@@ -55,9 +55,7 @@ class InstructionsXmlReport( XmlReportInterface ):
 
 	def getReport( self ):
 		doc = xml.dom.minidom.Document()
-		rootNode = doc.createElement( "mom-report" )
-		rootNode.attributes["name"] = "Make-O-Matic report"
-		rootNode.attributes["reportXmlVersion"] = str( self.REPORT_XML_VERSION )
+		rootNode = self._createRootNode( doc )
 
 		# fetch exception if any from mApp
 		exception = mApp().getException()
@@ -67,7 +65,7 @@ class InstructionsXmlReport( XmlReportInterface ):
 			instructionsNode.appendChild( create_exception_xml_node( doc, exception[0], tracebackToUnicode ) )
 		else:
 			try:
-				instructionsNode = self._createNode( self.__instructions, doc )
+				instructionsNode = self._createNodesRecursively( self.__instructions, doc )
 			except Exception as e:
 				instructionsNode = mApp().createXmlNode( doc, recursive = False )
 				instructionsNode.appendChild( create_exception_xml_node( doc, e, traceback.format_exc() ) )
@@ -76,7 +74,13 @@ class InstructionsXmlReport( XmlReportInterface ):
 		doc.appendChild( rootNode )
 		return doc.toxml()
 
-	def _createNode( self, instructions, document ):
+	def _createRootNode( self, document ):
+		rootNode = document.createElement( "mom-report" )
+		rootNode.attributes["name"] = "Make-O-Matic report"
+		rootNode.attributes["reportXmlVersion"] = str( self.REPORT_XML_VERSION )
+		return rootNode
+
+	def _createNodesRecursively( self, instructions, document ):
 		"""Create XML node from Instructions object
 		
 		Also create nodes from children recursively"""
@@ -84,7 +88,7 @@ class InstructionsXmlReport( XmlReportInterface ):
 		node = instructions.createXmlNode( document )
 
 		for child in instructions.getChildren():
-			childNode = self._createNode( child, document ) # enter recursion
+			childNode = self._createNodesRecursively( child, document ) # enter recursion
 			node.appendChild( childNode )
 
 		return node
