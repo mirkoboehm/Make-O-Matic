@@ -17,24 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.actions.Action import Action
+from core.actions.filesystem.DirActionBase import DirActionBase
+from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_path
 import os
-from core.helpers.GlobalMApp import mApp
 
-class CheckDirectoryExistsAction( Action ):
+class CheckDirectoryExistsAction( DirActionBase ):
 	"""Checks weather a Directory exists"""
 
 	def __init__( self, path, name = None ):
-		Action.__init__( self, name )
+		DirActionBase.__init__( self, name )
 		self.setPath( path )
-
-	def setPath( self, path ):
-		check_for_path( path, "The directory to create must be a non-empty name of a directory!" )
-		self.__path = path
-
-	def getPath( self ):
-		return self.__path
 
 	def run( self ):
 		check_for_path( self.getPath(), "No directory specified!" )
