@@ -26,8 +26,7 @@ class CheckDirectoryExistsAction( DirActionBase ):
 	"""Checks weather a Directory exists"""
 
 	def __init__( self, path, name = None ):
-		DirActionBase.__init__( self, name )
-		self.setPath( path )
+		DirActionBase.__init__( self, path, name )
 
 	def run( self ):
 		check_for_path( self.getPath(), "No directory specified!" )
