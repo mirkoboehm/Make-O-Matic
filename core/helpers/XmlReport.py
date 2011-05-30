@@ -50,10 +50,6 @@ class InstructionsXmlReport( XmlReportInterface ):
 	REPORT_XML_VERSION = 1
 
 	def __init__( self, instructions ):
-		"""Overloaded constructor
-		
-		\param parameter Can be a Instructions object (e.g. mApp()) or a string"""
-
 		assert isinstance( instructions, Instructions )
 		self.__instructions = instructions
 
