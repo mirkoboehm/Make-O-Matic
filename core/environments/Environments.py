@@ -170,13 +170,13 @@ class Environments( ConfigurationBase ):
 						continue
 					newPackages = list( packages )
 					newPackages.append( [ path, dep ] )
-					newDeps = list( self.getDependencies() )
+					newDeps = list( remainingDependencies )
 					newDeps.remove( dep )
 					if newDeps:
 						# there are still dependencies to find further up the path
 						theseMatches = self.__calculateMatches( newPackages, newDeps, folders[1:] )
 						if theseMatches:
-							matches.append( theseMatches )
+							matches.append( *theseMatches )
 					else:
 						# yay, all dependencies have been found
 						matches.append( newPackages )

@@ -95,13 +95,10 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		self.assertEquals( dep.getScore(), 120 )
 
 	def testTryFindTwoEnv( self ):
-		# FIXME: Expected failure, not executing this test for now
-		return
-
-		dep = [ 'dep-a-1.0.0', 'dep-b' ]
+		dep = [ 'dep-a-1.0.0', 'dep-b-2.2.0' ]
 		environments = Environments( dep )
 		matches = environments.findMatchingEnvironments()
-		self.assertEquals( len( matches ), 2 )
+		self.assertEquals( len( matches ), 1 )
 
 if __name__ == "__main__":
 	unittest.main()
