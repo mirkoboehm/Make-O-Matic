@@ -55,6 +55,8 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		environments = Environments( dep )
 		matches = environments.findMatchingEnvironments()
 		self.assertEquals( len( matches ), 1 )
+		for match in matches: # there is only one :-)
+			self.assertEquals( match.makeDescription(), 'dep-a-1.0.0' )
 
 	def testTryFindThreeMatches( self ):
 		dep = [ 'dep-a-1.?.0' ]
