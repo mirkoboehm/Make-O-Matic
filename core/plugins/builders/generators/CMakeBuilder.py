@@ -22,6 +22,7 @@ import sys
 from core.helpers.GlobalMApp import mApp
 from core.plugins.builders.maketools.NMakeTool import NMakeTool
 from core.plugins.builders.maketools import JomTool
+import os
 
 def getCMakeSearchPaths():
 	searchPaths = []
@@ -111,6 +112,9 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 		for variable in self.getCMakeVariables():
 			arguments.append( '-D{0}'.format( variable ) )
 
-		arguments.append( configuration.getProject().getSourceDir() )
+		sourceDir = configuration.getProject().getSourceDir()
+		if configuration.getSourcePrefix():
+			sourceDir = os.path.join( sourceDir, configuration.getSourcePrefix() )
+		arguments.append( sourceDir )
 		self._setCommandArguments( arguments )
 		MakefileGeneratorBuilder.createConfigureActions( self )
