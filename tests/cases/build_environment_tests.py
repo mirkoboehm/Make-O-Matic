@@ -39,6 +39,11 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		mApp().getSettings().set( Settings.EnvironmentsBaseDir, self.TEST_MOM_ENVIRONMENTS )
 		mApp().addLogger( ConsoleLogger() )
 
+	def _printMatches( self, matches ):
+		return # disabled
+		for match in matches:
+			print( match.makeDescription() )
+
 	def testTryFindNonExistantEnv( self ):
 		dep = [ 'nonsense-1.0.0' ]
 		environments = Environments( dep )
@@ -77,7 +82,7 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		dep.setFolder( packageFolder )
 		self.assertTrue( dep._readControlFile( packageFile ) )
 		self.assertTrue( dep.isEnabled() )
-		self.assertEquals( dep.getObjectStatus(), 'Test MOM Package' )
+		self.assertEquals( dep.getObjectStatus(), 'test-dep-a-1.1.0' )
 		with EnvironmentSaver():
 			dep.apply()
 			self.assertEquals( os.environ[ 'EXAMPLE_VARIABLE'], 'example_variable' )
@@ -91,14 +96,29 @@ class BuildEnvironmentTests( MomBuildMockupTestCase ):
 		dep.setFolder( packageFolder )
 		self.assertTrue( dep._readControlFile( packageFile ) )
 		self.assertTrue( not dep.isEnabled() )
-		self.assertEquals( dep.getObjectStatus(), 'Test Disabled MOM Package' )
+		self.assertEquals( dep.getObjectStatus(), 'test-disabled-dep-a-1.2.0' )
 		self.assertEquals( dep.getScore(), 120 )
 
-	def testTryFindTwoEnv( self ):
+	def testTryFindTwoEnvironments( self ):
 		dep = [ 'dep-a-1.0.0', 'dep-b-2.2.0' ]
 		environments = Environments( dep )
 		matches = environments.findMatchingEnvironments()
+		self._printMatches( matches )
 		self.assertEquals( len( matches ), 1 )
+
+	def testTryFindTwoEnvironmentsSameFolder( self ):
+		dep = [ 'dep-a-1.0.0', 'dep-b-2.0.0' ]
+		environments = Environments( dep )
+		matches = environments.findMatchingEnvironments()
+		self._printMatches( matches )
+		self.assertEquals( len( matches ), 1 )
+
+	def testTryFindNEnv( self ):
+		dep = [ 'dep-a-1.?.0', 'dep-b-2.?.0' ]
+		environments = Environments( dep )
+		matches = environments.findMatchingEnvironments()
+		self._printMatches( matches )
+		self.assertEquals( len( matches ), 7 )
 
 if __name__ == "__main__":
 	unittest.main()

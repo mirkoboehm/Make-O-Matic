@@ -100,6 +100,8 @@ class Dependency( MObject ):
 					if re.match( '^{0}'.format( Dependency._CommandPrefix ), line ):
 						if not self.applyProperty( controlFile, line ):
 							self._addCommand( line )
+				if not self.getObjectStatus():
+					self.setObjectStatus( os.path.basename( self.getFolder() ) )
 				return True
 		except IOError:
 			mApp().debugN( self, 3, 'no control file found at "{0}"'.format( controlFile ) )

@@ -151,38 +151,58 @@ class Environments( ConfigurationBase ):
 			deps[ folder ] = dep
 		self._setInstalledDependencies( deps )
 
-	def __calculateMatches( self, packages, remainingDependencies, folders ):
-		'''Recursively find the matches for this environment.'''
+	def __recurseUpwards( self, packages, remainingDependencies, folders, packagesInFolder ):
 		matches = []
-		if not folders:
-			return None
+		if not packagesInFolder:
+			# when all the packages in the current folder have been processed, traverse the directory tree 
+			# up one level, and continue there. Return an empty list if the root was reached. 
+			if len( folders ) > 1 and len( packages ) > 0:
+				folders = folders[1:]
+				packagesInFolder = os.listdir( folders[0] )
+			else:
+				return [] # done
 
+		folder = folders[0]
+		# check if packages + package is a match
+		package = packagesInFolder[0]
+		remainingPackages = packagesInFolder[1:]
+		path = os.path.join( folder, package )
+		for dependency in remainingDependencies:
+			if fnmatch( package, dependency ):
+				if path not in self._getInstalledDependencies():
+					mApp().debugN( self, 4, 'dependency {0} matches, but is not enabled'.format( package ) )
+					continue
+				newPackages = list( packages )
+				newPackages.append( [ path, dependency ] )
+				newDependencies = list( remainingDependencies )
+				newDependencies.remove( dependency )
+				if not newDependencies:
+					# all dependencies have been found
+					matches.append( newPackages )
+				else:
+					matches.extend( self.__recurseUpwards( newPackages, newDependencies, folders, remainingPackages ) )
+			else:
+				mApp().debugN( self, 4, 'dependency {0} does not match {1}'.format( package, dependency ) )
+		# recurse with remaining packages (there may be other matches for the same dependency)
+		matches.extend( self.__recurseUpwards( packages, remainingDependencies, folders, remainingPackages ) )
+		return matches
+
+	def __calculateMatches( self, packages, remainingDependencies, folders ):
+		'''Recursively find the matches for this environment and return a list of them.
+		Every match is a list of two-tuples: the folder, and the dependency it provides. This means that by definition, the number
+		of elements in every match is the number of original dependencies.
+		
+		A MOM package is a directory that contains a valid and enabled MOM_PACKAGE_CONFIGURATION file. 
+		
+		Matches are detected traversing the installation folders of the environment directory tree upwards. Installation folders are
+		those that contain any number of MOM packages. __calculateMatches will be called for every leaf installation folder. 
+		'''
 		mApp().debugN( self, 3, 'trying to find matching environments for {0}'.format( ", ".join( self.getDependencies() ) ) )
 		folder = folders[0]
-		for dep in remainingDependencies:
-			for item in os.listdir( folder ):
-				path = os.path.join( folder, item )
-				if not os.path.isdir( path ):
-					continue
-				if fnmatch( item, dep ):
-					if path not in self._getInstalledDependencies():
-						mApp().debugN( self, 4, 'dependency {0} matches, but is not enabled'.format( item ) )
-						continue
-					newPackages = list( packages )
-					newPackages.append( [ path, dep ] )
-					newDeps = list( remainingDependencies )
-					newDeps.remove( dep )
-					if newDeps:
-						# there are still dependencies to find further up the path
-						theseMatches = self.__calculateMatches( newPackages, newDeps, folders[1:] )
-						if theseMatches:
-							matches.append( *theseMatches )
-					else:
-						# yay, all dependencies have been found
-						matches.append( newPackages )
-				else:
-					mApp().debugN( self, 4, 'dependency {0} does not match {1}'.format( item, dep ) )
-		return matches
+		if not os.path.isdir( folder ):
+			return []
+		packagesInFolder = os.listdir( folder )
+		return self.__recurseUpwards( [], remainingDependencies, folders, packagesInFolder )
 
 	def __ensureDependencyOrder( self, unsortedMatches, dependencies ):
 		matches = []
@@ -209,10 +229,10 @@ class Environments( ConfigurationBase ):
 		mApp().debugN( self, 3, 'MomEnvironments root found at "{0}"'.format( momEnvironmentsRoot ) )
 		self.detectMomDependencies()
 		# make set of installation nodes
-		uniqueDependencyFolders = []
+		dependencyFolders = []
 		for dep in self._getInstalledDependencies():
-			uniqueDependencyFolders.append( self._getInstalledDependencies()[dep].getContainingFolder() )
-		uniqueDependencyFolders = frozenset( uniqueDependencyFolders )
+			dependencyFolders.append( self._getInstalledDependencies()[dep].getContainingFolder() )
+		uniqueDependencyFolders = frozenset( dependencyFolders )
 		allRawEnvironments = [] # these are the folders, that will be converted to Environment objects later
 		for folder in uniqueDependencyFolders:
 			# calculate the paths to look at
