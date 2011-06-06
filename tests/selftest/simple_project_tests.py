@@ -54,13 +54,13 @@ class SimpleProjectTests( MomTestCase ):
 	def testQueryProjectName( self ):
 		runner = self.querySetting( Settings.ProjectName )
 		self.assertEquals( runner.getReturnCode(), 0 )
-		line = runner.getStdOut().decode().strip()
+		line = runner.getStdOutAsString().strip()
 		self.assertEquals( line, 'project.name: Make-O-Matic' )
 
 	def testQueryMomVersion( self ):
 		runner = self.querySetting( Settings.MomVersionNumber )
 		self.assertEquals( runner.getReturnCode(), 0 )
-		line = runner.getStdOut().decode().strip()
+		line = runner.getStdOutAsString().strip()
 		expectedVersion = mApp().getSettings().get( Settings.MomVersionNumber )
 		self.assertEquals( line, '{0}: {1}'.format( Settings.MomVersionNumber, expectedVersion ) )
 
@@ -69,7 +69,7 @@ class SimpleProjectTests( MomTestCase ):
 		runner = RunCommand( cmd )
 		runner.run()
 		self.assertEquals( runner.getReturnCode(), 0 )
-		line = runner.getStdOut().decode().strip()
+		line = runner.getStdOutAsString().strip()
 		# we cannot know what the current revision is, but if the return code is not zero, it should not be empty:
 		self.assertTrue( line )
 

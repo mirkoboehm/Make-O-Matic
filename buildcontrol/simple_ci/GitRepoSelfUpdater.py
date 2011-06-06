@@ -43,5 +43,5 @@ class GitRepoSelfUpdater( SelfUpdater ):
 		else:
 			# we are not raising an exception, because we do not want the master to die because of, for example, a temporary 
 			# network outage
-			message = runner.getStdErr() or b''
-			mApp().message( self, 'Updating the git repository at "{0}" failed: "{1}"'.format( folder, message.decode() ) )
+			message = runner.getStdErrAsString()
+			mApp().message( self, 'Updating the git repository at "{0}" failed: "{1}"'.format( folder, message ) )

@@ -156,11 +156,17 @@ class RunCommand( MObject ):
 	def getStdOut( self ):
 		return self.__stdOut
 
+	def getStdOutAsString( self ):
+		return ( self.getStdOut() or '' ).decode()
+
 	def setStdErr( self, stderr ):
 		self.__stdErr = stderr
 
 	def getStdErr( self ):
 		return self.__stdErr
+
+	def getStdErrAsString( self ):
+		return ( self.getStdErr() or '' ).decode()
 
 	def getCommand( self ):
 		return map( lambda x: str( x ) , self.__cmd )

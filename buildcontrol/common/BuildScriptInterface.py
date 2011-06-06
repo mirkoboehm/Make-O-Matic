@@ -53,15 +53,13 @@ class BuildScriptInterface( MObject ):
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
-			stderr = ( runner.getStdErr() or '' ).decode()
 			raise MomError( 'Cannot query setting "{0}" for build script "{1}": {2}!'\
-				.format( setting, self.getBuildScript(), stderr ) )
-		output = runner.getStdOut()
+				.format( setting, self.getBuildScript(), runner.getStdErrAsString() ) )
+		output = runner.getStdOutAsString()
 		if not output:
-			stderr = ( runner.getStdErr() or '' ).decode()
 			raise MomError( 'The build script "{0}" did not return a value! It said: {1}'
-				.format( self.getBuildScript(), stderr ) )
-		line = output.decode().strip()
+				.format( self.getBuildScript(), runner.getStdErrAsString() ) )
+		line = output.strip()
 		groups = re.search( '^(.+?): (.+)$', line )
 		if not groups:
 			raise MomError( 'Did not understand this output: "{0}"!'.format( line ) )
@@ -89,7 +87,7 @@ class BuildScriptInterface( MObject ):
 		runner.run()
 		if runner.getReturnCode() != 0:
 			raise MomError( 'Cannot get initial revision for build script "{0}".'.format( self.getBuildScript() ) )
-		revision = runner.getStdOut().decode().strip()
+		revision = runner.getStdOutAsString().strip()
 		return revision
 
 	def executeBuildInfo( self, buildInfo, timeout = 24 * 60 * 60, captureOutput = False ):

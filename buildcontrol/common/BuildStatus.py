@@ -233,7 +233,7 @@ where id=?'''\
 			runner = iface.executeBuildInfo( buildInfo )
 			try:
 				with open( 'buildscript.log', 'w' ) as f:
-					text = runner.getStdOut() or b''
+					text = runner.getStdOutAsString()
 					f.write( text.decode() )
 			except Exception as e:
 				mApp().message( self, 'Problem! saving the build script output failed during handling an exception! {0}'

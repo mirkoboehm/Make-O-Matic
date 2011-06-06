@@ -66,9 +66,9 @@ class MomTestCase( unittest.TestCase ):
 			print( '\n' )
 			print( 'command failed: {0}'.format( description ) )
 			print( 'output:' )
-			print( runner.getStdOut().decode() )
+			print( runner.getStdOutAsString() )
 			print( 'error output:' )
-			print( runner.getStdErr().decode() )
+			print( runner.getStdErrAsString() )
 		self.assertEqual( runner.getReturnCode() == 0, zeroReturnCode )
 		return runner
 

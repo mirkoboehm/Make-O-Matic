@@ -47,7 +47,7 @@ class MomRemoteRunner( MApplication ):
 		# FIXME add a timeout?
 		runner = remote.invokeBuild( self.getParameters().getBuildScriptOptions() )
 		if runner.getStdOut():
-			print( runner.getStdOut().decode() )
+			print( runner.getStdOutAsString() )
 		self.registerReturnCode( runner.getReturnCode() )
 
 	def build( self ):
