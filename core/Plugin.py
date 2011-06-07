@@ -142,14 +142,35 @@ class Plugin( MObject ):
 		options have been applied to them.
 		
 		It can be used to insert actions into the build steps, for example."""
-
 		pass
 
 	def wrapUp( self ):
 		"""WrapUp is called when the last step has finished.
 		
 		It could be used to publish the reports, for example."""
+		pass
 
+	def performReport( self ):
+		if self.isEnabled():
+			return self.report()
+		else:
+			mApp().debugN( self, 2, 'this plug-in is disabled, not not creating reports' )
+
+	def report( self ):
+		"""Report is called after the build has finished. Plug-ins that generate reports 
+		about the build should overload this method."""
+		pass
+
+	def performNotify( self ):
+		if self.isEnabled():
+			return self.notify()
+		else:
+			mApp().debugN( self, 2, 'this plug-in is disabled, skipping notifications' )
+
+	def notify( self ):
+		"""Send out notifications about the build process. Plug-ins that, for example, send 
+		emails, create chat notifications or talk to remote servers should overload this 
+		method."""
 		pass
 
 	def shutDown( self ):
@@ -159,7 +180,6 @@ class Plugin( MObject ):
 		
 		\note shutDown() is called from the finally block of the build method, so in all normal cases, it will be called 
 		before the build script ends."""
-
 		pass
 
 	def _setCommandArguments( self, commandArguments ):

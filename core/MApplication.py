@@ -38,8 +38,8 @@ class MApplication( Instructions ):
 
 	class Phase( Enum ):
 		'''Enumerated values representing the phases of the application run.'''
-		Prepare, PreFlightCheck, Setup, Execute, WrapUp, ShutDown = range ( 6 )
-		_Descriptions = [ 'prepare', 'pre-flight check', 'setup', 'execute', 'wrap-up', 'shutdown' ]
+		Prepare, PreFlightCheck, Setup, Execute, WrapUp, Report, Notify, ShutDown = range ( 8 )
+		_Descriptions = [ 'prepare', 'pre-flight check', 'setup', 'execute', 'wrap-up', 'report', 'notify', 'shutdown' ]
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		Instructions.__init__( self, name, parent )
@@ -51,7 +51,7 @@ class MApplication( Instructions ):
 		self.__loggers = []
 		self.__settings = Settings()
 		self.__exception = None
-		self.__returnCode = 0
+		self.__returnCode = None
 		self.__phase = None
 		self._checkMinimumMomVersion( minimumMomVersion )
 
@@ -106,16 +106,20 @@ class MApplication( Instructions ):
 
 	def registerReturnCode( self, code ):
 		check_for_nonnegative_int( code, "The return code of the build script has to be a non-negative integer number!" )
-		if self.__returnCode == 0:
+		if self.__returnCode is None:
 			# only if there was no previous error:
 			self.__returnCode = code
-			self.error( self, 'return code {0} registered'.format( code ) )
+			msg = 'return code {0} registered'.format( code )
+			if self.__returnCode == 0:
+				self.message( self, msg )
+			else:
+				self.error( self, msg )
 		else:
 			self.debug( self, 'return code {0} registered - ignored because return code already set to {1}.'
 						.format( code, self.getReturnCode() ) )
 
 	def getReturnCode( self ):
-		return self.__returnCode
+		return self.__returnCode or 0
 
 	def registerException( self, exception ):
 		"""Registers exception with traceback
@@ -196,6 +200,10 @@ class MApplication( Instructions ):
 			raise # re-throw exception
 		finally:
 			if self.getReturnCode() != AbortBuildException.getReturnCode():
+				self._setPhase( MApplication.Phase.Report )
+				self.runReports()
+				self._setPhase( MApplication.Phase.Notify )
+				self.runNotifications()
 				self._setPhase( MApplication.Phase.ShutDown )
 				self.runShutDowns()
 
@@ -213,11 +221,15 @@ class MApplication( Instructions ):
 			self.message( self, "Aborted (no error): {0}".format( unicode( e ) ) )
 			return 0
 		except MomException as e:
+			self.deleteLogDirOnShutdown( False )
 			e.logErrorDescription()
 			return e.getReturnCode()
 		except KeyboardInterrupt:
 			self.message( self, 'Interrupted. Have a nice day.' )
 			return InterruptedException.getReturnCode()
+		except:
+			self.deleteLogDirOnShutdown( False )
+			raise
 
 	def build( self ):
 		'''build executes the program and exits the process with the correct return code.'''

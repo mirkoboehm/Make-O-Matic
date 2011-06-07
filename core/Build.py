@@ -205,6 +205,13 @@ class Build( MApplication ):
 	def runShutDowns( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode == Settings.RunMode_Build:
+			if self.getDeleteLogDirOnShutdown():
+				try:
+					if os.path.isdir( self.getLogDir() ):
+						mApp().debugN( self, 2, 'deleting log directory structure at "{0}"'.format( self.getLogDir() ) )
+						shutil.rmtree( self.getLogDir() )
+				except OSError as e:
+					raise ConfigurationError( 'Cannot delete log directory at "{0}": {1}'.format( self.getLogDir(), str( e ) ) )
 			return MApplication.runShutDowns( self )
 		else:
 			return None

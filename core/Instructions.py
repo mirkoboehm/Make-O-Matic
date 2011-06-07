@@ -55,6 +55,7 @@ class Instructions( MObject ):
 		MObject.__init__( self, name )
 		self._setBaseDir( None )
 		self.setLogDir( None )
+		self.deleteLogDirOnShutdown( True )
 		self.setPackagesDir( None )
 		self.setParent( None )
 		if parent: # the parent instructions object
@@ -109,6 +110,16 @@ class Instructions( MObject ):
 		The log directory is the full path the the location where log output of the step should be saved. It is usually located
 		under the log/ sub-directory of the build object, outside of the build tree."""
 		return self.__logDir
+
+	def deleteLogDirOnShutdown( self, onOff ):
+		"""If set to true, the log directory structure will be deleted in the shut down phase. 
+		This setting defaults to true, and will be disabled if an exception occurs. Reporters can set it back to true if, 
+		for example, all necessary information is part of the reports and needed locally after the report has been published."""
+		self.__deleteLogDir = onOff
+
+	def getDeleteLogDirOnShutdown( self ):
+		"""Return whether the log directory structure will be deleted during the shutdown phase."""
+		return self.__deleteLogDir
 
 	def setPackagesDir( self, path ):
 		'''Return the packages directory for this object. 
@@ -336,7 +347,6 @@ class Instructions( MObject ):
 	def executeStep( self, stepName ):
 		'''Execute one individual step.
 		This method does not recurse to child objects.'''
-
 		mApp().debugN( self, 2, "Executing step: {0}".format( stepName ) )
 		step = self.getStep( stepName )
 		try:
@@ -358,6 +368,20 @@ class Instructions( MObject ):
 			[ plugin.wrapUp() for plugin in self.getPlugins() ]
 			for child in self.getChildren():
 				child.runWrapups()
+
+	def runReports( self ):
+		with EnvironmentSaver():
+			mApp().debugN( self, 2, 'creating reports' )
+			[ plugin.performReport() for plugin in self.getPlugins()]
+			for child in self.getChildren():
+				child.runReports()
+
+	def runNotifications( self ):
+		with EnvironmentSaver():
+			mApp().debugN( self, 2, 'publishing notifications' )
+			[ plugin.notify() for plugin in self.getPlugins()]
+			for child in self.getChildren():
+				child.runNotifications()
 
 	def runShutDowns( self ):
 		with EnvironmentSaver():
