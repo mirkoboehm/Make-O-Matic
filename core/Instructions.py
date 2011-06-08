@@ -379,7 +379,7 @@ class Instructions( MObject ):
 	def runNotifications( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'publishing notifications' )
-			[ plugin.notify() for plugin in self.getPlugins()]
+			[ plugin.performNotify() for plugin in self.getPlugins()]
 			for child in self.getChildren():
 				child.runNotifications()
 
