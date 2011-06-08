@@ -108,7 +108,7 @@ class Action( MObject ):
 	def getStdErr( self ):
 		"""Returns the stderr output of the action. Can only be called after execution."""
 		if not self.didFinish() and not self.getAborted():
-			raise MomError( 'stdErr() queried before the action was finished' )
+			raise MomError( 'getStdErr() queried before the action was finished' )
 		return self.__stdErr
 
 	def _setStdOut( self, out ):
@@ -117,53 +117,61 @@ class Action( MObject ):
 	def getStdOut( self ):
 		"""Returns the stdout output of the action. Can only be called after execution."""
 		if not self.didFinish() and not self.getAborted():
-			raise MomError( 'stdOut() queried before the action was finished' )
+			raise MomError( 'getStdOut() queried before the action was finished' )
 		return self.__stdOut
 
 	def executeAction( self, step, instructions ):
-		try:
-			with self.__timeKeeper:
-				with EnvironmentSaver():
-					if self.getWorkingDirectory():
-						mApp().debugN( self, 3, 'changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
-						try:
-							os.chdir( str( self.getWorkingDirectory() ) )
-						except ( OSError, IOError ) as e:
-							raise BuildError( str( e ) )
-					self._aboutToStart()
-					mApp().debugN( self, 3, 'executing action {0}'.format( self.getLogDescription() ) )
+		with self.__timeKeeper:
+			with EnvironmentSaver():
+				if self.getWorkingDirectory():
+					mApp().debugN( self, 3, 'changing directory to "{0}"'.format( self.getWorkingDirectory() ) )
 					try:
-						result = self.run()
-						if result == None or not isinstance( result, int ):
-							raise MomError( 'Action {0} ({1}) did not return a valid non-negative integer return value from run()!'
-										.format( self.getName(), self.getLogDescription() ) )
-						self._setResult( int( result ) )
-						self._finished()
-					except MomException as e:
-						innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
-						self._aborted()
-						mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
-						mApp().debugN( self, 2, innerTraceback )
+						os.chdir( str( self.getWorkingDirectory() ) )
+					except ( OSError, IOError ) as e:
+						raise BuildError( str( e ) )
 
-						self._setStdErr( "{0}:\n\n{1}".format( e, innerTraceback ) )
+				self._aboutToStart()
+				mApp().debugN( self, 3, 'executing action {0}'.format( self.getLogDescription() ) )
+				try:
+					result = self.run()
+					if result == None or not isinstance( result, int ):
+						raise MomError( 'Action {0} ({1}) did not return a valid non-negative integer return value from run()!'
+									.format( self.getName(), self.getLogDescription() ) )
+					self._setResult( int( result ) )
+					self._finished()
+				except MomException as e:
+					innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
+					self._aborted()
+					mApp().debug( self, 'execution failed: "{0}"'.format( str( e ) ) )
+					mApp().debugN( self, 2, innerTraceback )
 
-						self._setResult( e.getReturnCode() )
-					if step.getLogfilePath():
-						try:
-							with codecs.open( step.getLogfilePath(), 'a', 'utf-8' ) as f:
-								if self.getStdOut() or self.getStdErr():
-									f.writelines( 'Output from action "{0}":\n'.format( self.getLogDescription() ) )
-									if self.getStdOut():
-										f.writelines( '\n=== Standard output ===\n' + self.getStdOut() )
-									if self.getStdErr():
-										f.writelines( '\n=== Error output ===\n' + self.getStdErr() )
-								else:
-									f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
-						except Exception as e:
-							raise MomError( 'cannot write to log file "{0}": {1}'.format( step.getLogfilePath(), str( e ) ) )
-					return self.getResult()
-		finally:
-			mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
+					self._setStdErr( "{0}:\n\n{1}".format( e, innerTraceback ) )
+					self._setResult( e.getReturnCode() )
+
+				self._writeStepLog( step.getLogfilePath() )
+
+				return self.getResult()
+
+		mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
+
+	def _writeStepLog( self, filePath ):
+		"""Write the results of this action to the specified path """
+
+		if not filePath:
+			return
+
+		try:
+			with codecs.open( filePath, 'a', 'utf-8' ) as f:
+				if self.getStdOut() or self.getStdErr():
+					f.writelines( 'Output from action "{0}":\n'.format( self.getLogDescription() ) )
+					if self.getStdOut():
+						f.writelines( '\n=== Standard output ===\n' + self.getStdOut() )
+					if self.getStdErr():
+						f.writelines( '\n=== Error output ===\n' + self.getStdErr() )
+				else:
+					f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
+		except Exception as e:
+			raise MomError( 'cannot write to log file "{0}": {1}'.format( filePath, str( e ) ) )
 
 	def getTagName( self ):
 		return "action"
