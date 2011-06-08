@@ -202,6 +202,20 @@ class Build( MApplication ):
 		else:
 			return None
 
+	def runReports( self ):
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode != Settings.RunMode_Build:
+			return
+
+		MApplication.runReports( self )
+
+	def runNotifications( self ):
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode != Settings.RunMode_Build:
+			return
+
+		MApplication.runNotifications( self )
+
 	def runShutDowns( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode == Settings.RunMode_Build:
