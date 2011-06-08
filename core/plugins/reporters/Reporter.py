@@ -40,10 +40,6 @@ class _ReporterBase( Plugin ):
 class RemoteReporter( _ReporterBase ):
 
 	def shutDown( self ):
-		reportingEnabled = mApp().getSettings().get( Settings.ScriptEnableRemoteReporting )
-		if not reportingEnabled:
-			mApp().debug( self, "Not sending report, disabled by settings (Settings.ScriptEnableRemoteReporting)" )
-			return
 		super( RemoteReporter, self ).shutDown()
 
 class LocalReporter( _ReporterBase ):

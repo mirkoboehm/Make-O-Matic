@@ -17,18 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.reporters.Reporter import LocalReporter
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
+from core.Plugin import Plugin
 
-class ConsoleReporter( LocalReporter ):
+class ConsoleReporter( Plugin ):
 
 	def __init__( self, name = None ):
-		LocalReporter.__init__( self, name )
+		Plugin.__init__( self, name )
 
 		self.__finished = False
 
-	def sendReport( self ):
+	def report( self ):
 		if self.__finished:
 			return
 

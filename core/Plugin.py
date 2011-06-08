@@ -167,7 +167,7 @@ class Plugin( MObject ):
 	def performNotify( self ):
 		reportingEnabled = mApp().getSettings().get( Settings.ScriptEnableRemoteReporting )
 		if not reportingEnabled:
-			mApp().debug( self, "Not sending report, disabled by settings (Settings.ScriptEnableRemoteReporting)" )
+			mApp().debug( self, "Not running notify phase, disabled by settings (Settings.ScriptEnableRemoteReporting)" )
 			return
 
 		if not self.isEnabled():

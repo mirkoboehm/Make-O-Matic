@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.reporters.Reporter import RemoteReporter
 from core.helpers.GlobalMApp import mApp
 from core.Build import Build
 from core.Settings import Settings
 from core.helpers.TypeCheckers import check_for_string
+from core.Plugin import Plugin
 
 import json
 import urllib2
@@ -33,7 +33,7 @@ def sendMessage( msg, url ):
 	request.get_method = lambda: 'PUT'
 	opener.open( request )
 
-class DaytonaReporter( RemoteReporter ):
+class DaytonaReporter( Plugin ):
 	"""
 	This plugin enables reporting build reports to a Daytona Bot specified in the settings.
 	
@@ -51,7 +51,7 @@ class DaytonaReporter( RemoteReporter ):
 		settings = mApp().getSettings()
 		check_for_string( settings.get( DaytonaReporter.PostUrlKey ), "DaytonaPostUrl must be a valid URL" )
 
-	def sendReport( self ):
+	def notify( self ):
 		msg = self._createMessage()
 
 		# send message
