@@ -23,6 +23,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
 from copy import deepcopy, copy
+from core.Settings import Settings
 
 class Plugin( MObject ):
 	"""
@@ -132,10 +133,11 @@ class Plugin( MObject ):
 
 		Do not overload this method to adapt it, overload setup instead ! '''
 
-		if self.isEnabled():
-			self.setup()
-		else:
+		if not self.isEnabled():
 			mApp().debugN( self, 2, 'this plugin is disabled, not generating any actions.' )
+			return
+
+		self.setup()
 
 	def setup( self ):
 		"""Setup is called after the build steps have been generated, and the command line 
@@ -151,10 +153,11 @@ class Plugin( MObject ):
 		pass
 
 	def performReport( self ):
-		if self.isEnabled():
-			return self.report()
-		else:
+		if not self.isEnabled():
 			mApp().debugN( self, 2, 'this plug-in is disabled, not not creating reports' )
+			return
+
+		self.report()
 
 	def report( self ):
 		"""Report is called after the build has finished. Plug-ins that generate reports 
@@ -162,10 +165,16 @@ class Plugin( MObject ):
 		pass
 
 	def performNotify( self ):
-		if self.isEnabled():
-			return self.notify()
-		else:
+		reportingEnabled = mApp().getSettings().get( Settings.ScriptEnableRemoteReporting )
+		if not reportingEnabled:
+			mApp().debug( self, "Not sending report, disabled by settings (Settings.ScriptEnableRemoteReporting)" )
+			return
+
+		if not self.isEnabled():
 			mApp().debugN( self, 2, 'this plug-in is disabled, skipping notifications' )
+			return
+
+		self.notify()
 
 	def notify( self ):
 		"""Send out notifications about the build process. Plug-ins that, for example, send 
