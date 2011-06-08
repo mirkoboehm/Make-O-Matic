@@ -377,6 +377,11 @@ class Instructions( MObject ):
 				child.runReports()
 
 	def runNotifications( self ):
+		notificationsEnabled = mApp().getSettings().get( Settings.ScriptEnableNotifications )
+		if not notificationsEnabled:
+			mApp().debug( self, "Not running notify phase, disabled by settings (Settings.ScriptEnableNotifications)" )
+			return
+
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'publishing notifications' )
 			[ plugin.performNotify() for plugin in self.getPlugins()]

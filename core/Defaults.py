@@ -53,7 +53,7 @@ class Defaults( MObject ):
 	ScriptIgnoreCommitMessageCommands = 'script.ignorecommitmessagecommands'
 	ScriptRunMode = 'script.runmode'
 	ScriptBuildName = 'script.buildname'
-	ScriptEnableRemoteReporting = 'script.enableremotereporting'
+	ScriptEnableNotifications = 'script.enablenotifications'
 	# ----- internal settings
 	MomVersionNumber = 'mom.version.number'
 	MomDebugIndentVariable = 'mom.debug.indentvariable'
@@ -146,7 +146,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.ScriptClientName ] = getNodeName()
 		defaultSettings[ Defaults.ScriptRunMode ] = Defaults.RunMode_Build
 		defaultSettings[ Defaults.ScriptIgnoreCommitMessageCommands ] = False
-		defaultSettings[ Defaults.ScriptEnableRemoteReporting ] = True
+		defaultSettings[ Defaults.ScriptEnableNotifications ] = True
 		# ----- internal settings
 		defaultSettings[ Defaults.MomDebugIndentVariable ] = 'MOM_INTERNAL_DEBUG_INDENT'
 		# ----- project settings:
