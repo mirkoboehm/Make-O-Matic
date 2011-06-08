@@ -32,7 +32,7 @@ class Parameters( MObject ):
 	def __init__( self, name = None ):
 		MObject.__init__( self, name )
 
-		self.__parser = self._getOptionParser()
+		self.__parser = self._createOptionParser()
 		( self.__options, self.__args ) = self.__parser.parse_args() # populate options and args 
 
 	def _getOptions( self ):
@@ -41,7 +41,7 @@ class Parameters( MObject ):
 	def getArgs( self ):
 		return self.__args
 
-	def _getOptionParser( self ):
+	def _createOptionParser( self ):
 		usage = "usage: %prog [options] [build|describe|query <setting>|print]"
 		version = 'Make-O-Matic {0}'.format( mApp().getMomVersion() )
 		description = '''\
@@ -128,6 +128,7 @@ e.g.: -s disable-cleanup,enable-create-packages""" )
 
 	def apply( self, settings ):
 		assert isinstance( settings, Settings )
+
 		if self.getRevision():
 			settings.set( Settings.ProjectRevision, self.getRevision() )
 		else:
@@ -150,39 +151,52 @@ e.g.: -s disable-cleanup,enable-create-packages""" )
 			runMode = self.getArgs()[1]
 			settings.set( settings.ScriptRunMode, runMode )
 
-	def __getBuildSequenceDescription( self, buildSteps ):
+	@staticmethod
+	def __getBuildSequenceDescription( buildSteps ):
 		# debug info:
 		texts = []
 		for stepName in buildSteps:
 			texts.append( '{0} ({1})'.format( stepName.getName(), 'enabled' if stepName.isEnabled() else 'disabled' ) )
 		return ', '.join( texts )
 
+	@staticmethod
+	def _findStep( stepName, buildSteps ):
+		"""Find step named \param stepName in \param buildSteps
+
+		\return Step if buildSteps contains named step, else None"""
+
+		for step in buildSteps:
+			if step.getName() == stepName:
+				return step
+
+		return None
+
 	def applyBuildSequenceSwitches( self, buildSteps ):
 		msg = self.__getBuildSequenceDescription( buildSteps )
 		mApp().debugN( self, 3, 'build sequence before command line parameters: {0}'.format( msg ), compareTo = msg )
 		switches = self.getBuildSteps()
-		if switches:
-			customSteps = switches.split( ',' )
-			for switch in customSteps:
-				stepName = None
-				enable = None
-				if switch.startswith( 'enable-' ):
-					stepName = switch[ len( 'enable-' ) : ].strip()
-					enable = True
-				elif switch.startswith( 'disable-' ):
-					stepName = switch[ len( 'disable-' ) : ].strip()
-					enable = False
-				else:
-					raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
-											.format( switch ) )
-				# apply:
-				found = False
-				for step in buildSteps:
-					if step.getName() == stepName:
-						step.setEnabled( enable )
-						found = True
-						break
-				if not found:
-					raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
-			msg = self.__getBuildSequenceDescription( buildSteps )
-			mApp().debug( self, 'build sequence: {0}'.format( msg ), compareTo = msg )
+		if not switches:
+			return
+
+		customSteps = switches.split( ',' )
+		for switch in customSteps:
+			stepName = None
+			enable = None
+			if switch.startswith( 'enable-' ):
+				stepName = switch[ len( 'enable-' ) : ].strip()
+				enable = True
+			elif switch.startswith( 'disable-' ):
+				stepName = switch[ len( 'disable-' ) : ].strip()
+				enable = False
+			else:
+				raise ConfigurationError( 'Build sequence switch "{0}" does not start with enable- or disable-!'
+										.format( switch ) )
+			# apply:
+			step = self._findStep( stepName, buildSteps )
+			if not step:
+				raise ConfigurationError( 'Undefined build step "{0}" in command line arguments!'.format( stepName ) )
+
+			step.setEnabled( enable )
+
+		msg = self.__getBuildSequenceDescription( buildSteps )
+		mApp().debug( self, 'build sequence: {0}'.format( msg ), compareTo = msg )
