@@ -32,15 +32,16 @@ class ConsoleLogger( Logger ):
 	def __init__( self ):
 		Logger.__init__( self, self.__class__.__name__ )
 
-	def __getLevel( self, mapp ):
+	@staticmethod
+	def __getLevel( mapp ):
 		verbosity = mapp.getSettings().get( Settings.ScriptLogLevel )
 		check_for_nonnegative_int( verbosity, "The debug level needs to be an integer of zero or more" )
 		return verbosity
 
-	def logError( self, mapp, mobject, msg ):
+	def _logError( self, mapp, mobject, msg ):
 		self.message( mapp, mobject, '*** ERROR: {0}'.format( msg ) )
 
-	def logMessage( self, mapp, mobject, msg ):
+	def _logMessage( self, mapp, mobject, msg ):
 		text = msg
 		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
 		try:
@@ -56,17 +57,17 @@ class ConsoleLogger( Logger ):
 		else:
 			typeName = '[{0}: {1}]'.format( mobject.__class__.__name__, mobject.getName() )
 
-		pieces = [ self.timeStampPrefix(), self.messagePrefix() or None, typeName, text ]
+		pieces = [ self._timeStampPrefix(), self._messagePrefix() or None, typeName, text ]
 		pieces = filter( lambda x: x, pieces )
 		fulltext = ' '.join( pieces )
-		# fulltext = '{0} {1}[{2}] {3}'.format( self.timeStampPrefix(), self.messagePrefix(), mobject.getName(), text )
+		# fulltext = '{0} {1}[{2}] {3}'.format( self._timeStampPrefix(), self._messagePrefix(), mobject.getName(), text )
 		sys.stderr.write( fulltext.encode( "utf-8" ) )
 
-	def logDebug( self, mapp, mobject, msg ):
+	def _logDebug( self, mapp, mobject, msg ):
 		if self.__getLevel( mapp ) > 0:
 			self.message( mapp, mobject, 'DEBUG: {0}'.format( msg ) )
 
-	def logDebugN( self, mapp, mobject, level , msg ):
+	def _logDebugN( self, mapp, mobject, level , msg ):
 		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )
 		verbosity = self.__getLevel( mapp )
 		if verbosity >= level:

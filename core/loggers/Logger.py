@@ -29,36 +29,36 @@ class Logger( Plugin ):
 
 	def error( self, mapp, mobject, msg, compareTo = None ):
 		if not self._checkForDuplicateMessage( msg, compareTo ):
-			return self.logError( mapp, mobject, msg )
+			return self._logError( mapp, mobject, msg )
 
-	def logError( self, mapp, mobject, msg ):
+	def _logError( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
 	def message( self, mapp, mobject, msg, compareTo = None ):
 		if not self._checkForDuplicateMessage( msg, compareTo ):
-			return self.logMessage( mapp, mobject, msg )
+			return self._logMessage( mapp, mobject, msg )
 
-	def logMessage( self, mapp, mobject, msg ):
+	def _logMessage( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
 	def debug( self, mapp, mobject, msg, compareTo = None ):
 		if not self._checkForDuplicateMessage( msg, compareTo ):
-			return self.logDebug( mapp, mobject, msg )
+			return self._logDebug( mapp, mobject, msg )
 
-	def logDebug( self, mapp, mobject, msg ):
+	def _logDebug( self, mapp, mobject, msg ):
 		raise NotImplementedError()
 
 	def debugN( self, mapp, mobject, level , msg, compareTo = None ):
 		if not self._checkForDuplicateMessage( msg, compareTo ):
-			return self.logDebugN( mapp, mobject, level, msg )
+			return self._logDebugN( mapp, mobject, level, msg )
 
-	def logDebugN( self, mapp, mobject, level , msg ):
+	def _logDebugN( self, mapp, mobject, level , msg ):
 		raise NotImplementedError()
 
-	def timeStampPrefix( self ):
+	def _timeStampPrefix( self ):
 		return datetime.now().strftime( '%y%m%d-%H:%M:%S' )
 
-	def messagePrefix( self ):
+	def _messagePrefix( self ):
 		return get_debug_prefix()
 
 	def _checkForDuplicateMessage( self, msg, compareTo ):
