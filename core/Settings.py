@@ -22,6 +22,7 @@ from core.Exceptions import ConfigurationError
 from core.helpers.GlobalMApp import mApp
 from core.helpers.NodeName import getNodeName
 from core.helpers.TypeCheckers import check_for_nonempty_string
+import traceback
 
 class Settings( Defaults ):
 	"""Settings stores all configurable values for a build script run."""
@@ -82,10 +83,13 @@ class Settings( Defaults ):
 						exec( code, currentGlobals )
 					mApp().debug( self, 'Configuration file "{0}" loaded successfully'.format( configFile ) )
 				except SyntaxError as e:
-					raise ConfigurationError( 'The configuration file "{0}" contains a syntax error: "{1}"'.format( configFile, str( e ) ) )
+					mApp().debug( self, traceback.format_exc() )
+					raise ConfigurationError( 'The configuration file "{0}" contains a syntax error: "{1}"'.format( configFile, str( e.stack ) ) )
 				except Exception as e: # we need to catch all exceptions, since we are calling user code 
+					mApp().debug( self, traceback.format_exc() )
 					raise ConfigurationError( 'The configuration file "{0}" contains an error: "{1}"'.format( configFile, str( e ) ) )
-				except: # we need to catch all exceptions, since we are calling user code 
+				except: # we need to catch all exceptions, since we are calling user code
+					mApp().debug( self, traceback.format_exc() )
 					raise ConfigurationError( 'The configuration file "{0}" contains an unknown error!'.format( configFile ) )
 
 	def getBuildTypeDescription( self, buildType ):
