@@ -55,7 +55,7 @@ class Instructions( MObject ):
 		MObject.__init__( self, name )
 		self._setBaseDir( None )
 		self.setLogDir( None )
-		self.deleteLogDirOnShutdown( True )
+		self.deleteLogDirOnShutdown( False )
 		self.setPackagesDir( None )
 		self.setParent( None )
 		if parent: # the parent instructions object

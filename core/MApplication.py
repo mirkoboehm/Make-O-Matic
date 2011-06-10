@@ -38,8 +38,8 @@ class MApplication( Instructions ):
 
 	class Phase( Enum ):
 		'''Enumerated values representing the phases of the application run.'''
-		Prepare, PreFlightCheck, Setup, Execute, WrapUp, Report, Notify, ShutDown = range ( 8 )
-		_Descriptions = [ 'prepare', 'pre-flight check', 'setup', 'execute', 'wrap-up', 'report', 'notify', 'shutdown' ]
+		Start, Prepare, PreFlightCheck, Setup, Execute, WrapUp, Report, Notify, ShutDown = range ( 9 )
+		_Descriptions = [ 'start', 'prepare', 'pre-flight check', 'setup', 'execute', 'wrap-up', 'report', 'notify', 'shutdown' ]
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		Instructions.__init__( self, name, parent )
@@ -52,7 +52,7 @@ class MApplication( Instructions ):
 		self.__settings = Settings()
 		self.__exception = None
 		self.__returnCode = None
-		self.__phase = None
+		self.__phase = self.Phase.Start
 		self._checkMinimumMomVersion( minimumMomVersion )
 
 	def getMomVersion( self ):
