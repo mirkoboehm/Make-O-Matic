@@ -102,17 +102,5 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		email = self.reporter.createEmail()
 		self.assertTrue( "N/A" in email.getSubject() )
 
-	def testSendEmail( self ):
-
-		def runPreFlightChecks_new( self ):
-			raise ConfigurationError( "Test Error" )
-		replace_bound_method( self.build, self.build.runPreFlightChecks, runPreFlightChecks_new )
-
-		settings = self.build.getSettings()
-		settings.set( Settings.EmailerSmtpServer, "www.e" )
-		settings.set( Settings.EmailerUsername, "test" )
-
-		self.build.buildAndReturn()
-
 if __name__ == "__main__":
 	unittest.main()
