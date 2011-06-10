@@ -86,7 +86,7 @@ class Step( MObject ):
 		return self.__ignorePreviousFailure
 
 	def isEmpty( self ):
-		return not self.getPreActions() and not self.getMainActions() and not self.getPostActions()
+		return len( self.getAllActions() ) == 0
 
 	def setLogfilePath( self, logfileName ):
 		check_for_string( logfileName, "The log file parameter must be a string containing a file name." )
@@ -96,13 +96,13 @@ class Step( MObject ):
 		return self.__logfilePath
 
 	def getRelativeLogFilePath( self ):
-		"""\return Relative path of log file to the build base dir"""
+		"""\return Relative path of log file to the build base directory"""
 
 		if not self.getLogfilePath():
 			return None
 
-		buildBaseDir = mApp().getBaseDir()
-		return os.path.relpath( self.getLogfilePath(), buildBaseDir )
+		appBaseDir = mApp().getBaseDir()
+		return os.path.relpath( self.getLogfilePath(), appBaseDir )
 
 	def getRelativeLinkTarget( self ):
 		return ( self.getRelativeLogFilePath(), None )
@@ -115,6 +115,9 @@ class Step( MObject ):
 
 	def getPostActions( self ):
 		return self.__postActions
+
+	def getAllActions( self ):
+		return [self.getPreActions(), self.getMainActions(), self.getPostActions()]
 
 	def addPreAction( self, action ):
 		"""Add one precommand."""
@@ -158,6 +161,7 @@ class Step( MObject ):
 		if not isinstance( action, Action ):
 			raise ConfigurationError( 'An action needs to implement the Action class (got {0} instead)!'
 				.format( repr( action ) if action else 'None' ) )
+
 		if prepend:
 			container.insert( 0, action )
 		else:
@@ -188,8 +192,8 @@ class Step( MObject ):
 			self._logEnvironment( instructions )
 
 			logfileName = '{0}.log'.format( make_foldername_from_string( self.getName() ) )
-			logfileName = os.path.join( instructions.getLogDir(), logfileName )
-			self.setLogfilePath( logfileName )
+			logfilePath = os.path.join( instructions.getLogDir(), logfileName )
+			self.setLogfilePath( logfilePath )
 			self.setResult( Step.Result.Success )
 
 			# execute each action associated to this step
@@ -229,7 +233,7 @@ class Step( MObject ):
 		node.attributes["result"] = str( self.Result.getKey( self.getResult() ) )
 		node.attributes["status"] = str( self.Status.getKey( self.getStatus() ) )
 
-		for actions in [self.getPreActions(), self.getMainActions(), self.getPostActions()]:
+		for actions in self.getAllActions():
 			if not actions:
 				continue
 			for action in actions:
