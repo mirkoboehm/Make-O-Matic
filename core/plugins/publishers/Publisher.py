@@ -16,9 +16,8 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Plugin import Plugin
-from core.actions.Action import Action
-from core.actions.ShellCommandAction import ShellCommandAction
 from core.actions.filesystem.CopyActionBase import CopyActionBase
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
 import os
@@ -47,9 +46,10 @@ class Publisher( Plugin ):
 
 	def __init__( self, name = None, uploadLocation = None, localDir = None ):
 		Plugin.__init__( self, name )
+
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
-		self.setStep( 'upload-packages' )
+		self._setStep( 'upload-packages' )
 		self.setExtraUploadSubDirs( [] )
 
 	def getObjectStatus( self ):
@@ -69,7 +69,7 @@ class Publisher( Plugin ):
 	def getLocalDir( self ):
 		return self.__localDir
 
-	def setStep( self, step ):
+	def _setStep( self, step ):
 		check_for_string( step, 'The step for the publisher must be a string representing a step name!' )
 		self.__step = step
 

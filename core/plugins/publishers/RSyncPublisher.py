@@ -115,7 +115,7 @@ class RSyncPublisher( Publisher ):
 
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
-		self.setStep( 'upload-packages' )
+		self._setStep( 'upload-packages' )
 
 	def _getUploadLocationOrDefault( self ):
 		uploadLocation = self.getUploadLocation()
@@ -150,7 +150,7 @@ class RSyncPackagesPublisher( RSyncPublisher ):
 		RSyncPublisher.__init__( self, name,
 			uploadLocation = mApp().getSettings().get( Settings.RSyncPublisherPackageUploadLocation ),
 			localDir = PathResolver( mApp().getPackagesDir ) )
-		self.setStep( 'upload-packages' )
+		self._setStep( 'upload-packages' )
 
 	def getObjectStatus( self ):
 		baseUrl = mApp().getSettings().get( Settings.PublisherPackageBaseHttpURL, False )

@@ -32,7 +32,7 @@ class FileSystemPublisher( Publisher ):
 		Publisher.__init__( self, name )
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
-		self.setStep( 'upload-packages' )
+		self._setStep( 'upload-packages' )
 
 	def setup( self ):
 		if not self.getUploadLocation():
@@ -61,7 +61,7 @@ class FileSystemPackagesPublisher( FileSystemPublisher ):
 	def __init__( self, name = None ):
 		FileSystemPublisher.__init__( self, name, uploadLocation = mApp().getSettings().get( Settings.FileSystemPublisherPackageUploadLocation ),
 			localDir = PathResolver( mApp().getPackagesDir ) )
-		self.setStep( 'upload-packages' )
+		self._setStep( 'upload-packages' )
 
 	def getObjectStatus( self ):
 		baseUrl = mApp().getSettings().get( Settings.PublisherPackageBaseHttpURL, False )
