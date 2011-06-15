@@ -149,11 +149,9 @@ class Action( MObject ):
 					self._setStdErr( "{0}:\n\n{1}".format( e, innerTraceback ) )
 					self._setResult( e.getReturnCode() )
 
-				self._writeLog( logFile )
-
-				return self.getResult()
-
+		self._writeLog( logFile )
 		mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
+		return self.getResult()
 
 	def _writeLog( self, filePath ):
 		"""Write the results of this action to the specified path """
