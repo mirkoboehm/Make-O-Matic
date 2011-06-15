@@ -26,16 +26,16 @@ import codecs
 import os.path
 import shutil
 
-class UploadReporter( Plugin ):
+class HtmlReporter( Plugin ):
 
 	def __init__( self, uploaderAction = None, name = None ):
-		super( UploadReporter, self ).__init__( name )
+		super( HtmlReporter, self ).__init__( name )
 
 		assert isinstance( uploaderAction, CopyActionBase )
 		self.__uploaderAction = uploaderAction
 
 	def preFlightCheck( self ):
-		super( UploadReporter, self ).preFlightCheck()
+		super( HtmlReporter, self ).preFlightCheck()
 
 	def getSourceLocation( self ):
 		baseDir = mApp().getBaseDir()
