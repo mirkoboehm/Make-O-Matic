@@ -112,6 +112,7 @@ PYTHON_DEPENDENCIES = [
 ]
 
 def check_dependencies():
+
 	def check_plugins( plugins ):
 		failed_list = []
 		for plugin_class in plugins:
@@ -119,13 +120,16 @@ def check_dependencies():
 			try:
 				plugin.resolveCommand()
 			except ( MomException, ConfigurationError ):
+				# try to get a sane plugin identifier
 				if hasattr( plugin, 'getCommand' ):
-					failed = plugin.getCommand()
-				elif hasattr( plugin, 'getName' ):
-					failed = plugin.getName()
-				else:
-					failed = plugin.__class__.__name__
-				failed_list.append( failed )
+					pluginName = plugin.getCommand()
+				if not pluginName and hasattr( plugin, 'getName' ):
+					pluginName = plugin.getName()
+				if not pluginName:
+					pluginName = plugin.__class__.__name__
+				assert( pluginName )
+
+				failed_list.append( pluginName )
 		return failed_list
 
 	def print_warning( missing_list, optional = False, type = '' ):
