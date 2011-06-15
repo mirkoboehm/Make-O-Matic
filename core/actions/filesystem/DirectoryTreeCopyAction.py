@@ -18,21 +18,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.actions.Action import Action
+from core.actions.filesystem.CopyActionBase import CopyActionBase
 from core.helpers.GlobalMApp import mApp
-import shutil
 from core.helpers.TypeCheckers import check_for_list_of_strings
 import os
+import shutil
 
-class DirectoryTreeCopyAction( Action ):
+class DirectoryTreeCopyAction( CopyActionBase ):
 	"""DirectoryTreeCopyAction encapsulates the copying of a directory tree 
 	to another directory, optionally ignoring some files.
 	It is mostly used internally, but can be of general use as well."""
+
 	def __init__( self, source, destination, ignorePatterns = None, overwrite = False ):
-		Action.__init__( self )
-		self.__source = source
-		self.__destination = destination
+		CopyActionBase.__init__( self, sourceLocation = source, targetLocation = destination )
+
 		self.__overwrite = overwrite
+
 		if ignorePatterns == None:
 			ignorePatterns = []
 		check_for_list_of_strings( ignorePatterns, "The ignore patterns must be a list of strings." )
@@ -40,7 +41,7 @@ class DirectoryTreeCopyAction( Action ):
 
 	def getLogDescription( self ):
 		"""Provide a textual description for the Action that can be added to the execution log file."""
-		return "copytree {0} {1}, ignoring {2}".format( str( self.__source ), str( self.__destination ), self.__ignorePatterns )
+		return "copytree {0} {1}, ignoring {2}".format( str( self.getSourcePath() ), str( self.getDestinationPath() ), self.__ignorePatterns )
 
 	def mycopytree( self, src, dst, ignore = None , overwrite = False ):
 		"""Copies the directory tree."""
@@ -94,9 +95,16 @@ class DirectoryTreeCopyAction( Action ):
 	def run( self ):
 		"""Copies the directory tree."""
 
-		ret = self.mycopytree( str( self.__source ) , str( self.__destination ),
-					shutil.ignore_patterns( *self.__ignorePatterns ), self.__overwrite )
+		print( self.getSourcePath() )
+		print( self.getDestinationPath() )
+
+		ret = self.mycopytree( 
+				str( self.getSourcePath() ),
+				str( self.getDestinationPath() ),
+				shutil.ignore_patterns( *self.__ignorePatterns ),
+				self.__overwrite
+		)
 
 		if ret == 0:
-			mApp().debugN( self, 2, 'copied directory tree "{0}" to "{1}".'.format( self.__source, self.__destination ) )
+			mApp().debugN( self, 2, 'copied directory tree "{0}" to "{1}".'.format( self.getSourcePath(), self.getDestinationPath() ) )
 		return ret
