@@ -206,7 +206,7 @@ class Step( MObject ):
 				for action in actions:
 					resultText = 'skipped'
 					if self.getResult() != Step.Result.Failure or action.getIgnorePreviousFailure():
-						result = action.executeAction( self, instructions )
+						result = action.executeAction( self.getLogfilePath() )
 						resultText = 'successful' if result == 0 else 'failed'
 						if result != 0:
 							self.setResult( Step.Result.Failure )

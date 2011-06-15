@@ -120,7 +120,7 @@ class Action( MObject ):
 			raise MomError( 'getStdOut() queried before the action was finished' )
 		return self.__stdOut
 
-	def executeAction( self, step, instructions ):
+	def executeAction( self, logFile = None ):
 		with self.__timeKeeper:
 			with EnvironmentSaver():
 				if self.getWorkingDirectory():
@@ -148,16 +148,17 @@ class Action( MObject ):
 					self._setStdErr( "{0}:\n\n{1}".format( e, innerTraceback ) )
 					self._setResult( e.getReturnCode() )
 
-				self._writeStepLog( step.getLogfilePath() )
+				self._writeLog( logFile )
 
 				return self.getResult()
 
 		mApp().debugN( self, 2, '{0} duration: {1}'.format( self.getLogDescription(), self.__timeKeeper.deltaString() ) )
 
-	def _writeStepLog( self, filePath ):
+	def _writeLog( self, filePath ):
 		"""Write the results of this action to the specified path """
 
 		if not filePath:
+			mApp().debugN( self, 3, "No log file specified, won't write log" )
 			return
 
 		try:
