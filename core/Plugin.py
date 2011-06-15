@@ -91,6 +91,10 @@ class Plugin( MObject ):
 		pass
 
 	def resolveCommand( self ):
+		# if no command specified, do not run check
+		if not self.getCommand():
+			return
+
 		runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
 		runCommand.checkVersion()
 
