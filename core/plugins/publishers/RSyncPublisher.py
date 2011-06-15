@@ -16,41 +16,13 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import platform, os, re, tempfile
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
-from core.actions.Action import Action
 from core.helpers.RunCommand import RunCommand
 from core.plugins.publishers.Publisher import Publisher, PublisherAction
-from core.actions.filesystem.RmDirAction import RmDirAction
-
-class _CreateUploadDirectoryAction( Action ):
-	def __init__( self, publisher ):
-		Action.__init__( self )
-		self.__publisher = publisher
-
-	def getLogDescription( self ):
-		return 'Create rsync upload target path if extra subdirectories are specified.'
-
-	def run( self ):
-		if self.__publisher.getExtraUploadSubDirs():
-			path = os.path.join( *self.__publisher._getExtraUploadSubdirsAsString() )
-			tempDir = tempfile.mkdtemp( prefix = 'mom_buildscript-', suffix = '-rsync-path' )
-			fullpath = os.path.join( tempDir, path )
-			os.makedirs( fullpath )
-			uploadLocation = self.__publisher._getUploadLocationOrDefault()
-			args = [ '-avz', '-e', 'ssh -o BatchMode=yes', tempDir + os.sep, uploadLocation ]
-			cmd = [ self.__publisher.getCommand() ] + args
-			runner = RunCommand( cmd, timeoutSeconds = 1200, searchPaths = self.__publisher.getCommandSearchPaths() )
-			if runner.run() != 0:
-				mApp().debugN( self, 1, 'Creating extra sub directories {0} on the upload server failed!'.format( path ) )
-				return runner.getReturnCode()
-			else:
-				mApp().debugN( self, 3, 'Created extra sub directories {0} on the upload server.'.format( path ) )
-				return 0
-		else:
-			return 0
 
 class RSyncUploadAction( PublisherAction ):
 	'''RSyncUploadAction uses RSync to publish data from the local directory to the upload location.
@@ -88,7 +60,29 @@ class RSyncUploadAction( PublisherAction ):
 		directory = re.sub( '\\\\+', '/', directory )
 		return directory
 
-	def run( self ):
+	def runCreateDirectories( self ):
+		# no need to create directories if no extra sub directories specified
+		if not self.getExtraUploadSubDirs():
+			return 0
+
+		path = os.path.join( *self._getExtraUploadSubdirsAsString() )
+		tempDir = tempfile.mkdtemp( prefix = 'mom_buildscript-', suffix = '-rsync-path' )
+		fullpath = os.path.join( tempDir, path )
+		os.makedirs( fullpath )
+		uploadLocation = self.getUploadLocation()
+		args = [ '-avz', '-e', 'ssh -o BatchMode=yes', tempDir + os.sep, uploadLocation ]
+		cmd = [ "rsync" ] + args
+		searchPaths = [ "C:/Program Files/cwRsync/bin" ]
+
+		runner = RunCommand( cmd, timeoutSeconds = 1200, searchPaths = searchPaths )
+		if runner.run() != 0:
+			mApp().debugN( self, 1, 'Creating extra sub directories {0} on the upload server failed!'.format( path ) )
+			return runner.getReturnCode()
+		else:
+			mApp().debugN( self, 3, 'Created extra sub directories {0} on the upload server.'.format( path ) )
+			return 0
+
+	def runUploadFiles( self ):
 		fromDir = self._makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
 		toDir = os.path.join( self.getUploadLocation(), *self._getExtraUploadSubdirsAsString() )
 		args = [ '-avz', '-e', 'ssh -o BatchMode=yes', fromDir, toDir ]
@@ -104,6 +98,12 @@ class RSyncUploadAction( PublisherAction ):
 			mApp().debugN( self, 3, 'Uploaded "{0}" to "{1}".'.format( fromDir, toDir ) )
 			return 0
 
+	def run( self ):
+		rc = self.runCreateDirectories()
+		if rc != 0:
+			return rc
+
+		return self.runUploadFiles()
 
 class RSyncPublisher( Publisher ):
 	'''A publisher that uses RSync to send results to a remote site.'''
@@ -131,8 +131,6 @@ class RSyncPublisher( Publisher ):
 
 		step = self.getInstructions().getStep( self.getStep() )
 		if str( self.getLocalDir() ):
-			subdirsAction = _CreateUploadDirectoryAction( self )
-			step.addMainAction( subdirsAction )
 			uploadAction = RSyncUploadAction()
 			uploadAction.setLocalDir( self.getLocalDir() )
 			uploadAction.setUploadLocation( uploadLocation )
