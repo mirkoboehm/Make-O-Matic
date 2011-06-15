@@ -100,18 +100,18 @@ def xml_compare( element1, element2, reporter = False ):
 
 	if element1.tag != element2.tag:
 		if reporter:
-			print( 'Tags do not match: %s and %s' % ( element1.tag, element2.tag ) )
+			reporter( 'Tags do not match: %s and %s' % ( element1.tag, element2.tag ) )
 		return False
 	for name, value in element1.attrib.items():
 		if element2.attrib.get( name ) != value:
 			if reporter:
-				print( 'Attributes do not match: %s=%r, %s=%r'
+				reporter( 'Attributes do not match: %s=%r, %s=%r'
 						 % ( name, value, name, element2.attrib.get( name ) ) )
 			return False
 	for name in element2.attrib.keys():
 		if name not in element1.attrib:
 			if reporter:
-				print( 'element2 has an attribute element1 is missing: %s'
+				reporter( 'element2 has an attribute element1 is missing: %s'
 						 % name )
 			return False
 	if not element1.text == element2.text :

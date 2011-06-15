@@ -95,9 +95,6 @@ class DirectoryTreeCopyAction( CopyActionBase ):
 	def run( self ):
 		"""Copies the directory tree."""
 
-		print( self.getSourcePath() )
-		print( self.getDestinationPath() )
-
 		ret = self.mycopytree( 
 				str( self.getSourcePath() ),
 				str( self.getDestinationPath() ),
