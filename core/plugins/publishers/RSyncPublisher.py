@@ -129,15 +129,19 @@ class RSyncPublisher( Publisher ):
 			mApp().message( self, 'Upload location is empty. Not generating any actions.' )
 			return
 
-		step = self.getInstructions().getStep( self.getStep() )
-		if str( self.getLocalDir() ):
-			uploadAction = RSyncUploadAction()
-			uploadAction.setLocalDir( self.getLocalDir() )
-			uploadAction.setUploadLocation( uploadLocation )
-			uploadAction.setExtraUploadSubDirs( self.getExtraUploadSubDirs() )
-			step.addMainAction( uploadAction )
-		else:
+		localDir = self.getLocalDir()
+
+		if not localDir:
 			mApp().debugN( self, 2, 'No local directory specified, not generating action' )
+			return
+
+		uploadAction = RSyncUploadAction()
+		uploadAction.setLocalDir( localDir )
+		uploadAction.setUploadLocation( uploadLocation )
+		uploadAction.setExtraUploadSubDirs( self.getExtraUploadSubDirs() )
+		step = self.getInstructions().getStep( self.getStep() )
+		step.addMainAction( uploadAction )
+
 
 class RSyncPackagesPublisher( RSyncPublisher ):
 	'''A RSync publisher that is pre-configured to publish the packages structure to the default location.'''

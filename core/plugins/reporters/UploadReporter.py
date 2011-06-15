@@ -24,11 +24,15 @@ import shutil
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 import codecs
+from core.plugins.publishers.Publisher import PublisherAction
 
 class UploadReporter( Plugin ):
 
-	def __init__( self, name = None ):
+	def __init__( self, uploaderAction = None, name = None ):
 		super( UploadReporter, self ).__init__( name )
+
+		assert isinstance( uploaderAction, PublisherAction )
+		self.__uploaderAction = uploaderAction
 
 	def preFlightCheck( self ):
 		super( UploadReporter, self ).preFlightCheck()
@@ -59,3 +63,17 @@ class UploadReporter( Plugin ):
 		f = codecs.open( filePath, 'w', encoding = "utf-8" )
 		f.write( html )
 		f.close()
+
+		self._upload()
+
+	def _upload( self ):
+		uploaderAction = self.__uploaderAction
+		if not uploaderAction:
+			return
+
+		uploaderAction.setLocalDir( self.getSourceLocation() )
+		mApp().debugN( self, 5, "Uploading report to {0}".format( uploaderAction.getUploadLocation() ) )
+
+		rc = uploaderAction.executeAction()
+		if rc != 0:
+			mApp().debug( self, "Uploading failed:", uploaderAction.getStdErr() )
