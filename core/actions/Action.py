@@ -17,17 +17,18 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.MObject import MObject
-from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_path
 from core.Exceptions import MomError, MomException, BuildError
-import os, sys
-from core.helpers.TimeKeeper import TimeKeeper
-from core.helpers.GlobalMApp import mApp
-from core.helpers.XmlUtils import create_child_node
+from core.MObject import MObject
 from core.helpers.EnvironmentSaver import EnvironmentSaver
-import traceback
+from core.helpers.GlobalMApp import mApp
 from core.helpers.StringUtils import to_unicode_or_bust
+from core.helpers.TimeKeeper import TimeKeeper
+from core.helpers.TypeCheckers import check_for_path, check_for_int
+from core.helpers.XmlUtils import create_child_node
 import codecs
+import os
+import sys
+import traceback
 
 class Action( MObject ):
 	"""Action is the base class for executomat actions.
@@ -96,7 +97,7 @@ class Action( MObject ):
 		return self.__aborted
 
 	def _setResult( self, result ):
-		check_for_nonnegative_int( result, 'The result of an action must be a non-negative integer!' )
+		check_for_int( result, 'The result of an action must be a non-negative integer!' )
 		self.__result = result
 
 	def getResult( self ):
