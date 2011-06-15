@@ -22,7 +22,6 @@ from core.actions.filesystem.CheckDirectoryExistsAction import CheckDirectoryExi
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
-from core.actions.filesystem.RmDirAction import RmDirAction
 import os
 
 class FileSystemPublisher( Publisher ):

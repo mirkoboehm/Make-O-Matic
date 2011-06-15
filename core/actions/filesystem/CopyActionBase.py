@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.actions.Action import Action
-from core.helpers.TypeCheckers import check_for_path, check_for_path_or_none
+from core.helpers.TypeCheckers import check_for_path_or_none
 
 class CopyActionBase( Action ):
 

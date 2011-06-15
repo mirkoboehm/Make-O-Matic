@@ -23,7 +23,6 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
 from copy import deepcopy, copy
-from core.Settings import Settings
 
 class Plugin( MObject ):
 	"""

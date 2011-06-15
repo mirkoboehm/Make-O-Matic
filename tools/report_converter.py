@@ -24,7 +24,6 @@ from core.helpers.XmlReportConverter import XmlReportConverter
 from core.helpers.XmlReport import StringBasedXmlReport
 from core.MApplication import MApplication
 import sys
-from xml.dom.minidom import Document, parseString
 
 TARGET_FORMATS = ["text", "html"]
 
@@ -36,7 +35,7 @@ def print_stderr( message ):
 
 def main():
 	# instantiate MApplication, required for debug() calls
-	app = MApplication()
+	MApplication()
 
 	# check if first parameter is set
 	try:

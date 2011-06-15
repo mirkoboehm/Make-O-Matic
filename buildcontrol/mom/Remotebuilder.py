@@ -16,6 +16,7 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 import os
 from core.MObject import MObject
 from core.Exceptions import ConfigurationError
@@ -23,7 +24,6 @@ from core.plugins.sourcecode import getScm
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
 from core.helpers.GlobalMApp import mApp
 from core.Settings import Settings
-import shutil
 from core.helpers.TempFolderDeleter import TempFolderDeleter
 
 class RemoteBuilder( MObject ):

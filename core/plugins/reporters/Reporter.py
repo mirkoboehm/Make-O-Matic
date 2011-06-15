@@ -18,8 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
 
 class _ReporterBase( Plugin ):
 	"""Internal Reporter base class, do not use directly"""
