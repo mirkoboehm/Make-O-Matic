@@ -18,25 +18,25 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.actions.Action import Action
-from core.helpers.TypeCheckers import check_for_path
+from core.helpers.TypeCheckers import check_for_path, check_for_path_or_none
 
 class CopyActionBase( Action ):
 
-	def __init__( self, sourceLocation, targetLocation, name = None ):
+	def __init__( self, sourceLocation = None, targetLocation = None, name = None ):
 		Action.__init__( self, name )
 
 		self.setSourcePath( sourceLocation )
 		self.setDestinationPath( targetLocation )
 
 	def setSourcePath( self, path ):
-		check_for_path( path, "Please specify a valid source path" )
+		check_for_path_or_none( path, "Please specify a valid source path" )
 		self.__sourceLocation = path
 
 	def getSourcePath( self ):
 		return self.__sourceLocation
 
 	def setDestinationPath( self, path ):
-		check_for_path( path, "Please specify a valid destination path" )
+		check_for_path_or_none( path, "Please specify a valid destination path" )
 		self.__targetLocation = path
 
 	def getDestinationPath( self ):

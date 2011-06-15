@@ -28,11 +28,13 @@ class RSyncUploadAction( PublisherAction ):
 	'''RSyncUploadAction uses RSync to publish data from the local directory to the upload location.
 	It determines the local and target location at execution time.'''
 
-	def __init__( self ):
-		PublisherAction.__init__( self )
+	def __init__( self, sourceLocation = None, targetLocation = None ):
+		PublisherAction.__init__( self,
+								sourceLocation = sourceLocation,
+								targetLocation = targetLocation )
 
 	def getLogDescription( self ):
-		return 'Upload files to "{0}"'.format( self.getUploadLocation() )
+		return 'Upload files to "{0}"'.format( self.getDestinationPath() )
 
 	@staticmethod
 	def _makeCygwinPathForRsync( directory ):
@@ -69,7 +71,7 @@ class RSyncUploadAction( PublisherAction ):
 		tempDir = tempfile.mkdtemp( prefix = 'mom_buildscript-', suffix = '-rsync-path' )
 		fullpath = os.path.join( tempDir, path )
 		os.makedirs( fullpath )
-		uploadLocation = self.getUploadLocation()
+		uploadLocation = self.getDestinationPath()
 		args = [ '-avz', '-e', 'ssh -o BatchMode=yes', tempDir + os.sep, uploadLocation ]
 		cmd = [ "rsync" ] + args
 		searchPaths = [ "C:/Program Files/cwRsync/bin" ]
@@ -83,8 +85,8 @@ class RSyncUploadAction( PublisherAction ):
 			return 0
 
 	def runUploadFiles( self ):
-		fromDir = self._makeCygwinPathForRsync( '{0}{1}'.format( self.getLocalDir(), os.sep ) )
-		toDir = os.path.join( self.getUploadLocation(), *self._getExtraUploadSubdirsAsString() )
+		fromDir = self._makeCygwinPathForRsync( '{0}{1}'.format( self.getSourcePath(), os.sep ) )
+		toDir = os.path.join( self.getDestinationPath(), *self._getExtraUploadSubdirsAsString() )
 		args = [ '-avz', '-e', 'ssh -o BatchMode=yes', fromDir, toDir ]
 		if 'Windows' in platform.platform(): #On windows, fake source permissions to be 755
 			args = [ '--chmod=ugo=rwx' ] + args
@@ -135,9 +137,7 @@ class RSyncPublisher( Publisher ):
 			mApp().debugN( self, 2, 'No local directory specified, not generating action' )
 			return
 
-		uploadAction = RSyncUploadAction()
-		uploadAction.setLocalDir( localDir )
-		uploadAction.setUploadLocation( uploadLocation )
+		uploadAction = RSyncUploadAction( localDir, uploadLocation )
 		uploadAction.setExtraUploadSubDirs( self.getExtraUploadSubDirs() )
 		step = self.getInstructions().getStep( self.getStep() )
 		step.addMainAction( uploadAction )

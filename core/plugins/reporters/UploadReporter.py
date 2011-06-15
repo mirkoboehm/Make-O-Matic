@@ -18,20 +18,20 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
+from core.actions.filesystem.CopyActionBase import CopyActionBase
 from core.helpers.GlobalMApp import mApp
-import os.path
-import shutil
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 import codecs
-from core.plugins.publishers.Publisher import PublisherAction
+import os.path
+import shutil
 
 class UploadReporter( Plugin ):
 
 	def __init__( self, uploaderAction = None, name = None ):
 		super( UploadReporter, self ).__init__( name )
 
-		assert isinstance( uploaderAction, PublisherAction )
+		assert isinstance( uploaderAction, CopyActionBase )
 		self.__uploaderAction = uploaderAction
 
 	def preFlightCheck( self ):
@@ -71,8 +71,8 @@ class UploadReporter( Plugin ):
 		if not uploaderAction:
 			return
 
-		uploaderAction.setLocalDir( self.getSourceLocation() )
-		mApp().debugN( self, 5, "Uploading report to {0}".format( uploaderAction.getUploadLocation() ) )
+		uploaderAction.setSourcePath( self.getSourceLocation() )
+		mApp().debugN( self, 5, "Uploading report to {0}".format( uploaderAction.getDestinationPath() ) )
 
 		rc = uploaderAction.executeAction()
 		if rc != 0:
