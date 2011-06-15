@@ -24,6 +24,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
 from string import Template
 import os
+from core.helpers.FilesystemAccess import make_foldername_from_string
 
 class PublisherAction( CopyActionBase ):
 
@@ -102,7 +103,11 @@ class Publisher( Plugin ):
 		def get( setting ):
 			settings = mApp().getSettings()
 			val = settings.get( setting, True )
-			return val or ""
+
+			if not val:
+				return ""
+
+			return make_foldername_from_string( val )
 
 		return dict( 
 			n = get( Settings.ScriptBuildName ),

@@ -211,7 +211,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
 		defaultSettings[ Defaults.EmailReporterUseCompressionForAttachments ] = False
 		# ----- Publisher settings:
-		defaultSettings[ Defaults.PublisherSubdirectoryTemplate] = "$n/$b/$v/$r/p"
+		defaultSettings[ Defaults.PublisherSubdirectoryTemplate] = "$n/$b/$v/$r/$p"
 		defaultSettings[ Defaults.RSyncPublisherPackageCleanup ] = True
 		defaultSettings[ Defaults.RSyncPublisherReportsCleanup ] = True
 		defaultSettings[ Defaults.FileSystemPublisherPackageCleanup ] = True
