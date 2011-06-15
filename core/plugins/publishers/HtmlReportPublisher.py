@@ -27,16 +27,16 @@ import codecs
 import os.path
 import shutil
 
-class HtmlReporter( Publisher ):
+class HtmlReportPublisher( Publisher ):
 
 	def __init__( self, uploaderAction = None, name = None ):
-		super( HtmlReporter, self ).__init__( name )
+		super( HtmlReportPublisher, self ).__init__( name )
 
 		assert isinstance( uploaderAction, CopyActionBase )
 		self.__uploaderAction = uploaderAction
 
 	def preFlightCheck( self ):
-		super( HtmlReporter, self ).preFlightCheck()
+		super( HtmlReportPublisher, self ).preFlightCheck()
 
 	def getSourceLocation( self ):
 		baseDir = mApp().getBaseDir()
