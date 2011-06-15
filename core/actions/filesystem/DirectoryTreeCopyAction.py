@@ -29,7 +29,7 @@ class DirectoryTreeCopyAction( CopyActionBase ):
 	to another directory, optionally ignoring some files.
 	It is mostly used internally, but can be of general use as well."""
 
-	def __init__( self, source, destination, ignorePatterns = None, overwrite = False ):
+	def __init__( self, source = None, destination = None, ignorePatterns = None, overwrite = False ):
 		CopyActionBase.__init__( self, sourceLocation = source, targetLocation = destination )
 
 		self.__overwrite = overwrite

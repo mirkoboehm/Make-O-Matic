@@ -18,8 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Plugin import Plugin
+from core.Settings import Settings
 from core.actions.filesystem.CopyActionBase import CopyActionBase
+from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
+from string import Template
 import os
 
 class PublisherAction( CopyActionBase ):
@@ -47,13 +50,14 @@ class Publisher( Plugin ):
 	def __init__( self, name = None, uploadLocation = None, localDir = None ):
 		Plugin.__init__( self, name )
 
+		self.setUploadBaseUrl( None )
 		self.setUploadLocation( uploadLocation )
 		self.setLocalDir( localDir )
 		self._setStep( 'upload-packages' )
 		self.setExtraUploadSubDirs( [] )
 
 	def getObjectStatus( self ):
-		return "Upload location: {0}".format( self.getUploadLocation() )
+		return "Upload location: {0}".format( self.getUploadUrl() )
 
 	def setUploadLocation( self, location ):
 		check_for_path_or_none( location, 'The upload location must be a nonempty string!' )
@@ -91,3 +95,34 @@ class Publisher( Plugin ):
 		'''Create the full upload path from the location and the extra sub directories and return it.'''
 		complete = os.path.join( self.getUploadLocation(), *self._getExtraUploadSubdirsAsString() )
 		return complete
+
+	@staticmethod
+	def _getUploadUrlSubstitutes():
+
+		def get( setting ):
+			settings = mApp().getSettings()
+			val = settings.get( setting, True )
+			return val or ""
+
+		return dict( 
+			n = get( Settings.ScriptBuildName ),
+			p = get( Settings.ScriptClientName ),
+			b = get( Settings.SourceCodeProviderBranchPrefix ),
+			v = get( Settings.SourceCodeProviderVersionName ),
+			r = get( Settings.ProjectRevisionWithTime )
+		)
+
+	def getUploadSubDirs( self ):
+		subdirsTemplateString = mApp().getSettings().get( Settings.PublisherSubdirectoryTemplate, True )
+		s = Template( subdirsTemplateString )
+		ret = s.substitute( self._getUploadUrlSubstitutes() )
+		return ret
+
+	def setUploadBaseUrl( self, baseUrl ):
+		self.__uploadBaseUrl = baseUrl
+
+	def getUploadBaseUrl( self ):
+		return self.__uploadBaseUrl
+
+	def getUploadUrl( self ):
+		return self.getUploadBaseUrl() + self.getUploadSubDirs()

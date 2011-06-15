@@ -17,16 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Plugin import Plugin
 from core.actions.filesystem.CopyActionBase import CopyActionBase
 from core.helpers.GlobalMApp import mApp
+from core.helpers.PathResolver import PathResolver
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
+from core.plugins.publishers.Publisher import Publisher
 import codecs
 import os.path
 import shutil
 
-class HtmlReporter( Plugin ):
+class HtmlReporter( Publisher ):
 
 	def __init__( self, uploaderAction = None, name = None ):
 		super( HtmlReporter, self ).__init__( name )
@@ -72,6 +73,7 @@ class HtmlReporter( Plugin ):
 			return
 
 		uploaderAction.setSourcePath( self.getSourceLocation() )
+		uploaderAction.setDestinationPath( PathResolver( self._getFullUploadLocation ) )
 		mApp().debugN( self, 5, "Uploading report to {0}".format( uploaderAction.getDestinationPath() ) )
 
 		rc = uploaderAction.executeAction()

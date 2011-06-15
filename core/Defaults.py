@@ -104,6 +104,7 @@ class Defaults( MObject ):
 	# ----- CMake Builder settings
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- Publisher settings (should be set in .mom/config.py):
+	PublisherSubdirectoryTemplate = 'publisher.subdirectory.template'
 	RSyncPublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
 	RSyncPublisherPackageCleanup = 'publisher.cleanup.packages'
 	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
@@ -210,6 +211,7 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
 		defaultSettings[ Defaults.EmailReporterUseCompressionForAttachments ] = False
 		# ----- Publisher settings:
+		defaultSettings[ Defaults.PublisherSubdirectoryTemplate] = "$n/$b/$v/$r/p"
 		defaultSettings[ Defaults.RSyncPublisherPackageCleanup ] = True
 		defaultSettings[ Defaults.RSyncPublisherReportsCleanup ] = True
 		defaultSettings[ Defaults.FileSystemPublisherPackageCleanup ] = True
