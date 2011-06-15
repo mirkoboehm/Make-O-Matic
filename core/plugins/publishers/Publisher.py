@@ -19,6 +19,47 @@
 from core.Plugin import Plugin
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
 import os
+from core.actions.Action import Action
+from core.actions.ShellCommandAction import ShellCommandAction
+
+class PublisherAction( Action ):
+
+	def __init__( self ):
+		Action.__init__( self )
+
+		self.setUploadLocation( None )
+		self.setLocalDir( None )
+		self.setExtraUploadSubDirs( [] )
+
+	def setUploadLocation( self, location ):
+		check_for_path_or_none( location, 'The upload location must be a nonempty string!' )
+		self.__uploadLocation = location
+
+	def getUploadLocation( self ):
+		return self.__uploadLocation
+
+	def setLocalDir( self, localDir ):
+		check_for_path_or_none( localDir, 'The local directory must be a nonempty string!' )
+		self.__localDir = localDir
+
+	def getLocalDir( self ):
+		return self.__localDir
+
+	def setExtraUploadSubDirs( self, listOfSubdirs ):
+		check_for_list_of_paths( listOfSubdirs, 'The list of extra upload subdirectories most contains paths.' )
+		self.__extraUploadSubDirs = listOfSubdirs
+
+	def getExtraUploadSubDirs( self ):
+		return self.__extraUploadSubDirs
+
+	def _getExtraUploadSubdirsAsString( self ):
+		paths = map( str, self.getExtraUploadSubDirs() )
+		return paths
+
+	def _getFullUploadLocation( self ):
+		'''Create the full upload path from the location and the extra sub directories and return it.'''
+		complete = os.path.join( self.getUploadLocation(), *self._getExtraUploadSubdirsAsString() )
+		return complete
 
 class Publisher( Plugin ):
 
