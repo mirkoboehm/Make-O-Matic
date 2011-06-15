@@ -20,6 +20,7 @@
 import signal
 from core.helpers.GlobalMApp import mApp
 import inspect
+import traceback
 
 class MomException( Exception ):
 	"""MomException encapsulates an error that occurs during a build script run."""
@@ -29,6 +30,9 @@ class MomException( Exception ):
 		self.value = value
 		self.details = details
 		self.__phase = mApp().getPhase()
+		self.__traceback = traceback.format_stack()[:-1]
+
+		# get caller
 		curframe = inspect.currentframe()
 		try:
 			calframe = inspect.getouterframes( curframe, 2 )
@@ -54,6 +58,9 @@ class MomException( Exception ):
 	def getPhase( self ):
 		return self.__phase
 
+	def getTraceback( self ):
+		return self.__traceback
+
 	def logErrorDescription( self ):
 		from core.MApplication import MApplication
 		phase = MApplication.Phase.getDescription( self.getPhase() )
@@ -64,6 +71,11 @@ class MomException( Exception ):
 			messages = self.getDetails().splitlines()
 			for message in messages:
 				mApp().message( mApp(), message )
+
+		if self.getTraceback():
+			mApp().message( mApp(), "Traceback:" )
+			for line in self.getTraceback():
+				mApp().message( mApp(), line )
 
 
 class BuildError( MomException ):
