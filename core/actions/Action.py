@@ -162,14 +162,19 @@ class Action( MObject ):
 
 		try:
 			with codecs.open( filePath, 'a', 'utf-8' ) as f:
+				f.writelines( '*** Log from {0} ***\n'.format( self.getName() ) )
+				f.writelines( '{0}\n'.format( self.getLogDescription() ) )
 				if self.getStdOut() or self.getStdErr():
-					f.writelines( 'Output from action "{0}":\n'.format( self.getLogDescription() ) )
 					if self.getStdOut():
-						f.writelines( '\n=== Standard output ===\n' + self.getStdOut() )
+						f.writelines( '\n=== Standard output ===\n' + self.getStdOut().rstrip() + "\n" )
 					if self.getStdErr():
-						f.writelines( '\n=== Error output ===\n' + self.getStdErr() )
+						print self.getStdErr()
+						f.writelines( '\n=== Error output ===\n' + self.getStdErr().rstrip() + "\n" )
 				else:
-					f.writelines( '(The action "{0}" did not generate any output.)\n'.format( self.getLogDescription() ) )
+					f.writelines( '(The action did not generate any output.)\n' )
+
+				# append some separator string
+				f.writelines( "\n*** End of log ***\n\n" )
 		except Exception as e:
 			raise MomError( 'cannot write to log file "{0}": {1}'.format( filePath, str( e ) ) )
 
