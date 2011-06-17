@@ -169,8 +169,14 @@ class EmailReporter( Plugin ):
 		report = InstructionsXmlReport( instructions )
 		converter = XmlReportConverter( report )
 
-		# text and html part
-		email.attachTextPart( converter.convertToTextSummary() )
+		### text and html part
+		# summary
+		email.attachAlternativeTextPart( 
+				converter.convertToTextSummary(),
+				self.createHtmlSummary()
+		)
+
+		# body
 		textReport = converter.convertToText( short = True )
 		htmlReport = converter.convertToHtml()
 		if htmlReport:
