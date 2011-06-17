@@ -18,16 +18,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-
-from core.helpers.XmlReport import InstructionsXmlReport
-from core.helpers.GlobalMApp import mApp
-from core.helpers.Emailer import Email, Emailer
-from core.helpers.XmlReportConverter import XmlReportConverter
 from core.Build import Build
-from core.Settings import Settings
 from core.Exceptions import MomError, BuildError, ConfigurationError
-from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
 from core.Plugin import Plugin
+from core.Settings import Settings
+from core.helpers.Emailer import Email, Emailer
+from core.helpers.GlobalMApp import mApp
+from core.helpers.TemplateSupport import MomTemplate
+from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
+from core.helpers.XmlReport import InstructionsXmlReport
+from core.helpers.XmlReportConverter import XmlReportConverter
+import os.path
+
 
 class EmailReporter( Plugin ):
 	"""
@@ -86,6 +88,27 @@ class EmailReporter( Plugin ):
 			return "Cannot generate HTML, probably due to missing python-lxml package"
 		else:
 			return ""
+
+	def createHtmlSummary( self ):
+		SUMMARY_TEMPLATE_PATH = os.path.join( self._PLUGIN_DATA_DIR, "EmailReporter_SummaryTemplate.html" )
+
+		instructions = mApp()
+		assert isinstance( instructions, Build )
+		info = instructions.getProject().getScm().getRevisionInfo()
+
+		d = dict()
+		returnCode = instructions.getReturnCode()
+		d["my.returncode"] = returnCode
+		d["my.status"] = ( "☺" if returnCode == 0 else "☠" )
+		d["my.bgcolor"] = ( "#00FF33" if returnCode == 0 else "red" )
+		d["my.committerName"] = info.committerName
+		d["my.footer"] = "Build took {0}".format( instructions.getTimeKeeper().deltaString() )
+
+		templateString = open( SUMMARY_TEMPLATE_PATH, 'r' ).read()
+		s = MomTemplate( templateString )
+		s.overwrites = d
+		htmlString = s.substitute()
+		return htmlString
 
 	def createEmail( self ):
 		instructions = mApp()

@@ -17,12 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.MObject import MObject
+from copy import deepcopy, copy
 from core.Exceptions import MomException, ConfigurationError
+from core.MObject import MObject
 from core.helpers.GlobalMApp import mApp
 from core.helpers.RunCommand import RunCommand
 from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
-from copy import deepcopy, copy
+import os.path
 
 class Plugin( MObject ):
 	"""
@@ -46,6 +47,8 @@ class Plugin( MObject ):
 	\subsection others Others
 	Each plugin can register its own XSL templates using the following functions
 	\see getXslTemplates"""
+
+	_PLUGIN_DATA_DIR = os.path.join( os.path.dirname( __file__ ), "plugins/data" )
 
 	def __init__( self, name = None ):
 

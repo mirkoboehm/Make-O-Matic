@@ -101,5 +101,14 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		email = self.reporter.createEmail()
 		self.assertTrue( "N/A" in email.getSubject() )
 
+	def testCreateEmailHtmlSummary( self ):
+		summary = self.reporter.createHtmlSummary()
+
+		# simple test here. makes more sense to do manual tests with this
+		self.assertTrue( "XmlReportTestBuild" in summary )
+
+		#print( summary )
+
+
 if __name__ == "__main__":
 	unittest.main()

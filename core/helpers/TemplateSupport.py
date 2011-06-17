@@ -24,6 +24,7 @@ from string import Template
 class _TemplateDict( dict ):
 
 	escape = False
+	overwrites = {}
 
 	def __init__( self, *args ):
 		dict.__init__( self, *args )
@@ -31,6 +32,12 @@ class _TemplateDict( dict ):
 		self.__settings = mApp().getSettings()
 
 	def __getitem__( self, key ):
+		# first: try to get the value from the overwrite dict
+		val = self.overwrites.get( key )
+		if val:
+			return val
+
+		# next: try to get it from settings
 		val = self.__settings.get( key, True )
 		if not val:
 			return ""
@@ -47,14 +54,20 @@ class _TemplateDict( dict ):
 class MomTemplate( Template ):
 
 	idpattern = r'[_a-z][\._a-z0-9]*'
+	overwrites = {}
 
-	def substitute( self, escape = False ):
+	def _getDict( self, escape ):
 		d = _TemplateDict()
 		d.escape = escape
+
+		d.overwrites = self.overwrites
+		return d
+
+	def substitute( self, escape = False ):
+		d = self._getDict( escape )
 		return Template.substitute( self, d )
 
 	def safe_substitute( self, escape = False ):
-		d = _TemplateDict()
-		d.escape = escape
+		d = self._getDict( escape )
 		return Template.safe_substitute( self, d )
 

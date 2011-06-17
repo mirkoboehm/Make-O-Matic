@@ -1,0 +1,44 @@
+<html>
+<head>
+<style type="text/css">
+.header .footer {
+	font-size: 120%;
+}
+
+.header {
+	background-color: $my.bgcolor;
+}
+.footer {
+	background-color: #B8B8B8;
+}
+</style>
+</head>
+
+<body>
+<div class="header">
+$my.status <b>$script.buildname</b> ($project.buildtype)
+</div>
+</br>
+
+<table>
+	<tr>
+		<td>Client:</td>
+		<td>$script.clientname</td>
+	</tr>
+	<tr>
+		<td>Revision:</td>
+		<td>$project.revision</td>
+	</tr>
+	<tr>
+		<td>Committer:</td>
+		<td>$my.committerName</td>
+	</tr>
+</table>
+</br>
+
+<div class="footer">
+$my.footer
+</div>
+
+</body>
+</html>
