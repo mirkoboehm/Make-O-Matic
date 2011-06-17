@@ -168,7 +168,6 @@ class Action( MObject ):
 					if self.getStdOut():
 						f.writelines( '\n=== Standard output ===\n' + self.getStdOut().rstrip() + "\n" )
 					if self.getStdErr():
-						print self.getStdErr()
 						f.writelines( '\n=== Error output ===\n' + self.getStdErr().rstrip() + "\n" )
 				else:
 					f.writelines( '(The action did not generate any output.)\n' )
