@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
 from core.Exceptions import MomError, ConfigurationError, BuildError
+from core.Plugin import Plugin
+from core.Settings import Settings
+from core.actions.ShellCommandAction import ShellCommandAction
+from core.executomat.Step import Step
+from core.helpers.GlobalMApp import mApp
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
-from core.helpers.XmlReportGenerator import XmlReportGenerator
-from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
-from core.loggers.ConsoleLogger import ConsoleLogger
-import os.path
 from core.helpers.XmlUtils import xml_compare
+from core.loggers.ConsoleLogger import ConsoleLogger
+from core.plugins.helpers.XmlReportGenerator import XmlReportGenerator
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from tests.helpers.TestUtils import replace_bound_method
-from core.executomat.Step import Step
-from core.Plugin import Plugin
-from core.actions.ShellCommandAction import ShellCommandAction
+import os.path
+import unittest
 
 try:
 	from lxml import etree
