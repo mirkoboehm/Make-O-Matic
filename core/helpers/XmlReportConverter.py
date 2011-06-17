@@ -18,20 +18,21 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-
-import os.path
 from core.Exceptions import ConfigurationError, MomError, returncode_to_description, BuildError
-from core.helpers.GlobalMApp import mApp
 from core.MObject import MObject
-from textwrap import TextWrapper
+from core.executomat.Step import Step
+from core.helpers.GlobalMApp import mApp
+from core.helpers.TemplateSupport import MomTemplate
+from core.helpers.TimeKeeper import formatted_time_delta
 from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute, \
 	find_nodes_with_attribute_and_value
 from datetime import datetime
-from core.helpers.TimeKeeper import formatted_time_delta
-import xml.etree.ElementTree
-from core.executomat.Step import Step
-import traceback
+from textwrap import TextWrapper
+import os.path
 import sys
+import traceback
+import xml.etree.ElementTree
+
 
 try:
 	from lxml import etree
