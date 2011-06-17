@@ -1,8 +1,12 @@
 <html>
 <head>
 <style type="text/css">
-.header .footer {
-	font-size: 120%;
+.header, .footer {
+	padding-top: 5px;
+	padding-bottom: 5px;
+
+	font-weight: bold;
+	font-size: 110%;
 }
 
 .header {
@@ -11,16 +15,47 @@
 .footer {
 	background-color: #B8B8B8;
 }
+
+.status {
+	font-weight: bold;
+}
+
+pre {
+	font-size: 8pt;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	width: 800px;
+	background-color: #EEEEEE;
+
+	/* line wrap hack */
+	white-space: pre-wrap; /* css-3 */
+	white-space: -moz-pre-wrap
+	!important; /* Mozilla, since 1999 */
+	white-space: -pre-wrap; /*
+	Opera 4-6 */
+	white-space: -o-pre-wrap; /* Opera 7 */
+	word-wrap:
+	break-word; /* Internet Explorer 5.5+ */
+}
 </style>
 </head>
 
 <body>
 <div class="header">
-$my.status <b>$script.buildname</b> ($project.buildtype)
+$my.statusIcon $script.buildname ($project.buildtype)
 </div>
-</br>
+<br/>
 
 <table>
+	<tr class="status">
+		<td>Status:</td>
+		<td>$my.statusSummary</td>
+	</tr>
+	<tr class="status">
+		<td>Details:</td>
+		<td>$my.statusDetails</td>
+	</tr>
+	<tr><td></td><td></td></tr>
 	<tr>
 		<td>Client:</td>
 		<td>$script.clientname</td>
@@ -31,14 +66,23 @@ $my.status <b>$script.buildname</b> ($project.buildtype)
 	</tr>
 	<tr>
 		<td>Committer:</td>
-		<td>$my.committerName</td>
+		<td>$my.scmCommitterName</td>
+	</tr>
+	<tr>
+		<td>Commit time:</td>
+		<td>$my.scmCommitTime</td>
+	</tr>
+	<tr>
+		<td>Commit Message:</td>
+		<td><pre>$my.scmCommitMessage</pre></td>
 	</tr>
 </table>
-</br>
+<br/>
 
 <div class="footer">
 $my.footer
 </div>
+<br/>
 
 </body>
 </html>

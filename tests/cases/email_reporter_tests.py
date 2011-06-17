@@ -102,6 +102,13 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		self.assertTrue( "N/A" in email.getSubject() )
 
 	def testCreateEmailHtmlSummary( self ):
+		scm = self.build.getProject().getScm()
+
+		# set revision explicitly (with multi-line message)
+		scm.setRevision( "35fe6206bf1c1b576c69e4001d345404cdfd41be" )
+		scm._resetRevisionInfo()
+		self.build.runPreFlightChecks()
+
 		summary = self.reporter.createHtmlSummary()
 
 		# simple test here. makes more sense to do manual tests with this

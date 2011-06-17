@@ -99,10 +99,15 @@ class EmailReporter( Plugin ):
 		d = dict()
 		returnCode = instructions.getReturnCode()
 		d["my.returncode"] = returnCode
-		d["my.status"] = ( "☺" if returnCode == 0 else "☠" )
+		d["my.statusIcon"] = ( "☺" if returnCode == 0 else "☠" )
+		d["my.statusSummary"] = ( "success" if returnCode == 0 else "ERROR" )
+		d["my.statusDetails"] = "Failed steps: ".format( " ".join( instructions.getFailedSteps() ) ) \
+				if len( instructions.getFailedSteps() ) > 0 else "---"
 		d["my.bgcolor"] = ( "#00FF33" if returnCode == 0 else "red" )
-		d["my.committerName"] = info.committerName
-		d["my.footer"] = "Build took {0}".format( instructions.getTimeKeeper().deltaString() )
+		d["my.scmCommitterName"] = info.committerName or ""
+		d["my.scmCommitTime"] = info.commitTimeReadable or ""
+		d["my.scmCommitMessage"] = info.commitMessage or ""
+		d["my.footer"] = "Build took: {0}".format( instructions.getTimeKeeper().deltaString() )
 
 		templateString = open( SUMMARY_TEMPLATE_PATH, 'r' ).read()
 		s = MomTemplate( templateString )

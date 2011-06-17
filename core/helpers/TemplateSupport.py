@@ -34,7 +34,7 @@ class _TemplateDict( dict ):
 	def __getitem__( self, key ):
 		# first: try to get the value from the overwrite dict
 		val = self.overwrites.get( key )
-		if val:
+		if val != None:
 			return val
 
 		# next: try to get it from settings
