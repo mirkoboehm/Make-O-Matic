@@ -1,7 +1,7 @@
 <html>
 <head>
 <style type="text/css">
-.header, .footer {
+.xheader, .xfooter {
 	padding-top: 5px;
 	padding-bottom: 5px;
 
@@ -9,14 +9,14 @@
 	font-size: 110%;
 }
 
-.header {
+.xheader {
 	background-color: $my.bgcolor;
 }
-.footer {
+.xfooter {
 	background-color: #B8B8B8;
 }
 
-.status {
+.xstatus {
 	font-weight: bold;
 }
 
@@ -41,17 +41,17 @@ pre {
 </head>
 
 <body>
-<div class="header">
+<div class="xheader">
 $my.statusIcon $script.buildname ($project.buildtype)
 </div>
 <br/>
 
 <table>
-	<tr class="status">
-		<td>Status:</td>
+	<tr class="xstatus">
+		<td width="200px">Status:</td>
 		<td>$my.statusSummary</td>
 	</tr>
-	<tr class="status">
+	<tr class="xstatus">
 		<td>Details:</td>
 		<td>$my.statusDetails</td>
 	</tr>
@@ -79,7 +79,7 @@ $my.statusIcon $script.buildname ($project.buildtype)
 </table>
 <br/>
 
-<div class="footer">
+<div class="xfooter">
 $my.footer
 </div>
 <br/>
