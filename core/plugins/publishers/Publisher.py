@@ -67,6 +67,9 @@ class Publisher( Plugin ):
 
 		return "Upload location: {0}".format( uploadUrl )
 
+	def getPluginType( self ):
+		return "publisher"
+
 	def setUploadLocation( self, location ):
 		check_for_path_or_none( location, 'The upload location must be a nonempty string!' )
 		self.__uploadLocation = location

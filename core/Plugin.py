@@ -77,6 +77,9 @@ class Plugin( MObject ):
 	def getTagName( self ):
 		return "plugin"
 
+	def getPluginType( self ):
+		return "general"
+
 	def performPrepare( self ):
 		'''This message controls the execution of the prepare phase.
 		It should not be overloaded. Overload prepare() instead.'''
@@ -254,6 +257,7 @@ class Plugin( MObject ):
 		node = super( Plugin, self ).createXmlNode( document )
 		node.attributes["isEnabled"] = str( self.isEnabled() )
 		node.attributes["isOptional"] = str( self.isOptional() )
+		node.attributes["pluginType"] = str( self.getPluginType() )
 		return node
 
 	def getXmlTemplate( self, element, wrapper ):

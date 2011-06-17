@@ -342,6 +342,15 @@ class XmlReportConverter( MObject ):
 			out += wrapper.wrapMultiLine( string_from_node( buildNode, "commitMessage" ), drop_empty_lines = False )
 			wrapper.dedent( indentString = "  " )
 
+			# additional plugin info
+			out += " "
+			out += wrapper.wrap( "Additional plugin info:" )
+			wrapper.indent( indentString = "* " )
+			publisherNodes = find_nodes_with_attribute_and_value( buildNode, "plugin", "pluginType", "publisher" )
+			for publisherNode in publisherNodes:
+				out += wrapper.wrap( "Publisher:       {0}".format( string_from_node( publisherNode, "objectstatus" ) ) )
+			wrapper.dedent( indentString = "  " )
+
 		wrapper.dedent()
 
 		out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
