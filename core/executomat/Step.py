@@ -99,7 +99,7 @@ class Step( MObject ):
 	def getLogfilePath( self ):
 		return self.__logfilePath
 
-	def getRelativeLogFilePath( self ):
+	def _getRelativeLogFilePath( self ):
 		"""\return Relative path of log file to the build base directory"""
 
 		if not self.getLogfilePath():
@@ -109,7 +109,7 @@ class Step( MObject ):
 		return os.path.relpath( self.getLogfilePath(), appBaseDir )
 
 	def getRelativeLinkTarget( self ):
-		return ( self.getRelativeLogFilePath(), None )
+		return ( self._getRelativeLogFilePath(), "Get log file for this step" )
 
 	def getPreActions( self ):
 		return self.__preActions

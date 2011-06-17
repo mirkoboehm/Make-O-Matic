@@ -19,6 +19,8 @@
 
 from core.Plugin import Plugin
 from core.actions.ShellCommandAction import ShellCommandAction
+from core.helpers.GlobalMApp import mApp
+import os.path
 
 class PackageProvider( Plugin ):
 
@@ -43,5 +45,17 @@ class PackageProvider( Plugin ):
 		steps, for example."""
 		self.makePackageStep()
 
+	def _getRelativePackagesDirPath( self ):
+		packagesDir = self.getInstructions().getPackagesDir()
+		if not packagesDir:
+			return None
+
+		appBaseDir = mApp().getBaseDir()
+		return os.path.relpath( self.getInstructions().getPackagesDir(), appBaseDir )
+
 	def getRelativeLinkTarget( self ):
-		return ( self.getInstructions().getPackagesDir(), "Get packages for this configuration" )
+		step = self.getInstructions().getStep( 'create-packages' )
+		if step.isEnabled():
+			return ( self._getRelativePackagesDirPath(), "Get packages for this configuration" )
+		else:
+			return ( None, None )
