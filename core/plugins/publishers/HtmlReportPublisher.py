@@ -58,11 +58,17 @@ class HtmlReportPublisher( Publisher ):
 		report = InstructionsXmlReport( mApp() )
 		converter = XmlReportConverter( report )
 		html = converter.convertToHtml( True )
-		filePath = os.path.join( self.getSourceLocation(), "index.html" )
 
 		# write file
+		filePath = os.path.join( self.getSourceLocation(), "index.html" )
 		f = codecs.open( filePath, 'w', encoding = "utf-8" )
 		f.write( html )
+		f.close()
+
+		# temporary: also write report
+		filePath = os.path.join( self.getSourceLocation(), "build-report.xml" )
+		f = codecs.open( filePath, 'w', encoding = "utf-8" )
+		f.write( report.getReport() )
 		f.close()
 
 		self._upload()
