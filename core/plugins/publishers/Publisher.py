@@ -17,15 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from core.Exceptions import ConfigurationError
 from core.Plugin import Plugin
 from core.Settings import Settings
 from core.actions.filesystem.CopyActionBase import CopyActionBase
+from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.GlobalMApp import mApp
+from core.helpers.TemplateSupport import MomTemplate
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
 from string import Template
 import os
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.Exceptions import ConfigurationError
 
 class PublisherAction( CopyActionBase ):
 
@@ -107,30 +108,10 @@ class Publisher( Plugin ):
 		complete = os.path.join( self.getUploadLocation(), *self._getExtraUploadSubdirsAsString() )
 		return complete
 
-	@staticmethod
-	def _getUploadUrlSubstitutes():
-
-		def get( setting ):
-			settings = mApp().getSettings()
-			val = settings.get( setting, True )
-
-			if not val:
-				return ""
-
-			return make_foldername_from_string( val )
-
-		return dict( 
-			n = get( Settings.ScriptBuildName ),
-			p = get( Settings.ScriptClientName ),
-			b = get( Settings.SourceCodeProviderBranchPrefix ),
-			v = get( Settings.SourceCodeProviderVersionName ),
-			r = get( Settings.ProjectRevisionWithTime )
-		)
-
 	def getUploadSubDirs( self ):
 		subdirsTemplateString = mApp().getSettings().get( Settings.PublisherSubdirectoryTemplate, True )
-		s = Template( subdirsTemplateString )
-		ret = s.substitute( self._getUploadUrlSubstitutes() )
+		s = MomTemplate( subdirsTemplateString )
+		ret = s.substitute( escape = True )
 		return ret
 
 	def setUploadBaseUrl( self, baseUrl ):

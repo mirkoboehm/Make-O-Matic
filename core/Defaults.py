@@ -211,7 +211,13 @@ class Defaults( MObject ):
 		defaultSettings[ Defaults.EmailReporterNotifyCommitterOnFailure ] = True
 		defaultSettings[ Defaults.EmailReporterUseCompressionForAttachments ] = False
 		# ----- Publisher settings:
-		defaultSettings[ Defaults.PublisherSubdirectoryTemplate] = "$n/$b/$v/$r/$p"
+		defaultSettings[ Defaults.PublisherSubdirectoryTemplate] = "${0}/${1}/${2}/${3}/${4}".format( 
+				Defaults.ScriptBuildName,
+				Defaults.SourceCodeProviderBranchPrefix,
+				Defaults.SourceCodeProviderVersionName,
+				Defaults.ProjectRevisionWithTime,
+				Defaults.ScriptClientName
+				)
 		defaultSettings[ Defaults.RSyncPublisherPackageCleanup ] = True
 		defaultSettings[ Defaults.RSyncPublisherReportsCleanup ] = True
 		defaultSettings[ Defaults.FileSystemPublisherPackageCleanup ] = True
