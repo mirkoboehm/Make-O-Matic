@@ -25,6 +25,7 @@ from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, 
 from string import Template
 import os
 from core.helpers.FilesystemAccess import make_foldername_from_string
+from core.Exceptions import ConfigurationError
 
 class PublisherAction( CopyActionBase ):
 
@@ -58,7 +59,13 @@ class Publisher( Plugin ):
 		self.setExtraUploadSubDirs( [] )
 
 	def getObjectStatus( self ):
-		return "Upload location: {0}".format( self.getUploadUrl() )
+		# self.getUploadUrl() may throw if revision, etc. is not available. Catch this.
+		try:
+			uploadUrl = self.getUploadUrl()
+		except ConfigurationError:
+			uploadUrl = "(Cannot yet resolve location)"
+
+		return "Upload location: {0}".format( uploadUrl )
 
 	def setUploadLocation( self, location ):
 		check_for_path_or_none( location, 'The upload location must be a nonempty string!' )
