@@ -20,6 +20,7 @@ import string
 from core.Exceptions import MomException
 from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
 from core.helpers.XmlUtils import create_child_node
+import inspect
 
 class MObject( object ):
 	"""MObject is the base class for objects used during a MoM script run."""
@@ -68,6 +69,10 @@ class MObject( object ):
 			# FIXME (Mirko) find a better formating for the details
 			self._printDescribeLine( prefix + ' > ', self.getName(), self.getObjectDescription(), replacePatterns )
 
+	@classmethod
+	def getBaseClassNames( cls ):
+		return [c.__module__ + "." + c.__name__ for c in inspect.getmro( cls )]
+
 	def _printDescribeLine( self, prefix, name, details, replacePatterns = True ):
 		clazz = self.__class__.__name__
 		if name != clazz:
@@ -100,6 +105,7 @@ class MObject( object ):
 
 		node = document.createElement( self.getTagName() )
 		node.attributes["name"] = self.getName()
+		node.attributes["bases"] = " ".join( self.getBaseClassNames() )
 		node.attributes["relativeLinkTarget"] = str ( self.getRelativeLinkTarget()[0] )
 		node.attributes["relativeLinkTargetDescription"] = str ( self.getRelativeLinkTarget()[1] )
 		create_child_node( document, node, "objectdescription", self.getObjectDescription() if self.getObjectDescription() else "" )
