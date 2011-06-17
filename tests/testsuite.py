@@ -58,6 +58,7 @@ import sys
 import unittest
 #from tests.cases.emailer_tests import EmailerTest
 from tests.cases.mapplication_tests import MApplicationTests
+from tests.cases.template_support_tests import TemplateSupportTests
 
 CLASSES = [
 	# self tests first
@@ -85,6 +86,7 @@ CLASSES = [
 	ScmModulesTests,
 	XmlReportTests,
 	SettingsTests,
+	TemplateSupportTests,
 	QTestTests,
 	SettingResolverTest,
 	MApplicationTests
