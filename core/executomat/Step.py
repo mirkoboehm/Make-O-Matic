@@ -86,7 +86,11 @@ class Step( MObject ):
 		return self.__ignorePreviousFailure
 
 	def isEmpty( self ):
-		return len( self.getAllActions() ) == 0
+		for actions in self.getAllActions():
+			if len( actions ) > 0:
+				return False
+
+		return True
 
 	def setLogfilePath( self, logfileName ):
 		check_for_string( logfileName, "The log file parameter must be a string containing a file name." )
@@ -117,6 +121,8 @@ class Step( MObject ):
 		return self.__postActions
 
 	def getAllActions( self ):
+		"""\return 3-Element-List of List of actions ([[..],[..],[..]])"""
+
 		return [self.getPreActions(), self.getMainActions(), self.getPostActions()]
 
 	def addPreAction( self, action ):
