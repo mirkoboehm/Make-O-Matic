@@ -102,7 +102,7 @@ body, table {
 	width: 800px;
 }
 
-div#mom-report div {
+div.tag-build div {
 	margin-left: 1%;
 }
 
@@ -167,6 +167,25 @@ h5 {
 	#BBBBBB;
 }
 
+.xheader, .xfooter {
+	padding: 5px;
+	margin: 10px 0px;
+
+	font-weight: bold;
+	font-size: 110%;
+	
+	background-color: #B8B8B8;
+	border: 1px solid black;
+	
+	text-align: center;
+}
+
+.xplugins {
+	border: 1px dashed grey;
+	margin-top: 10px;
+	padding: 5px;
+}
+
 .log {
 	padding-left: 10px;
 }
@@ -176,6 +195,10 @@ h5 {
 }
 .step-status {
 	font-weight: bold;
+}
+
+.tag-plugin {
+	margin-bottom: 5px;
 }
 				</style>
 				<title>Build Report for <xsl:value-of select=".//build/@name"/></title>
@@ -203,10 +226,50 @@ h5 {
 	</xsl:template>
 	
 	<xsl:template name="showSummary">
-		<xsl:value-of select=".//build/@sys-platform"></xsl:value-of>
+		<xsl:choose>
+			<xsl:when test=".//build/@returncode = '0'">
+				<div class="xheader" style="background-color: #00FF33">
+					<xsl:value-of select=".//build/@name"/><br/><br/>
+					SUCCESS
+				</div>
+			</xsl:when>
+			<xsl:otherwise>
+				<div class="xheader" style="background-color: red">
+					<xsl:value-of select=".//build/@name"/><br/><br/>
+					FAILURE
+				</div>
+			</xsl:otherwise>
+		</xsl:choose>
 		
-		<xsl:apply-templates select=".//plugin[@pluginType = 'scm']"/>
-		<xsl:apply-templates select=".//plugin[@pluginType = 'publisher']"/>
+		<table>
+			<tr>
+				<td width="200px">Status:</td>
+				<td>
+					<xsl:call-template name="showBuildStatus">
+						<xsl:with-param name="returncode" select=".//build/@returncode"/>
+					</xsl:call-template>
+				</td>
+			</tr>
+			<tr><td></td><td></td></tr>
+			<tr>
+				<td>Node:</td>
+				<td>
+					<xsl:value-of select=".//build/@sys-nodename" />
+						[<xsl:value-of select=".//build/@sys-platform" /> (<xsl:value-of select=".//build/@sys-version" />)]
+				</td></tr>
+		</table>
+		
+		<div class="xplugins">
+			<h5>Additional plugin information</h5>
+			<table>
+				<xsl:apply-templates select=".//plugin[@pluginType = 'scm']"/>
+				<xsl:apply-templates select=".//plugin[@pluginType = 'publisher']"/>
+			</table>
+		</div>
+		
+		<div class="xfooter">
+				Build time: <xsl:value-of select=".//build/@timing" />
+		</div>
 	</xsl:template>
 
 	<xsl:template match="exception">
@@ -296,19 +359,21 @@ h5 {
 		</xsl:if>
 	</xsl:template>
 
-<!--
 	<xsl:template match="plugins">
 		<xsl:if test="count(./plugin) > 0">
-			<h4>Plugins:</h4>
+			<table>
+			<h5>Plugins:</h5>
 			<div class="tag-plugins">
 				<xsl:apply-templates/>
 			</div>
+			</table>
+			<br/>
 		</xsl:if>
 	</xsl:template>
--->
 
 	<xsl:template match="plugin">
-		<h5>
+		<tr>
+		<td>
 			<xsl:value-of select="@name" />
 			<xsl:if test="@isEnabled = 'False'">
 				[Disabled]
@@ -316,10 +381,13 @@ h5 {
 			<xsl:if test="@isOptional = 'True'">
 				[Optional]
 			</xsl:if>
+		</td>
+		<td>
 			<xsl:if test="string-length(objectstatus) > 0">
 				(<xsl:value-of select="objectstatus"/>)
 			</xsl:if>
-		</h5>
+		</td>
+		</tr>
 		<!-- TODO: Doesn't work for some reason, why?
 		<div class="tag-plugin">
 		 -->
