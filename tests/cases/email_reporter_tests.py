@@ -37,46 +37,55 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		# add EmailReporter plugin
 		self.reporter = EmailReporter( "TestEmailReporter" )
 		self.build.addPlugin( self.reporter )
-		self.build.runPreFlightChecks()
 
-	def testCreateEmail1( self ):
+	def testCreateEmailOnNormalExit( self ):
 		self.build.registerReturnCode( 0 ) # no failure
+		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
 
 		self.assertEquals( email.getToAddresses(), ["DR"] )
 
-	def testCreateEmail2( self ):
+	def testCreateEmailOnConfiguratioError( self ):
 		self.build.registerReturnCode( ConfigurationError.getReturnCode() )
+		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
 
-		self.assertTrue( "DR" in email.getToAddresses() and "CER" in email.getToAddresses() )
+		self.assertTrue( "DR" in email.getToAddresses() )
+		self.assertTrue( "CER" in email.getToAddresses() )
 
-	def testCreateEmail3( self ):
+	def testCreateEmailOnMomError( self ):
 		self.build.registerReturnCode( MomError.getReturnCode() )
+		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
 
-		self.assertTrue( "DR" in email.getToAddresses() and "MER" in email.getToAddresses() )
+		self.assertTrue( "DR" in email.getToAddresses() )
+		self.assertTrue( "MER" in email.getToAddresses() )
 
-	def testCreateEmail4( self ):
+	def testCreateEmailOnBuildError1( self ):
 		self.build.registerReturnCode( BuildError.getReturnCode() )
 		scm = self.build.getProject().getScm()
 
 		# commit1
 		scm.setRevision( "409ae013ff1a9dccf41a60b4cefcd849309893bd" ) # commit by Mirko
-		scm._resetRevisionInfo()
 		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
-		self.assertTrue( "DR" in email.getToAddresses() and "mirko@kdab.com" in email.getToAddresses() )
+		self.assertTrue( "DR" in email.getToAddresses() )
+		self.assertTrue( "mirko@kdab.com" in email.getToAddresses() )
+
+	def testCreateEmailOnBuildError2( self ):
+		self.build.registerReturnCode( BuildError.getReturnCode() )
+		scm = self.build.getProject().getScm()
 
 		# commit2
 		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" ) # commit by Kevin
-		scm._resetRevisionInfo()
 		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
-		self.assertTrue( "DR" in email.getToAddresses() and "krf@electrostorm.net" in email.getToAddresses() )
+		self.assertTrue( "DR" in email.getToAddresses() )
+		self.assertTrue( "krf@electrostorm.net" in email.getToAddresses() )
 
 	def testCreateEmailNoRecipients( self ):
 		mApp().getSettings().set( Settings.EmailReporterDefaultRecipients, None )
+		self.build.runPreFlightChecks()
 		email = self.reporter.createEmail()
 
 		self.assertEquals( len( email.getToAddresses() ), 0 )
@@ -85,7 +94,6 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		scm = self.build.getProject().getScm()
 
 		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" )
-		scm._resetRevisionInfo()
 		self.build.runPreFlightChecks()
 
 		email = self.reporter.createEmail()
@@ -95,7 +103,6 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		scm = self.build.getProject().getScm()
 
 		scm.setRevision( "---" )
-		scm._resetRevisionInfo()
 		self.build.runPreFlightChecks()
 
 		email = self.reporter.createEmail()
@@ -106,7 +113,6 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 
 		# set revision explicitly (with multi-line message)
 		scm.setRevision( "35fe6206bf1c1b576c69e4001d345404cdfd41be" )
-		scm._resetRevisionInfo()
 		self.build.runPreFlightChecks()
 
 		summary = self.reporter.createHtmlSummary()
