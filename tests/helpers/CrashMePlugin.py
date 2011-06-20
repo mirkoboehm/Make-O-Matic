@@ -16,10 +16,10 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.Plugin import Plugin
-import os
 
 class CrashMePlugin( Plugin ):
+
 	def setup( self ):
-		if os.environ.has_key( 'CRASHME_PLUGIN_CRASH_IN_SETUP' ):
-			raise SyntaxError( 'The CrashMePlugin raised a syntax error' )
+		raise SyntaxError( 'The CrashMePlugin raised a syntax error' )

@@ -25,7 +25,6 @@ from tests.helpers.CrashMePlugin import CrashMePlugin
 
 build, project = BuildProject( 'Make-O-Matic', 'git://github.com/KDAB/Make-O-Matic.git', '0.5.0', versionName = 'French Fries' )
 
-build.addPlugin( CrashMePlugin() )
 # set up configurations:
 python = PythonConfiguration( 'Python', parent = project )
 # Hint: do not enable running the test suite here, because this script is part of the test suite :-)
