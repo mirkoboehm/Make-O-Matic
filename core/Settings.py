@@ -78,9 +78,7 @@ class Settings( Defaults ):
 						'__file__' : configFile,
 						'application' : mApp()
 					}
-					with open( configFile ) as f:
-						code = f.read()
-						exec( code, currentGlobals )
+					execfile( configFile, currentGlobals )
 					mApp().debug( self, 'Configuration file "{0}" loaded successfully'.format( configFile ) )
 				except SyntaxError as e:
 					mApp().debug( self, traceback.format_exc() )
