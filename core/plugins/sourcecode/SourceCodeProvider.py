@@ -89,6 +89,9 @@ class SourceCodeProvider( Plugin ):
 	def setParseBranchCommits( self, onOff ):
 		self.__parseBranchCommits = onOff
 
+	def getPluginType( self ):
+		return "scm"
+
 	def getRevisionInfo( self ):
 		"""Returns a RevisionInfo object"""
 		if not self.__revisionInfo:

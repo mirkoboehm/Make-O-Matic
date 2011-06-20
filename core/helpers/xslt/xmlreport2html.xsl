@@ -4,6 +4,8 @@
 	xmlns="http://www.w3.org/1999/xhtml">
 
 	<xsl:output method="xml" indent="yes" encoding="UTF-8" />
+	
+	<xsl:param name="summaryOnly"/>
 	<xsl:param name="enableCrossLinking"/>
 
 	<xsl:template name="showBuildStatus">
@@ -100,7 +102,7 @@ body, table {
 	width: 800px;
 }
 
-div#build-report div {
+div#mom-report div {
 	margin-left: 1%;
 }
 
@@ -176,10 +178,10 @@ h5 {
 	font-weight: bold;
 }
 				</style>
-				<title>Build Report</title>
+				<title>Build Report for <xsl:value-of select=".//build/@name"/></title>
 			</head>
 			<body>
-				<div id="build-report">
+				<div id="mom-report">
 					<xsl:apply-templates/>
 				</div>
 			</body>
@@ -187,6 +189,25 @@ h5 {
 	</xsl:template>
 	
 	<xsl:strip-space  elements="*"/>
+
+	<xsl:template match="mom-report">
+		<xsl:choose>
+			<xsl:when test="$summaryOnly = '1'">
+				<xsl:call-template name="showSummary"></xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:apply-templates/>
+			</xsl:otherwise>
+		</xsl:choose>
+		
+	</xsl:template>
+	
+	<xsl:template name="showSummary">
+		<xsl:value-of select=".//build/@sys-platform"></xsl:value-of>
+		
+		<xsl:apply-templates select=".//plugin[@pluginType = 'scm']"/>
+		<xsl:apply-templates select=".//plugin[@pluginType = 'publisher']"/>
+	</xsl:template>
 
 	<xsl:template match="exception">
 		<div class="tag-exception">

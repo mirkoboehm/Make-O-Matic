@@ -233,7 +233,7 @@ class XmlReportConverter( MObject ):
 	def hasXsltSupport( self ):
 		return ( etree.__name__ == "lxml.etree" )
 
-	def convertToHtml( self, enableCrossLinking = False ):
+	def convertToHtml( self, summaryOnly = False, enableCrossLinking = False ):
 		"""Converts the report to HTML using the XSL stylesheet for HTML
 
 		\note Be very sure to catch all exceptions here!"""
@@ -243,11 +243,15 @@ class XmlReportConverter( MObject ):
 			return None
 
 		# transform only accepts bytes, we have to "escape" the enableCrossLinking parameter
+		summaryOnly = "1" if summaryOnly else "0"
 		enableCrossLinkingParam = "1" if enableCrossLinking else "0"
 
 		try:
 			transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
-			result = str( transform( etree.XML( self.__xmlReport.getReport() ), enableCrossLinking = enableCrossLinkingParam ) )
+			result = str( transform( etree.XML( self.__xmlReport.getReport() ),
+					summaryOnly = summaryOnly,
+					enableCrossLinking = enableCrossLinkingParam )
+			)
 		except Exception, e:
 			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
 			result = "Could not create HTML report. Caught exception:\n {0}\nTraceback:\n{1}".format( e, innerTraceback )
