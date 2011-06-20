@@ -115,6 +115,12 @@ class EmailReporter( Plugin ):
 		htmlString = s.substitute()
 		return htmlString
 
+	def createHtmlSummaryNG( self ):
+		report = InstructionsXmlReport( mApp() )
+		conv = XmlReportConverter( report )
+		htmlString = conv.convertToHtml( summaryOnly = True )
+		return htmlString
+
 	def createEmail( self ):
 		instructions = mApp()
 		assert isinstance( instructions, Build )
