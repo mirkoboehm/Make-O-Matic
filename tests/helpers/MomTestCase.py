@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
 from core.Build import Build
 from core.MApplication import MApplication
-from datetime import datetime
-import unittest
 from core.helpers.RunCommand import RunCommand
+from core.helpers.XmlReport import InstructionsXmlReport
+from core.helpers.XmlReportConverter import XmlReportConverter
+from datetime import datetime
+import os
+import unittest
 
 class MomTestCase( unittest.TestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.
@@ -56,6 +58,21 @@ class MomTestCase( unittest.TestCase ):
 		MApplication.instance = None
 
 		#print( "[time: {0}]".format( datetime.utcnow() - self.startTime ) )
+
+	def _getReport( self, instructions = None ):
+		if instructions is None:
+			instructions = self.build
+
+		report = InstructionsXmlReport( instructions )
+		return report
+
+	def _printTextReport( self, instructions = None ):
+		conv = XmlReportConverter( self._getReport( instructions ) )
+		print( conv.convertToText() )
+
+	def _printHtmlReport( self, instructions = None ):
+		conv = XmlReportConverter( self._getReport( instructions ) )
+		print( conv.convertToHtml() )
 
 	def runCommand( self, cmd, description, timeout = None, zeroReturnCode = True ):
 		'''Helper method to run shell commands in tests. It creates a RunCommand object, runs it, 
