@@ -20,6 +20,7 @@
 from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
 import os
 from core.helpers.GlobalMApp import mApp
+from core.helpers.TypeCheckers import check_for_path
 
 class QMakeBuilder( MakefileGeneratorBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
@@ -27,7 +28,7 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 	def __init__( self, name = None, projectFile = None ):
 		MakefileGeneratorBuilder.__init__( self, name )
 		self.enableInstallation( False )
-		self._projectFile = projectFile
+		self.__projectFilePath = projectFile
 		self._setCommand( "qmake" )
 
 	def enableInstallation( self, onoff ):
@@ -36,16 +37,29 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 	def installEnabled( self ):
 		return self.__install
 
+	def setProjectFilePath( self, projectFilePath ):
+		"""Set the project file path for this builder
+
+		\param projectFilePath Likely a path in the form of /path/to/source/project.pro"""
+
+		check_for_path( projectFilePath, "Project file property must be a valid path" )
+		self.__projectFilePath = projectFilePath
+
+	def getProjectFilePath( self ):
+		return self.__projectFilePath
+
 	def createConfigureActions( self ):
 		if not self.getInSourceBuild():
-			project = self.getInstructions().getProject()
-			sourceDirectory = project.getSourceDir()
-			if not self._projectFile:
+			if not self.getProjectFilePath():
 				# If we don't have a project file, guess from the name
 				# FIXME: We should probably check this somehow but can't be done until after preFlightCheck
-				self._projectFile = "{0}.pro".format( project.getName() )
-			projectFilePath = os.path.join( sourceDirectory, self._projectFile )
-			self._setCommandArguments( [ projectFilePath ] )
+				project = self.getInstructions().getProject()
+				sourceDirectory = project.getSourceDir()
+				projectFile = "{0}.pro".format( project.getName() )
+				self.setProjectFilePath( os.path.join( sourceDirectory, projectFile ) )
+
+			self._setCommandArguments( [ self.getProjectFilePath() ] )
+
 		MakefileGeneratorBuilder.createConfigureActions( self )
 
 	def createConfMakeInstallActions( self ):
