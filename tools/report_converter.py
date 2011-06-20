@@ -4,7 +4,7 @@
 # This file is part of Make-O-Matic.
 # 
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-# Author: Mirko Boehm <mirko@kdab.com>
+# Author: Kevin Funk <kevin.funk@kdab.com>
 # 
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,10 +25,10 @@ from core.helpers.XmlReport import StringBasedXmlReport
 from core.MApplication import MApplication
 import sys
 
-TARGET_FORMATS = ["text", "html"]
+TARGET_FORMATS = ["text", "text_summary", "html", "html_summary"]
 
 def usage():
-	print_stderr( "Usage: {0} INPUT_FILE [text|html]".format( sys.argv[0] ) )
+	print_stderr( "Usage: {0} INPUT_FILE [{1}]".format( sys.argv[0], "|".join( TARGET_FORMATS ) ) )
 
 def print_stderr( message ):
 	print( message, file = sys.stderr )
@@ -44,7 +44,7 @@ def main():
 		usage()
 		sys.exit( 1 )
 
-	# check if second parameter in TARGET_FORMATS, if unset: use text
+	# check if second parameter in TARGET_FORMATS
 	try:
 		if sys.argv[2] in TARGET_FORMATS:
 			targetFormat = sys.argv[2]
@@ -52,6 +52,7 @@ def main():
 			usage()
 			sys.exit( 1 )
 	except IndexError:
+		# second parameter not set => using default
 		targetFormat = "text"
 
 	# start IO
@@ -61,10 +62,13 @@ def main():
 
 	converter = XmlReportConverter( xmlReport )
 	if targetFormat == "text":
-		print( converter.convertToTextSummary() )
 		print( converter.convertToText() )
+	elif targetFormat == "text_summary":
+		print( converter.convertToTextSummary() )
 	elif targetFormat == "html":
 		print( converter.convertToHtml( enableCrossLinking = True ) )
+	elif targetFormat == "html_summary":
+		print( converter.convertToHtml( summaryOnly = True, enableCrossLinking = True ) )
 
 if __name__ == "__main__":
 	main()
