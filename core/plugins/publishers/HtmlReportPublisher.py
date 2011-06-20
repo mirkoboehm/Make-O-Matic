@@ -57,7 +57,7 @@ class HtmlReportPublisher( Publisher ):
 
 		report = InstructionsXmlReport( mApp() )
 		converter = XmlReportConverter( report )
-		html = converter.convertToHtml( True )
+		html = converter.convertToHtml( enableCrossLinking = True )
 
 		# write file
 		filePath = os.path.join( self.getSourceLocation(), "index.html" )
