@@ -226,6 +226,14 @@ class Build( MApplication ):
 						shutil.rmtree( self.getLogDir() )
 				except OSError as e:
 					raise ConfigurationError( 'Cannot delete log directory at "{0}": {1}'.format( self.getLogDir(), str( e ) ) )
+			if self.getPackagesDir():
+				try:
+					if os.path.isdir( self.getPackagesDir() ):
+						mApp().debugN( self, 2, 'deleting packages directory structure at "{0}"'.format( self.getPackagesDir() ) )
+						shutil.rmtree( self.getPackagesDir() )
+				except OSError as e:
+					raise ConfigurationError( 'Cannot delete packages directory at "{0}": {1}'.format( self.getPackagesDir(),
+						str( e ) ) )
 			return MApplication.runShutDowns( self )
 		else:
 			return None
