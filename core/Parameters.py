@@ -80,6 +80,8 @@ http://docs.kdab.com/make-o-matic/{0}/html
 e.g.: -s disable-cleanup,enable-create-packages""" )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
 			help = 'set the level of debug output (-v, -vv, -vvv...)' )
+		parser.add_option( '-d', '--disable-shutdown', action = 'store_true', dest = 'disableShutdown', default = False,
+			help = 'disable the shutdown phase (packages, logs and other folders are deleted during shutdown)' )
 		return parser
 
 	def parse( self ):
@@ -125,6 +127,9 @@ e.g.: -s disable-cleanup,enable-create-packages""" )
 
 	def getIgnoreConfigurationFiles( self ):
 		return self._getOptions().ignoreConfigurationFiles
+
+	def getDisableShutdown( self ):
+		return self._getOptions().disableShutdown
 
 	def apply( self, settings ):
 		assert isinstance( settings, Settings )

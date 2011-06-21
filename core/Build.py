@@ -218,7 +218,7 @@ class Build( MApplication ):
 
 	def runShutDowns( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
-		if mode == Settings.RunMode_Build:
+		if mode == Settings.RunMode_Build and not self.getParameters().getDisableShutdown():
 			if self.getDeleteLogDirOnShutdown():
 				try:
 					if os.path.isdir( self.getLogDir() ):
