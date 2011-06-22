@@ -99,8 +99,8 @@ class Email( MObject ):
 	def attachAlternativeTextPart( self, textString, htmlString ):
 		"""\warning Can only be set once!"""
 
-		part1 = MIMEText( textString, 'plain', _charset = 'utf-8' )
-		part2 = MIMEText( htmlString, 'html', _charset = 'utf-8' )
+		part1 = MIMEText( textString.encode( "utf-8" ), 'plain', _charset = 'utf-8' )
+		part2 = MIMEText( htmlString.encode( "utf-8" ), 'html', _charset = 'utf-8' )
 		alternativePart = MIMEMultipart( 'alternative' )
 		alternativePart.attach( part1 )
 		alternativePart.attach( part2 )
