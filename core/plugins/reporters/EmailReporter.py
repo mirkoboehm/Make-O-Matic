@@ -29,6 +29,7 @@ from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_f
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 import os.path
+from core.helpers.RevisionInfo import RevisionInfo
 
 
 class EmailReporter( Plugin ):
@@ -133,7 +134,10 @@ class EmailReporter( Plugin ):
 		reporterUseCompression = mApp().getSettings().get( Settings.EmailReporterUseCompressionForAttachments, False )
 
 		# get revision info, do not crash here
-		info = instructions.getProject().getScm().getRevisionInfo()
+		try:
+			info = instructions.getProject().getScm().getRevisionInfo()
+		except MomError:
+			info = RevisionInfo()
 		revision = ( info.shortRevision if info.shortRevision else info.revision ) or "N/A"
 
 		returnCode = instructions.getReturnCode()
