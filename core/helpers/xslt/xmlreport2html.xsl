@@ -282,11 +282,18 @@ h5 {
 				<br/>
 			</xsl:if>
 
-			<h5>Plugin information</h5>
-			<table><tbody>
-				<xsl:apply-templates select=".//plugin[@pluginType = 'scm']"/>
-				<xsl:apply-templates select=".//plugin[@pluginType = 'publisher']"/>
-			</tbody></table>
+			<xsl:if test="count(.//exception) > 0">
+				<h5>Caught exception:</h5>
+				<xsl:apply-templates select=".//exception"/>
+			</xsl:if>
+
+			<xsl:if test="count(.//plugin) > 0">
+				<h5>Plugin information</h5>
+				<table><tbody>
+					<xsl:apply-templates select=".//plugin[@pluginType = 'scm']"/>
+					<xsl:apply-templates select=".//plugin[@pluginType = 'publisher']"/>
+				</tbody></table>
+			</xsl:if>
 		</div>
 		
 		<div class="xfooter">
@@ -407,12 +414,8 @@ h5 {
 		<td>
 			<xsl:if test="string-length(objectstatus) > 0">
 				(<xsl:value-of select="objectstatus"/>)
+				<br/>
 			</xsl:if>
-		</td>
-		</tr>
-		<!-- TODO: Doesn't work for some reason, why?
-		<div class="tag-plugin">
-		 -->
 		<xsl:if test="$enableCrossLinking = '1' and @relativeLinkTarget != 'None'">
 			<a>
 				<xsl:attribute name="href">
@@ -426,7 +429,8 @@ h5 {
 			<!-- Plugin templates are inserted here -->
 			<xsl:when test="@name = 'placeholder'" />
 		</xsl:choose>
-		<!--</div>-->
+		</td>
+		</tr>
 	</xsl:template>
 
 	<xsl:template match="step">
