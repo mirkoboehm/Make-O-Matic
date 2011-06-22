@@ -16,10 +16,10 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from core.plugins.publishers.Publisher import Publisher
 from core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
 from core.actions.filesystem.CheckDirectoryExistsAction import CheckDirectoryExistsAction
-from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
 import os
@@ -35,12 +35,9 @@ class FileSystemPublisher( Publisher ):
 
 	def setup( self ):
 		if not self.getUploadLocation():
-			defaultLocation = mApp().getSettings().get( Settings.FileSystemPublisherPackageUploadLocation, False )
-			mApp().debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
-			self.setUploadLocation( defaultLocation )
-			if not self.getUploadLocation():
-				mApp().message( self, 'Upload location is empty. Not generating any actions.' )
-				return
+			mApp().message( self, 'Upload location is empty. Not generating any actions.' )
+			return
+
 		localdir = self.getLocalDir()
 		if not self.getLocalDir():
 			localdir = PathResolver( mApp().getPackagesDir )
@@ -58,47 +55,15 @@ class FileSystemPackagesPublisher( FileSystemPublisher ):
 	'''A filesystem publisher that is pre-configured to publish the packages structure to the default location.'''
 
 	def __init__( self, name = None ):
-		FileSystemPublisher.__init__( self, name, uploadLocation = mApp().getSettings().get( Settings.FileSystemPublisherPackageUploadLocation ),
+		FileSystemPublisher.__init__( self, name,
 			localDir = PathResolver( mApp().getPackagesDir ) )
 		self._setStep( 'upload-packages' )
 
-	def getObjectStatus( self ):
-		baseUrl = mApp().getSettings().get( Settings.PublisherPackageBaseHttpURL, False )
-		if baseUrl:
-			return "Location: {0}".format( baseUrl )
 
-		super( FileSystemPackagesPublisher, self ).getObjectStatus()
-
-	def setup( self ):
-		super( FileSystemPackagesPublisher, self ).setup()
-		if ( mApp().getSettings().get( Settings.FileSystemPublisherPackageCleanup ) ):
-			step = self.getInstructions().getStep( self.getStep() )
-			#FIXME if the directory is cleared he cannot write logs anymore and fails the build,
-			#so disable for now
-			#step.addMainAction( RmDirAction( PathResolver( mApp().getPackagesDir ) ) )
-
-# FIXME the reports publisher needs to be called after the build finished 
-# (chicken and egg problem, the report can only be created once the build is done)
-# implement uploading in wrapUp()?
 class FileSystemReportsPublisher( FileSystemPublisher ):
 	'''A filesystem publisher that is pre-configured to publish the reports structure to the default location.'''
 
 	def __init__( self, name = None ):
 
-		FileSystemPublisher.__init__( self, name, uploadLocation = mApp().getSettings().get( Settings.FileSystemPublisherReportsUploadLocation ),
+		FileSystemPublisher.__init__( self, name,
 			localDir = PathResolver( mApp().getLogDir ) )
-
-	def getObjectStatus( self ):
-		baseUrl = mApp().getSettings().get( Settings.PublisherReportsBaseHttpURL, False )
-		if baseUrl:
-			return "Location: {0}".format( baseUrl )
-
-		super( FileSystemReportsPublisher, self ).getObjectStatus()
-
-	def setup( self ):
-		super( FileSystemReportsPublisher, self ).setup()
-		if ( mApp().getSettings().get( Settings.FileSystemPublisherReportsCleanup ) ):
-			step = self.getInstructions().getStep( self.getStep() )
-			#FIXME if the directory is cleared he cannot write logs anymore and fails the build,
-			#so disable for now
-			#step.addMainAction( RmDirAction( PathResolver( mApp().getLogDir ) ) )
