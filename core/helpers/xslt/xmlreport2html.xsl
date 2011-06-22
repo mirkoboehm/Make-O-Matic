@@ -110,7 +110,7 @@ pre {
 	font-size: 8pt;
 	margin-top: 10px;
 	margin-bottom: 10px;
-	width: 800px;
+	width: 100%;
 	background-color: #EEEEEE;
 
 	/* line wrap hack */
@@ -172,7 +172,7 @@ h5 {
 	margin: 10px 0px;
 
 	font-weight: bold;
-	font-size: 110%;
+	font-size: 120%;
 	
 	background-color: #B8B8B8;
 	border: 1px solid black;
@@ -184,6 +184,12 @@ h5 {
 	border: 1px dashed grey;
 	margin-top: 10px;
 	padding: 5px;
+}
+
+.xsmiley {
+	font-size: 300%;
+
+	float: left;
 }
 
 .log {
@@ -226,18 +232,28 @@ h5 {
 	</xsl:template>
 	
 	<xsl:template name="showSummary">
+		<div class="xheader">
 		<xsl:choose>
 			<xsl:when test=".//build/@returncode = '0'">
-				<div class="xheader" style="background-color: #00FF33">
-					<xsl:value-of select=".//build/@name"/> (SUCCESS)
-				</div>
+				<xsl:attribute name="style">background-color: #00FF33</xsl:attribute>
+				<span class="xsmiley">
+					&#9786;
+				</span>
+				<xsl:value-of select=".//build/@name"/>
+				<br/><br/>
+				SUCCESS
 			</xsl:when>
 			<xsl:otherwise>
-				<div class="xheader" style="background-color: red">
-					<xsl:value-of select=".//build/@name"/> (FAILURE)
-				</div>
+				<xsl:attribute name="style">background-color: red</xsl:attribute>
+				<span class="xsmiley">
+					&#9760;
+				</span>
+				<xsl:value-of select=".//build/@name"/>
+				<br/><br/>
+				FAILURE
 			</xsl:otherwise>
 		</xsl:choose>
+		</div>
 		
 		<table>
 			<tr>
@@ -256,7 +272,7 @@ h5 {
 						[<xsl:value-of select=".//build/@sys-platform" /> (<xsl:value-of select=".//build/@sys-version" />)]
 				</td></tr>
 		</table>
-		
+
 		<div class="xdetails">
 			<xsl:if test="count(.//step[@result = 'Failure']) > 0">
 				<h5>Failed steps:</h5>
@@ -353,9 +369,9 @@ h5 {
 			<table>
 				<thead>
 					<tr>
-						<th width="500px">Steps: <xsl:value-of select="@name" /></th>
-						<th width="200px">Timing</th>
-						<th width="300px">Status, Result</th>
+						<th width="50%">Steps: <xsl:value-of select="@name" /></th>
+						<th width="20%">Timing</th>
+						<th width="30%">Status, Result</th>
 					</tr>
 				</thead>
 				<tbody>
