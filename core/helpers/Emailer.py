@@ -20,7 +20,7 @@
 from core.MObject import MObject
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from smtplib import SMTP, SMTPHeloError, SMTPAuthenticationError, SMTPException
+from smtplib import SMTP, SMTPHeloError, SMTPAuthenticationError, SMTPException, SMTPRecipientsRefused
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError
@@ -151,8 +151,11 @@ class Emailer( MObject ):
 		addresses = email.getToAddresses()
 		if email.getFromAddress() and len( addresses ) > 0:
 			# for each address send out an unique mail with only one 'To' recipient
-			for address in addresses:
-				self.__server.sendmail( email.getFromAddress(), address, email.getMessageText( address ) )
+			try:
+				for address in addresses:
+					self.__server.sendmail( email.getFromAddress(), address, email.getMessageText( address ) )
+			except SMTPRecipientsRefused:
+				mApp().debugN( self, 3, "Recipient refused: {0}".format( email.getFromAddress() ) )
 		else:
 			raise ConfigurationError( 'Sender/recipient addresses missing, cannot send mail!' )
 
