@@ -19,12 +19,12 @@
 
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
-from core.Plugin import Plugin
+from core.plugins.reporters.Reporter import Reporter
 
-class ConsoleReporter( Plugin ):
+class ConsoleReporter( Reporter ):
 
 	def __init__( self, name = None ):
-		Plugin.__init__( self, name )
+		Reporter.__init__( self, name )
 
 		self.__finished = False
 

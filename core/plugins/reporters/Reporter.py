@@ -19,27 +19,11 @@
 
 from core.Plugin import Plugin
 
-class _ReporterBase( Plugin ):
-	"""Internal Reporter base class, do not use directly"""
+class Reporter( Plugin ):
+	"""Reporter base class"""
 
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
 
-	def sendReport( self ):
-		"""Implement this for creating and sending your report
-
-		\note This is run during the shutdown phase"""
-
-		raise NotImplementedError()
-
-	def shutDown( self ):
-		self.sendReport()
-
-class RemoteReporter( _ReporterBase ):
-
-	def shutDown( self ):
-		super( RemoteReporter, self ).shutDown()
-
-class LocalReporter( _ReporterBase ):
-
-	pass
+	def getPluginType( self ):
+		return "reporter"

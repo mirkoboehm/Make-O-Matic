@@ -17,12 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.GlobalMApp import mApp
 from core.Build import Build
 from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_string
-from core.Plugin import Plugin
-
+from core.plugins.reporters.Reporter import Reporter
 import json
 import urllib2
 
@@ -33,7 +32,7 @@ def sendMessage( msg, url ):
 	request.get_method = lambda: 'PUT'
 	opener.open( request )
 
-class DaytonaReporter( Plugin ):
+class DaytonaReporter( Reporter ):
 	"""
 	This plugin enables reporting build reports to a Daytona Bot specified in the settings.
 	

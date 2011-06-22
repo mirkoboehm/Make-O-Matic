@@ -20,7 +20,6 @@
 from __future__ import unicode_literals
 from core.Build import Build
 from core.Exceptions import MomError, BuildError, ConfigurationError
-from core.Plugin import Plugin
 from core.Settings import Settings
 from core.helpers.Emailer import Email, Emailer
 from core.helpers.GlobalMApp import mApp
@@ -28,9 +27,10 @@ from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_f
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
 from core.helpers.RevisionInfo import RevisionInfo
+from core.plugins.reporters.Reporter import Reporter
 
 
-class EmailReporter( Plugin ):
+class EmailReporter( Reporter ):
 	"""
 	This plugin enables reporting build reports to a list of email recipients specified in the settings.
 	EmailReporter allows you to specify multiple recipients list, which are notified on special cases.
