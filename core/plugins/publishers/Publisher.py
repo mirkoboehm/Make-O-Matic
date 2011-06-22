@@ -21,11 +21,10 @@ from core.Exceptions import ConfigurationError
 from core.Plugin import Plugin
 from core.Settings import Settings
 from core.actions.filesystem.CopyActionBase import CopyActionBase
-from core.helpers.FilesystemAccess import make_foldername_from_string
 from core.helpers.GlobalMApp import mApp
 from core.helpers.TemplateSupport import MomTemplate
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
-from string import Template
+from core.helpers.XmlReportConverter import ReportFormat
 import os
 
 class PublisherAction( CopyActionBase ):
@@ -70,6 +69,20 @@ class Publisher( Plugin ):
 
 	def getPluginType( self ):
 		return "publisher"
+
+	def getXslTemplates( self ):
+		return { ReportFormat.HTML:
+			"""
+			<a>
+				<xsl:attribute name="href"><xsl:value-of select="@publisherUrl"/></xsl:attribute>
+				Get full report here
+			</a>
+			""" }
+
+	def createXmlNode( self, document ):
+		node = Plugin.createXmlNode( self, document )
+		node.attributes["publisherUrl"] = self.getUploadUrl()
+		return node
 
 	def setUploadLocation( self, location ):
 		check_for_path_or_none( location, 'The upload location must be a nonempty string!' )
