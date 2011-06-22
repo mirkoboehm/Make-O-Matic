@@ -188,7 +188,7 @@ class EmailReporter( Plugin ):
 		# summary
 		email.attachAlternativeTextPart( 
 				converter.convertToTextSummary(),
-				self.createHtmlSummary()
+				self.createHtmlSummaryNG()
 		)
 
 		# body
