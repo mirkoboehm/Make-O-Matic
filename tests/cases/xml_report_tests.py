@@ -250,18 +250,6 @@ class XmlReportTests( MomBuildMockupTestCase ):
 
 		self.assertTrue( "self.runExecute()" in doc.find( "{0}/traceback".format( e ) ).text )
 
-	def testXmlReportOnUnicodeCommit( self ):
-		MomBuildMockupTestCase.setUp( self, useScm = True )
-		scm = self.build.getProject().getScm()
-
-		# this commit has non-ascii chars in committer name and commit message
-		scm.setRevision( "81e6763a708250587584d96118e05b70227a4251" )
-		self.build.runPreFlightChecks()
-
-		converter = XmlReportConverter( self._getXmlReport() )
-		text = converter.convertToText()
-		self.assertTrue( u"äöü" in text )
-
 	def testXmlReportOnUnicodeOutput( self ):
 		# inject plugin producing unicode strings
 		class TestPlugin( Plugin ):
