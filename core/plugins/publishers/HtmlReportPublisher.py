@@ -38,13 +38,15 @@ class HtmlReportPublisher( Publisher ):
 	def preFlightCheck( self ):
 		super( HtmlReportPublisher, self ).preFlightCheck()
 
-	def getSourceLocation( self ):
+	def getTemporaryLocation( self ):
+		"""Return unique temporary location within $BASE"""
+
 		baseDir = mApp().getBaseDir()
-		return os.path.join( baseDir, "upload" )
+		subDir = "{0}_{1}_upload".format( self.getName(), id( self ) )
+		return os.path.join( baseDir, subDir )
 
-	def _copyDirectory( self, sourceDirectory, relativeTargetDirectory ):
-		targetDirectory = os.path.join( self.getSourceLocation(), relativeTargetDirectory )
-
+	def _copyDirectory( self, sourceDirectory, relativeDirectory ):
+		targetDirectory = os.path.join( self.getTemporaryLocation(), relativeDirectory )
 		mApp().debugN( self, 5, "Copying {0} to {1}".format( sourceDirectory, targetDirectory ) )
 		shutil.copytree( sourceDirectory, targetDirectory )
 
@@ -52,7 +54,13 @@ class HtmlReportPublisher( Publisher ):
 		self._copyDirectory( mApp().getLogDir(), "log" )
 		self._copyDirectory( mApp().getPackagesDir(), "packages" )
 
+	def _deleteClonedDirectories( self ):
+		targetDirectory = os.path.join( self.getTemporaryLocation() )
+		mApp().debugN( self, 5, "Deleting temporary folder: {0}".format( targetDirectory ) )
+		shutil.rmtree( targetDirectory )
+
 	def report( self ):
+		# create temporary directories
 		self._cloneDirectories()
 
 		report = InstructionsXmlReport( mApp() )
@@ -60,25 +68,28 @@ class HtmlReportPublisher( Publisher ):
 		html = converter.convertToHtml( enableCrossLinking = True )
 
 		# write file
-		filePath = os.path.join( self.getSourceLocation(), "index.html" )
+		filePath = os.path.join( self.getTemporaryLocation(), "index.html" )
 		f = codecs.open( filePath, 'w', encoding = "utf-8" )
 		f.write( html )
 		f.close()
 
 		# temporary: also write report
-		filePath = os.path.join( self.getSourceLocation(), "build-report.xml" )
+		filePath = os.path.join( self.getTemporaryLocation(), "build-report.xml" )
 		f = codecs.open( filePath, 'w', encoding = "utf-8" )
 		f.write( report.getReport() )
 		f.close()
 
 		self._upload()
 
+		# cleanup temporary directories again
+		self._deleteClonedDirectories()
+
 	def _upload( self ):
 		uploaderAction = self.__uploaderAction
 		if not uploaderAction:
 			return
 
-		uploaderAction.setSourcePath( self.getSourceLocation() )
+		uploaderAction.setSourcePath( self.getTemporaryLocation() )
 		uploaderAction.setDestinationPath( PathResolver( self._getFullUploadLocation ) )
 		mApp().debugN( self, 5, "Uploading report to {0}".format( uploaderAction.getDestinationPath() ) )
 
