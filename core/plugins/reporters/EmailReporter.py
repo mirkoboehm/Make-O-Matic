@@ -24,11 +24,9 @@ from core.Plugin import Plugin
 from core.Settings import Settings
 from core.helpers.Emailer import Email, Emailer
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TemplateSupport import MomTemplate
 from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
-import os.path
 from core.helpers.RevisionInfo import RevisionInfo
 
 
@@ -91,32 +89,6 @@ class EmailReporter( Plugin ):
 			return ""
 
 	def createHtmlSummary( self ):
-		SUMMARY_TEMPLATE_PATH = os.path.join( self._PLUGIN_DATA_DIR, "EmailReporter_SummaryTemplate.html" )
-
-		instructions = mApp()
-		assert isinstance( instructions, Build )
-		info = instructions.getProject().getScm().getRevisionInfo()
-
-		d = dict()
-		returnCode = instructions.getReturnCode()
-		d["my.returncode"] = returnCode
-		d["my.statusIcon"] = ( "☺" if returnCode == 0 else "☠" )
-		d["my.statusSummary"] = ( "success" if returnCode == 0 else "ERROR" )
-		d["my.statusDetails"] = "Failed steps: ".format( " ".join( instructions.getFailedSteps() ) ) \
-				if len( instructions.getFailedSteps() ) > 0 else "---"
-		d["my.bgcolor"] = ( "#00FF33" if returnCode == 0 else "red" )
-		d["my.scmCommitterName"] = info.committerName or ""
-		d["my.scmCommitTime"] = info.commitTimeReadable or ""
-		d["my.scmCommitMessage"] = info.commitMessage or ""
-		d["my.footer"] = "Build took: {0}".format( instructions.getTimeKeeper().deltaString() )
-
-		templateString = open( SUMMARY_TEMPLATE_PATH, 'r' ).read()
-		s = MomTemplate( templateString )
-		s.overwrites = d
-		htmlString = s.substitute()
-		return htmlString
-
-	def createHtmlSummaryNG( self ):
 		report = InstructionsXmlReport( mApp() )
 		conv = XmlReportConverter( report )
 		htmlString = conv.convertToHtml( summaryOnly = True )
@@ -188,7 +160,7 @@ class EmailReporter( Plugin ):
 		# summary
 		email.attachAlternativeTextPart( 
 				converter.convertToTextSummary(),
-				self.createHtmlSummaryNG()
+				self.createHtmlSummary()
 		)
 
 		# body
