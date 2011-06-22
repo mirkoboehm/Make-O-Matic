@@ -151,11 +151,11 @@ class Emailer( MObject ):
 		addresses = email.getToAddresses()
 		if email.getFromAddress() and len( addresses ) > 0:
 			# for each address send out an unique mail with only one 'To' recipient
-			try:
-				for address in addresses:
+			for address in addresses:
+				try:
 					self.__server.sendmail( email.getFromAddress(), address, email.getMessageText( address ) )
-			except SMTPRecipientsRefused:
-				mApp().debugN( self, 3, "Recipient refused: {0}".format( email.getFromAddress() ) )
+				except SMTPRecipientsRefused:
+					mApp().debugN( self, 3, "Recipient refused: {0}".format( email.getFromAddress() ) )
 		else:
 			raise ConfigurationError( 'Sender/recipient addresses missing, cannot send mail!' )
 
