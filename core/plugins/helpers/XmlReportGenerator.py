@@ -45,7 +45,7 @@ class XmlReportGenerator( Plugin ):
 		self.__finished = False
 		self.__failed = False
 
-	def shutDown( self ):
+	def report( self ):
 		if self.__finished:
 			return
 
