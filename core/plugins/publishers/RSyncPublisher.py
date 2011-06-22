@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import platform, os, re, tempfile
-from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.PathResolver import PathResolver
 from core.helpers.RunCommand import RunCommand
@@ -117,16 +116,8 @@ class RSyncPublisher( Publisher ):
 		self.setLocalDir( localDir )
 		self._setStep( 'upload-packages' )
 
-	def _getUploadLocationOrDefault( self ):
-		uploadLocation = self.getUploadLocation()
-		if not uploadLocation:
-			defaultLocation = mApp().getSettings().get( Settings.RSyncPublisherPackageUploadLocation, False )
-			mApp().debugN( self, 3, 'Upload location not specified, using default "{0}".'.format( defaultLocation ) )
-			uploadLocation = defaultLocation
-		return uploadLocation
-
 	def setup( self ):
-		uploadLocation = self._getUploadLocationOrDefault()
+		uploadLocation = self.getUploadLocation()
 		if not uploadLocation:
 			mApp().message( self, 'Upload location is empty. Not generating any actions.' )
 			return
@@ -148,47 +139,14 @@ class RSyncPackagesPublisher( RSyncPublisher ):
 
 	def __init__( self, name = None ):
 		RSyncPublisher.__init__( self, name,
-			uploadLocation = mApp().getSettings().get( Settings.RSyncPublisherPackageUploadLocation ),
-			localDir = PathResolver( mApp().getPackagesDir ) )
-		self._setStep( 'upload-packages' )
+				localDir = PathResolver( mApp().getPackagesDir )
+		)
 
-	def getObjectStatus( self ):
-		baseUrl = mApp().getSettings().get( Settings.PublisherPackageBaseHttpURL, False )
-		if baseUrl:
-			return "Location: {0}".format( baseUrl )
-
-		super( RSyncPackagesPublisher, self ).getObjectStatus()
-
-	def setup( self ):
-		super( RSyncPackagesPublisher, self ).setup()
-		if ( mApp().getSettings().get( Settings.RSyncPublisherPackageCleanup ) ):
-			step = self.getInstructions().getStep( self.getStep() )
-			#FIXME if the directory is cleared he cannot write logs anymore and fails the build,
-			#so disable for now
-			#step.addMainAction( RmDirAction( PathResolver( mApp().getPackagesDir ) ) )
-
-# FIXME the reports publisher needs to be called after the build finished 
-# (chicken and egg problem, the report can only be created once the build is done)
-# implement uploading in wrapUp()?
 class RSyncReportsPublisher( RSyncPublisher ):
 	'''A RSync publisher that is pre-configured to publish the reports structure to the default location.'''
 
 	def __init__( self, name = None ):
 		RSyncPublisher.__init__( self, name,
-			uploadLocation = mApp().getSettings().get( Settings.RSyncPublisherReportsUploadLocation ),
-			localDir = PathResolver( mApp().getLogDir ) )
+				localDir = PathResolver( mApp().getLogDir )
+		)
 
-	def getObjectStatus( self ):
-		baseUrl = mApp().getSettings().get( Settings.PublisherReportsBaseHttpURL, False )
-		if baseUrl:
-			return "Location: {0}".format( baseUrl )
-
-		super( RSyncReportsPublisher, self ).getObjectStatus()
-
-	def setup( self ):
-		super( RSyncReportsPublisher, self ).setup()
-		if ( mApp().getSettings().get( Settings.RSyncPublisherReportsCleanup ) ):
-			step = self.getInstructions().getStep( self.getStep() )
-			#FIXME if the directory is cleared he cannot write logs anymore and fails the build,
-			#so disable for now
-			#step.addMainAction( RmDirAction( PathResolver( mApp().getLogDir ) ) )
