@@ -29,6 +29,7 @@ import traceback
 from copy import deepcopy, copy
 from core.helpers.TimeKeeper import TimeKeeper
 import os
+from core.Plugin import Plugin
 
 class Instructions( MObject ):
 	"""
@@ -372,9 +373,9 @@ class Instructions( MObject ):
 	def runReports( self ):
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'creating reports' )
-			[ plugin.performReport() for plugin in self.getPlugins()]
 			for child in self.getChildren():
 				child.runReports()
+			self._runForEach( self.getPlugins(), Plugin.performReport, catchExceptions = True )
 
 	def runNotifications( self ):
 		notificationsEnabled = mApp().getSettings().get( Settings.ScriptEnableNotifications )
@@ -384,27 +385,47 @@ class Instructions( MObject ):
 
 		with EnvironmentSaver():
 			mApp().debugN( self, 2, 'publishing notifications' )
-			[ plugin.performNotify() for plugin in self.getPlugins()]
 			for child in self.getChildren():
 				child.runNotifications()
+			self._runForEach( self.getPlugins(), Plugin.performNotify, catchExceptions = True )
 
 	def runShutDowns( self ):
 		with EnvironmentSaver():
 			self.shutDown()
+			mApp().debugN( self, 2, 'shutting down' )
 			for child in self.getChildren():
 				child.runShutDowns()
-			mApp().debugN( self, 2, 'shutting down' )
-			for plugin in self.getPlugins():
-				try:
-					plugin.shutDown()
-				except Exception as e:
-					text = '''\
-An error occurred during shutdown: "{0}"
-Offending module: "{1}" 
-This error will not change the return code of the script!
-{2}'''.format( str( e ), plugin.getName(), traceback.format_exc() )
-					mApp().message( self, text )
+			self._runForEach( self.getPlugins(), Plugin.shutDown, catchExceptions = True )
 
+	def _runForEach( self, objectList, method, catchExceptions = False ):
+		"""Run \param method for each object in \param objectList
+
+		\note The List objectList must contain MObjects only!"""
+
+		assert method
+
+		for object in objectList:
+			assert isinstance( object, MObject )
+
+			# check if object implements the specified method
+			assert hasattr( object, method.__name__ )
+
+			# run
+			try:
+				method( object )
+			except Exception as e:
+				text = '''\
+An error occurred during {0}: "{1}"
+Offending module: "{2}" 
+{3}'''.format( method.__name__,
+		str( e ),
+		object.getName(),
+		traceback.format_exc()
+ )
+				mApp().message( self, text )
+
+				if not catchExceptions:
+					raise # re-raise
 
 	def prepare( self ):
 		'''Execute the prepare phase for this object.'''
