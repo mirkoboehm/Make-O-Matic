@@ -180,7 +180,7 @@ h5 {
 	text-align: center;
 }
 
-.xplugins {
+.xdetails {
 	border: 1px dashed grey;
 	margin-top: 10px;
 	padding: 5px;
@@ -229,14 +229,12 @@ h5 {
 		<xsl:choose>
 			<xsl:when test=".//build/@returncode = '0'">
 				<div class="xheader" style="background-color: #00FF33">
-					<xsl:value-of select=".//build/@name"/><br/><br/>
-					SUCCESS
+					<xsl:value-of select=".//build/@name"/> (SUCCESS)
 				</div>
 			</xsl:when>
 			<xsl:otherwise>
 				<div class="xheader" style="background-color: red">
-					<xsl:value-of select=".//build/@name"/><br/><br/>
-					FAILURE
+					<xsl:value-of select=".//build/@name"/> (FAILURE)
 				</div>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -259,12 +257,20 @@ h5 {
 				</td></tr>
 		</table>
 		
-		<div class="xplugins">
-			<h5>Additional plugin information</h5>
-			<table>
+		<div class="xdetails">
+			<xsl:if test="count(.//step[@result = 'Failure']) > 0">
+				<h5>Failed steps:</h5>
+				<table><tbody>
+					<xsl:apply-templates select=".//step[@result = 'Failure']"/>
+				</tbody></table>
+				<br/>
+			</xsl:if>
+
+			<h5>Plugin information</h5>
+			<table><tbody>
 				<xsl:apply-templates select=".//plugin[@pluginType = 'scm']"/>
 				<xsl:apply-templates select=".//plugin[@pluginType = 'publisher']"/>
-			</table>
+			</tbody></table>
 		</div>
 		
 		<div class="xfooter">
