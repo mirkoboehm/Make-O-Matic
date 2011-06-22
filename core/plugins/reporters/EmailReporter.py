@@ -163,13 +163,13 @@ class EmailReporter( Plugin ):
 				self.createHtmlSummary()
 		)
 
-		# body
-		textReport = converter.convertToText( short = True )
-		htmlReport = converter.convertToHtml()
-		if htmlReport:
-			email.attachAlternativeTextPart( textReport, htmlReport )
-		else:
-			email.attachTextPart( textReport )
+		# report
+#		textReport = converter.convertToText( short = True )
+#		htmlReport = converter.convertToHtml()
+#		if htmlReport:
+#			email.attachAlternativeTextPart( textReport, htmlReport )
+#		else:
+#			email.attachTextPart( textReport )
 
 		# attachments
 		exception = mApp().getException()
