@@ -127,7 +127,8 @@ class XmlReportConverter( MObject ):
 		self.__xmlReport = xmlReport
 
 		# ElementTree.fromstring requires encoded data, fails otherwise
-		self.__elementTree = xml.etree.ElementTree.fromstring( xmlReport.getReport().encode( "utf-8" ) ) # cache ElementTree object
+		encodedData = xmlReport.getReport().encode( "utf-8" )
+		self.__elementTree = xml.etree.ElementTree.fromstring( encodedData ) # cache ElementTree object
 
 		self.__xslTemplateSnippets = {}
 		self.__xmlTemplateFunctions = {}
@@ -248,7 +249,7 @@ class XmlReportConverter( MObject ):
 
 		try:
 			transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
-			result = str( transform( etree.XML( self.__xmlReport.getReport() ),
+			result = unicode( transform( etree.XML( self.__xmlReport.getReport() ),
 					summaryOnly = summaryOnly,
 					enableCrossLinking = enableCrossLinkingParam )
 			)

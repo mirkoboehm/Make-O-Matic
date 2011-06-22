@@ -246,12 +246,12 @@ class SourceCodeProvider( Plugin ):
 		node = Plugin.createXmlNode( self, document )
 
 		info = self.getRevisionInfo()
-		node.attributes["revision"] = str( info.revision )
-		node.attributes["committerName"] = str( info.committerName )
-		node.attributes["committerEmail"] = str( info.committerEmail )
-		node.attributes["commitTime"] = str( info.commitTime )
-		node.attributes["commitTimeReadable"] = str( info.commitTimeReadable )
-		create_child_node( document, node, "commitMessage", info.commitMessage )
+		node.attributes["revision"] = info.revision
+		node.attributes["committerName"] = unicode( info.committerName )
+		node.attributes["committerEmail"] = unicode( info.committerEmail )
+		node.attributes["commitTime"] = info.commitTime
+		node.attributes["commitTimeReadable"] = unicode( info.commitTimeReadable )
+		create_child_node( document, node, "commitMessage", unicode( info.commitMessage ) )
 
 		return node
 
