@@ -68,7 +68,12 @@ class InstructionsXmlReport( XmlReportInterface ):
 				instructionsNode = self._createNodesRecursively( self.__instructions, doc )
 			except Exception as e:
 				instructionsNode = mApp().createXmlNode( doc, recursive = False )
-				instructionsNode.appendChild( create_exception_xml_node( doc, e, traceback.format_exc() ) )
+				exceptionNode = create_exception_xml_node( 
+						doc,
+						"Caught exception during report generation: {0}".format( e ),
+						traceback.format_exc()
+				)
+				instructionsNode.appendChild( exceptionNode )
 
 		rootNode.appendChild( instructionsNode )
 		doc.appendChild( rootNode )
