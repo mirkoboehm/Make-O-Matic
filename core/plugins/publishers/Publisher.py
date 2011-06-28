@@ -134,4 +134,4 @@ class Publisher( Plugin ):
 		return self.__uploadBaseUrl
 
 	def getUploadUrl( self ):
-		return self.getUploadBaseUrl() + self.getUploadSubDirs()
+		return ( self.getUploadBaseUrl() or '' ) + self.getUploadSubDirs()

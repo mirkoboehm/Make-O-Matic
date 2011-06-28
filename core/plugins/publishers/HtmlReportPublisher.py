@@ -70,7 +70,7 @@ class HtmlReportPublisher( Publisher ):
 		# write file
 		filePath = os.path.join( self.getTemporaryLocation(), "index.html" )
 		f = codecs.open( filePath, 'w', encoding = "utf-8" )
-		f.write( html )
+		f.write( html or '' )
 		f.close()
 
 		# temporary: also write report
