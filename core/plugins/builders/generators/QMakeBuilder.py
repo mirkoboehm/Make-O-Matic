@@ -49,18 +49,27 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 		return self.__projectFilePath
 
 	def createConfigureActions( self ):
-		if not self.getInSourceBuild():
-			if not self.getProjectFilePath():
-				# If we don't have a project file, guess from the name
-				# FIXME: We should probably check this somehow but can't be done until after preFlightCheck
-				project = self.getInstructions().getProject()
-				sourceDirectory = project.getSourceDir()
-				projectFile = "{0}.pro".format( project.getName() )
-				self.setProjectFilePath( os.path.join( sourceDirectory, projectFile ) )
+		configuration = self.getInstructions()
+		project = configuration.getProject()
+		sourceDirectory = project.getSourceDir()
+		projectFileName = self.getProjectFilePath()
+		if not projectFileName:
+			# use the project name, that is Make-O-Matic's convention
+			name = project.getName()
+		if self.getInSourceBuild():
+			sourceDirectory = configuration.getBuildDir()
+		if configuration.getSourcePrefix():
+			sourceSubDir = os.path.join( sourceDirectory, configuration.getSourcePrefix() )
+			# use the folder name, as that is the convention with QMake
+			name = os.path.basename( sourceSubDir )
+			if not self.getInSourceBuild():
+				sourceDirectory = sourceSubDir
+		projectFileName = "{0}.pro".format( name )
+		# set commands:
+		proFile = os.path.join( sourceDirectory, projectFileName )
+		self._setCommandArguments( [ proFile ] )
 
-			self._setCommandArguments( [ self.getProjectFilePath() ] )
-
-		MakefileGeneratorBuilder.createConfigureActions( self )
+		super( QMakeBuilder, self ).createConfigureActions()
 
 	def createConfMakeInstallActions( self ):
 		# Stupidly, QMake doesn't have a standard way of installing to a prefix so just disable this
