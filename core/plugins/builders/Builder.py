@@ -45,7 +45,7 @@ class Builder( Plugin ):
 	def createPrepareSourceDirActions( self ):
 		if self.getInSourceBuild():
 			if not self.__inSourceBuildSupported:
-				raise NotImplementedError( 'In-source builds are not implemented.' )
+				raise NotImplementedError( 'In-source builds are not supported by this Builder.' )
 			# If we're doing an in-source build, copy the tree to the build directory
 			configuration = self.getInstructions()
 			source = os.path.join( configuration.getProject().getSourceDir(), configuration.getSourcePrefix() )
@@ -55,7 +55,7 @@ class Builder( Plugin ):
 			step.addMainAction( DirectoryTreeCopyAction( source, build, ignore ) )
 		else:
 			if not self.__outOfSourceBuildSupported:
-				raise NotImplementedError( 'Out-of-source builds are not implemented.' )
+				raise NotImplementedError( 'Out-of-source builds are not supported by this Builder.' )
 
 	def createConfigureActions( self ):
 		raise NotImplementedError()
