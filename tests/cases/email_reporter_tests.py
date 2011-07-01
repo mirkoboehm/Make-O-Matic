@@ -17,12 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from core.plugins.reporters.EmailReporter import EmailReporter
-from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
 from core.Exceptions import ConfigurationError, MomError, BuildError
+from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
+from core.plugins.reporters.EmailReporter import EmailReporter
+from email.feedparser import FeedParser
+from tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
+import email
+import unittest
 
 class EmailReporterTest( MomBuildMockupTestCase ):
 
@@ -115,13 +117,19 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		scm.setRevision( "35fe6206bf1c1b576c69e4001d345404cdfd41be" )
 		self.build.runPreFlightChecks()
 
-		summary = self.reporter.createHtmlSummary()
+		text = self.reporter.createEmail().getMessageText( "DR" )
 
-		# simple test here. makes more sense to do manual tests with this
-		self.assertTrue( "XmlReportTestBuild" in summary )
+		msg = email.message_from_string( text )
+		for part in msg.walk():
+			contentType = part.get_content_type()
+			if not contentType in ["text/plain", "text/html"]:
+				continue
 
-		#print( summary )
+			payload = part.get_payload( decode = True )
 
+			# simple test here. makes more sense to do manual tests with this
+			self.assertTrue( "XmlReportTestBuild" in payload )
+			self.assertTrue( "convenience" in payload ) # from commit message
 
 if __name__ == "__main__":
 	unittest.main()

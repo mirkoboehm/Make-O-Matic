@@ -88,12 +88,6 @@ class EmailReporter( Reporter ):
 		else:
 			return ""
 
-	def createHtmlSummary( self ):
-		report = InstructionsXmlReport( mApp() )
-		conv = XmlReportConverter( report )
-		htmlString = conv.convertToHtml( summaryOnly = True )
-		return htmlString
-
 	def createEmail( self ):
 		instructions = mApp()
 		assert isinstance( instructions, Build )
@@ -160,7 +154,7 @@ class EmailReporter( Reporter ):
 		# summary
 		email.attachAlternativeTextPart( 
 				converter.convertToTextSummary(),
-				self.createHtmlSummary()
+				converter.convertToHtml( summaryOnly = True )
 		)
 
 		# report
