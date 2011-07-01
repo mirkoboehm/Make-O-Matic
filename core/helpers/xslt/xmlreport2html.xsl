@@ -503,6 +503,15 @@ toggle(logView, 'table-row');
 			</tr>
 			<tr class="logview" >
 				<td colspan="4">
+					<p style="text-align: right;">
+						<a>
+							<xsl:attribute name="href">
+								<xsl:value-of select="@relativeLinkTarget"/>
+							</xsl:attribute>
+							(Download log file)
+						</a>
+					</p>
+
 					<pre loaded="false">Not yet loaded.</pre>
 				</td>
 			</tr>
