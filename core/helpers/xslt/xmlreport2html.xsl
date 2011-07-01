@@ -65,11 +65,33 @@
 		<html>
 			<head>
 				<script type="text/javascript">
-function toggle(obj)
+/**
+ * Get next *valid* sibling of element
+ */
+function getNextSibling(startBrother){
+	endBrother=startBrother.nextSibling;
+	while(endBrother.nodeType!=1){
+		endBrother = endBrother.nextSibling;
+	}
+	return endBrother;
+}
+
+/**
+ * Getting the closest parent with the given tag name.
+ */
+function getParentByTagName(obj, tag)
+{
+	var obj_parent = obj.parentNode;
+	if (!obj_parent) return false;
+	if (obj_parent.tagName.toLowerCase() == tag) return obj_parent;
+	else return getParentByTagName(obj_parent, tag);
+}
+
+function toggle(obj, style)
 {
 	var el = obj;
-	if ( el.style.display != 'block' ) {
-		el.style.display = 'block';
+	if ( el.style.display != style ) {
+		el.style.display = style;
 	}
 	else {
 		el.style.display = 'none';
@@ -77,9 +99,11 @@ function toggle(obj)
 
 }
 
-function toggle_display_file(file, element)
+function load_file(file, viewElement)
 {
-	toggle(element);
+	// load only once
+	if (viewElement.getAttribute("loaded") == "true")
+		return;
 
 	// try to fetch file contents when element content is still empty
 	var httpRequest = new XMLHttpRequest();
@@ -87,7 +111,8 @@ function toggle_display_file(file, element)
 	httpRequest.send(null);
 	httpRequest.onreadystatechange = function()
 	{
-		element.innerHTML = this.responseText;
+		viewElement.innerHTML = this.responseText;
+		viewElement.setAttribute("loaded", "true");
 	}
 }
 
@@ -104,6 +129,20 @@ body, table {
 
 div.tag-build div {
 	margin-left: 1%;
+}
+
+input {
+	text-align: center;
+	border: 1px solid #000;
+	cursor: pointer;
+	padding: 0px 6px;
+
+	background-color: #DBDADA;
+}
+
+input:hover
+{
+	background-color: #ECEAEA;
 }
 
 pre {
@@ -124,12 +163,17 @@ pre {
 	break-word; /* Internet Explorer 5.5+ */
 }
 
-pre.logviewer {
+tr.logview {
 	display: none;
+	width: 100%;
 }
 
 th {
 	text-align: left;
+}
+
+td {
+	padding: 0 5px;
 }
 
 /* headings */
@@ -376,9 +420,9 @@ h5 {
 			<table>
 				<thead>
 					<tr>
-						<th width="50%">Steps: <xsl:value-of select="@name" /></th>
+						<th width="40%">Steps: <xsl:value-of select="@name" /></th>
 						<th width="20%">Timing</th>
-						<th width="30%">Status, Result</th>
+						<th width="40%">Status, Result</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -441,10 +485,13 @@ h5 {
 					<span><xsl:value-of select="@name" /></span>
 
 					<xsl:if test="$enableCrossLinking = '1' and @relativeLinkTarget != 'None'">
-						<input type="button" value="Show/hide log content">
-							<xsl:attribute name="onClick">toggle_display_file('<xsl:value-of select="@relativeLinkTarget"/>', this.parentNode.getElementsByTagName("pre")[0])</xsl:attribute>
+						<input style="float: right;" value="Show/hide log content">
+							<xsl:attribute name="onClick">
+var logView = getNextSibling(getParentByTagName(this, 'tr'));
+load_file('<xsl:value-of select="@relativeLinkTarget"/>', logView.getElementsByTagName('pre')[0]);
+toggle(logView, 'table-row');
+							</xsl:attribute>
 						</input>
-						<pre class="logviewer"></pre>
 					</xsl:if>
 				</td>
 				<td>
@@ -452,6 +499,11 @@ h5 {
 				</td>
 				<td class="step-status">
 					<xsl:call-template name="showStepStatus" />
+				</td>
+			</tr>
+			<tr class="logview" >
+				<td colspan="4">
+					<pre loaded="false">Not yet loaded.</pre>
 				</td>
 			</tr>
 
