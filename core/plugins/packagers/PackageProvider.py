@@ -20,6 +20,7 @@
 from core.Plugin import Plugin
 from core.actions.ShellCommandAction import ShellCommandAction
 from core.helpers.GlobalMApp import mApp
+from core.helpers.StringUtils import make_posixpath
 import os.path
 
 class PackageProvider( Plugin ):
@@ -55,7 +56,9 @@ class PackageProvider( Plugin ):
 
 	def getRelativeLinkTarget( self ):
 		step = self.getInstructions().getStep( 'create-packages' )
+		unixPath = make_posixpath( self._getRelativePackagesDirPath() )
+
 		if step.isEnabled():
-			return ( self._getRelativePackagesDirPath(), "Get packages for this configuration" )
+			return ( unixPath, "Get packages for this configuration" )
 		else:
 			return ( None, None )

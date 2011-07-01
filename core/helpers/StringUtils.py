@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import textwrap
 from optparse import IndentedHelpFormatter
+import textwrap
 
 # not our code, let pylint ignore this
 # pylint: disable-all
@@ -88,3 +88,11 @@ def to_unicode_or_bust( obj, encoding = 'utf-8' ):
 		if not isinstance( obj, unicode ):
 			obj = unicode( obj, encoding )
 	return unicode( obj )
+
+def make_posixpath( path ):
+	"""Convenience method for replacing windows path separators to unix separators"""
+
+	if not path:
+		return None
+
+	return path.replace( "\\", "/" )
