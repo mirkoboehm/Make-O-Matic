@@ -71,6 +71,9 @@ class EmailReporter( Reporter ):
 	def notify( self ):
 		email = self.createEmail()
 
+		recipients = self.getRecipientList()
+		email.setToAddresses( recipients )
+
 		if len( email.getToAddresses() ) == 0:
 			mApp().debug( self, 'Not sending mail, no recipients added' )
 			return
@@ -88,36 +91,67 @@ class EmailReporter( Reporter ):
 		else:
 			return ""
 
-	def createEmail( self ):
-		instructions = mApp()
-		assert isinstance( instructions, Build )
+	def _getRevisionInfo( self ):
+		# get revision info, do not crash here
+		try:
+			info = mApp().getProject().getScm().getRevisionInfo()
+		except MomError:
+			info = RevisionInfo()
+
+		return info
+
+	def getRecipientList( self ):
+		info = self._getRevisionInfo()
+		returnCode = mApp().getReturnCode()
 
 		# get settings
 		reporterDefaultRecipients = mApp().getSettings().get( Settings.EmailReporterDefaultRecipients, False )
 		reporterConfigurationErrorRecipients = mApp().getSettings().get( Settings.EmailReporterConfigurationErrorRecipients, False )
 		reporterMomErrorRecipients = mApp().getSettings().get( Settings.EmailReporterMomErrorRecipients, False )
+
+		recipients = set()
+		if reporterDefaultRecipients:
+			recipients.update( reporterDefaultRecipients )
+
+		if returnCode == ConfigurationError.getReturnCode() or ( info.revision is None ):
+			if reporterConfigurationErrorRecipients:
+				recipients.update( reporterConfigurationErrorRecipients )
+
+		elif returnCode == BuildError.getReturnCode():
+			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
+				if info.committerEmail:
+					recipients.add( info.committerEmail )
+				else:
+					mApp().debug( self, 'Could not add committer {0} as recipient, email address is missing: {0}'
+								.format( info.committerName ) )
+
+		elif returnCode == MomError.getReturnCode():
+			if reporterMomErrorRecipients:
+				recipients.update( reporterMomErrorRecipients )
+
+		return recipients
+
+	def createEmail( self ):
+		assert isinstance( mApp(), Build )
+
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
 		reporterUseCompression = mApp().getSettings().get( Settings.EmailReporterUseCompressionForAttachments, False )
 
-		# get revision info, do not crash here
-		try:
-			info = instructions.getProject().getScm().getRevisionInfo()
-		except MomError:
-			info = RevisionInfo()
+		info = self._getRevisionInfo()
 		revision = ( info.shortRevision if info.shortRevision else info.revision ) or "N/A"
 
-		returnCode = instructions.getReturnCode()
+		returnCode = mApp().getReturnCode()
 		status = ( "☺" if returnCode == 0 else "☠" ) # to smile or not to smile, that's the question
-		type = instructions.getSettings().get( Settings.ProjectBuildType )
+		type = mApp().getSettings().get( Settings.ProjectBuildType )
 
 		email = Email()
 
 		# build header
 		email.setSubject( '{0} {1} ({2}), {3}, {4}'.format( 
 				status,
-				instructions.getName(),
+				mApp().getName(),
 				type,
-				instructions.getSystemShortName(),
+				mApp().getSystemShortName(),
 				revision
 				) )
 		email.setFromAddress( reporterSender )
@@ -126,28 +160,8 @@ class EmailReporter( Reporter ):
 		email.setCustomHeader( "MOM-Build-Name", mApp().getName() )
 		email.setCustomHeader( "MOM-Version", mApp().getMomVersion() )
 
-		# add recipients
-		if reporterDefaultRecipients:
-			email.setToAddresses( reporterDefaultRecipients )
-
-		if returnCode == ConfigurationError.getReturnCode() or ( info.revision is None ):
-			if reporterConfigurationErrorRecipients:
-				email.addToAddresses( reporterConfigurationErrorRecipients )
-
-		elif returnCode == BuildError.getReturnCode():
-			if mApp().getSettings().get( Settings.EmailReporterNotifyCommitterOnFailure ):
-				if info.committerEmail:
-					email.addToAddresses( [ info.committerEmail] )
-				else:
-					mApp().debug( self, 'Could not add committer {0} as recipient, email address is missing: {0}'
-								.format( info.committerName ) )
-
-		elif returnCode == MomError.getReturnCode():
-			if reporterMomErrorRecipients:
-				email.addToAddresses( reporterMomErrorRecipients )
-
 		# body
-		report = InstructionsXmlReport( instructions )
+		report = InstructionsXmlReport( mApp() )
 		converter = XmlReportConverter( report )
 
 		### text and html part

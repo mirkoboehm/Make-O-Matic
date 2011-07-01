@@ -40,28 +40,28 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		self.reporter = EmailReporter( "TestEmailReporter" )
 		self.build.addPlugin( self.reporter )
 
+	def _getRecipients( self ):
+		return self.reporter.getRecipientList()
+
 	def testCreateEmailOnNormalExit( self ):
 		self.build.registerReturnCode( 0 ) # no failure
 		self.build.runPreFlightChecks()
-		email = self.reporter.createEmail()
 
-		self.assertEquals( email.getToAddresses(), ["DR"] )
+		self.assertTrue( "DR" in self._getRecipients() and len( self._getRecipients() ) == 1 )
 
 	def testCreateEmailOnConfiguratioError( self ):
 		self.build.registerReturnCode( ConfigurationError.getReturnCode() )
 		self.build.runPreFlightChecks()
-		email = self.reporter.createEmail()
 
-		self.assertTrue( "DR" in email.getToAddresses() )
-		self.assertTrue( "CER" in email.getToAddresses() )
+		self.assertTrue( "DR" in self._getRecipients() )
+		self.assertTrue( "CER" in self._getRecipients() )
 
 	def testCreateEmailOnMomError( self ):
 		self.build.registerReturnCode( MomError.getReturnCode() )
 		self.build.runPreFlightChecks()
-		email = self.reporter.createEmail()
 
-		self.assertTrue( "DR" in email.getToAddresses() )
-		self.assertTrue( "MER" in email.getToAddresses() )
+		self.assertTrue( "DR" in self._getRecipients() )
+		self.assertTrue( "MER" in self._getRecipients() )
 
 	def testCreateEmailOnBuildError1( self ):
 		self.build.registerReturnCode( BuildError.getReturnCode() )
@@ -70,9 +70,8 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		# commit1
 		scm.setRevision( "409ae013ff1a9dccf41a60b4cefcd849309893bd" ) # commit by Mirko
 		self.build.runPreFlightChecks()
-		email = self.reporter.createEmail()
-		self.assertTrue( "DR" in email.getToAddresses() )
-		self.assertTrue( "mirko@kdab.com" in email.getToAddresses() )
+		self.assertTrue( "DR" in self._getRecipients() )
+		self.assertTrue( "mirko@kdab.com" in self._getRecipients() )
 
 	def testCreateEmailOnBuildError2( self ):
 		self.build.registerReturnCode( BuildError.getReturnCode() )
@@ -81,16 +80,14 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		# commit2
 		scm.setRevision( "040acdfb5331caab182a072f8d68dec3f4a402e9" ) # commit by Kevin
 		self.build.runPreFlightChecks()
-		email = self.reporter.createEmail()
-		self.assertTrue( "DR" in email.getToAddresses() )
-		self.assertTrue( "krf@electrostorm.net" in email.getToAddresses() )
+		self.assertTrue( "DR" in self._getRecipients() )
+		self.assertTrue( "krf@electrostorm.net" in self._getRecipients() )
 
 	def testCreateEmailNoRecipients( self ):
 		mApp().getSettings().set( Settings.EmailReporterDefaultRecipients, None )
 		self.build.runPreFlightChecks()
-		email = self.reporter.createEmail()
 
-		self.assertEquals( len( email.getToAddresses() ), 0 )
+		self.assertEquals( len( self._getRecipients() ), 0 )
 
 	def testCreateEmailSubjectWithValidRevision( self ):
 		scm = self.build.getProject().getScm()
