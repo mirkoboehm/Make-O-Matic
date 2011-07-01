@@ -23,10 +23,10 @@ from core.Exceptions import MomError, BuildError, ConfigurationError
 from core.Settings import Settings
 from core.helpers.Emailer import Email, Emailer
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string
+from core.helpers.RevisionInfo import RevisionInfo
+from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string, check_for_list_of_strings
 from core.helpers.XmlReport import InstructionsXmlReport
 from core.helpers.XmlReportConverter import XmlReportConverter
-from core.helpers.RevisionInfo import RevisionInfo
 from core.plugins.reporters.Reporter import Reporter
 
 
@@ -54,6 +54,12 @@ class EmailReporter( Reporter ):
 	@note Settings marked with a (*) are required
 	"""
 
+	def __init__( self, name = None ):
+		super( Reporter, self ).__init__( name = name )
+
+		self.setRecipients( [] )
+		self.setEnableFullReport( False )
+
 	def preFlightCheck( self ):
 		# check settings, may fail
 		settings = mApp().getSettings()
@@ -74,6 +80,21 @@ class EmailReporter( Reporter ):
 		self._initEmailBody( email )
 		self._initEmailRecipients( email )
 		return email
+
+	def setEnableFullReport( self, enable ):
+		self.__enableFullReport = enable
+
+	def getEnableFullReport( self ):
+		return self.__enableFullReport
+
+	def setRecipients( self, recipients ):
+		"""If this is set, only these recipients will receive an email."""
+
+		check_for_list_of_strings( recipients, "Please pass a valid list of recipients (strings)" )
+		self.__recipientList = recipients
+
+	def getRecipients( self ):
+		return self.__recipientList
 
 	def notify( self ):
 		assert isinstance( mApp(), Build )
@@ -107,6 +128,10 @@ class EmailReporter( Reporter ):
 		return info
 
 	def getRecipientList( self ):
+		# use overwrite if set
+		if len( self.getRecipients() ) > 0:
+			return self.getRecipients()
+
 		info = self._getRevisionInfo()
 		returnCode = mApp().getReturnCode()
 
@@ -178,12 +203,15 @@ class EmailReporter( Reporter ):
 		)
 
 		# report
-#		textReport = converter.convertToText( short = True )
-#		htmlReport = converter.convertToHtml()
-#		if htmlReport:
-#			email.attachAlternativeTextPart( textReport, htmlReport )
-#		else:
-#			email.attachTextPart( textReport )
+		if self.getEnableFullReport():
+			email.attachAlternativeTextPart( 
+					converter.convertToText( short = True ),
+					converter.convertToHtml()
+			)
+
+			returnCode = mApp().getReturnCode()
+			if returnCode != 0:
+				email.addTextAttachment( converter.convertToFailedStepsLog(), "failed-steps.log", useCompression = reporterUseCompression )
 
 		# attachments
 		exception = mApp().getException()
