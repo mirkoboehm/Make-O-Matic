@@ -33,7 +33,7 @@ class SimpleCITests( MomTestCase ):
 
 	ThisFilePath = os.path.realpath( os.path.dirname( __file__ ) )
 	BuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'example_mom_buildscript.py' )
-	SyntaxErrorBuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'syntax-error.py' )
+	SyntaxErrorBuildScriptName = os.path.join( ThisFilePath, '..', 'buildscripts', 'syntax_error.py' )
 	ToolName = os.path.join( ThisFilePath, '..', '..', 'tools', 'simple_ci.py' )
 	TestInstanceName = 'simple_ci_tests'
 	CurrentDirectory = os.getcwd()

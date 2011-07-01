@@ -18,5 +18,6 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 print( 'This build script will now raise a SyntaxError.' )
 raise SyntaxError( 'This build script is intentionally broken!' )
