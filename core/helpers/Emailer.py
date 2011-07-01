@@ -72,6 +72,8 @@ class Email( MObject ):
 	def setSubject( self, subject ):
 		"""\warning Can only be set once!"""
 
+		assert( not self._getMessage()['Subject'] )
+
 		# Need to use Header class to use UTF-8 encoded text
 		# see http://docs.python.org/library/email.header.html
 		h = Header( subject, 'utf-8' )
@@ -97,7 +99,13 @@ class Email( MObject ):
 		self.__mixedPart.attach( part )
 
 	def attachAlternativeTextPart( self, textString, htmlString ):
-		"""\warning Can only be set once!"""
+		"""Attach a multipart part to this message.
+
+		If htmlString is None, only a text part is added."""
+
+		if not htmlString:
+			self.attachTextPart( textString )
+			return
 
 		part1 = MIMEText( ( textString or '' ).encode( "utf-8" ), 'plain', _charset = 'utf-8' )
 		part2 = MIMEText( ( htmlString or '' ).encode( "utf-8" ), 'html', _charset = 'utf-8' )
