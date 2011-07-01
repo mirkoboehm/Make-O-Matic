@@ -25,6 +25,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.TemplateSupport import MomTemplate
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
 from core.helpers.XmlReportConverter import ReportFormat
+from urlparse import urljoin
 import os
 
 class PublisherAction( CopyActionBase ):
@@ -57,6 +58,13 @@ class Publisher( Plugin ):
 		self.setLocalDir( localDir )
 		self._setStep( 'upload-packages' )
 		self.setExtraUploadSubDirs( [] )
+
+	def preFlightCheck( self ):
+		if not self.getUploadLocation():
+			raise ConfigurationError( "Must have a valid upload location!" )
+
+		if not self.getUploadBaseUrl():
+			raise ConfigurationError( "Must have a valid upload base URL!" )
 
 	def getObjectStatus( self ):
 		# self.getUploadUrl() may throw if revision, etc. is not available. Catch this.
@@ -134,4 +142,8 @@ class Publisher( Plugin ):
 		return self.__uploadBaseUrl
 
 	def getUploadUrl( self ):
-		return ( self.getUploadBaseUrl() or '' ) + self.getUploadSubDirs()
+		subDirs = self.getUploadSubDirs()
+		if subDirs:
+			return urljoin( self.getUploadBaseUrl(), self.getUploadSubDirs() )
+
+		return self.getUploadBaseUrl()
