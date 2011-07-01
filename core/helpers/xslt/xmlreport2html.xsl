@@ -484,15 +484,25 @@ h5 {
 				<td>
 					<span><xsl:value-of select="@name" /></span>
 
+					<span style="float: right;">
 					<xsl:if test="$enableCrossLinking = '1' and @relativeLinkTarget != 'None'">
-						<input style="float: right;" value="Show/hide log content">
+						<a title="Show/hide log" href="javascript:void(0);">
 							<xsl:attribute name="onClick">
 var logView = getNextSibling(getParentByTagName(this, 'tr'));
 load_file('<xsl:value-of select="@relativeLinkTarget"/>', logView.getElementsByTagName('pre')[0]);
 toggle(logView, 'table-row');
 							</xsl:attribute>
-						</input>
+							(+/-)
+						</a>
+
+						<a title="Download log file">
+							<xsl:attribute name="href">
+								<xsl:value-of select="@relativeLinkTarget"/>
+							</xsl:attribute>
+							(DL)
+						</a>
 					</xsl:if>
+					</span>
 				</td>
 				<td>
 					<xsl:value-of select="@timing" />
@@ -503,15 +513,6 @@ toggle(logView, 'table-row');
 			</tr>
 			<tr class="logview" >
 				<td colspan="4">
-					<p style="text-align: right;">
-						<a>
-							<xsl:attribute name="href">
-								<xsl:value-of select="@relativeLinkTarget"/>
-							</xsl:attribute>
-							(Download log file)
-						</a>
-					</p>
-
 					<pre loaded="false">Not yet loaded.</pre>
 				</td>
 			</tr>
