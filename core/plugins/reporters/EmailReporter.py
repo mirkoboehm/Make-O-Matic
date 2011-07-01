@@ -68,11 +68,17 @@ class EmailReporter( Reporter ):
 
 		check_for_string( settings.get( Settings.EmailReporterSender ), "EmailReporterSender must be a valid email address" )
 
-	def notify( self ):
-		email = self.createEmail()
+	def createEmail( self ):
+		email = Email()
+		self._initEmailHeader( email )
+		self._initEmailBody( email )
+		self._initEmailRecipients( email )
+		return email
 
-		recipients = self.getRecipientList()
-		email.setToAddresses( recipients )
+	def notify( self ):
+		assert isinstance( mApp(), Build )
+
+		email = self.createEmail()
 
 		if len( email.getToAddresses() ) == 0:
 			mApp().debug( self, 'Not sending mail, no recipients added' )
@@ -131,11 +137,8 @@ class EmailReporter( Reporter ):
 
 		return recipients
 
-	def createEmail( self ):
-		assert isinstance( mApp(), Build )
-
+	def _initEmailHeader( self, email ):
 		reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
-		reporterUseCompression = mApp().getSettings().get( Settings.EmailReporterUseCompressionForAttachments, False )
 
 		info = self._getRevisionInfo()
 		revision = ( info.shortRevision if info.shortRevision else info.revision ) or "N/A"
@@ -143,8 +146,6 @@ class EmailReporter( Reporter ):
 		returnCode = mApp().getReturnCode()
 		status = ( "☺" if returnCode == 0 else "☠" ) # to smile or not to smile, that's the question
 		type = mApp().getSettings().get( Settings.ProjectBuildType )
-
-		email = Email()
 
 		# build header
 		email.setSubject( '{0} {1} ({2}), {3}, {4}'.format( 
@@ -160,7 +161,12 @@ class EmailReporter( Reporter ):
 		email.setCustomHeader( "MOM-Build-Name", mApp().getName() )
 		email.setCustomHeader( "MOM-Version", mApp().getMomVersion() )
 
+		return email
+
+	def _initEmailBody( self, email ):
 		# body
+		reporterUseCompression = mApp().getSettings().get( Settings.EmailReporterUseCompressionForAttachments, False )
+
 		report = InstructionsXmlReport( mApp() )
 		converter = XmlReportConverter( report )
 
@@ -185,4 +191,11 @@ class EmailReporter( Reporter ):
 			traceback = u"\n".join( exception[1] )
 			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], traceback ), "exception.log", useCompression = reporterUseCompression )
 
+		return email
+
+	def _initEmailRecipients( self, email ):
+		# add addresses
+		recipients = self.getRecipientList()
+
+		email.setToAddresses( recipients )
 		return email
