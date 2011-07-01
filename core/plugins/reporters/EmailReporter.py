@@ -174,6 +174,7 @@ class EmailReporter( Reporter ):
 		# attachments
 		exception = mApp().getException()
 		if exception:
-			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], exception[1] ), "build.log", useCompression = reporterUseCompression )
+			traceback = u"\n".join( exception[1] )
+			email.addTextAttachment( "{0}\n\n{1}".format( exception[0], traceback ), "exception.log", useCompression = reporterUseCompression )
 
 		return email
