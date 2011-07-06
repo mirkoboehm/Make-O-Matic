@@ -4,4 +4,6 @@
 .settings/
 pylint.html
 output.html
-
+build/
+dist/
+Make_O_Matic.egg-info/
