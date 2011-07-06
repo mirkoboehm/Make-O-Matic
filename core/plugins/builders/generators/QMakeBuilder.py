@@ -30,6 +30,13 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 		self.enableInstallation( False )
 		self.__projectFilePath = projectFile
 		self._setCommand( "qmake" )
+		self.setQMakeArguments( [] )
+
+	def setQMakeArguments( self, args ):
+		self.__qmakeArguments = args
+
+	def getQMakeArguments( self ):
+		return self.__qmakeArguments
 
 	def enableInstallation( self, onoff ):
 		self.__install = onoff
@@ -67,7 +74,7 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 		projectFileName = "{0}.pro".format( name )
 		# set commands:
 		proFile = os.path.join( sourceDirectory, projectFileName )
-		self._setCommandArguments( [ proFile ] )
+		self._setCommandArguments( [ proFile ] + self.getQMakeArguments() )
 
 		super( QMakeBuilder, self ).createConfigureActions()
 
