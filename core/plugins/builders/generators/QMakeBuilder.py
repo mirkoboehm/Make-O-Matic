@@ -21,28 +21,76 @@ from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGe
 import os
 from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_path
+from core.helpers.PathResolver import PathResolver
+
+class QMakeVariable( object ):
+	def __init__( self, name, value, type = None ):
+		self.setName( name )
+		self.setValue( value )
+		self.setType( type )
+
+	def setName( self, name ):
+		self.__name = name
+
+	def getName( self ):
+		return self.__name
+
+	def setValue( self, value ):
+		self.__value = value
+
+	def getValue( self ):
+		return self.__value
+
+	def setType( self, type ):
+		self.__type = type
+
+	def getType( self ):
+		return self.__type
+
+	def __str__( self ):
+		if self.getType() == None:
+			prefix = ''
+		elif self.getType() == 'add' :
+			prefix = '+'
+		else:
+			prefix = '-'
+		text = '{0}{1}={2}'.format( 
+			self.getName(),
+			prefix,
+			str( self.getValue() ) )
+		return text
 
 class QMakeBuilder( MakefileGeneratorBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
 
-	def __init__( self, name = None, projectFile = None ):
+	def __init__( self, name = None, projectFile = None, installPrefixVariableName = 'PREFIX' ):
 		MakefileGeneratorBuilder.__init__( self, name )
 		self.enableInstallation( False )
 		self.__projectFilePath = projectFile
 		self._setCommand( "qmake" )
-		self.setQMakeArguments( [] )
+		self.__qmakeVariables = []
+		self.setInstallPrefixVariableName( installPrefixVariableName )
 
-	def setQMakeArguments( self, args ):
-		self.__qmakeArguments = args
+	def setQMakeVariables( self, variables ):
+		self.__qmakeVariables = variables
 
-	def getQMakeArguments( self ):
-		return self.__qmakeArguments
+	def getQMakeVariables( self ):
+		return self.__qmakeVariables
+
+	def addQMakeVariable( self, variable ):
+		self.getQMakeVariables().append( variable )
 
 	def enableInstallation( self, onoff ):
 		self.__install = onoff
 
 	def installEnabled( self ):
 		return self.__install
+
+	def setInstallPrefixVariableName( self, prefix ):
+		self.__installPrefixVariableName = prefix
+
+	def getInstllPrefixVariableName( self ):
+		return self.__installPrefixVariableName
 
 	def setProjectFilePath( self, projectFilePath ):
 		"""Set the project file path for this builder
@@ -74,7 +122,11 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 		projectFileName = "{0}.pro".format( name )
 		# set commands:
 		proFile = os.path.join( sourceDirectory, projectFileName )
-		self._setCommandArguments( [ proFile ] + self.getQMakeArguments() )
+		arguments = [ proFile ]
+		for variable in self.getQMakeVariables():
+			arguments.append( str( variable ) )
+		arguments.append( '{0}={1}'.format( self.getInstllPrefixVariableName(), configuration.getTargetDir() ) )
+		self._setCommandArguments( arguments )
 
 		super( QMakeBuilder, self ).createConfigureActions()
 
