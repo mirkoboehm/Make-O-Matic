@@ -104,9 +104,14 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 	def getProjectFileBaseName( self ):
 		return self.__projectFileBaseName
 
-
 	def getProjectFilePath( self ):
 		"""Dynamically get the full project file path of this builder
+
+		When trying to build a special subfolder of a project this will try to use the subfolder's name for the project file
+		(e.g. source prefix: subproject/ => return "/source/subproject/subproject.pro"
+
+		\note If self.getProjectFileBaseName() is set this will be used as a overwrite.
+		(e.g. self.setProjectFileBaseName("specialproject") => return "/source/subproject/specialproject.pro")
 
 		\return Path to project file, e.g. /path/to/source/project.pro"""
 
@@ -124,8 +129,9 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 		# append source prefix if set
 		if configuration.getSourcePrefix():
 			sourceSubDir = os.path.join( sourceDirectory, configuration.getSourcePrefix() )
-			# use the folder name, as that is the convention with QMake
-			baseName = os.path.basename( sourceSubDir )
+			# use the folder name, as that is the convention with QMake,
+			# e.g. prefix is subproject/src => baseName == src
+			baseName = self.getProjectFileBaseName() or os.path.basename( sourceSubDir )
 			if not self.getInSourceBuild():
 				sourceDirectory = sourceSubDir
 
