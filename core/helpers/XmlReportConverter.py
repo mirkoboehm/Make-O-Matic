@@ -27,7 +27,9 @@ from core.helpers.TimeKeeper import formatted_time_delta
 from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute, \
 	find_nodes_with_attribute_and_value
 from datetime import datetime
+from io import StringIO
 from textwrap import TextWrapper
+import codecs
 import os.path
 import sys
 import traceback
@@ -73,6 +75,24 @@ class ReportFormat:
 		else:
 			return "Unknown format"
 
+class _PrefixResolver( etree.Resolver ):
+
+	def __init__( self, prefix ):
+		self.prefix = prefix
+
+	def resolve( self, url, ubid, context ):
+		if not url.startswith( self.prefix ):
+			return
+
+		fileName = url.split( ':' )[1]
+
+		thisDirectory = os.path.dirname( os.path.realpath( __file__ ) )
+		filePaths = [fileName, os.path.join( thisDirectory, fileName )]
+		for filePath in filePaths:
+			if os.path.exists( filePath ):
+				return self.resolve_filename( fileName, context )
+
+		raise ConfigurationError( "File not found: {0}".format( fileName ) )
 
 class _MyTextWrapper( TextWrapper ):
 	"""TextWrapper Wrapper class ;)
@@ -152,12 +172,14 @@ class XmlReportConverter( MObject ):
 
 		for key, value in self._XSL_STYLESHEETS.items():
 			try:
-				f = open( os.path.dirname( __file__ ) + '/xslt/{0}'.format( value ) )
-				self.__xslTemplateSnippets[key] = etree.XML( f.read() )
+				fileName = os.path.dirname( __file__ ) + '/xslt/{0}'.format( value )
+				f = codecs.open( fileName, 'r', encoding = "utf-8" )
+				parser = etree.XMLParser()
+				parser.resolvers.add( _PrefixResolver( "external" ) )
+				self.__xslTemplateSnippets[key] = etree.parse( StringIO( f.read() ), parser )
+				f.close()
 			except KeyError:
 				raise MomError( "XSL Stylesheet missing: {0}".format( value ) )
-			except etree.XMLSyntaxError, e:
-				raise MomError( "XSL Stylesheet for {0} is malformed: {1}".format( ReportFormat.toString( key ), e ) )
 
 	def _fetchTemplates( self, instructions ):
 		"""Fetches templates from all registered plugins in the Instruction object
@@ -248,10 +270,16 @@ class XmlReportConverter( MObject ):
 		enableCrossLinkingParam = "1" if enableCrossLinking else "0"
 
 		try:
+			javaScriptFilePath = os.path.join( os.path.dirname( __file__ ), "xslt", "xmlreport2html.js" )
+			javaScriptFile = codecs.open( javaScriptFilePath, 'r', encoding = "utf-8" )
+			javaScript = javaScriptFile.read()
+			javaScriptFile.close()
+
 			transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
-			result = unicode( transform( etree.XML( self.__xmlReport.getReport() ),
-					summaryOnly = summaryOnly,
-					enableCrossLinking = enableCrossLinkingParam )
+			result = transform( etree.XML( self.__xmlReport.getReport() ),
+					summaryOnly = etree.XSLT.strparam( summaryOnly ),
+					enableCrossLinking = etree.XSLT.strparam( enableCrossLinkingParam ),
+					javaScript = etree.XSLT.strparam( javaScript )
 			)
 		except Exception, e:
 			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )

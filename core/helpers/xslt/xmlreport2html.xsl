@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet version="1.0"
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
 	xmlns="http://www.w3.org/1999/xhtml">
 
-	<xsl:output method="xml" indent="yes" encoding="UTF-8" />
+	<xsl:output method="html" />
 	
 	<xsl:param name="summaryOnly"/>
 	<xsl:param name="enableCrossLinking"/>
+	<xsl:param name="javaScript"/>
 
 	<xsl:template name="showBuildStatus">
 		<xsl:param name="returncode"/>
@@ -65,60 +65,7 @@
 		<html>
 			<head>
 				<script type="text/javascript">
-/**
- * Get next *valid* sibling of element
- */
-function getNextSibling(startBrother){
-	endBrother=startBrother.nextSibling;
-	while(endBrother.nodeType!=1){
-		endBrother = endBrother.nextSibling;
-	}
-	return endBrother;
-}
-
-/**
- * Getting the closest parent with the given tag name.
- */
-function getParentByTagName(obj, tag)
-{
-	var obj_parent = obj.parentNode;
-	if (!obj_parent) return false;
-	if (obj_parent.tagName.toLowerCase() == tag) return obj_parent;
-	else return getParentByTagName(obj_parent, tag);
-}
-
-function toggle(obj, style)
-{
-	var el = obj;
-	if ( el.style.display != style ) {
-		el.style.display = style;
-	}
-	else {
-		el.style.display = 'none';
-	}
-
-}
-
-function load_file(file, viewElement)
-{
-	// load only once
-	if (viewElement.getAttribute("loaded") == "true")
-		return;
-
-	// try to fetch file contents when element content is still empty
-	var httpRequest = new XMLHttpRequest();
-	httpRequest.open("GET", file, true);
-	httpRequest.send(null);
-	httpRequest.onreadystatechange = function()
-	{
-		viewElement.innerHTML = this.responseText;
-		viewElement.setAttribute("loaded", "true");
-	}
-}
-
-window.onload=function onLoad()
-{
-}
+					<xsl:value-of select="$javaScript"/>
 				</script>
 				<style type="text/css">
 /*** default tags ***/
