@@ -23,6 +23,16 @@ function getParentByTagName(obj, tag)
 	else return getParentByTagName(obj_parent, tag);
 }
 
+/**
+ * XHTML escaping
+ *
+ * Replaces & ==> &amp, etc.
+ */
+function html_escape(string)
+{
+	return string.replace('&', "&amp;").replace('"', "&quot;").replace("'", "&#39;").replace('>', "&gt;").replace('<', "&lt;");
+}
+
 function toggle(obj, style)
 {
 	var el = obj;
@@ -46,7 +56,7 @@ function load_file(file, viewElement)
 	httpRequest.send(null);
 	httpRequest.onreadystatechange = function()
 	{
-		viewElement.innerHTML = this.responseText;
+		viewElement.innerHTML = html_escape(this.responseText);
 		viewElement.setAttribute("loaded", "true");
 	}
 }
