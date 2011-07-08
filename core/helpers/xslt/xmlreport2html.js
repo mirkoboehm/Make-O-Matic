@@ -1,6 +1,3 @@
-<!--/*--><root><![CDATA[<!--*/--> 
-
-
 /**
  * Get next *valid* sibling of element
  */
@@ -64,5 +61,3 @@ function load_file(file, viewElement)
 window.onload=function onLoad()
 {
 }
-
-<!--/*-->]]></root><!--*/-->
