@@ -179,6 +179,8 @@ class XmlReportConverter( MObject ):
 				f.close()
 			except KeyError:
 				raise MomError( "XSL Stylesheet missing: {0}".format( value ) )
+			except etree.XMLSyntaxError, e:
+				raise MomError( "XSL Stylesheet for {0} is malformed: {1}".format( ReportFormat.toString( key ), e ) )
 
 	def _fetchTemplates( self, instructions ):
 		"""Fetches templates from all registered plugins in the Instruction object
