@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from core.helpers.GlobalMApp import mApp
+from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
 from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
 import os
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_path
-from core.helpers.PathResolver import PathResolver
 
 class QMakeVariable( object ):
+
 	def __init__( self, name, value, type = None ):
 		self.setName( name )
 		self.setValue( value )
@@ -63,10 +63,11 @@ class QMakeVariable( object ):
 class QMakeBuilder( MakefileGeneratorBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
 
-	def __init__( self, name = None, projectFile = None, installPrefixVariableName = 'PREFIX' ):
+	def __init__( self, name = None, installPrefixVariableName = 'PREFIX' ):
 		MakefileGeneratorBuilder.__init__( self, name )
+
+		self.setProjectFileBaseName( None )
 		self.enableInstallation( False )
-		self.__projectFilePath = projectFile
 		self._setCommand( "qmake" )
 		self.__qmakeVariables = []
 		self.setInstallPrefixVariableName( installPrefixVariableName )
@@ -92,37 +93,50 @@ class QMakeBuilder( MakefileGeneratorBuilder ):
 	def getInstllPrefixVariableName( self ):
 		return self.__installPrefixVariableName
 
-	def setProjectFilePath( self, projectFilePath ):
-		"""Set the project file path for this builder
+	def setProjectFileBaseName( self, projectFileBaseName ):
+		"""Set the project file base name for this builder
 
-		\param projectFilePath Likely a path in the form of /path/to/source/project.pro"""
+		\param projectFileBaseName 'project' in a path like /path/to/source/project.pro"""
 
-		check_for_path( projectFilePath, "Project file property must be a valid path" )
-		self.__projectFilePath = projectFilePath
+		check_for_nonempty_string_or_none( projectFileBaseName, "Project file base name must be a valid string" )
+		self.__projectFileBaseName = projectFileBaseName
+
+	def getProjectFileBaseName( self ):
+		return self.__projectFileBaseName
+
 
 	def getProjectFilePath( self ):
-		return self.__projectFilePath
+		"""Dynamically get the full project file path of this builder
 
-	def createConfigureActions( self ):
+		\return Path to project file, e.g. /path/to/source/project.pro"""
+
 		configuration = self.getInstructions()
 		project = configuration.getProject()
 		sourceDirectory = project.getSourceDir()
-		projectFileName = self.getProjectFilePath()
-		if not projectFileName:
-			# use the project name, that is Make-O-Matic's convention
-			name = project.getName()
+
+		# use the specified project file name, fall back to project name if empty
+		baseName = self.getProjectFileBaseName() or project.getName()
+
+		# overwrite source directory when using the source copy in the build directory
 		if self.getInSourceBuild():
 			sourceDirectory = configuration.getBuildDir()
+
+		# append source prefix if set
 		if configuration.getSourcePrefix():
 			sourceSubDir = os.path.join( sourceDirectory, configuration.getSourcePrefix() )
 			# use the folder name, as that is the convention with QMake
-			name = os.path.basename( sourceSubDir )
+			baseName = os.path.basename( sourceSubDir )
 			if not self.getInSourceBuild():
 				sourceDirectory = sourceSubDir
-		projectFileName = "{0}.pro".format( name )
-		# set commands:
-		proFile = os.path.join( sourceDirectory, projectFileName )
-		arguments = [ proFile ]
+
+		projectFileName = "{0}.pro".format( baseName )
+		return os.path.join( sourceDirectory, projectFileName )
+
+	def createConfigureActions( self ):
+		configuration = self.getInstructions()
+		projectFile = self.getProjectFilePath()
+
+		arguments = [ projectFile ]
 		for variable in self.getQMakeVariables():
 			arguments.append( str( variable ) )
 		arguments.append( '{0}={1}'.format( self.getInstllPrefixVariableName(), configuration.getTargetDir() ) )
