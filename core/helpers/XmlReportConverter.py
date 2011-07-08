@@ -22,7 +22,6 @@ from core.Exceptions import ConfigurationError, MomError, returncode_to_descript
 from core.MObject import MObject
 from core.executomat.Step import Step
 from core.helpers.GlobalMApp import mApp
-from core.helpers.TemplateSupport import MomTemplate
 from core.helpers.TimeKeeper import formatted_time_delta
 from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute, \
 	find_nodes_with_attribute_and_value
@@ -280,11 +279,11 @@ class XmlReportConverter( MObject ):
 			cssFilePath = os.path.join( os.path.dirname( __file__ ), "xslt", "xmlreport2html.css" )
 
 			transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
-			result = transform( etree.XML( self.__xmlReport.getReport() ),
+			result = unicode( transform( etree.XML( self.__xmlReport.getReport() ),
 					summaryOnly = etree.XSLT.strparam( summaryOnly ),
 					enableCrossLinking = etree.XSLT.strparam( enableCrossLinkingParam ),
 					javaScriptContent = etree.XSLT.strparam( readFile( javaScriptFilePath ) ),
-					cssContent = etree.XSLT.strparam( readFile( cssFilePath ) )
+					cssContent = etree.XSLT.strparam( readFile( cssFilePath ) ) )
 			)
 		except Exception, e:
 			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )

@@ -157,9 +157,9 @@ class XmlReportTests( MomBuildMockupTestCase ):
 		self.assertTrue( os.path.exists( filePath ), "Log file does not exist" )
 
 		# check file content
-		file = open( filePath )
-		fileContent = file.read()
-		self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
+		with open( filePath ) as file:
+			fileContent = file.read()
+			self.assertNotEqual( len( fileContent ), 0, "Log file is empty" )
 
 #		f1 = open( "/tmp/workfile1", 'w' )
 #		f2 = open( "/tmp/workfile2", 'w' )
