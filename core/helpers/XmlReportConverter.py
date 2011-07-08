@@ -270,16 +270,21 @@ class XmlReportConverter( MObject ):
 		enableCrossLinkingParam = "1" if enableCrossLinking else "0"
 
 		try:
+			def readFile( filePath ):
+				f = codecs.open( filePath, 'r', encoding = "utf-8" )
+				content = f.read()
+				f.close()
+				return content
+
 			javaScriptFilePath = os.path.join( os.path.dirname( __file__ ), "xslt", "xmlreport2html.js" )
-			javaScriptFile = codecs.open( javaScriptFilePath, 'r', encoding = "utf-8" )
-			javaScript = javaScriptFile.read()
-			javaScriptFile.close()
+			cssFilePath = os.path.join( os.path.dirname( __file__ ), "xslt", "xmlreport2html.css" )
 
 			transform = etree.XSLT( self.__xslTemplateSnippets[ ReportFormat.HTML ] )
 			result = transform( etree.XML( self.__xmlReport.getReport() ),
 					summaryOnly = etree.XSLT.strparam( summaryOnly ),
 					enableCrossLinking = etree.XSLT.strparam( enableCrossLinkingParam ),
-					javaScript = etree.XSLT.strparam( javaScript )
+					javaScriptContent = etree.XSLT.strparam( readFile( javaScriptFilePath ) ),
+					cssContent = etree.XSLT.strparam( readFile( cssFilePath ) )
 			)
 		except Exception, e:
 			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )

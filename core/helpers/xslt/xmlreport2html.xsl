@@ -6,7 +6,9 @@
 	
 	<xsl:param name="summaryOnly"/>
 	<xsl:param name="enableCrossLinking"/>
-	<xsl:param name="javaScript"/>
+
+	<xsl:param name="javaScriptContent"/>
+	<xsl:param name="cssContent"/>
 
 	<xsl:template name="showBuildStatus">
 		<xsl:param name="returncode"/>
@@ -65,138 +67,10 @@
 		<html>
 			<head>
 				<script type="text/javascript">
-					<xsl:value-of select="$javaScript"/>
+					<xsl:value-of select="$javaScriptContent"/>
 				</script>
 				<style type="text/css">
-/*** default tags ***/
-body, table {
-	font-family: Arial;
-	width: 800px;
-}
-
-div.tag-build div {
-	margin-left: 1%;
-}
-
-input {
-	text-align: center;
-	border: 1px solid #000;
-	cursor: pointer;
-	padding: 0px 6px;
-
-	background-color: #DBDADA;
-}
-
-input:hover
-{
-	background-color: #ECEAEA;
-}
-
-pre {
-	font-size: 8pt;
-	margin-top: 10px;
-	margin-bottom: 10px;
-	width: 100%;
-	background-color: #EEEEEE;
-
-	/* line wrap hack */
-	white-space: pre-wrap; /* css-3 */
-	white-space: -moz-pre-wrap
-	!important; /* Mozilla, since 1999 */
-	white-space: -pre-wrap; /*
-	Opera 4-6 */
-	white-space: -o-pre-wrap; /* Opera 7 */
-	word-wrap:
-	break-word; /* Internet Explorer 5.5+ */
-}
-
-tr.logview {
-	display: none;
-	width: 100%;
-}
-
-th {
-	text-align: left;
-}
-
-td {
-	padding: 0 5px;
-}
-
-/* headings */
-h1 {
-	font-size: 120%;
-	margin: 0px;
-	padding: 0px;
-}
-h2 {
-	font-size: 115%;
-}
-h3 {
-	font-size: 110%;
-}
-h4 {
-	font-size: 105%;
-}
-
-h5 {
-	margin-top: 5px;
-	margin-bottom: 5px;
-
-	font-size: 100%;
-}
-
-/*** classes ***/
-.success {
-	color: green;
-}
-.fail {
-	color: red;
-}
-.neutral {
-	color:
-	#BBBBBB;
-}
-
-.xheader, .xfooter {
-	padding: 5px;
-	margin: 10px 0px;
-
-	font-weight: bold;
-	font-size: 120%;
-	
-	background-color: #B8B8B8;
-	border: 1px solid black;
-	
-	text-align: center;
-}
-
-.xdetails {
-	border: 1px dashed grey;
-	margin-top: 10px;
-	padding: 5px;
-}
-
-.xsmiley {
-	font-size: 300%;
-
-	float: left;
-}
-
-.log {
-	padding-left: 10px;
-}
-.build-status {
-	font-weight: bold;
-	font-size: 10pt;
-}
-.step-status {
-	font-weight: bold;
-}
-
-.tag-plugin {
-	margin-bottom: 5px;
-}
+					<xsl:value-of select="$cssContent"/>
 				</style>
 				<title>Build Report for <xsl:value-of select=".//build/@name"/></title>
 			</head>
