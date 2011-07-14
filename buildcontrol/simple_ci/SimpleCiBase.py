@@ -144,11 +144,11 @@ class SimpleCiBase( MApplication ):
 					buildNames.append( name )
 					goodScripts.append( buildScript )
 				else:
-					self.message( self, 'ERROR in build script "{0}": The build name "{1}" is already used by another '
+					self.error( self, 'Error in build script "{0}": The build name "{1}" is already used by another '
 								'build script. Build script disregarded.'.format( buildScript, name ) )
-			except MomError:
-				self.message( self, 'ERROR in build script "{0}": error querying the build name. Build script disregarded.'
-					.format( buildScript ) )
+			except MomError, e:
+				self.error( self, 'Error in build script "{0}": Error querying the build name. Build script disregarded. Reason: {1}'
+					.format( buildScript, e ) )
 		return goodScripts
 
 	def runBuildScriptTestBuild( self, buildScripts ):
