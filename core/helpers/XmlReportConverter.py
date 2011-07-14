@@ -274,6 +274,11 @@ class XmlReportConverter( MObject ):
 			def readFile( filePath ):
 				f = codecs.open( filePath, 'r', encoding = "utf-8" )
 				content = f.read()
+
+				# Note: bug in python-lxml affecting win32: if content contains CR-chars, XSLT.strparam() will HTML-encode these.
+				# We don't want that, obviously. Strip out CRs.
+				content = content.replace( '\r\n', 'n' )
+
 				f.close()
 				return content
 
