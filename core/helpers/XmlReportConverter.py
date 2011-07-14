@@ -277,7 +277,7 @@ class XmlReportConverter( MObject ):
 
 				# Note: bug in python-lxml affecting win32: if content contains CR-chars, XSLT.strparam() will HTML-encode these.
 				# We don't want that, obviously. Strip out CRs.
-				content = content.replace( '\r\n', 'n' )
+				content = content.replace( '\r\n', '\n' )
 
 				f.close()
 				return content
