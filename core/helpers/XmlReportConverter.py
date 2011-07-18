@@ -294,7 +294,11 @@ class XmlReportConverter( MObject ):
 			)
 		except Exception, e:
 			innerTraceback = "".join( traceback.format_tb( sys.exc_info()[2] ) )
-			result = "Could not create HTML report. Caught exception:\n {0}\nTraceback:\n{1}".format( e, innerTraceback )
+			result = """
+<html><body><pre>
+Could not create HTML report. Caught exception:\n {0}\nTraceback:\n{1}
+</pre></body></html>""".format( e, innerTraceback )
+
 		return result
 
 	def convertToText( self, short = False ):
