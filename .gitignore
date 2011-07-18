@@ -1,4 +1,7 @@
+*.orig
 *.pyc
+*~
+.*
 .project
 .pydevproject
 .settings/
