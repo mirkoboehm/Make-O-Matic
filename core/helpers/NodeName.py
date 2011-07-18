@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from platform import platform
+import platform
 
 def getNodeName():
 	v = os.getenv( "MOM_NODENAME" )
