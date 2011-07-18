@@ -37,7 +37,6 @@ class Settings( Defaults ):
 		else:
 			self.__momFolder = "mom"
 
-	@staticmethod
 	def getGlobalFolder( self, toolName = None ):
 		if sys.platform == 'darwin':
 			globalFolder = os.path.join( "/Library/Application Support", self.__momFolder )
@@ -50,7 +49,6 @@ class Settings( Defaults ):
 			globalFolder = os.path.join( globalFolder, toolName )
 		return globalFolder
 
-	@staticmethod
 	def getUserFolder( self, toolName = None ):
 		if sys.platform == 'darwin':
 			userFolder = os.path.join( "~/Library/Application Support", self.__momFolder )
