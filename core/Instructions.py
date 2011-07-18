@@ -179,7 +179,7 @@ class Instructions( MObject ):
 		* or if any instance of the children has failed'''
 
 		for child in self.getChildren():
-			if child.hasFailed():
+			if child.hasFailedRecursively():
 				return True
 
 		return self.hasFailed()
