@@ -302,7 +302,7 @@ class XmlReportConverter( MObject ):
 
 		\note Be very sure to catch all exceptions here!"""
 
-		wrapper = _MyTextWrapper( width = 80 )
+		wrapper = _MyTextWrapper( width = 1000 )
 
 		if short:
 			ignoredTags = ["traceback"]
@@ -321,7 +321,7 @@ class XmlReportConverter( MObject ):
 
 		\note Be very sure to catch all exceptions here!"""
 
-		wrapper = _MyTextWrapper( replace_whitespace = False, drop_whitespace = False, width = 80 )
+		wrapper = _MyTextWrapper( replace_whitespace = False, drop_whitespace = False, width = 1000 )
 
 		try:
 			result = self._toTextSummary( wrapper )
@@ -350,10 +350,10 @@ class XmlReportConverter( MObject ):
 		out = []
 
 		# START: Summary
-		out += wrapper.wrapAndFillLine( "*** Build report: {0}, {1}".format( 
+		out += wrapper.wrap( "*** Build report: {0}, {1} ***".format( 
 				buildNode.attrib["name"],
 				buildNode.attrib["sys-shortname"] ),
-				'*' )
+		)
 
 		wrapper.indent()
 
@@ -393,14 +393,18 @@ class XmlReportConverter( MObject ):
 			wrapper.indent( indentString = "* " )
 			publisherNodes = find_nodes_with_attribute_and_value( buildNode, "plugin", "pluginType", "publisher" )
 			for publisherNode in publisherNodes:
-				out += wrapper.wrap( "Publisher:       {0}".format( string_from_node( publisherNode, "objectstatus" ) ) )
+				out += wrapper.wrap( "{0}: {1}".format( 
+					publisherNode.attrib["name"],
+					string_from_node( publisherNode, "objectstatus" )
+				) )
 			wrapper.dedent( indentString = "  " )
 
 		wrapper.dedent()
 
-		out += wrapper.wrapAndFillLine( "*** Build time: {0}, round trip time: {1}".format( 
+		out += wrapper.wrap( "*** Build time: {0}, round trip time: {1} ***".format( 
 				string_from_node_attribute( buildNode, "build", "timing" ),
-				roundTripTime ), '*' )
+				roundTripTime ),
+		)
 		# END: Summary
 
 		out += " "

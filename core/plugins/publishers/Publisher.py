@@ -71,9 +71,9 @@ class Publisher( Plugin ):
 		try:
 			uploadUrl = self.getUploadUrl()
 		except ConfigurationError:
-			uploadUrl = "(Cannot yet resolve location)"
+			uploadUrl = "(Cannot (yet) resolve location)"
 
-		return "Upload location: {0}".format( uploadUrl )
+		return uploadUrl
 
 	def getPluginType( self ):
 		return "publisher"
