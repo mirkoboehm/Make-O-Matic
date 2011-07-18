@@ -19,6 +19,7 @@
 
 import platform
 import sys
+from NodeName import getNodeName
 
 def platform_details():
 	if sys.platform == 'win32':
@@ -36,7 +37,7 @@ def machine_info():
 	info = {}
 	info["sys-architecture"] = " ".join( platform.architecture() ).replace( "ELF", "" ).rstrip()
 	info["sys-platform"] = platform.system().replace( "Darwin", "Mac OS X" )
-	info["sys-nodename"] = platform.node()
+	info["sys-nodename"] = getNodeName()
 	info["sys-version"] = platform.version()
 	info["sys-platform-details"] = platform_details()
 	info["python-version"] = platform.python_version()

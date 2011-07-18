@@ -18,11 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from socket import gethostname 
+from platform import platform
 
 def getNodeName():
 	v = os.getenv( "MOM_NODENAME" )
 	if v != None and len( v ) > 0:
 		return v
 	else:
-		return gethostname() 
+		return platform.node()
