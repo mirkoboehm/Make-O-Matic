@@ -10,7 +10,7 @@ setup(
 	license = "GPL",
 	keywords = "make-o-matic",
 	url = "https://github.com/KDAB/Make-O-Matic",
-	packages = ['buildcontrol', 'core', 'tests', 'tools'],
+	packages = ['buildcontrol', 'core', 'mom', 'tools'],
 	classifiers = [
 		"Development Status :: 3 - Alpha",
 		"Environment :: Console",
@@ -24,7 +24,7 @@ setup(
 			"mom = tools.mom:main",
 			"mom-report-converter = tools.report_converter:main",
 			"mom-ci = tools.simple_ci:main",
-			"mom-test = tests.testsuite_selftest:main",
+			"mom-test = mom.tests.testsuite_selftest:main",
 		],
 	},
 )

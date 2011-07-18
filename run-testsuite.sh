@@ -1,3 +1,3 @@
 #!/bin/sh
 
-cd tests && python testsuite.py
+cd mom/tests && python testsuite.py
