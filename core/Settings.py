@@ -66,6 +66,14 @@ class Settings( Defaults ):
 		folders = [ self.globalFolder( toolName ), self.userFolder( toolName ) ]
 		hostConfigFile = '{0}.py'.format( getNodeName() )
 		files = [ 'config.py', hostConfigFile ]
+
+		additionalConfigFile = mApp().getParameters().getConfigFile()
+		if additionalConfigFile:
+			if os.path.exists( additionalConfigFile ):
+				files.append( additionalConfigFile )
+			else:
+				mApp().debug( self, "Warning: Not loading invalid config file: {0}".format( additionalConfigFile ) )
+
 		for folder in folders:
 			for fileName in files:
 				configFile = os.path.join( folder, fileName )

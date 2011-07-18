@@ -67,6 +67,8 @@ http://docs.kdab.com/make-o-matic/{0}/html
 			help = 'repository tag to be built' )
 		parser.add_option( '-b', '--branch', action = 'store', dest = 'branch',
 			help = 'repository branch to be built' )
+		parser.add_option( '-l', '--load-config-file', action = 'store', dest = 'configFile',
+			help = 'additional config file which will be loaded during startup' )
 		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
 			help = 'full URL to the repository (local or remote), e.g. src:/path/to/repository or git://gitorious.org/foo' )
 		parser.add_option( '-t', '--type', action = 'store', dest = 'buildType',
@@ -100,6 +102,9 @@ e.g.: -s disable-cleanup,enable-create-packages""" )
 
 	def getScmLocation( self ):
 		return self._getOptions().url
+
+	def getConfigFile( self ):
+		return self._getOptions().configFile
 
 	def getBuildType( self ):
 		buildType = self._getOptions().buildType
