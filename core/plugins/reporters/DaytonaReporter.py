@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Build import Build
+from core.Exceptions import returncode_to_description, MomException
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_string
@@ -66,6 +67,15 @@ class DaytonaReporter( Reporter ):
 	def getObjectStatus( self ):
 			return ""
 
+	def _getFailedConfigurationsWithStep(self, instr):
+		ret = []
+		for child in instr.getChildren():
+			r = self._getFailedConfigurationsWithStep( child )
+			ret.extend( r )
+		if instr.hasFailed():
+			ret.append( ( instr.getName(), instr.getFailedSteps()[0] ) )
+		return ret
+
 	def _createMessage( self ):
 		instructions = mApp()
 		assert isinstance( instructions, Build )
@@ -77,7 +87,8 @@ class DaytonaReporter( Reporter ):
 		revision = ( info.shortRevision if info.shortRevision else info.revision ) or "N/A"
 
 		returnCode = instructions.getReturnCode()
-		status = ( "☺" if returnCode == 0 else "☠" ) # to smile or not to smile, that's the question
+		noError = returnCode == 0
+		status = ( "☺" if noError else "☠" ) # to smile or not to smile, that's the question
 		type = mApp().getSettings().get( Settings.ProjectBuildType )
 
 		# build header
@@ -89,10 +100,17 @@ class DaytonaReporter( Reporter ):
 				revision,
 				info.committerName
 				)
+		if not noError:
+			failed = self._getFailedConfigurationsWithStep( instructions )
+			if len( failed ) > 0:
+				text += ': Configuration {0} failed in step {1}'.format( failed[0][0], failed[0][1].getName() )
+				if len( failed ) > 1:
+					ff = failed[1:]
+					text += '; Other configurations failed: %s' % ", ".join([i[0] for i in ff])/
 
 		msg["text"] = text
-		msg["MOM-Build-Name"] = mApp().getName()
-		msg["MOM-Version"] = mApp().getMomVersion()
+		msg["MOM-Build-Name"] = instructions.getName()
+		msg["MOM-Version"] = instructions.getMomVersion()
 		msg["MOM-Success"] = "true" if returnCode == 0 else "false"
 		msg["MOM-Project"] = instructions.getName()
 		msg["sender"] = "make-o-matic"
