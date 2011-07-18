@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from core.plugins.sourcecode.SCMGit import SCMGit
 from core.Exceptions import ConfigurationError
 from core.plugins.sourcecode import getScm
+from core.plugins.sourcecode.SCMGit import SCMGit
 from core.plugins.sourcecode.SCMSubversion import SCMSubversion
 from mom.tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
+import unittest
 
 class ScmFactoryTests( MomBuildMockupTestCase ):
 

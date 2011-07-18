@@ -17,45 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from datetime import datetime
-from mom.tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
-from core.helpers.SCMUidMapper import SCMUidSvnAuthorsFileMap
-import os.path
-from core.Defaults import Defaults
 from buildcontrol.common.BuildInfo import BuildInfo
+from core.Defaults import Defaults
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
+from core.helpers.SCMUidMapper import SCMUidSvnAuthorsFileMap
+from datetime import datetime
+from mom.tests.helpers.ScmTestCase import ScmTestCase
+import os.path
+import unittest
 
-class ScmModulesTests ( MomBuildMockupTestCase ):
+class ScmSvnTests ( ScmTestCase ):
 
-	GIT_EXAMPLE = 'git://github.com/defunkt/hub.git'
 	SVN_EXAMPLE = 'http://googletest.googlecode.com/svn/'
-
-	def _initialize( self, scmUrl, revision = None, branch = None, tag = None ):
-		self.project.createScm( scmUrl )
-
-		if revision:
-			self.project.getScm().setRevision( revision )
-
-		if branch:
-			self.project.getScm().setBranch( branch )
-
-		if tag:
-			self.project.getScm().setTag( tag )
-
-		self.build.getParameters().parse()
-		self.build.initialize()
-		self.build.runPrepare()
-		self.build.runPreFlightChecks()
-		self.build.runSetups()
-
-	def _validateRevisionInfoContent( self, info ):
-		self.assertNotEquals( info.committerName, None )
-		self.assertNotEquals( info.commitMessage, None )
-		self.assertNotEquals( info.commitTime, None )
-		self.assertNotEquals( info.commitTimeReadable, None )
-		self.assertNotEquals( info.revision, None )
 
 	def testScmUidMapperWithAuthorsMap( self ):
 		self._initialize( self.SVN_EXAMPLE )
@@ -65,53 +39,6 @@ class ScmModulesTests ( MomBuildMockupTestCase ):
 		mapper.addMapping( fileMap )
 		email = mapper.getEmail( "kevin.funk" )
 		self.assertNotEquals( email, None )
-
-	def testScmGit( self ):
-		self._initialize( self.GIT_EXAMPLE )
-
-		info = self.project.getScm().getRevisionInfo()
-		self._validateRevisionInfoContent( info )
-		self.assertNotEquals( info.shortRevision, None, "Git should have a short revision" )
-
-	def testScmGitOneLineCommitMessage( self ):
-		self._initialize( self.GIT_EXAMPLE, revision = "a01b256f848e362efbf9f65cc4118c6ebe521539" )
-
-		info = self.project.getScm().getRevisionInfo()
-		self._validateRevisionInfoContent( info )
-		self.assertEquals( len( info.commitMessage.split( '\n' ) ), 1, "Commit message is not properly aligned" )
-		self.assertTrue( isinstance( info.commitMessage, basestring ) )
-
-	def testScmGitMultiLineCommitMessage( self ):
-		self._initialize( self.GIT_EXAMPLE, revision = "f4ac3b0233ed1622e75643882c073d26ee5971d5" )
-
-		info = self.project.getScm().getRevisionInfo()
-		self._validateRevisionInfoContent( info )
-		self.assertEquals( len( info.commitMessage.split( '\n' ) ), 6, "Commit message is not properly aligned" )
-		self.assertTrue( isinstance( info.commitMessage, basestring ) )
-
-	def testScmGitRevision( self ):
-		self._initialize( self.GIT_EXAMPLE, revision = "c2e575fa09b2e90a9108" )
-
-		info = self.project.getScm().getRevisionInfo()
-		self._validateRevisionInfoContent( info )
-
-	def testScmGitShortRevision( self ):
-		self._initialize( self.GIT_EXAMPLE, revision = "c2e575" )
-
-		info = self.project.getScm().getRevisionInfo()
-		self._validateRevisionInfoContent( info )
-
-	def testScmGitBranch( self ):
-		self._initialize( self.GIT_EXAMPLE, branch = "gh-pages" )
-
-		info = self.project.getScm().getRevisionInfo()
-		self._validateRevisionInfoContent( info )
-
-	def testScmGitTag( self ):
-		self._initialize( self.GIT_EXAMPLE, tag = "v1.4.1" )
-
-		info = self.project.getScm().getRevisionInfo()
-		self._validateRevisionInfoContent( info )
 
 	def testScmSvn( self ):
 		self._initialize( self.SVN_EXAMPLE )

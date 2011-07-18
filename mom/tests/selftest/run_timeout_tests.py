@@ -21,7 +21,7 @@ from mom.tests.helpers.MomTestCase import MomTestCase
 import sys
 import unittest
 
-class RunWithTimeoutTest( MomTestCase ):
+class RunWithTimeoutTests( MomTestCase ):
 
 	def setUp( self ):
 		MomTestCase.setUp( self )

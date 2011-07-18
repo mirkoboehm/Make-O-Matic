@@ -20,8 +20,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # work around to import the correct "core" module, remove when refactoring is finished
-import sys
 import os
+import sys
+import unittest
 sys.path.insert( 0, os.path.abspath( os.path.join( os.path.realpath( os.path.dirname( __file__ ) ) , "..", ".." ) ) )
 
 from core.Exceptions import MomException, ConfigurationError
@@ -38,9 +39,6 @@ from core.plugins.sourcecode.SCMSubversion import SCMSubversion
 from core.plugins.testers.CTest import CTest
 from mom.tests.buildcontrol.BuildScriptInterfaceTests import BuildScriptInterfaceTests
 from mom.tests.buildcontrol.BuildStatusPersistenceTests import BuildStatusPersistenceTests
-from mom.tests.cases.run_timeout_tests import RunWithTimeoutTest
-from mom.tests.cases.scm_factory_tests import ScmFactoryTests
-from mom.tests.cases.scm_modules_tests import ScmModulesTests
 from mom.tests.core.MApplicationTests import MApplicationTests
 from mom.tests.core.RunModeDescribeTests import RunModeDescribeTests
 from mom.tests.core.RunModePrintTests import RunModePrintTests
@@ -57,11 +55,15 @@ from mom.tests.plugins.EmailReporterTest import EmailReporterTest
 from mom.tests.plugins.PreprocessorTests import PreprocessorTests
 from mom.tests.plugins.PyUnitTesterTests import PyUnitTesterTests
 from mom.tests.plugins.QTestTests import QTestTests
+from mom.tests.plugins.ScmFactoryTests import ScmFactoryTests
+from mom.tests.plugins.ScmGitTests import ScmGitTests
+from mom.tests.plugins.ScmSvnTests import ScmSvnTests
 from mom.tests.selftest.charm_build_tests import CharmBuildTests
 from mom.tests.selftest.environment_setup_tests import EnvironmentSetupTests
+from mom.tests.selftest.run_timeout_tests import RunWithTimeoutTests
 from mom.tests.selftest.simple_ci_tests import SimpleCITests
 from mom.tests.selftest.simple_project_tests import SimpleProjectTests
-import unittest
+
 #from mom.tests.cases.emailer_tests import EmailerTest
 
 CLASSES = [
@@ -85,9 +87,10 @@ CLASSES = [
 	PyUnitTesterTests,
 	RunModePrintTests,
 	RunModeDescribeTests,
-	RunWithTimeoutTest,
+	RunWithTimeoutTests,
 	ScmFactoryTests,
-	ScmModulesTests,
+	ScmGitTests,
+	ScmSvnTests,
 	XmlReportTests,
 	SettingsTests,
 	TemplateSupportTests,
