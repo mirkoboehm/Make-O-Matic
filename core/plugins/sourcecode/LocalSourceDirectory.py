@@ -38,7 +38,7 @@ class LocalSourceDirectory( SourceCodeProvider ):
 		info.committerName = getpass.getuser()
 		info.commitTime = 0
 		info.commitTimeReadable = 'N/A'
-		info.revision = 'WIP'
+		info.revision = 'N/A'
 		return info
 
 	def _getRevisionsSince( self, revision, cap = None ):

@@ -68,32 +68,26 @@ http://docs.kdab.com/make-o-matic/{0}/html
 		parser.add_option( '-b', '--branch', action = 'store', dest = 'branch',
 			help = 'repository branch to be built' )
 		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
-			help = 'Full SCM URL' )
+			help = 'full URL to the repository (local or remote), e.g. src:/path/to/repository or git://gitorious.org/foo' )
 		parser.add_option( '-t', '--type', action = 'store', dest = 'buildType',
 			help = 'selects the build type (for example "M" (manual), "C" (continuous), "D" (daily), "S" (snapshot), "F" (full))' )
 		parser.add_option( '-m', '--ignore-commit-message', action = 'store_true', dest = 'ignoreCommitMessage',
 			help = 'ignore commit message commands (like "MOM:BuildType=S")' )
 		parser.add_option( '--ignore-configuration-files', action = 'store_true', dest = "ignoreConfigurationFiles",
-			help = "Ignore settings provided by configuration files" )
+			help = "ignore settings provided by configuration files" )
 		parser.add_option( '-s', '--build-steps', action = 'store', dest = 'buildSteps',
 			help = """enable or disable individual builds steps on top of the defaults for the build type, \
 e.g.: -s disable-cleanup,enable-create-packages""" )
 		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
 			help = 'set the level of debug output (-v, -vv, -vvv...)' )
 		parser.add_option( '-d', '--disable-shutdown', action = 'store_true', dest = 'disableShutdown', default = False,
-			help = 'disable the shutdown phase (packages, logs and other folders are deleted during shutdown)' )
+			help = 'disable the shutdown phase (use this to keep packages, logs and other folders)' )
 		return parser
 
 	def parse( self ):
-		""" read program execution options, setting up variables and proceed the dependent steps 
-		The options --configure-options, -b, -l, -z have been removed.
-		-b and -l are now a run mode (query).
-		-z is also a run mode (print).
-		-i is now an argument to the build run mode."""
+		""" read program execution options, setting up variables and proceed the dependent steps"""
 
-		# parse options:
 		( self.__options, self.__args ) = self.__parser.parse_args( sys.argv )
-		# except BadOptionError, OptionValueError as e:
 
 	def getRevision( self ):
 		return self._getOptions().revision
