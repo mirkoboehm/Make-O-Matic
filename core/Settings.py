@@ -37,7 +37,8 @@ class Settings( Defaults ):
 		else:
 			self.__momFolder = "mom"
 
-	def globalFolder( self, toolName = None ):
+	@staticmethod
+	def getGlobalFolder( self, toolName = None ):
 		if sys.platform == 'darwin':
 			globalFolder = os.path.join( "/Library/Application Support", self.__momFolder )
 		elif sys.platform == 'win32':
@@ -49,7 +50,8 @@ class Settings( Defaults ):
 			globalFolder = os.path.join( globalFolder, toolName )
 		return globalFolder
 
-	def userFolder( self, toolName = None ):
+	@staticmethod
+	def getUserFolder( self, toolName = None ):
 		if sys.platform == 'darwin':
 			userFolder = os.path.join( "~/Library/Application Support", self.__momFolder )
 			userFolder = os.path.expanduser( userFolder )
@@ -63,7 +65,7 @@ class Settings( Defaults ):
 		return userFolder
 
 	def evalConfigurationFiles( self, toolName = None ):
-		folders = [ self.globalFolder( toolName ), self.userFolder( toolName ) ]
+		folders = [ self.getGlobalFolder( toolName ), self.getUserFolder( toolName ) ]
 		hostConfigFile = '{0}.py'.format( getNodeName() )
 		files = [ 'config.py', hostConfigFile ]
 
