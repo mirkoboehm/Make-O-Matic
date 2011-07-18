@@ -18,7 +18,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Build import Build
-from core.Exceptions import returncode_to_description, MomException
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.helpers.TypeCheckers import check_for_string
@@ -67,7 +66,7 @@ class DaytonaReporter( Reporter ):
 	def getObjectStatus( self ):
 			return ""
 
-	def _getFailedConfigurationsWithStep(self, instr):
+	def _getFailedConfigurationsWithStep( self, instr ):
 		ret = []
 		for child in instr.getChildren():
 			r = self._getFailedConfigurationsWithStep( child )
@@ -106,7 +105,7 @@ class DaytonaReporter( Reporter ):
 				text += ': Configuration {0} failed in step {1}'.format( failed[0][0], failed[0][1].getName() )
 				if len( failed ) > 1:
 					ff = failed[1:]
-					text += '; Other configurations failed: %s' % ", ".join([i[0] for i in ff])/
+					text += '; Other configurations failed: %s' % ", ".join( [i[0] for i in ff] )
 
 		msg["text"] = text
 		msg["MOM-Build-Name"] = instructions.getName()

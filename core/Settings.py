@@ -82,7 +82,7 @@ class Settings( Defaults ):
 					mApp().debug( self, 'Configuration file "{0}" loaded successfully'.format( configFile ) )
 				except SyntaxError as e:
 					mApp().debug( self, traceback.format_exc() )
-					raise ConfigurationError( 'The configuration file "{0}" contains a syntax error: "{1}"'.format( configFile, str( e.stack ) ) )
+					raise ConfigurationError( 'The configuration file "{0}" contains a syntax error: "{1}"'.format( configFile, str( e ) ) )
 				except Exception as e: # we need to catch all exceptions, since we are calling user code 
 					mApp().debug( self, traceback.format_exc() )
 					raise ConfigurationError( 'The configuration file "{0}" contains an error: "{1}"'.format( configFile, str( e ) ) )
