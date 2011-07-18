@@ -27,6 +27,7 @@ from core.Project import Project
 from core.plugins.reporters.ConsoleReporter import ConsoleReporter
 from core.plugins.helpers.XmlReportGenerator import XmlReportGenerator
 from core.Configuration import Configuration
+from core.plugins.selftset.IntegrityChecker import IntegrityChecker
 
 def getBuild( name, minimumMomVersion ):
 	try:
@@ -37,6 +38,7 @@ def getBuild( name, minimumMomVersion ):
 		build.addLogger( logger )
 		build.addPlugin( XmlReportGenerator() )
 		build.addPlugin( ConsoleReporter() )
+		build.addPlugin( IntegrityChecker() )
 
 		build.initialize()
 		return build
