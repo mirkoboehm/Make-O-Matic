@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
-# Author: Mike McQuaid <mike.mcquaid@kdab.com>
+# Author: Andreas Holzammer <andreas.holzammer@kdab.com>
 #
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -19,19 +19,9 @@
 from core.plugins.builders.maketools.MakeTool import MakeTool
 import sys
 
-class GNUMakeTool( MakeTool ):
-	'''GNUMakeTool implements a class for a the GNU Make makefile tool.'''
+class MingwMakeTool( MakeTool ):
+	'''MingwMakeTool implements a class for a the mingw Make makefile tool.'''
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-#		searchPaths = []
-#		if sys.platform == "win32":
-#			from core.helpers.RegistryHelper import getPathsFromRegistry
-#			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MinGW\\InstallLocation",
-#				"HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\MSYS-1.0_is1\\Inno Setup: App Path" ]
-#			searchPaths += getPathsFromRegistry( keys, "bin" )
-		self._setCommand( 'make' )
-#		self._setCommandSearchPaths( searchPaths )
-
-	def getArguments( self ):
-		return [ '-j{0}'.format( self._getJobs() )  ]
+		self._setCommand( 'mingw32-make' )

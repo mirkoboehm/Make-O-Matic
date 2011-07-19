@@ -25,15 +25,15 @@ class NMakeTool( MakeTool ):
 	def __init__( self ):
 		MakeTool.__init__( self )
 		searchPaths = []
-		if sys.platform == "win32":
-			from core.helpers.RegistryHelper import getPathsFromRegistry
-			keys = [ "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\InstallDir",
-				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\9.0\InstallDir",
-				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\9.0\InstallDir",
-				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\InstallDir" ]
-			searchPaths += getPathsFromRegistry( keys, "../../VC/bin" )
+#		if sys.platform == "win32":
+#			from core.helpers.RegistryHelper import getPathsFromRegistry
+#			keys = [ "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\InstallDir",
+#				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\9.0\InstallDir",
+#				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\9.0\InstallDir",
+#				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\8.0\InstallDir" ]
+#			searchPaths += getPathsFromRegistry( keys, "../../VC/bin" )
 		self._setCommand( 'nmake' )
-		self._setCommandSearchPaths( searchPaths )
+#		self._setCommandSearchPaths( searchPaths )
 		self._setVersionParameter( '/?' )
 
 	def getArguments( self ):

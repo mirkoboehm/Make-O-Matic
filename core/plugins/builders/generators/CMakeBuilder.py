@@ -22,6 +22,9 @@ import sys
 from core.helpers.GlobalMApp import mApp
 from core.plugins.builders.maketools.NMakeTool import NMakeTool
 from core.plugins.builders.maketools import JomTool
+from core.plugins.builders.maketools import getMakeTools
+from core.plugins.builders.maketools.MingwMakeTool import MingwMakeTool
+from core.Exceptions import ConfigurationError
 import os
 
 def getCMakeSearchPaths():
@@ -75,12 +78,26 @@ class CMakeBuilder( MakefileGeneratorBuilder ):
 			return None
 
 		# do not escape or quote here, it does not work for some reason
-		if isinstance( self.getMakeTool(), NMakeTool ):
-			return '-GNMake Makefiles'
-		elif isinstance( self.getMakeTool(), JomTool ):
-			return '-GNMake Makefiles JOM'
-		else:
-			return None
+		jom = False
+		for MakeTool in getMakeTools():
+			if MakeTool == JomTool:
+				jom = True
+			else:
+				tool = MakeTool()
+				try:
+					tool.resolveCommand()
+				except ConfigurationError:
+					pass
+				else:
+					if MakeTool == NMakeTool:
+						if jom:
+							return '-GNMake Makefiles JOM'
+						else:
+							return '-GNMake Makefiles'
+					elif MakeTool == MingwMakeTool:
+						return '-GMinGW Makefiles'
+
+		return None
 
 	def __init__( self, name = None, inSourceBuild = False ):
 		MakefileGeneratorBuilder.__init__( self, name )

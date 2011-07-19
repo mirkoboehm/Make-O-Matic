@@ -20,10 +20,11 @@ import sys
 from core.plugins.builders.maketools.NMakeTool import NMakeTool
 from core.plugins.builders.maketools.GNUMakeTool import GNUMakeTool
 from core.plugins.builders.maketools.JomTool import JomTool
+from core.plugins.builders.maketools.MingwMakeTool import MingwMakeTool
 from core.Exceptions import ConfigurationError
 
 def getMakeTools():
-	return [ JomTool, NMakeTool, GNUMakeTool ]
+	return [ JomTool, NMakeTool, MingwMakeTool, GNUMakeTool ]
 
 def getMakeToolNames():
 	return [ tool().getCommand() for tool in getMakeTools() ]
