@@ -53,21 +53,25 @@ class BuildScriptInterface( MObject ):
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
 		if runner.getReturnCode() != 0:
-			raise MomError( 'Cannot query setting "{0}" for build script "{1}": {2}!'\
+			raise MomError( 'Cannot query setting "{0}" for build script "{1}":\n {2}!'\
 				.format( setting, self.getBuildScript(), runner.getStdErrAsString() ) )
+
 		output = runner.getStdOutAsString()
 		if not output:
-			raise MomError( 'The build script "{0}" did not return a value! It said: {1}'
+			raise MomError( 'The build script "{0}" did not return a value! It said:\n {1}'
 				.format( self.getBuildScript(), runner.getStdErrAsString() ) )
+
 		line = output.strip()
 		groups = re.search( '^(.+?): (.+)$', line )
 		if not groups:
 			raise MomError( 'Did not understand this output: "{0}"!'.format( line ) )
+
 		variable = groups.groups()[1]
 		return variable
 
 	def queryRevisionsSince( self, revision ):
 		'''Execute the build script, and return the lines it outputs for "query revisions-since"'''
+
 		cmd = [ sys.executable, self.getBuildScript(), 'print', 'revisions-since', str( revision ) ] + self.getParameters()
 		runner = RunCommand( cmd, 1800 )
 		runner.run()
@@ -75,9 +79,11 @@ class BuildScriptInterface( MObject ):
 			msg = 'Cannot get revision list for build script "{0}", continuing with next project.'\
 				.format( self.getBuildScript() )
 			raise MomError( msg )
+
 		output = runner.getStdOut()
 		if not output:
 			return []
+
 		lines = output.decode().split( '\n' )
 		return lines
 
@@ -87,6 +93,7 @@ class BuildScriptInterface( MObject ):
 		runner.run()
 		if runner.getReturnCode() != 0:
 			raise MomError( 'Cannot get initial revision for build script "{0}".'.format( self.getBuildScript() ) )
+
 		revision = runner.getStdOutAsString().strip()
 		return revision
 
