@@ -115,8 +115,12 @@ class EmailReporter( Reporter ):
 	def getObjectStatus( self ):
 		if not XmlReportConverter.hasXsltSupport():
 			return "Cannot generate HTML, probably due to missing python-lxml package"
-		else:
-			return ""
+
+		if len( self.getRecipients() ) > 0:
+			typeString = "full report" if self.getEnableFullReport() else "summary"
+			return "Recipients: {0} ({1})".format( ", ".join( self.__recipientList ), typeString )
+
+		return "Recipients: (Using pre-configured settings)"
 
 	def _getRevisionInfo( self ):
 		# get revision info, do not crash here
