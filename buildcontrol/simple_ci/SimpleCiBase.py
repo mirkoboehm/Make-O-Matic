@@ -37,9 +37,9 @@ class SimpleCiBase( MApplication ):
 		MApplication.__init__( self, name, parent )
 
 		self.__params = SimpleCiParameters()
+		self.__params.parse()
 		if self.__params.getInstanceName():
 			self.setName( self.__params.getInstanceName() )
-		self.__params.parse()
 		self.__buildStatus = BuildStatus()
 
 	def preFlightCheck( self ):
