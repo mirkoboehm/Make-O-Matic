@@ -18,16 +18,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from core.Build import Build
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
-from core.loggers.ConsoleLogger import ConsoleLogger
-from core.Exceptions import MomException
-import sys
-from core.Project import Project
-from core.plugins.reporters.ConsoleReporter import ConsoleReporter
-from core.plugins.helpers.XmlReportGenerator import XmlReportGenerator
 from core.Configuration import Configuration
-from core.plugins.selftset.IntegrityChecker import IntegrityChecker
+from core.Exceptions import MomException
+from core.Project import Project
+from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
+from core.loggers.ConsoleLogger import ConsoleLogger
+from core.plugins.helpers.XmlReportGenerator import XmlReportGenerator
+from core.plugins.reporters.ConsoleReporter import ConsoleReporter
+from core.plugins.selftest.IntegrityChecker import IntegrityChecker
+import sys
 
 def getBuild( name, minimumMomVersion ):
 	try:
