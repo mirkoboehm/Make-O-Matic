@@ -105,15 +105,11 @@ class Defaults( MObject ):
 	CMakeBuilderTool = 'configuration.builder.cmake.toolname'
 	# ----- Publisher settings (should be set in .mom/config.py):
 	PublisherSubdirectoryTemplate = 'publisher.subdirectory.template'
-	RSyncPublisherPackageUploadLocation = 'publisher.uploadlocation.packages'
 	RSyncPublisherPackageCleanup = 'publisher.cleanup.packages'
 	PublisherPackageBaseHttpURL = 'publisher.basehttpurl.packages'
-	RSyncPublisherReportsUploadLocation = 'publisher.uploadlocation.reports'
 	RSyncPublisherReportsCleanup = 'publisher.cleanup.reports'
 	PublisherReportsBaseHttpURL = 'publisher.basehttpurl.reports'
-	FileSystemPublisherPackageUploadLocation = 'publisher.filesystem.uploadlocation.packages'
 	FileSystemPublisherPackageCleanup = 'publisher.filesystem.cleanup.packages'
-	FileSystemPublisherReportsUploadLocation = 'publisher.filesystem.uploadlocation.reports'
 	FileSystemPublisherReportsCleanup = 'publisher.filesystem.cleanup.reports'
 	# ----- EmailReporter settings:
 	EmailReporterSender = 'emailreporter.sender'
