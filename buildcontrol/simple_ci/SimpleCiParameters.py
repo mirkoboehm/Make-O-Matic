@@ -16,14 +16,15 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.MObject import MObject
-import optparse, sys
 
-class Parameters( MObject ):
+from core.Parameters import Parameters
+import sys
+
+class SimpleCiParameters( Parameters ):
 
 	def __init__( self ):
-		MObject.__init__( self )
-		self.setDebugLevel( 0 )
+		super( SimpleCiParameters, self ).__init__()
+
 		self.setBuildScripts( None )
 		self.setControlDir( None )
 		self.setPerformTestBuilds( False )
@@ -38,12 +39,6 @@ class Parameters( MObject ):
 
 	def getControlDir( self ):
 		return self.__controlDir
-
-	def setDebugLevel( self, level ):
-		self.__debugLevelParameter = level
-
-	def getDebugLevel( self ):
-		return self.__debugLevelParameter
 
 	def setPerformTestBuilds( self, doIt ):
 		self.__performTestBuilds = doIt
@@ -87,31 +82,33 @@ class Parameters( MObject ):
 	def getInstanceName( self ):
 		return self.__instanceName
 
+	def _initParser( self, parser ):
+		super( SimpleCiParameters, self )._initParser( parser )
+
+		group = parser.add_option_group( "Simple CI options" )
+		group.add_option( "-c", "--control-folder", type = "string", dest = "control_dir",
+			help = "select control folder that contains the build scripts" )
+		group.add_option( "-d", "--test-run", action = "store_true", dest = "test_run",
+			help = "compile the last revision of every product for testing" )
+		group.add_option( "-f" , "--no-find", action = "store_true", dest = "no_find",
+			help = "do not try to discover new revisions for the projects (default: do try)" )
+		group.add_option( "-b", "--no-build", action = "store_true", dest = "no_build",
+			help = "do not start build jobs for new revisions (default: do build)" )
+		group.add_option( "-s", "--slave", action = "store_true", dest = "slaveMode",
+			help = "run in slave mode (the one that actually does the builds)" )
+		group.add_option( "-n", "--instance-name", type = "string", dest = "instance_name",
+			help = "the instance name is used to locate the configuration and database files (see debug output)" )
+		group.add_option( '-p', '--pause', type = 'int', dest = 'delay',
+			help = 'pause after every slave run, in seconds' )
+
 	def parse( self ):
 		"""Parse command line options, give help"""
-		parser = optparse.OptionParser()
-		parser.add_option( "-c", "--control-folder", type = "string", dest = "control_dir",
-			help = "select control folder that contains the build scripts" )
-		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity',
-			help = 'level of debug output. More than 5 "v"s will enable verbose output in buildscripts' )
-		parser.add_option( "-d", "--test-run", action = "store_true", dest = "test_run",
-			help = "compile the last revision of every product for testing" )
-		parser.add_option( "-f" , "--no-find", action = "store_true", dest = "no_find",
-			help = "do not try to discover new revisions for the projects (default: do try)" )
-		parser.add_option( "-b", "--no-build", action = "store_true", dest = "no_build",
-			help = "do not start build jobs for new revisions (default: do build)" )
-		parser.add_option( "-s", "--slave", action = "store_true", dest = "slaveMode",
-			help = "run in slave mode (the one that actually does the builds)" )
-		parser.add_option( "-n", "--instance-name", type = "string", dest = "instance_name",
-			help = "the instance name is used to locate the configuration and database files (see debug output)" )
-		parser.add_option( '-p', '--pause', type = 'int', dest = 'delay',
-			help = 'pause after every slave run, in seconds' )
-		( options, args ) = parser.parse_args( sys.argv )
+
+		super( SimpleCiParameters, self ).parse()
+
+		( options, args ) = self.getParser().parse_args( sys.argv )
 		if options.control_dir:
 			self.setControlDir( str( options.control_dir ) )
-		if options.verbosity:
-			level = int( options.verbosity )
-			self.setDebugLevel( level )
 		if options.test_run:
 			self.setPerformTestBuilds( True )
 		if options.slaveMode:
@@ -124,6 +121,5 @@ class Parameters( MObject ):
 			self.setDelay( options.delay )
 		if options.instance_name:
 			self.setInstanceName( options.instance_name )
+
 		self.setBuildScripts( args[1:] )
-
-

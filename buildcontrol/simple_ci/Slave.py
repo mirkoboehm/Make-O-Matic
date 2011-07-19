@@ -16,16 +16,14 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from buildcontrol.simple_ci.SimpleCiBase import SimpleCiBase
-import os
-from core.helpers.GlobalMApp import mApp
 from core.Exceptions import ConfigurationError, MomException
+from core.helpers.GlobalMApp import mApp
+import os
 import time
 
 class Slave( SimpleCiBase ):
-
-	def __init__( self, params, name = None, parent = None ):
-		SimpleCiBase.__init__( self, params, name, parent )
 
 	def getToolName( self ):
 		return 'simpleci_slave'
@@ -75,4 +73,3 @@ class Slave( SimpleCiBase ):
 				self.debugN( self, 2, '.' )
 				time.sleep( sleepPeriod )
 			self.debug( self, 'done, exiting.' )
-

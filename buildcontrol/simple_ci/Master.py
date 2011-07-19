@@ -16,16 +16,14 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 from buildcontrol.simple_ci.SimpleCiBase import SimpleCiBase
 import os
 import sys
 import time
-from buildcontrol.SubprocessHelpers import extend_debug_prefix, restore_debug_prefix
 
 class Master( SimpleCiBase ):
-
-	def __init__( self, params, name = None, parent = None ):
-		SimpleCiBase.__init__( self, params, name, parent )
 
 	def getToolName( self ):
 		return 'simpleci_master'
@@ -54,7 +52,7 @@ class Master( SimpleCiBase ):
 		After every run, the master takes a short sleep."""
 		# execute the build control process slave:
 		cmd = '{0} {1}'.format( sys.executable, ' '.join( sys.argv + [ '--slave' ] ) )
-		self.debug( self, '*** now starting slave CI process ***' )
+		self.debug( self, '*** now starting slave CI process: {0} ***'.format( cmd ) )
 		oldIndent = extend_debug_prefix( 'slave' )
 		result = -1
 		try:
@@ -62,4 +60,3 @@ class Master( SimpleCiBase ):
 		finally:
 			restore_debug_prefix( oldIndent )
 		self.debug( self, '*** slave finished with exit code {0}. ***'.format( result ) )
-

@@ -23,7 +23,6 @@ import unittest
 import sys
 import glob
 from core.MApplication import MApplication
-from buildcontrol.simple_ci import Parameters
 from buildcontrol.simple_ci.Slave import Slave
 from mom.tests.helpers.TestUtils import md5sum
 from core.helpers.SafeDeleteTree import rmtree
@@ -67,11 +66,7 @@ class SimpleCITests( MomTestCase ):
 		MApplication.instance = None
 
 		# instantiate SimpleCiBase instance
-		params = Parameters.Parameters()
-		params.parse()
-		if instanceName:
-			params.setInstanceName( instanceName )
-		simpleCiInstance = Slave( params )
+		simpleCiInstance = Slave()
 		dir = simpleCiInstance.getDataDir()
 
 		# reset MApplication instance

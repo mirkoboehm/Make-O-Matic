@@ -16,11 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+from buildcontrol.mom.MomParameters import MomParameters
+from buildcontrol.mom.Remotebuilder import RemoteBuilder
 from core.MApplication import MApplication
 from core.loggers.ConsoleLogger import ConsoleLogger
-from buildcontrol.mom.Parameters import Parameters
 import sys
-from buildcontrol.mom.Remotebuilder import RemoteBuilder
 
 class MomRemoteRunner( MApplication ):
 	'''MomRemoteRunner takes the location descriptor of a remote build script, fetches the build script, 
@@ -28,7 +29,7 @@ class MomRemoteRunner( MApplication ):
 
 	def __init__( self ):
 		MApplication.__init__( self, name = 'mom' )
-		self.__parameters = Parameters()
+		self.__parameters = MomParameters()
 
 	def getToolName( self ):
 		return 'mom'

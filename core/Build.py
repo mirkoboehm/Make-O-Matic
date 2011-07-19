@@ -17,21 +17,22 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import os
-from core.MApplication import MApplication
-from core.Project import Project
+from core.BuildParameters import BuildParameters
+from core.Defaults import Defaults
 from core.Exceptions import ConfigurationError, MomError
-from core.Settings import Settings
+from core.MApplication import MApplication
 from core.Parameters import Parameters
-from core.helpers.MachineInfo import machine_info
+from core.Project import Project
+from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
-import time
+from core.helpers.MachineInfo import machine_info
+from core.helpers.SafeDeleteTree import rmtree
+from core.helpers.TimeUtils import formatted_time
+from datetime import datetime
+import os
 import shutil
 import sys
-from core.Defaults import Defaults
-from core.helpers.SafeDeleteTree import rmtree
-from datetime import datetime
-from core.helpers.TimeUtils import formatted_time
+import time
 
 class Build( MApplication ):
 	'''Build represents the facilities provided by the currently running build script.
@@ -41,7 +42,7 @@ class Build( MApplication ):
 		MApplication.__init__( self, minimumMomVersion, name, parent )
 		mApp().getSettings().set( Settings.ScriptBuildName, name )
 		self.__project = None
-		self.__parameters = Parameters()
+		self.__parameters = BuildParameters()
 		self.__startTime = datetime.utcnow()
 
 	def getParameters( self ):

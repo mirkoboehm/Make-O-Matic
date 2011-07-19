@@ -16,17 +16,18 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.MObject import MObject
+
 from core.Exceptions import ConfigurationError
+from core.Parameters import Parameters
+from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 import optparse
-from core.Settings import Settings
 
-class Parameters( MObject ):
+class MomParameters( Parameters ):
 	'''Parse the parameters of an invocation of the mom tool.'''
 
 	def __init__( self, name = None ):
-		MObject.__init__( self, name )
+		super( MomParameters, self ).__init__( name )
 
 	def getRevision( self ):
 		return self.__revision
@@ -43,6 +44,20 @@ class Parameters( MObject ):
 	def getBuildscriptName( self ):
 		return self.__name
 
+	def _createOptionParser( self ):
+		parser = optparse.OptionParser()
+		parser.add_option( '-r', '--revision', action = 'store', dest = 'revision',
+			help = 'build script revision to be retrieved' )
+		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
+			help = 'SCM location including SCM identifier' )
+		parser.add_option( '-p', '--path', action = 'store', dest = 'buildscriptPath', default = 'admin',
+			help = 'path of the build script in the specified repository, without the build script' )
+		parser.add_option( '-n', '--name', action = 'store', dest = 'buildscriptName', default = 'buildscript.py',
+			help = 'filename of the build script' )
+		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
+			help = 'level of debug output' )
+		return parser
+
 	def parse( self, arguments ):
 		'''The mom command line contains two parts, a set of options for the mom tool itself, and a set of options for the 
 		invoked build script. The latter are ignored by mom, and will be passed down to the build script only. Both sections are 
@@ -50,6 +65,9 @@ class Parameters( MObject ):
 		tool. Example: 
 		mom -vv -u git://github.com/KDAB/Make-O-Matic.git -p mom/buildscript.py -r4711 - -vv -t H -r4711
 		'''
+
+		super( MomParameters, self ).parse()
+
 		# make a copy to avoid accidentally modifying sys.args
 		momOptions = arguments[:]
 		# split up the command line into the two sections: 
@@ -62,20 +80,9 @@ class Parameters( MObject ):
 				break
 			index = index + 1
 		mApp().debugN( self, 2, 'mom tool options: {0}'.format( ' '.join( arguments ) ) )
-		# set up the parser:
-		parser = optparse.OptionParser()
-		parser.add_option( '-r', '--revision', action = 'store', dest = 'revision',
-			help = 'build script revision to be retrieved' )
-		parser.add_option( '-u', '--scm-url', action = 'store', dest = 'url',
-			help = 'SCM location including SCM identifier' )
-		parser.add_option( '-p', '--path', action = 'store', dest = 'buildscriptPath', default = 'admin',
-			help = 'path of the build script in the specified repository, without the build script' )
-		parser.add_option( '-n', '--name', action = 'store', dest = 'buildscriptName', default = 'buildscript.py',
-			help = 'filename of the build script' )
-		parser.add_option( '-v', '--verbosity', action = 'count', dest = 'verbosity', default = 0,
-			help = 'level of debug output' )
+
 		# parse options:
-		( options, args ) = parser.parse_args( momOptions )
+		( options, args ) = self.getParser().parse_args( momOptions )
 		if options.revision:
 			self.__revision = options.revision
 		else:

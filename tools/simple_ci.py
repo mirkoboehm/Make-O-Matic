@@ -18,13 +18,21 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from buildcontrol.simple_ci import Master, Slave, Parameters
+
+from buildcontrol.simple_ci.Master import Master
+from buildcontrol.simple_ci.Slave import Slave
+import sys
+
+def make_slave():
+	for o in sys.argv[1:]:
+		if o in ( "-s", "--slave" ):
+			return True
+
+	return False
 
 if __name__ == "__main__":
-	params = Parameters.Parameters()
-	params.parse()
-	if params.getSlaveMode():
-		ci = Slave.Slave( params )
+	if make_slave():
+		ci = Slave()
 	else:
-		ci = Master.Master( params )
+		ci = Master()
 	ci.build()

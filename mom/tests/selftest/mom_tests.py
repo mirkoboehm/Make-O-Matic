@@ -16,11 +16,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from mom.tests.helpers.MomTestCase import MomTestCase
-from buildcontrol.mom.Parameters import Parameters
-import os, sys, unittest
-from core.helpers.RevisionInfo import RevisionInfo
+
+from buildcontrol.mom.MomParameters import MomParameters
 from buildcontrol.mom.Remotebuilder import RemoteBuilder
+from mom.tests.helpers.MomTestCase import MomTestCase
+import os
+import sys
+import unittest
 
 class MomTests( MomTestCase ):
 	'''MomTests tests the mom remote runner tool.'''
@@ -31,35 +33,29 @@ class MomTests( MomTestCase ):
 		momArgs = [ sys.argv[0], '-vv', '-u', 'git://github.com/KDAB/Make-O-Matic.git',
 			'-p', 'mom/buildscript.py', '-r', '4711', '-' ]
 		args = momArgs + buildscriptArgs
-		params = Parameters()
+		params = MomParameters()
 		params.parse( args )
 		self.assertEqual( buildscriptArgs, params.getBuildScriptOptions() )
 
 	def testFetchRemoteBuildscript( self ):
-		revInfo = RevisionInfo()
-		revInfo.revision = 'HEAD'
 		name = 'buildscript.py'
 		path = 'admin'
 		location = 'git://github.com/KDAB/Make-O-Matic.git'
-		remote = RemoteBuilder( revInfo, location = location, path = path, script = name )
-		try:
-			path, temps = remote.fetchBuildScript()
-			self.assertTrue( os.path.exists( path ) )
-			del temps
-		except Exception as e:
-			self.fail( 'fetching the remote build script fails: {0}'.format( e ) )
+		remote = RemoteBuilder( 'HEAD', location = location, path = path, script = name )
+
+		# run
+		path, temps = remote.fetchBuildScript()
+		self.assertTrue( os.path.exists( path ) )
+		del temps
 
 	def testExecuteRemoteHBuild( self ):
-		revInfo = RevisionInfo()
-		revInfo.revision = 'HEAD'
 		name = 'buildscript.py'
 		path = 'admin'
 		location = 'git:git://github.com/KDAB/Make-O-Matic.git'
-		remote = RemoteBuilder( revInfo, location = location, path = path, script = name )
-		try:
-			remote.invokeBuild( args = [ '-vv', '-t', 'H'] )
-		except Exception as e:
-			self.fail( 'executing the remote build script fails: {0}'.format( e ) )
+		remote = RemoteBuilder( 'HEAD', location = location, path = path, script = name )
+
+		# run
+		remote.invokeBuild( args = [ '-vv', '-t', 'H'] )
 
 if __name__ == "__main__":
 	unittest.main()

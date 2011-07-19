@@ -16,28 +16,31 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.MApplication import MApplication
-from buildcontrol.common.BuildStatus import BuildStatus
-from core.helpers.FilesystemAccess import make_foldername_from_string
-import os
-from core.Exceptions import ConfigurationError, MomError
-from core.Settings import Settings
-from core.loggers.ConsoleLogger import ConsoleLogger
-from core.helpers.GlobalMApp import mApp
+
 from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
+from buildcontrol.common.BuildStatus import BuildStatus
+from buildcontrol.simple_ci.SimpleCiParameters import SimpleCiParameters
+from core.Exceptions import ConfigurationError, MomError
+from core.MApplication import MApplication
+from core.Settings import Settings
+from core.helpers.FilesystemAccess import make_foldername_from_string
+from core.helpers.GlobalMApp import mApp
+from core.loggers.ConsoleLogger import ConsoleLogger
+import os
 
 class SimpleCiBase( MApplication ):
 	"""SimpleCI implements a trivial Continuous Integration process that performs builds for a number of Make-O-Matic build scripts.
 	SimpleCIBase implements the common logic of the simple_ci master and slave processes.
 	"""
 
-	def __init__( self, params, name = None, parent = None ):
-		'''Constructor.'''
+	def __init__( self, name = None, parent = None ):
 		MApplication.__init__( self, name, parent )
-		self.__params = params
+
+		self.__params = SimpleCiParameters()
+		if self.__params.getInstanceName():
+			self.setName( self.__params.getInstanceName() )
+		self.__params.parse()
 		self.__buildStatus = BuildStatus()
-		if params.getInstanceName():
-			self.setName( params.getInstanceName() )
 
 	def preFlightCheck( self ):
 		'''Perform the pre-flight check.'''
@@ -65,7 +68,7 @@ class SimpleCiBase( MApplication ):
 
 	def getInstanceDir( self ):
 		'''The instance directory contains all instance specific data.'''
-		path = self.getSettings().userFolder( self.getToolName() )
+		path = self.getSettings().getUserFolder( self.getToolName() )
 		if not os.path.isdir( path ):
 			try:
 				os.makedirs( path )
