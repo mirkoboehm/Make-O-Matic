@@ -22,8 +22,10 @@
 from buildcontrol.simple_ci.Master import Master
 from buildcontrol.simple_ci.Slave import Slave
 import sys
+from core.helpers.GlobalMApp import mApp
 
 def make_slave():
+	# we have to copy some code here to instantiate the correct Simple CI instance (Master/Slave)
 	for o in sys.argv[1:]:
 		if o in ( "-s", "--slave" ):
 			return True
@@ -35,4 +37,9 @@ if __name__ == "__main__":
 		ci = Slave()
 	else:
 		ci = Master()
+
+	# apply instance name if supplied
+	if mApp().getParameters().getInstanceName():
+		ci.setName( mApp().getParameters().getInstanceName() )
+
 	ci.build()

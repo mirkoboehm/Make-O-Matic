@@ -38,8 +38,6 @@ class SimpleCiBase( MApplication ):
 
 		self.__params = SimpleCiParameters()
 		self.__params.parse()
-		if self.__params.getInstanceName():
-			self.setName( self.__params.getInstanceName() )
 		self.__buildStatus = BuildStatus()
 
 	def preFlightCheck( self ):
@@ -98,6 +96,7 @@ class SimpleCiBase( MApplication ):
 		settings.set( Settings.ScriptLogLevel, self.getParameters().getDebugLevel() )
 		self.debug( self, 'debug level is {0}'.format( self.getParameters().getDebugLevel() ) )
 		database = os.path.join( self.getDataDir(), 'buildstatus.sqlite' )
+		self.debug( self, 'using database: {0}'.format( database ) )
 		self.getBuildStatus().setDatabaseFilename( database )
 		MApplication.build( self ) # call base class implementation
 

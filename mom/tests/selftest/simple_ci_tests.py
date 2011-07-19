@@ -67,6 +67,7 @@ class SimpleCITests( MomTestCase ):
 
 		# instantiate SimpleCiBase instance
 		simpleCiInstance = Slave()
+		simpleCiInstance.setName( self.TestInstanceName )
 		dir = simpleCiInstance.getDataDir()
 
 		# reset MApplication instance
