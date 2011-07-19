@@ -16,11 +16,12 @@
 # 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.MApplication import MApplication
+
 from buildcontrol.mom.Remotebuilder import RemoteBuilder
-from core.Parameters import Parameters
-from core.loggers.ConsoleLogger import ConsoleLogger
+from core.BuildParameters import BuildParameters
+from core.MApplication import MApplication
 from core.Settings import Settings
+from core.loggers.ConsoleLogger import ConsoleLogger
 import sys
 
 class ProxyBuilder( MApplication ):
@@ -31,7 +32,7 @@ class ProxyBuilder( MApplication ):
 		MApplication.__init__( self, name = 'proxybuilder' )
 		self.addLogger( ConsoleLogger() )
 		self.setDoBranchBuilds( False )
-		self.__params = Parameters()
+		self.__params = BuildParameters()
 		self.__params.parse()
 		self.__params.apply( self.getSettings() )
 		self.getSettings().set( Settings.ScriptLogLevel, self.__params.getDebugLevel() )
