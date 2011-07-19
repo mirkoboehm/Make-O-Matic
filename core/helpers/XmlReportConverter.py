@@ -74,25 +74,6 @@ class ReportFormat:
 		else:
 			return "Unknown format"
 
-class _PrefixResolver( etree.Resolver ):
-
-	def __init__( self, prefix ):
-		self.prefix = prefix
-
-	def resolve( self, url, ubid, context ):
-		if not url.startswith( self.prefix ):
-			return
-
-		fileName = url.split( ':' )[1]
-
-		thisDirectory = os.path.dirname( os.path.realpath( __file__ ) )
-		filePaths = [fileName, os.path.join( thisDirectory, fileName )]
-		for filePath in filePaths:
-			if os.path.exists( filePath ):
-				return self.resolve_filename( fileName, context )
-
-		raise ConfigurationError( "File not found: {0}".format( fileName ) )
-
 class _MyTextWrapper( TextWrapper ):
 	"""TextWrapper Wrapper class ;)
 	
@@ -174,7 +155,6 @@ class XmlReportConverter( MObject ):
 				fileName = os.path.dirname( __file__ ) + '/xslt/{0}'.format( value )
 				f = codecs.open( fileName, 'r', encoding = "utf-8" )
 				parser = etree.XMLParser()
-				parser.resolvers.add( _PrefixResolver( "external" ) )
 				self.__xslTemplateSnippets[key] = etree.parse( StringIO( f.read() ), parser )
 				f.close()
 			except KeyError:
