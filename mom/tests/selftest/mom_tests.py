@@ -55,7 +55,7 @@ class MomTests( MomTestCase ):
 		remote = RemoteBuilder( 'HEAD', location = location, path = path, script = name )
 
 		# run
-		remote.invokeBuild( args = [ '-vv', '-t', 'H'] )
+		remote.invokeBuild( args = [ '-vv', '-t', 'H', '-s', 'disable-test,disable-create-docs'] )
 
 if __name__ == "__main__":
 	unittest.main()
