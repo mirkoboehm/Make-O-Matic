@@ -20,11 +20,11 @@
 from __future__ import unicode_literals
 
 import string, sys, os
-from core.loggers.Logger import Logger
-from core.helpers.TypeCheckers import check_for_nonnegative_int
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.Exceptions import MomException
+from mom.core.loggers.Logger import Logger
+from mom.core.helpers.TypeCheckers import check_for_nonnegative_int
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Exceptions import MomException
 
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""

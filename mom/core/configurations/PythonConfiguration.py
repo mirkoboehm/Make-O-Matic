@@ -16,8 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Configuration import Configuration
-from core.helpers.RunCommand import RunCommand
+from mom.core.Configuration import Configuration
+from mom.core.helpers.RunCommand import RunCommand
 import sys
 
 class PythonConfiguration( Configuration ):

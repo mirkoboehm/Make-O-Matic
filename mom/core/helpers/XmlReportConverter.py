@@ -18,12 +18,12 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from core.Exceptions import ConfigurationError, MomError, returncode_to_description, BuildError
-from core.MObject import MObject
-from core.executomat.Step import Step
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TimeKeeper import formatted_time_delta
-from core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute, \
+from mom.core.Exceptions import ConfigurationError, MomError, returncode_to_description, BuildError
+from mom.core.MObject import MObject
+from mom.core.executomat.Step import Step
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TimeKeeper import formatted_time_delta
+from mom.core.helpers.XmlUtils import string_from_node_attribute, string_from_node, float_from_node_attribute, \
 	find_nodes_with_attribute_and_value
 from datetime import datetime
 from io import StringIO

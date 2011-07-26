@@ -1,32 +1,32 @@
 # This file is part of Make-O-Matic.
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 # Author: Mirko Boehm <mirko@kdab.com>
-# 
+#
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Make-O-Matic is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.MObject import MObject
+from mom.core.MObject import MObject
 import sqlite3, os, sys
-from buildcontrol.common.BuildInfo import BuildInfo
-from core.Exceptions import ConfigurationError
-from core.Settings import Settings
-from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.helpers.GlobalMApp import mApp
-from buildcontrol.SubprocessHelpers import extend_debug_prefix
-from core.helpers.EnvironmentSaver import EnvironmentSaver
-from core.helpers.SafeDeleteTree import rmtree
+from mom.apps.common.BuildInfo import BuildInfo
+from mom.core.Exceptions import ConfigurationError
+from mom.core.Settings import Settings
+from mom.apps.common.BuildScriptInterface import BuildScriptInterface
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.GlobalMApp import mApp
+from mom.apps.SubprocessHelpers import extend_debug_prefix
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.core.helpers.SafeDeleteTree import rmtree
 
 class BuildStatus( MObject ):
 	'''Build status stores the status of each individual revision in a sqlite3 database.'''
@@ -100,9 +100,9 @@ values ( NULL, ?, ?, ?, ?, ?, ?, ?, ?, ? )'''.format( BuildStatus.TableName )
 				buildInfo.getTag(),
 				buildInfo.getBuildScript(),
 				buildInfo.getBuildId() ]
-			query = '''update {0} 
-set build_name=?, status=?, priority=?, type=?, 
-    revision=?, url=?, branch=?, tag=?, script=? 
+			query = '''update {0}
+set build_name=?, status=?, priority=?, type=?,
+    revision=?, url=?, branch=?, tag=?, script=?
 where id=?'''\
 				.format( BuildStatus.TableName )
 			c.execute( query, values )
@@ -146,7 +146,7 @@ where id=?'''\
 			return self._loadBuildInfo( connection, status )
 
 	def registerNewRevisions( self, buildScript ):
-		'''Determines new revisions committed since the last call with the same build script, 
+		'''Determines new revisions committed since the last call with the same build script,
 		and adds those to the database.'''
 		iface = BuildScriptInterface( buildScript )
 		buildName = iface.querySetting( Settings.ScriptBuildName )
@@ -184,7 +184,7 @@ where id=?'''\
 			if buildInfos:
 				mApp().debug( self, 'build queue:' )
 				for buildInfo in buildInfos:
-					mApp().debug( self, '{0} {1}: {2} - {3}'.format( 
+					mApp().debug( self, '{0} {1}: {2} - {3}'.format(
 						buildInfo.getBuildType().upper() or ' ',
 						buildInfo.getProjectName(),
 						buildInfo.getRevision(),
@@ -196,7 +196,7 @@ where id=?'''\
 			cursor.close()
 
 	def performBuild( self, buildInfo ):
-		"""Start a build process for a new revision. baseDir is the directory where all builds go. To build 
+		"""Start a build process for a new revision. baseDir is the directory where all builds go. To build
 		different revisions and build types under it, subdirectories have to be used."""
 		buildType = buildInfo.getBuildType().lower()
 		# Under windows we have the problem that paths need to be short, so take only 7 digists of the git hash
@@ -243,12 +243,12 @@ where id=?'''\
 				# FIXME send out email reports on configuration or MOM errors
 				mApp().message( self, 'exit code {0}'.format( runner.getReturnCode() ) )
 				print( """\
--->   ____        _ _     _   _____     _ _          _ 
+-->   ____        _ _     _   _____     _ _          _
 -->  | __ ) _   _(_) | __| | |  ___|_ _(_) | ___  __| |
 -->  |  _ \| | | | | |/ _` | | |_ / _` | | |/ _ \/ _` |
 -->  | |_) | |_| | | | (_| | |  _| (_| | | |  __/ (_| |
 -->  |____/ \__,_|_|_|\__,_| |_|  \__,_|_|_|\___|\__,_|
---> 
+-->
 """ )
 				return False
 			else:
@@ -258,7 +258,7 @@ where id=?'''\
 -->  | |__ _  _(_) |__| |  __| |___ _ _  ___
 -->  | '_ \ || | | / _` | / _` / _ \ ' \/ -_)
 -->  |_.__/\_,_|_|_\__,_| \__,_\___/_||_\___|
---> 
+-->
 """ )
 				return True
 

@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import ConfigurationError
-from core.Plugin import Plugin
-from core.Settings import Settings
-from core.actions.filesystem.CopyActionBase import CopyActionBase
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TemplateSupport import MomTemplate
-from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
-from core.helpers.XmlReportConverter import ReportFormat
+from mom.core.Exceptions import ConfigurationError
+from mom.core.Plugin import Plugin
+from mom.core.Settings import Settings
+from mom.core.actions.filesystem.CopyActionBase import CopyActionBase
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TemplateSupport import MomTemplate
+from mom.core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
+from mom.core.helpers.XmlReportConverter import ReportFormat
 from urlparse import urljoin
 import os
 

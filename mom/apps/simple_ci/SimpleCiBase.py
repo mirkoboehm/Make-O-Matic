@@ -1,31 +1,31 @@
 # This file is part of Make-O-Matic.
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 # Author: Mirko Boehm <mirko@kdab.com>
-# 
+#
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Make-O-Matic is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
-from buildcontrol.common.BuildStatus import BuildStatus
-from buildcontrol.simple_ci.SimpleCiParameters import SimpleCiParameters
-from core.Exceptions import ConfigurationError, MomError
-from core.MApplication import MApplication
-from core.Settings import Settings
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.helpers.GlobalMApp import mApp
-from core.loggers.ConsoleLogger import ConsoleLogger
+from mom.apps.common.BuildScriptInterface import BuildScriptInterface
+from mom.apps.common.BuildStatus import BuildStatus
+from mom.apps.simple_ci.SimpleCiParameters import SimpleCiParameters
+from mom.core.Exceptions import ConfigurationError, MomError
+from mom.core.MApplication import MApplication
+from mom.core.Settings import Settings
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.loggers.ConsoleLogger import ConsoleLogger
 import os
 
 class SimpleCiBase( MApplication ):
@@ -101,7 +101,7 @@ class SimpleCiBase( MApplication ):
 		MApplication.build( self ) # call base class implementation
 
 	def performBuilds( self, buildScripts ):
-		'''PerformBuilds is the central method of a SimpleCI run. 
+		'''PerformBuilds is the central method of a SimpleCI run.
 		It retrieves new revisions, and calls the build scripts.'''
 		error = []
 		x = 0

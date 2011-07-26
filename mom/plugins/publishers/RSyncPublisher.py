@@ -18,10 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import platform, os, re, tempfile
-from core.helpers.GlobalMApp import mApp
-from core.helpers.PathResolver import PathResolver
-from core.helpers.RunCommand import RunCommand
-from core.plugins.publishers.Publisher import Publisher, PublisherAction
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.PathResolver import PathResolver
+from mom.core.helpers.RunCommand import RunCommand
+from mom.plugins.publishers.Publisher import Publisher, PublisherAction
 
 class RSyncUploadAction( PublisherAction ):
 	'''RSyncUploadAction uses RSync to publish data from the local directory to the upload location.

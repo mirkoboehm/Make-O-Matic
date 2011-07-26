@@ -17,19 +17,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.MObject import MObject
-from core.helpers.GlobalMApp import mApp
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.Exceptions import ConfigurationError, MomError, BuildError
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string, check_for_path_or_none
-from core.executomat.Step import Step
-from core.Settings import Settings
-from core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.core.MObject import MObject
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.Exceptions import ConfigurationError, MomError, BuildError
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string, check_for_path_or_none
+from mom.core.executomat.Step import Step
+from mom.core.Settings import Settings
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
 import traceback
 from copy import deepcopy, copy
-from core.helpers.TimeKeeper import TimeKeeper
+from mom.core.helpers.TimeKeeper import TimeKeeper
 import os
-from core.Plugin import Plugin
+from mom.core.Plugin import Plugin
 
 class Instructions( MObject ):
 	"""

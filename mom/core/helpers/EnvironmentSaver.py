@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
-from core.Exceptions import MomError
+from mom.core.Exceptions import MomError
 
 class EnvironmentSaver( object ):
 	def __enter__( self ):

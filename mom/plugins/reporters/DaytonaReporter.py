@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Build import Build
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_string
-from core.plugins.reporters.Reporter import Reporter
+from mom.core.Build import Build
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TypeCheckers import check_for_string
+from mom.plugins.reporters.Reporter import Reporter
 import json
 import urllib2
 

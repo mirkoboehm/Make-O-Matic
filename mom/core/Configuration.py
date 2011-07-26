@@ -16,15 +16,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-import core
-from core.ConfigurationBase import ConfigurationBase
+
+from mom.core.ConfigurationBase import ConfigurationBase
+from mom.core.Project import Project
+from mom.core.Settings import Settings
+from mom.core.actions.filesystem.MkDirAction import MkDirAction
+from mom.core.actions.filesystem.RmDirAction import RmDirAction
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.PathResolver import PathResolver
+from mom.core.helpers.TypeCheckers import check_for_string
 import os
-from core.actions.filesystem.MkDirAction import MkDirAction
-from core.helpers.PathResolver import PathResolver
-from core.actions.filesystem.RmDirAction import RmDirAction
-from core.helpers.TypeCheckers import check_for_string
 
 class Configuration( ConfigurationBase ):
 	'''Configuration represents a variant of how a project is built.
@@ -35,7 +36,7 @@ class Configuration( ConfigurationBase ):
 		self.__sourcePrefix = ""
 
 	def _setProject( self, project ):
-		assert isinstance( project, core.Project.Project )
+		assert isinstance( project, Project )
 		self.__project = project
 
 	def _getNormPath( self, name ):

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.common.BuildInfo import BuildInfo
-from buildcontrol.common.BuildStatus import BuildStatus
+from mom.apps.common.BuildInfo import BuildInfo
+from mom.apps.common.BuildStatus import BuildStatus
 from tempfile import NamedTemporaryFile
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os

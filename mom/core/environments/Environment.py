@@ -16,8 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.ConfigurationBase import ConfigurationBase
-from core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.core.ConfigurationBase import ConfigurationBase
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
 from copy import deepcopy
 
 class Environment( ConfigurationBase ):
@@ -26,7 +26,7 @@ class Environment( ConfigurationBase ):
 
 	def __init__( self, name = None, parent = None ):
 		ConfigurationBase.__init__( self, name, parent )
-		from core.environments.Environments import Environments
+		from mom.core.environments.Environments import Environments
 		assert isinstance( parent, Environments )
 		self.setDependencies( [] )
 

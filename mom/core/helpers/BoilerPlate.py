@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Build import Build
-from core.Configuration import Configuration
-from core.Exceptions import MomException
-from core.Project import Project
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.loggers.ConsoleLogger import ConsoleLogger
-from core.plugins.helpers.XmlReportGenerator import XmlReportGenerator
-from core.plugins.reporters.ConsoleReporter import ConsoleReporter
-from core.plugins.selftest.IntegrityChecker import IntegrityChecker
+from mom.core.Build import Build
+from mom.core.Configuration import Configuration
+from mom.core.Exceptions import MomException
+from mom.core.Project import Project
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.loggers.ConsoleLogger import ConsoleLogger
+from mom.plugins.helpers.XmlReportGenerator import XmlReportGenerator
+from mom.plugins.reporters.ConsoleReporter import ConsoleReporter
+from mom.plugins.selftest.IntegrityChecker import IntegrityChecker
 import sys
 
 def getBuild( name, minimumMomVersion ):

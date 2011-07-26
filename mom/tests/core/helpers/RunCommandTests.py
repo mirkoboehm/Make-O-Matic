@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import unittest
-from core.helpers.RunCommand import RunCommand
-from core.Exceptions import ConfigurationError
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.Exceptions import ConfigurationError
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os
 import sys

@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import string
-from core.Exceptions import MomException
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
-from core.helpers.XmlUtils import create_child_node
+from mom.core.Exceptions import MomException
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string_or_none
+from mom.core.helpers.XmlUtils import create_child_node
 import inspect
 
 class MObject( object ):
@@ -86,7 +86,7 @@ class MObject( object ):
 		# FIXME this is duplicated form ConsoleLogger, maybe it could use a helper?
 		if replacePatterns:
 			try:
-				from core.helpers.GlobalMApp import mApp
+				from mom.core.helpers.GlobalMApp import mApp
 				basedir = mApp().getBaseDir()
 				line = string.replace( line, basedir, '$BASE' )
 			except MomException:

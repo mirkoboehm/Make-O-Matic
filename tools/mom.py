@@ -19,7 +19,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.mom.MomRemoteRunner import MomRemoteRunner
+from mom.apps.mom.MomRemoteRunner import MomRemoteRunner
 
 if __name__ == "__main__":
 	mom = MomRemoteRunner()

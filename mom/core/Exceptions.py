@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 import inspect
 import signal
 import traceback
@@ -68,7 +68,7 @@ class MomException( Exception ):
 		return self.__traceback
 
 	def logErrorDescription( self ):
-		from core.MApplication import MApplication
+		from mom.core.MApplication import MApplication
 		phase = MApplication.Phase.getDescription( self.getPhase() )
 		mApp().error( mApp(), u'error in {0} during {1} phase'.format( self.__caller, phase ) )
 		mApp().error( mApp(), u'return code {0}: {1}'.format( self.getReturnCode() , unicode( self ) ) )

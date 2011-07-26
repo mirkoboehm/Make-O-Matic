@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.builders.MakeBasedBuilder import MakeBasedBuilder
-from core.actions.ShellCommandAction import ShellCommandAction
+from mom.plugins.builders.MakeBasedBuilder import MakeBasedBuilder
+from mom.core.actions.ShellCommandAction import ShellCommandAction
 
 class MakefileGeneratorBuilder( MakeBasedBuilder ):
 	'''MakefileGeneratorBuilder generates the actions to build a project from a tool

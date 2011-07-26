@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import sys
-from core.plugins.builders.maketools.NMakeTool import NMakeTool
-from core.plugins.builders.maketools.GNUMakeTool import GNUMakeTool
-from core.plugins.builders.maketools.JomTool import JomTool
-from core.plugins.builders.maketools.MingwMakeTool import MingwMakeTool
-from core.Exceptions import ConfigurationError
+from mom.plugins.builders.maketools.NMakeTool import NMakeTool
+from mom.plugins.builders.maketools.GNUMakeTool import GNUMakeTool
+from mom.plugins.builders.maketools.JomTool import JomTool
+from mom.plugins.builders.maketools.MingwMakeTool import MingwMakeTool
+from mom.core.Exceptions import ConfigurationError
 
 def getMakeTools():
 	return [ JomTool, NMakeTool, MingwMakeTool, GNUMakeTool ]

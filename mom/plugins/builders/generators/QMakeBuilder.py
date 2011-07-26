@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none
-from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string_or_none
+from mom.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
 import os
 
 class QMakeVariable( object ):

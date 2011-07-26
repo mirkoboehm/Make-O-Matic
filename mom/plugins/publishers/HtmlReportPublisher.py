@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.actions.filesystem.CopyActionBase import CopyActionBase
-from core.helpers.GlobalMApp import mApp
-from core.helpers.PathResolver import PathResolver
-from core.helpers.XmlReport import InstructionsXmlReport
-from core.helpers.XmlReportConverter import XmlReportConverter
-from core.plugins.publishers.Publisher import Publisher
+from mom.core.actions.filesystem.CopyActionBase import CopyActionBase
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.PathResolver import PathResolver
+from mom.core.helpers.XmlReport import InstructionsXmlReport
+from mom.core.helpers.XmlReportConverter import XmlReportConverter
+from mom.plugins.publishers.Publisher import Publisher
 import codecs
 import os.path
 import shutil

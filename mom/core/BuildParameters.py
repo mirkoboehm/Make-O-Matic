@@ -1,8 +1,8 @@
-from core.Exceptions import ConfigurationError
-from core.Parameters import Parameters
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from mom.core.Exceptions import ConfigurationError
+from mom.core.Parameters import Parameters
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string
 
 class BuildParameters( Parameters ):
 

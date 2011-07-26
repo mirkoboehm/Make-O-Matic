@@ -19,7 +19,7 @@
 
 from mom.tests.helpers.MomTestCase import MomTestCase
 import unittest
-from core.plugins.testers.Analyzer import Analyzer
+from mom.plugins.testers.Analyzer import Analyzer
 
 class _MyAnalyzer( Analyzer ):
 	"""Inherit Analyzer and make non-public API public"""

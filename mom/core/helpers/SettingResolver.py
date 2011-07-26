@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.helpers.GlobalMApp import mApp
-from core.Exceptions import ConfigurationError
-from core.helpers.StringResolver import StringResolver
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Exceptions import ConfigurationError
+from mom.core.helpers.StringResolver import StringResolver
 
 class SettingResolver( StringResolver ):
 	'''A SettingResolver returns the value of a setting at the time it is converted to a string.

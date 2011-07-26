@@ -18,11 +18,11 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mom.tests.helpers.MomTestCase import MomTestCase
-from core.Exceptions import MomError
+from mom.core.Exceptions import MomError
 import unittest
-from core.MApplication import MApplication
-from core.helpers.GlobalMApp import mApp
-from core.loggers.ConsoleLogger import ConsoleLogger
+from mom.core.MApplication import MApplication
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.loggers.ConsoleLogger import ConsoleLogger
 
 class MApplicationTests( MomTestCase ):
 

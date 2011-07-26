@@ -18,13 +18,13 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from copy import deepcopy, copy
-from core.Exceptions import MomException, ConfigurationError
-from core.MObject import MObject
-from core.helpers.GlobalMApp import mApp
-from core.helpers.RunCommand import RunCommand
-from core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
+from mom.core.Exceptions import MomException, ConfigurationError
+from mom.core.MObject import MObject
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
 import os.path
-from core.helpers.XmlUtils import create_child_node
+from mom.core.helpers.XmlUtils import create_child_node
 
 class Plugin( MObject ):
 	"""

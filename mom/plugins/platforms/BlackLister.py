@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.platforms.Selector import Selector
-from core.Exceptions import AbortBuildException
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
+from mom.plugins.platforms.Selector import Selector
+from mom.core.Exceptions import AbortBuildException
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
 
 class BlackLister( Selector ):
 	"""BlackLister is used to prevent builds on specific blacklisted platforms.

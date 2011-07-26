@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.TypeCheckers import check_for_path
-from core.helpers.GlobalMApp import mApp
-from core.helpers.SafeDeleteTree import rmtree
-from core.actions.filesystem.DirActionBase import DirActionBase
+from mom.core.helpers.TypeCheckers import check_for_path
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.SafeDeleteTree import rmtree
+from mom.core.actions.filesystem.DirActionBase import DirActionBase
 
 class RmDirAction( DirActionBase ):
 	"""RmDirAction deletes a directory."""

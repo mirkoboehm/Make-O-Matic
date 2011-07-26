@@ -16,8 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Project import Project
-from core.BuildInstructions import BuildInstructions
+from mom.core.Project import Project
+from mom.core.BuildInstructions import BuildInstructions
 
 class ConfigurationBase( BuildInstructions ):
 	'''ConfigurationBase encapsulates common logic of configuration-like objects.'''

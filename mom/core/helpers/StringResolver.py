@@ -16,10 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Exceptions import ConfigurationError
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
+from mom.core.Exceptions import ConfigurationError
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
 
 class StringResolver( object ):
 

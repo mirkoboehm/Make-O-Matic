@@ -1,26 +1,26 @@
 # This file is part of Make-O-Matic.
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 # Author: Mirko Boehm <mirko@kdab.com>
-# 
+#
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Make-O-Matic is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import ConfigurationError
-from core.Parameters import Parameters
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
+from mom.core.Exceptions import ConfigurationError
+from mom.core.Parameters import Parameters
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
 import optparse
 
 class MomParameters( Parameters ):
@@ -59,10 +59,10 @@ class MomParameters( Parameters ):
 		return parser
 
 	def parse( self, arguments ):
-		'''The mom command line contains two parts, a set of options for the mom tool itself, and a set of options for the 
-		invoked build script. The latter are ignored by mom, and will be passed down to the build script only. Both sections are 
-		separated by a single dash. If the single dash is not found, it is assumed that all parameters are to be parsed by the mom 
-		tool. Example: 
+		'''The mom command line contains two parts, a set of options for the mom tool itself, and a set of options for the
+		invoked build script. The latter are ignored by mom, and will be passed down to the build script only. Both sections are
+		separated by a single dash. If the single dash is not found, it is assumed that all parameters are to be parsed by the mom
+		tool. Example:
 		mom -vv -u git://github.com/KDAB/Make-O-Matic.git -p mom/buildscript.py -r4711 - -vv -t H -r4711
 		'''
 
@@ -70,7 +70,7 @@ class MomParameters( Parameters ):
 
 		# make a copy to avoid accidentally modifying sys.args
 		momOptions = arguments[:]
-		# split up the command line into the two sections: 
+		# split up the command line into the two sections:
 		index = 0
 		self.__buildScriptOptions = []
 		for item in arguments:

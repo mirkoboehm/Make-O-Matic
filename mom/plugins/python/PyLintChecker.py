@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.testers.Analyzer import Analyzer
-from core.helpers.TypeCheckers import check_for_list_of_paths_or_none, check_for_path_or_none
-from core.configurations.PythonConfiguration import PythonConfiguration
-from core.Exceptions import MomError
-from core.actions.Action import Action
-from core.helpers.RunCommand import RunCommand
+from mom.plugins.testers.Analyzer import Analyzer
+from mom.core.helpers.TypeCheckers import check_for_list_of_paths_or_none, check_for_path_or_none
+from mom.core.configurations.PythonConfiguration import PythonConfiguration
+from mom.core.Exceptions import MomError
+from mom.core.actions.Action import Action
+from mom.core.helpers.RunCommand import RunCommand
 import re
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 import os
 import sys
 

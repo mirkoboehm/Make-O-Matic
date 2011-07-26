@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import MomError, MomException, BuildError
-from core.MObject import MObject
-from core.helpers.EnvironmentSaver import EnvironmentSaver
-from core.helpers.GlobalMApp import mApp
-from core.helpers.StringUtils import to_unicode_or_bust
-from core.helpers.TimeKeeper import TimeKeeper
-from core.helpers.TypeCheckers import check_for_path, check_for_int
-from core.helpers.XmlUtils import create_child_node
+from mom.core.Exceptions import MomError, MomException, BuildError
+from mom.core.MObject import MObject
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.StringUtils import to_unicode_or_bust
+from mom.core.helpers.TimeKeeper import TimeKeeper
+from mom.core.helpers.TypeCheckers import check_for_path, check_for_int
+from mom.core.helpers.XmlUtils import create_child_node
 import codecs
 import os
 import sys

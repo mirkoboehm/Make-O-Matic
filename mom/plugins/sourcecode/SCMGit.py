@@ -17,21 +17,21 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
-from core.Exceptions import ConfigurationError, MomError
-from core.helpers.RunCommand import RunCommand
-from core.actions.ShellCommandAction import ShellCommandAction
-from core.actions.Action import Action
+from mom.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
+from mom.core.Exceptions import ConfigurationError, MomError
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.actions.ShellCommandAction import ShellCommandAction
+from mom.core.actions.Action import Action
 import os, sys
-from core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
 import re
-from core.helpers.GlobalMApp import mApp
-from core.helpers.RevisionInfo import RevisionInfo
-from core.Settings import Settings
-from buildcontrol.common.BuildInfo import BuildInfo
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.RevisionInfo import RevisionInfo
+from mom.core.Settings import Settings
+from mom.apps.common.BuildInfo import BuildInfo
 
 if sys.platform == "win32":
-	from core.helpers.RegistryHelper import getPathsFromRegistry
+	from mom.core.helpers.RegistryHelper import getPathsFromRegistry
 
 class _UpdateHiddenCloneAction( Action ):
 

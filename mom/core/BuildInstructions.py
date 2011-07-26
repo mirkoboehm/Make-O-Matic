@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Instructions import Instructions
+from mom.core.Instructions import Instructions
 import os
-from core.helpers.GlobalMApp import mApp
-from core.Exceptions import ConfigurationError
-from core.Settings import Settings
-from core.actions.filesystem.MkDirAction import MkDirAction
-from core.actions.filesystem.RmDirAction import RmDirAction
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Exceptions import ConfigurationError
+from mom.core.Settings import Settings
+from mom.core.actions.filesystem.MkDirAction import MkDirAction
+from mom.core.actions.filesystem.RmDirAction import RmDirAction
 
 class BuildInstructions( Instructions ):
 	'''BuildInstructions is the base class for all elements that form the build tree of a project.

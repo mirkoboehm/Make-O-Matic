@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.packagers.PackageProvider import PackageProvider
-from core.actions.filesystem.FilesMoveAction import FilesMoveAction
-from core.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
+from mom.plugins.packagers.PackageProvider import PackageProvider
+from mom.core.actions.filesystem.FilesMoveAction import FilesMoveAction
+from mom.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
 import os
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Settings import Settings
 import re
 from datetime import datetime
-from core.actions.Action import Action
+from mom.core.actions.Action import Action
 
 _CPackConfig = '''SET(CPACK_PACKAGE_NAME "@CPACK_PACKAGE_NAME@")
 SET(CPACK_PACKAGE_NAME_SIMPLIFIED "@CPACK_PACKAGE_NAME_SIMPLIFIED@")

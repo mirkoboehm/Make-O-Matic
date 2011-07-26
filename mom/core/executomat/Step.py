@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import MomError, ConfigurationError
-from core.MObject import MObject
-from core.Settings import Settings
-from core.actions.Action import Action
-from core.helpers.Enum import Enum
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.helpers.GlobalMApp import mApp
-from core.helpers.StringUtils import make_posixpath
-from core.helpers.TimeKeeper import TimeKeeper
-from core.helpers.TypeCheckers import check_for_string, check_for_nonempty_string
+from mom.core.Exceptions import MomError, ConfigurationError
+from mom.core.MObject import MObject
+from mom.core.Settings import Settings
+from mom.core.actions.Action import Action
+from mom.core.helpers.Enum import Enum
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.StringUtils import make_posixpath
+from mom.core.helpers.TimeKeeper import TimeKeeper
+from mom.core.helpers.TypeCheckers import check_for_string, check_for_nonempty_string
 import os
 
 class Step( MObject ):

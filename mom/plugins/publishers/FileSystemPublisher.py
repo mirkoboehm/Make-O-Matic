@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.publishers.Publisher import Publisher
-from core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
-from core.actions.filesystem.CheckDirectoryExistsAction import CheckDirectoryExistsAction
-from core.helpers.GlobalMApp import mApp
-from core.helpers.PathResolver import PathResolver
+from mom.plugins.publishers.Publisher import Publisher
+from mom.core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
+from mom.core.actions.filesystem.CheckDirectoryExistsAction import CheckDirectoryExistsAction
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.PathResolver import PathResolver
 import os
 
 class FileSystemPublisher( Publisher ):

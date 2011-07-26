@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import BuildError
-from core.plugins.Preprocessor import _PreprocessorAction
+from mom.core.Exceptions import BuildError
+from mom.plugins.Preprocessor import _PreprocessorAction
 from mom.tests.helpers.MomTestCase import MomTestCase
 import unittest
 

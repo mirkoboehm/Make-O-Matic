@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.plugins.builders.maketools.MakeTool import MakeTool
+from mom.plugins.builders.maketools.MakeTool import MakeTool
 import sys
 
 class NMakeTool( MakeTool ):
@@ -26,7 +26,7 @@ class NMakeTool( MakeTool ):
 		MakeTool.__init__( self )
 		searchPaths = []
 #		if sys.platform == "win32":
-#			from core.helpers.RegistryHelper import getPathsFromRegistry
+#			from mom.core.helpers.RegistryHelper import getPathsFromRegistry
 #			keys = [ "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\InstallDir",
 #				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\9.0\InstallDir",
 #				"HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\9.0\InstallDir",

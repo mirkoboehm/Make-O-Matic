@@ -19,24 +19,23 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# work around to import the correct "core" module, remove when refactoring is finished
-import os
 import sys
 import unittest
-sys.path.insert( 0, os.path.abspath( os.path.join( os.path.realpath( os.path.dirname( __file__ ) ) , "..", ".." ) ) )
 
-from core.Exceptions import MomException, ConfigurationError
-from core.MApplication import MApplication
-from core.plugins.DoxygenGenerator import DoxygenGenerator
-from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder
-from core.plugins.builders.generators.QMakeBuilder import QMakeBuilder
-from core.plugins.builders.maketools import getMakeTool, getMakeToolNames
-from core.plugins.packagers.CPack import CPack
-from core.plugins.publishers.RSyncPublisher import RSyncPublisher
-from core.plugins.python.PyLintChecker import PyLintChecker
-from core.plugins.sourcecode.SCMGit import SCMGit
-from core.plugins.sourcecode.SCMSubversion import SCMSubversion
-from core.plugins.testers.CTest import CTest
+print( sys.path )
+
+from mom.core.Exceptions import MomException, ConfigurationError
+from mom.core.MApplication import MApplication
+from mom.plugins.DoxygenGenerator import DoxygenGenerator
+from mom.plugins.builders.generators.CMakeBuilder import CMakeBuilder
+from mom.plugins.builders.generators.QMakeBuilder import QMakeBuilder
+from mom.plugins.builders.maketools import getMakeTool, getMakeToolNames
+from mom.plugins.packagers.CPack import CPack
+from mom.plugins.publishers.RSyncPublisher import RSyncPublisher
+from mom.plugins.python.PyLintChecker import PyLintChecker
+from mom.plugins.sourcecode.SCMGit import SCMGit
+from mom.plugins.sourcecode.SCMSubversion import SCMSubversion
+from mom.plugins.testers.CTest import CTest
 from mom.tests.buildcontrol.BuildScriptInterfaceTests import BuildScriptInterfaceTests
 from mom.tests.buildcontrol.BuildStatusPersistenceTests import BuildStatusPersistenceTests
 from mom.tests.core.MApplicationTests import MApplicationTests

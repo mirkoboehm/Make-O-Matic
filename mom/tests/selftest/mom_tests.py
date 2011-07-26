@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.mom.MomParameters import MomParameters
-from buildcontrol.mom.Remotebuilder import RemoteBuilder
+from mom.apps.mom.MomParameters import MomParameters
+from mom.apps.mom.Remotebuilder import RemoteBuilder
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os
 import sys

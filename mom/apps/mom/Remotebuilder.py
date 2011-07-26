@@ -1,30 +1,30 @@
 # This file is part of Make-O-Matic.
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 # Author: Mirko Boehm <mirko@kdab.com>
-# 
+#
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Make-O-Matic is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from core.MObject import MObject
-from core.Exceptions import ConfigurationError
-from core.plugins.sourcecode import getScm
-from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
-from core.helpers.TempFolderDeleter import TempFolderDeleter
+from mom.core.MObject import MObject
+from mom.core.Exceptions import ConfigurationError
+from mom.plugins.sourcecode import getScm
+from mom.apps.common.BuildScriptInterface import BuildScriptInterface
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Settings import Settings
+from mom.core.helpers.TempFolderDeleter import TempFolderDeleter
 
 class RemoteBuilder( MObject ):
 	def __init__( self, revision = None, location = None, branch = None, tag = None, path = None, script = None, name = None, rootTrunk = False ):
@@ -92,7 +92,7 @@ class RemoteBuilder( MObject ):
 		if os.path.exists( localBuildscript ):
 			return localBuildscript, temps
 		else:
-			raise ConfigurationError( 'The build script {0} was not found at the path {1} in the repository at revision {2}'.format( 
+			raise ConfigurationError( 'The build script {0} was not found at the path {1} in the repository at revision {2}'.format(
 				self.getBuildscript(), self.getPath(), self.getRevision() ) )
 
 	def getRevisionsSinceForBranchBuilds( self, command, options, location, branch, tag ):

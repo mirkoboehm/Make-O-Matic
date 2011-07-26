@@ -19,15 +19,15 @@
 
 import subprocess, time
 from threading import Thread
-from core.MObject import MObject
-from core.helpers.GlobalMApp import mApp
-from core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths
+from mom.core.MObject import MObject
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TypeCheckers import check_for_positive_int, check_for_path, check_for_list_of_paths
 import os.path
 import sys
 import copy
-from core.Exceptions import ConfigurationError
-from core.Settings import Settings
-from core.helpers.StringUtils import to_unicode_or_bust
+from mom.core.Exceptions import ConfigurationError
+from mom.core.Settings import Settings
+from mom.core.helpers.StringUtils import to_unicode_or_bust
 
 class _CommandRunner( Thread ):
 

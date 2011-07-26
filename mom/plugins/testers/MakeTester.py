@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.testers.TestProvider import TestProvider
-from core.plugins.builders import maketools
+from mom.plugins.testers.TestProvider import TestProvider
+from mom.plugins.builders import maketools
 
 class MakeTester( TestProvider ):
 

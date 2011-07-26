@@ -19,10 +19,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.simple_ci.Master import Master
-from buildcontrol.simple_ci.Slave import Slave
+from mom.apps.simple_ci.Master import Master
+from mom.apps.simple_ci.Slave import Slave
 import sys
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 
 def make_slave():
 	# we have to copy some code here to instantiate the correct Simple CI instance (Master/Slave)

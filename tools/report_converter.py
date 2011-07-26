@@ -20,9 +20,9 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
-from core.helpers.XmlReportConverter import XmlReportConverter
-from core.helpers.XmlReport import StringBasedXmlReport
-from core.MApplication import MApplication
+from mom.core.helpers.XmlReportConverter import XmlReportConverter
+from mom.core.helpers.XmlReport import StringBasedXmlReport
+from mom.core.MApplication import MApplication
 import sys
 
 TARGET_FORMATS = ["text", "text_summary", "html", "html_summary"]

@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.actions.Action import Action
-from core.helpers.TypeCheckers import check_for_path
+from mom.core.actions.Action import Action
+from mom.core.helpers.TypeCheckers import check_for_path
 
 class DirActionBase( Action ):
 

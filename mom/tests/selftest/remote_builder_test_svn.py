@@ -16,5 +16,5 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from buildcontrol.ProxyBuilder import ProxyBuilder
+from mom.apps.ProxyBuilder import ProxyBuilder
 ProxyBuilder( location = 'svn+ssh://svn.kde.org/home/kde/trunk/playground/utils/charm', path = 'make-o-matic' ).build()

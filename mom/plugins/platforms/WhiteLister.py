@@ -16,10 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.plugins.platforms.Selector import Selector
-from core.Exceptions import AbortBuildException
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
+from mom.plugins.platforms.Selector import Selector
+from mom.core.Exceptions import AbortBuildException
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Settings import Settings
 
 class WhiteLister( Selector ):
 	"""WhiteLister is used to allow builds only on specific whitelisted platforms.

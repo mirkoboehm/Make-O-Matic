@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.BuildParameters import BuildParameters
-from core.Defaults import Defaults
-from core.Exceptions import ConfigurationError, MomError
-from core.MApplication import MApplication
-from core.Parameters import Parameters
-from core.Project import Project
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.helpers.MachineInfo import machine_info
-from core.helpers.SafeDeleteTree import rmtree
-from core.helpers.TimeUtils import formatted_time
+from mom.core.BuildParameters import BuildParameters
+from mom.core.Defaults import Defaults
+from mom.core.Exceptions import ConfigurationError, MomError
+from mom.core.MApplication import MApplication
+from mom.core.Parameters import Parameters
+from mom.core.Project import Project
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.MachineInfo import machine_info
+from mom.core.helpers.SafeDeleteTree import rmtree
+from mom.core.helpers.TimeUtils import formatted_time
 from datetime import datetime
 import os
 import shutil

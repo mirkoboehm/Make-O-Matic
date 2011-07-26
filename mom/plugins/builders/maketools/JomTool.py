@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.plugins.builders.maketools.MakeTool import MakeTool
+from mom.plugins.builders.maketools.MakeTool import MakeTool
 
 class JomTool( MakeTool ):
 	'''JomTool implements a class for the Nokia Jom makefile tool.'''

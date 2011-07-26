@@ -17,16 +17,16 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Project import Project
-from core.Settings import Settings
-from core.environments.Environments import Environments
-from core.Configuration import Configuration
-from core.Build import Build
+from mom.core.Project import Project
+from mom.core.Settings import Settings
+from mom.core.environments.Environments import Environments
+from mom.core.Configuration import Configuration
+from mom.core.Build import Build
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os
 import sys
-from core.helpers.SafeDeleteTree import rmtree
-from core.plugins.DoxygenGenerator import DoxygenGenerator
+from mom.core.helpers.SafeDeleteTree import rmtree
+from mom.plugins.DoxygenGenerator import DoxygenGenerator
 
 class MomBuildMockupTestCase( MomTestCase ):
 	'''MomTestCase is a base test case class that sets up and tears down the Build object.'''

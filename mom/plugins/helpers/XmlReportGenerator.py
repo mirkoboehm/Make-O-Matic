@@ -19,13 +19,13 @@
 
 from __future__ import unicode_literals
 
-from core.Plugin import Plugin
-from core.helpers.XmlReport import InstructionsXmlReport
+from mom.core.Plugin import Plugin
+from mom.core.helpers.XmlReport import InstructionsXmlReport
 import os.path
-from core.Exceptions import ConfigurationError
-from core.helpers.XmlReportConverter import ReportFormat, XmlReportConverter
+from mom.core.Exceptions import ConfigurationError
+from mom.core.helpers.XmlReportConverter import ReportFormat, XmlReportConverter
 import codecs
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 
 class XmlReportGenerator( Plugin ):
 	"""

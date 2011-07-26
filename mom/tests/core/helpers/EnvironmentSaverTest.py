@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os
 import unittest

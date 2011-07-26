@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.Emailer import Email, Emailer
+from mom.core.helpers.Emailer import Email, Emailer
 from mom.tests.helpers.MomTestCase import MomTestCase
 import unittest
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Settings import Settings
 import sys
 
 class EmailerTests( MomTestCase ):

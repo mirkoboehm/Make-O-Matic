@@ -17,17 +17,17 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import MomError, ConfigurationError, BuildError
-from core.Plugin import Plugin
-from core.Settings import Settings
-from core.actions.ShellCommandAction import ShellCommandAction
-from core.executomat.Step import Step
-from core.helpers.GlobalMApp import mApp
-from core.helpers.XmlReport import InstructionsXmlReport
-from core.helpers.XmlReportConverter import XmlReportConverter
-from core.helpers.XmlUtils import xml_compare
-from core.loggers.ConsoleLogger import ConsoleLogger
-from core.plugins.helpers.XmlReportGenerator import XmlReportGenerator
+from mom.core.Exceptions import MomError, ConfigurationError, BuildError
+from mom.core.Plugin import Plugin
+from mom.core.Settings import Settings
+from mom.core.actions.ShellCommandAction import ShellCommandAction
+from mom.core.executomat.Step import Step
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.XmlReport import InstructionsXmlReport
+from mom.core.helpers.XmlReportConverter import XmlReportConverter
+from mom.core.helpers.XmlUtils import xml_compare
+from mom.core.loggers.ConsoleLogger import ConsoleLogger
+from mom.plugins.helpers.XmlReportGenerator import XmlReportGenerator
 from mom.tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 from mom.tests.helpers.TestUtils import replace_bound_method
 import os.path

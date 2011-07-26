@@ -22,10 +22,10 @@ import os
 import unittest
 import sys
 import glob
-from core.MApplication import MApplication
-from buildcontrol.simple_ci.Slave import Slave
+from mom.core.MApplication import MApplication
+from mom.apps.simple_ci.Slave import Slave
 from mom.tests.helpers.TestUtils import md5sum
-from core.helpers.SafeDeleteTree import rmtree
+from mom.core.helpers.SafeDeleteTree import rmtree
 
 class SimpleCITests( MomTestCase ):
 	'''SimpleCITests executes the simple_ci tool in different ways.'''

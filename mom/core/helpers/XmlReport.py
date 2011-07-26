@@ -19,10 +19,10 @@
 
 from __future__ import unicode_literals
 
-from core.Instructions import Instructions
+from mom.core.Instructions import Instructions
 import traceback
-from core.helpers.XmlUtils import create_exception_xml_node
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.XmlUtils import create_exception_xml_node
+from mom.core.helpers.GlobalMApp import mApp
 import xml.dom.minidom
 
 class XmlReportInterface( object ):

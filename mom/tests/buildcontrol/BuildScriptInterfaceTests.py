@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
-from core.Exceptions import MomError
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.helpers.SafeDeleteTree import rmtree
+from mom.apps.common.BuildScriptInterface import BuildScriptInterface
+from mom.core.Exceptions import MomError
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.SafeDeleteTree import rmtree
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os
 import unittest

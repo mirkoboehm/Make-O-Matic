@@ -18,7 +18,7 @@
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from core.helpers.PathResolver import PathResolver
+from mom.core.helpers.PathResolver import PathResolver
 import unittest
 from mom.tests.helpers.MomTestCase import MomTestCase
 

@@ -18,8 +18,8 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os
-from buildcontrol.common.BuildScriptInterface import BuildScriptInterface
-from core.Settings import Settings
+from mom.apps.common.BuildScriptInterface import BuildScriptInterface
+from mom.core.Settings import Settings
 import unittest
 
 class CharmBuildTests( MomTestCase ):

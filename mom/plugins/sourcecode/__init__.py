@@ -16,10 +16,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.plugins.sourcecode.SCMGit import SCMGit
-from core.plugins.sourcecode.SCMSubversion import SCMSubversion
-from core.plugins.sourcecode.LocalSourceDirectory import LocalSourceDirectory
-from core.Exceptions import ConfigurationError
+from mom.plugins.sourcecode.SCMGit import SCMGit
+from mom.plugins.sourcecode.SCMSubversion import SCMSubversion
+from mom.plugins.sourcecode.LocalSourceDirectory import LocalSourceDirectory
+from mom.core.Exceptions import ConfigurationError
 import re
 
 def getScm( url, name = None ):

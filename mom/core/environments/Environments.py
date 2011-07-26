@@ -17,14 +17,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.ConfigurationBase import ConfigurationBase
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
+from mom.core.ConfigurationBase import ConfigurationBase
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Settings import Settings
 import os
-from core.Exceptions import MomError, ConfigurationError
-from core.environments.Dependency import Dependency
+from mom.core.Exceptions import MomError, ConfigurationError
+from mom.core.environments.Dependency import Dependency
 from fnmatch import fnmatch
-from core.environments.Environment import Environment
+from mom.core.environments.Environment import Environment
 
 class Environments( ConfigurationBase ):
 	'''Environments is a decorator for Configuration. It takes a configuration, and a list of required folders, and detects matches

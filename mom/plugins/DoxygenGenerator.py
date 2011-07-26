@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Plugin import Plugin
-from core.helpers.TypeCheckers import check_for_path, check_for_path_or_none
-from core.actions.ShellCommandAction import ShellCommandAction
+from mom.core.Plugin import Plugin
+from mom.core.helpers.TypeCheckers import check_for_path, check_for_path_or_none
+from mom.core.actions.ShellCommandAction import ShellCommandAction
 import sys
 import os
-from core.actions.filesystem.RmDirAction import RmDirAction
-from core.actions.filesystem.MkDirAction import MkDirAction
+from mom.core.actions.filesystem.RmDirAction import RmDirAction
+from mom.core.actions.filesystem.MkDirAction import MkDirAction
 
 class DoxygenGenerator( Plugin ):
 
@@ -31,7 +31,7 @@ class DoxygenGenerator( Plugin ):
 		Plugin.__init__( self, name )
 		searchPaths = []
 		if sys.platform == "win32":
-			from core.helpers.RegistryHelper import getPathsFromRegistry
+			from mom.core.helpers.RegistryHelper import getPathsFromRegistry
 			keys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\doxygen_is1\\Inno Setup: App Path" ]
 			searchPaths += getPathsFromRegistry( keys, "bin" )
 		self._setCommand( "doxygen" )

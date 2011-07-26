@@ -20,7 +20,7 @@
 import os
 import unittest
 from mom.tests.helpers.MomTestCase import MomTestCase
-from core.MomSetup import mom_root_dir
+from mom.core.MomSetup import mom_root_dir
 import sys
 
 class EnvironmentSetupTests( MomTestCase ):

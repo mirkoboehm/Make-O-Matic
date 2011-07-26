@@ -17,13 +17,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.	If not, see <http://www.gnu.org/licenses/>.
 
-from core.MObject import MObject
+from mom.core.MObject import MObject
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from smtplib import SMTP, SMTPHeloError, SMTPAuthenticationError, SMTPException, SMTPRecipientsRefused
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.Exceptions import ConfigurationError
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Exceptions import ConfigurationError
 from email.header import Header
 from email.mime.base import MIMEBase
 import bz2

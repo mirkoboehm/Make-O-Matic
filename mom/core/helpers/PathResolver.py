@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 import os
-from core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_callable
-from core.helpers.StringResolver import StringResolver
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_callable
+from mom.core.helpers.StringResolver import StringResolver
 
 class PathResolver( StringResolver ):
 	'''A path resolver resolves a project filename to its full path at the time it is converted to a string.

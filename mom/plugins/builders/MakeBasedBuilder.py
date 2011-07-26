@@ -16,13 +16,13 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.plugins.builders.Builder import Builder
-from core.actions.ShellCommandAction import ShellCommandAction
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
+from mom.plugins.builders.Builder import Builder
+from mom.core.actions.ShellCommandAction import ShellCommandAction
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
 import multiprocessing
-from core.plugins.builders import maketools
-from core.plugins.builders.maketools import getMakeTool
+from mom.plugins.builders import maketools
+from mom.plugins.builders.maketools import getMakeTool
 
 class MakeBasedBuilder( Builder ):
 	'''MakeBasedBuilder implements a base class for builders that implement variants of a build process that uses the make tools.'''

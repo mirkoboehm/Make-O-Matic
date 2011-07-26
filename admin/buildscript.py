@@ -19,13 +19,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.DoxygenGenerator import DoxygenGenerator
-from core.plugins.Preprocessor import Preprocessor
-from core.helpers.PathResolver import PathResolver
-from core.configurations.PythonConfiguration import PythonConfiguration
-from core.helpers.BoilerPlate import BuildProject
-from core.plugins.python.PyUnitTester import PyUnitTester
-from core.plugins.python.PyLintChecker import PyLintChecker
+from mom.plugins.DoxygenGenerator import DoxygenGenerator
+from mom.plugins.Preprocessor import Preprocessor
+from mom.core.helpers.PathResolver import PathResolver
+from mom.core.configurations.PythonConfiguration import PythonConfiguration
+from mom.core.helpers.BoilerPlate import BuildProject
+from mom.plugins.python.PyUnitTester import PyUnitTester
+from mom.plugins.python.PyLintChecker import PyLintChecker
 import os
 
 build, project = BuildProject( name = 'Make-O-Matic', version = '0.5.0',

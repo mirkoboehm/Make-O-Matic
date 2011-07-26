@@ -19,11 +19,11 @@
 
 import unittest
 from mom.tests.helpers.MomTestCase import MomTestCase
-from core.helpers.SettingResolver import SettingResolver
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.Exceptions import ConfigurationError
-from core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.SettingResolver import SettingResolver
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Exceptions import ConfigurationError
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
 
 class SettingResolverTests( MomTestCase ):
 

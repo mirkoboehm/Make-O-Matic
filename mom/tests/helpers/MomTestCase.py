@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Build import Build
-from core.MApplication import MApplication
-from core.helpers.RunCommand import RunCommand
-from core.helpers.XmlReport import InstructionsXmlReport
-from core.helpers.XmlReportConverter import XmlReportConverter
+from mom.core.Build import Build
+from mom.core.MApplication import MApplication
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.helpers.XmlReport import InstructionsXmlReport
+from mom.core.helpers.XmlReportConverter import XmlReportConverter
 from datetime import datetime
 import os
 import unittest

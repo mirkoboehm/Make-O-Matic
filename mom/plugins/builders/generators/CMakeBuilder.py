@@ -17,20 +17,20 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
+from mom.plugins.builders.generators.MakefileGeneratorBuilder import MakefileGeneratorBuilder
 import sys
-from core.helpers.GlobalMApp import mApp
-from core.plugins.builders.maketools.NMakeTool import NMakeTool
-from core.plugins.builders.maketools import JomTool
-from core.plugins.builders.maketools import getMakeTools
-from core.plugins.builders.maketools.MingwMakeTool import MingwMakeTool
-from core.Exceptions import ConfigurationError
+from mom.core.helpers.GlobalMApp import mApp
+from mom.plugins.builders.maketools.NMakeTool import NMakeTool
+from mom.plugins.builders.maketools import JomTool
+from mom.plugins.builders.maketools import getMakeTools
+from mom.plugins.builders.maketools.MingwMakeTool import MingwMakeTool
+from mom.core.Exceptions import ConfigurationError
 import os
 
 def getCMakeSearchPaths():
 	searchPaths = []
 	if sys.platform == "win32":
-		from core.helpers.RegistryHelper import getPathsFromRegistry
+		from mom.core.helpers.RegistryHelper import getPathsFromRegistry
 		registryKeys = [ "HKEY_LOCAL_MACHINE\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\CMake\\UninstallString" ]
 		relativePath = "../bin"
 		searchPaths += getPathsFromRegistry( registryKeys, relativePath )

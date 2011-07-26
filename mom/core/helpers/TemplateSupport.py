@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.FilesystemAccess import make_foldername_from_string
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.GlobalMApp import mApp
 from string import Template
 
 class _TemplateDict( dict ):

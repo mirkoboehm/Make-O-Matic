@@ -16,9 +16,9 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Plugin import Plugin
+from mom.core.Plugin import Plugin
 import os
-from core.Exceptions import ConfigurationError
+from mom.core.Exceptions import ConfigurationError
 import re
 
 class Selector( Plugin ):

@@ -1,31 +1,31 @@
 # This file is part of Make-O-Matic.
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 # Author: Mirko Boehm <mirko@kdab.com>
-# 
+#
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Make-O-Matic is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.mom.Remotebuilder import RemoteBuilder
-from core.BuildParameters import BuildParameters
-from core.MApplication import MApplication
-from core.Settings import Settings
-from core.loggers.ConsoleLogger import ConsoleLogger
+from mom.apps.mom.Remotebuilder import RemoteBuilder
+from mom.core.BuildParameters import BuildParameters
+from mom.core.MApplication import MApplication
+from mom.core.Settings import Settings
+from mom.core.loggers.ConsoleLogger import ConsoleLogger
 import sys
 
 class ProxyBuilder( MApplication ):
-	'''ProxyBuilder takes a few arguments that describe a remote build script, 
+	'''ProxyBuilder takes a few arguments that describe a remote build script,
 	and then executes that build script using a RemoteBuilder.'''
 
 	def __init__( self, location, branch = None, tag = None, path = 'admin', script = 'buildscript.py' , rootTrunk = False ):
@@ -68,7 +68,7 @@ class ProxyBuilder( MApplication ):
 		builder = RemoteBuilder( location = location, branch = branch, tag = tag, path = self.__path, script = self.__script, rootTrunk = self.__rootTrunk )
 		builder.setRevision( self.getParameters().getRevision() )
 		options = sys.argv[1:]
-		# if location, branch or tag parameters are not specified on the command line, add the settings from 
+		# if location, branch or tag parameters are not specified on the command line, add the settings from
 		# the invoking script to the arguments:
 		if not self.getParameters().getScmLocation() and location:
 			options = [ '-u', location] + options

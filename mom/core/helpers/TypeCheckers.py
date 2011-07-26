@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import ConfigurationError
+from mom.core.Exceptions import ConfigurationError
 
 def check_for_list_of_paths( expression, description ):
 	if not isinstance( expression, list ):
@@ -57,7 +57,7 @@ def check_for_nonempty_string_or_none( expression, description ):
 
 def check_for_path( expression, description ):
 	# import locally, because the resolvers uses the type checkers as well
-	from core.helpers.StringResolver import StringResolver
+	from mom.core.helpers.StringResolver import StringResolver
 	if not isinstance( expression, StringResolver ):
 		check_for_nonempty_string( expression, description )
 

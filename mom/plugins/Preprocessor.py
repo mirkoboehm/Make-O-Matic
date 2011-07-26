@@ -16,14 +16,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+from mom.core.Exceptions import BuildError
+from mom.core.Plugin import Plugin
+from mom.core.actions.Action import Action
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TypeCheckers import check_for_path_or_none, \
+	check_for_string, check_for_nonempty_string_or_none
+import mom.core.Project
 import os
-from core.Plugin import Plugin
-from core.actions.Action import Action
-from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_nonempty_string_or_none
 import re
-from core.Exceptions import BuildError
-from core.helpers.GlobalMApp import mApp
-import core
 
 class _PreprocessorAction( Action ):
 	'''The _PreprocessorAction performs the input file conversion.'''
@@ -202,7 +203,7 @@ class Preprocessor( Plugin ):
 		return self.__step
 
 	def setProject( self, project ):
-		assert isinstance( project, core.Project.Project )
+		assert isinstance( project, mom.core.Project.Project )
 		self.__project = project
 
 	def getProject( self ):

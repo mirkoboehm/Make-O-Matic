@@ -19,7 +19,7 @@
 
 from mom.tests.helpers.MomTestCase import MomTestCase
 import unittest
-from core.plugins.python.PyUnitTester import PyUnitTester
+from mom.plugins.python.PyUnitTester import PyUnitTester
 import sys
 
 class PyUnitTesterTests( MomTestCase ):
@@ -45,7 +45,7 @@ class PyUnitTesterTests( MomTestCase ):
 #		self.assertTrue( False )
 
 #	def testAddException( self ):
-#		from core.Exceptions import MomError
+#		from mom.core.Exceptions import MomError
 #		raise MomError( "" )
 
 	def testParseStr1( self ):

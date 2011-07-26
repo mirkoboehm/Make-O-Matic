@@ -19,17 +19,17 @@
 
 from __future__ import print_function
 
-from core.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
-from core.Settings import Settings
-from core.Exceptions import MomError
-from core.helpers.PathResolver import PathResolver
-from core.helpers.GlobalMApp import mApp
+from mom.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
+from mom.core.Settings import Settings
+from mom.core.Exceptions import MomError
+from mom.core.helpers.PathResolver import PathResolver
+from mom.core.helpers.GlobalMApp import mApp
 import os
-from core.actions.filesystem.MkDirAction import MkDirAction
-from core.BuildInstructions import BuildInstructions
-from core.plugins.sourcecode import getScm
-from core.helpers.TypeCheckers import check_for_path_or_none
-from core.actions.filesystem.RmDirAction import RmDirAction
+from mom.core.actions.filesystem.MkDirAction import MkDirAction
+from mom.core.BuildInstructions import BuildInstructions
+from mom.plugins.sourcecode import getScm
+from mom.core.helpers.TypeCheckers import check_for_path_or_none
+from mom.core.actions.filesystem.RmDirAction import RmDirAction
 
 class Project( BuildInstructions ):
 	"""A Project represents an entity to build.
@@ -45,7 +45,7 @@ class Project( BuildInstructions ):
 		self.__scm = None
 
 	def getBuild( self ):
-		from core.Build import Build
+		from mom.core.Build import Build
 		assert isinstance( self.getParent(), Build )
 		return self.getParent()
 

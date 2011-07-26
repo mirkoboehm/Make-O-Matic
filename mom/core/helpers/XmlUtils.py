@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import MomException, returncode_to_description
-from core.helpers.StringUtils import to_unicode_or_bust
+from mom.core.Exceptions import MomException, returncode_to_description
+from mom.core.helpers.StringUtils import to_unicode_or_bust
 
 # *** Note ***
 # This module should only use stuff from Python's xml.* package, do not depend on external packages for now

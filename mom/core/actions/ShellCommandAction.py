@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_list_of_paths
-from core.Exceptions import MomError
-from core.helpers.RunCommand import RunCommand
-from core.actions.Action import Action
+from mom.core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_list_of_paths
+from mom.core.Exceptions import MomError
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.actions.Action import Action
 
 class ShellCommandAction( Action ):
 	"""ShellCommandAction encapsulates the execution of one command in the Step class.

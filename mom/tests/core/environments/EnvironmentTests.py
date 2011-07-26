@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-from core.Settings import Settings
-from core.environments.Dependency import Dependency
-from core.environments.Environments import Environments
-from core.helpers.EnvironmentSaver import EnvironmentSaver
-from core.helpers.GlobalMApp import mApp
-from core.loggers.ConsoleLogger import ConsoleLogger
+from mom.core.Settings import Settings
+from mom.core.environments.Dependency import Dependency
+from mom.core.environments.Environments import Environments
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.loggers.ConsoleLogger import ConsoleLogger
 from mom.tests.helpers.MomBuildMockupTestCase import MomBuildMockupTestCase
 import os
 import unittest

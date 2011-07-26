@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.testers.TestProvider import TestProvider
-from core.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
-from core.helpers.GlobalMApp import mApp
+from mom.plugins.testers.TestProvider import TestProvider
+from mom.plugins.builders.generators.CMakeBuilder import getCMakeSearchPaths
+from mom.core.helpers.GlobalMApp import mApp
 import re
 
 class CTest( TestProvider ):

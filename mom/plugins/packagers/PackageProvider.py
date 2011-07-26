@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Plugin import Plugin
-from core.actions.ShellCommandAction import ShellCommandAction
-from core.helpers.GlobalMApp import mApp
-from core.helpers.StringUtils import make_posixpath
+from mom.core.Plugin import Plugin
+from mom.core.actions.ShellCommandAction import ShellCommandAction
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.StringUtils import make_posixpath
 import os.path
 
 class PackageProvider( Plugin ):

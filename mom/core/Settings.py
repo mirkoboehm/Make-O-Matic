@@ -16,12 +16,12 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Defaults import Defaults
+from mom.core.Defaults import Defaults
 import os, sys
-from core.Exceptions import ConfigurationError
-from core.helpers.GlobalMApp import mApp
-from core.helpers.NodeName import getNodeName
-from core.helpers.TypeCheckers import check_for_nonempty_string
+from mom.core.Exceptions import ConfigurationError
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.NodeName import getNodeName
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string
 import traceback
 
 class Settings( Defaults ):

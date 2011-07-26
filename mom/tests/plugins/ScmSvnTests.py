@@ -17,11 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from buildcontrol.common.BuildInfo import BuildInfo
-from core.Defaults import Defaults
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.helpers.SCMUidMapper import SCMUidSvnAuthorsFileMap
+from mom.apps.common.BuildInfo import BuildInfo
+from mom.core.Defaults import Defaults
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.SCMUidMapper import SCMUidSvnAuthorsFileMap
 from datetime import datetime
 from mom.tests.helpers.ScmTestCase import ScmTestCase
 import os.path

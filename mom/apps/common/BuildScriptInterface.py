@@ -1,32 +1,32 @@
 # This file is part of Make-O-Matic.
 # -*- coding: utf-8 -*-
-# 
+#
 # Copyright (C) 2010 Klaralvdalens Datakonsult AB, a KDAB Group company, info@kdab.com
 # Author: Mirko Boehm <mirko@kdab.com>
-# 
+#
 # Make-O-Matic is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # Make-O-Matic is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.MObject import MObject
+from mom.core.MObject import MObject
 import sys
-from core.helpers.RunCommand import RunCommand
-from core.Exceptions import MomError
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.Exceptions import MomError
 import re
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 import os
-from core.helpers.EnvironmentSaver import EnvironmentSaver
-from buildcontrol.SubprocessHelpers import extend_debug_prefix
-from core.Settings import Settings
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.apps.SubprocessHelpers import extend_debug_prefix
+from mom.core.Settings import Settings
 
 class BuildScriptInterface( MObject ):
 	'''BuildScriptInterface encapsulates ways to invoke a build script.'''
@@ -99,7 +99,7 @@ class BuildScriptInterface( MObject ):
 
 	def executeBuildInfo( self, buildInfo, timeout = 24 * 60 * 60, captureOutput = False ):
 		params = []
-		# temp 
+		# temp
 		debugLevel = mApp().getSettings().get( Settings.SimpleCIScriptDebugLevel, False ) or 0
 		# assemble args:
 		params.extend( [ '-t', buildInfo.getBuildType() or 'M'] )
@@ -116,8 +116,8 @@ class BuildScriptInterface( MObject ):
 		return self.executeWithArgs( timeout, params, captureOutput )
 
 	def execute( self, timeout = 24 * 60 * 60, buildType = 'm', revision = None, url = None, args = None, captureOutput = False ):
-		'''Execute the build script. 
-		The method returns the RunCommand object used to execute the build script, through which the return code and the output 
+		'''Execute the build script.
+		The method returns the RunCommand object used to execute the build script, through which the return code and the output
 		can be retrieved.'''
 		params = []
 		if buildType:

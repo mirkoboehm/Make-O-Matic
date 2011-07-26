@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Exceptions import MomError, ConfigurationError
-from core.helpers.TypeCheckers import check_for_path
-from core.Plugin import Plugin
-from core.helpers.XmlUtils import create_child_node
-from core.helpers.XmlReportConverter import ReportFormat
-from core.helpers.SCMUidMapper import SCMUidMapper
-from buildcontrol.common.BuildInfo import BuildInfo
-from core.helpers.GlobalMApp import mApp
-from core.Settings import Settings
+from mom.core.Exceptions import MomError, ConfigurationError
+from mom.core.helpers.TypeCheckers import check_for_path
+from mom.core.Plugin import Plugin
+from mom.core.helpers.XmlUtils import create_child_node
+from mom.core.helpers.XmlReportConverter import ReportFormat
+from mom.core.helpers.SCMUidMapper import SCMUidMapper
+from mom.apps.common.BuildInfo import BuildInfo
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.Settings import Settings
 import datetime
 
 class SourceCodeProvider( Plugin ):

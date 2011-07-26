@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.XmlReport import InstructionsXmlReport
-from core.helpers.XmlReportConverter import XmlReportConverter
-from core.plugins.reporters.Reporter import Reporter
+from mom.core.helpers.XmlReport import InstructionsXmlReport
+from mom.core.helpers.XmlReportConverter import XmlReportConverter
+from mom.plugins.reporters.Reporter import Reporter
 
 class ConsoleReporter( Reporter ):
 

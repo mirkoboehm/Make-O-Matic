@@ -20,14 +20,14 @@
 from __future__ import unicode_literals
 
 import sys
-from core.loggers.Logger import Logger
-from core.Exceptions import MomError, MomException, InterruptedException, AbortBuildException
-from core.Settings import Settings
-from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
-from core.Instructions import Instructions
+from mom.core.loggers.Logger import Logger
+from mom.core.Exceptions import MomError, MomException, InterruptedException, AbortBuildException
+from mom.core.Settings import Settings
+from mom.core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonempty_string
+from mom.core.Instructions import Instructions
 import traceback
-from core.helpers.MachineInfo import machine_info
-from core.helpers.Enum import Enum
+from mom.core.helpers.MachineInfo import machine_info
+from mom.core.helpers.Enum import Enum
 
 class MApplication( Instructions ):
 	'''MApplication represents the facilities provided by the currently running script.

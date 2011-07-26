@@ -18,7 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from datetime import datetime, timedelta
-from core.helpers.TimeUtils import formatted_time_delta
+from mom.core.helpers.TimeUtils import formatted_time_delta
 
 class TimeKeeper( object ):
 	'''TimeKeeper records the time an operation took.'''

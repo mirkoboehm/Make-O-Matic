@@ -17,10 +17,10 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
-from core.helpers.RunCommand import RunCommand
-from core.helpers.SafeDeleteTree import rmtree
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.helpers.SafeDeleteTree import rmtree
 from mom.tests.helpers.MomTestCase import MomTestCase
 import glob
 import os

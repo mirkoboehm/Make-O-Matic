@@ -16,8 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-from core.Plugin import Plugin
-from core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
+from mom.core.Plugin import Plugin
+from mom.core.actions.filesystem.DirectoryTreeCopyAction import DirectoryTreeCopyAction
 import os
 
 class Builder( Plugin ):

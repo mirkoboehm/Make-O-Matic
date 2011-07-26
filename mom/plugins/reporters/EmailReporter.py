@@ -18,16 +18,16 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
-from core.Build import Build
-from core.Exceptions import MomError, BuildError, ConfigurationError
-from core.Settings import Settings
-from core.helpers.Emailer import Email, Emailer
-from core.helpers.GlobalMApp import mApp
-from core.helpers.RevisionInfo import RevisionInfo
-from core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string, check_for_list_of_strings
-from core.helpers.XmlReport import InstructionsXmlReport
-from core.helpers.XmlReportConverter import XmlReportConverter
-from core.plugins.reporters.Reporter import Reporter
+from mom.core.Build import Build
+from mom.core.Exceptions import MomError, BuildError, ConfigurationError
+from mom.core.Settings import Settings
+from mom.core.helpers.Emailer import Email, Emailer
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.RevisionInfo import RevisionInfo
+from mom.core.helpers.TypeCheckers import check_for_list_of_strings_or_none, check_for_string, check_for_list_of_strings
+from mom.core.helpers.XmlReport import InstructionsXmlReport
+from mom.core.helpers.XmlReportConverter import XmlReportConverter
+from mom.plugins.reporters.Reporter import Reporter
 
 
 class EmailReporter( Reporter ):

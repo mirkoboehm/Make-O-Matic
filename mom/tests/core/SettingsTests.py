@@ -19,9 +19,9 @@
 
 from __future__ import with_statement
 from mom.tests.helpers.MomTestCase import MomTestCase
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 import unittest
-from core.Exceptions import ConfigurationError
+from mom.core.Exceptions import ConfigurationError
 
 class SettingsTests( MomTestCase ):
 

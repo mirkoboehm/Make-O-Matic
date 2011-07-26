@@ -19,14 +19,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.helpers.BoilerPlate import BuildProject
-from core.Configuration import Configuration
-from core.helpers.PathResolver import PathResolver
-from core.plugins.publishers.RSyncPublisher import RSyncPublisher
-from core.plugins.builders.generators.CMakeBuilder import CMakeBuilder, CMakeVariable
-from core.plugins.packagers.CPack import CPack
-from core.plugins.testers.CTest import CTest
-from core.environments.Environments import Environments
+from mom.core.helpers.BoilerPlate import BuildProject
+from mom.core.Configuration import Configuration
+from mom.core.helpers.PathResolver import PathResolver
+from mom.plugins.publishers.RSyncPublisher import RSyncPublisher
+from mom.plugins.builders.generators.CMakeBuilder import CMakeBuilder, CMakeVariable
+from mom.plugins.packagers.CPack import CPack
+from mom.plugins.testers.CTest import CTest
+from mom.core.environments.Environments import Environments
 
 build, project = BuildProject( 'Charm', 'git://github.com/KDAB/Charm.git', '1.4.0', build = 'Charm Build' )
 

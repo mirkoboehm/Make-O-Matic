@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.testers.Analyzer import Analyzer
-from core.actions.ShellCommandAction import ShellCommandAction
+from mom.plugins.testers.Analyzer import Analyzer
+from mom.core.actions.ShellCommandAction import ShellCommandAction
 
 class TestProviderAction( ShellCommandAction ):
 	def __init__( self, tester, command = None, timeout = None ):

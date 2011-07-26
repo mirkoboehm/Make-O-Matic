@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.actions.Action import Action
+from mom.core.actions.Action import Action
 from shutil import move, Error
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 from os.path import isdir
 
 class FilesMoveAction( Action ):

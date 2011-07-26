@@ -17,28 +17,28 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
-from core.Exceptions import ConfigurationError
-from core.helpers.RunCommand import RunCommand
-from core.actions.ShellCommandAction import ShellCommandAction
+from mom.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
+from mom.core.Exceptions import ConfigurationError
+from mom.core.helpers.RunCommand import RunCommand
+from mom.core.actions.ShellCommandAction import ShellCommandAction
 import time
 from xml.dom import minidom
-from core.helpers.RevisionInfo import RevisionInfo
+from mom.core.helpers.RevisionInfo import RevisionInfo
 import os
 import tempfile
-from core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
 import sys
-from buildcontrol.common.BuildInfo import BuildInfo
-from core.Settings import Settings
-from core.helpers.GlobalMApp import mApp
+from mom.apps.common.BuildInfo import BuildInfo
+from mom.core.Settings import Settings
+from mom.core.helpers.GlobalMApp import mApp
 from datetime import datetime
 import calendar
-from core.helpers.TimeUtils import formatted_time
+from mom.core.helpers.TimeUtils import formatted_time
 import re
-from core.Defaults import Defaults
+from mom.core.Defaults import Defaults
 
 if sys.platform == "win32":
-	from core.helpers.RegistryHelper import getPathsFromRegistry
+	from mom.core.helpers.RegistryHelper import getPathsFromRegistry
 
 class SCMSubversion( SourceCodeProvider ):
 	"""Subversion SCM Provider Class"""

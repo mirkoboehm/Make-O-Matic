@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.plugins.testers.TestProvider import TestProvider
-from core.configurations.PythonConfiguration import PythonConfiguration
-from core.Exceptions import MomError, ConfigurationError
-from core.helpers.TypeCheckers import check_for_path_or_none
+from mom.plugins.testers.TestProvider import TestProvider
+from mom.core.configurations.PythonConfiguration import PythonConfiguration
+from mom.core.Exceptions import MomError, ConfigurationError
+from mom.core.helpers.TypeCheckers import check_for_path_or_none
 import re
-from core.helpers.GlobalMApp import mApp
+from mom.core.helpers.GlobalMApp import mApp
 
 class PyUnitTester( TestProvider ):
 

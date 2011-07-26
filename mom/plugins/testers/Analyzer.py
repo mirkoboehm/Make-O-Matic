@@ -17,8 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from core.Plugin import Plugin
-from core.Exceptions import MomError
+from mom.core.Plugin import Plugin
+from mom.core.Exceptions import MomError
 
 class Analyzer( Plugin ):
 
