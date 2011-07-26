@@ -21,7 +21,6 @@ from mom.core.BuildParameters import BuildParameters
 from mom.core.Defaults import Defaults
 from mom.core.Exceptions import ConfigurationError, MomError
 from mom.core.MApplication import MApplication
-from mom.core.Parameters import Parameters
 from mom.core.Project import Project
 from mom.core.Settings import Settings
 from mom.core.helpers.GlobalMApp import mApp

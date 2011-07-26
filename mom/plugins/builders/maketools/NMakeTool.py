@@ -16,15 +16,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from mom.plugins.builders.maketools.MakeTool import MakeTool
-import sys
 
 class NMakeTool( MakeTool ):
 	'''NMakeTool implements a class for the Microsoft NMake makefile tool.'''
 
 	def __init__( self ):
 		MakeTool.__init__( self )
-		searchPaths = []
+#		searchPaths = []
 #		if sys.platform == "win32":
 #			from mom.core.helpers.RegistryHelper import getPathsFromRegistry
 #			keys = [ "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\InstallDir",

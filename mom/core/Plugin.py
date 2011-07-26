@@ -24,7 +24,6 @@ from mom.core.helpers.GlobalMApp import mApp
 from mom.core.helpers.RunCommand import RunCommand
 from mom.core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
 import os.path
-from mom.core.helpers.XmlUtils import create_child_node
 
 class Plugin( MObject ):
 	"""

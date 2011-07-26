@@ -18,13 +18,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from mom.core.MObject import MObject
-import optparse
-import sys
-from mom.core.Settings import Settings
-from mom.core.helpers.TypeCheckers import check_for_nonempty_string
-from mom.core.Exceptions import ConfigurationError
 from mom.core.helpers.GlobalMApp import mApp
 from mom.core.helpers.StringUtils import IndentedHelpFormatterWithNL
+import optparse
+import sys
 
 class Parameters( MObject ):
 	'''Parameters parses and stores the command line parameters (arguments) of a script.'''

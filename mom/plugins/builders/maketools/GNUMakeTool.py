@@ -16,8 +16,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 from mom.plugins.builders.maketools.MakeTool import MakeTool
-import sys
 
 class GNUMakeTool( MakeTool ):
 	'''GNUMakeTool implements a class for a the GNU Make makefile tool.'''
