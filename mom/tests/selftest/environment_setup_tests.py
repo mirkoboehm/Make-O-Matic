@@ -26,9 +26,12 @@ import sys
 class EnvironmentSetupTests( MomTestCase ):
 
 	def _getPathPosition( self, path ):
-		normalizedPathList = [os.path.abspath( x ) for x in sys.path]
+		def normalized( path ):
+			return os.path.abspath( os.path.realpath( path ) )
 
-		return normalizedPathList.index( path )
+		normalizedPathList = [normalized( x ) for x in sys.path]
+
+		return normalizedPathList.index( normalized( path ) )
 
 	def testIfTestEnvironmentVariableIsSet( self ):
 		self.assertTrue( os.getenv( "MOM_TESTS_RUNNING" ) == "1" )

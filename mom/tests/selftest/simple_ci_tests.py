@@ -32,7 +32,7 @@ class SimpleCITests( MomTestCase ):
 
 	BuildScriptName = os.path.join( MomTestCase.TEST_DIRECTORY, 'buildscripts', 'example_mom_buildscript.py' )
 	SyntaxErrorBuildScriptName = os.path.join( MomTestCase.TEST_DIRECTORY, 'buildscripts', 'syntax_error.py' )
-	ToolName = os.path.join( MomTestCase.TEST_DIRECTORY, '..', '..', 'tools', 'simple_ci.py' )
+	ToolName = os.path.join( MomTestCase.TEST_DIRECTORY, '..', 'tools', 'simple_ci.py' )
 	TestInstanceName = 'simple_ci_tests'
 	CurrentDirectory = os.getcwd()
 

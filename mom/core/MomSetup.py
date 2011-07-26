@@ -26,6 +26,5 @@ def mom_root_dir():
 	modules are located in this folder.'''
 
 	filePath = inspect.getfile( mom )
-	path = os.path.split( filePath )[ 0 ]
-	path = os.path.split( path )[ 0 ]
-	return path
+	dirPath = os.path.join( os.path.dirname( filePath ), '..' )
+	return os.path.abspath( dirPath )
