@@ -17,9 +17,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import signal
 from core.helpers.GlobalMApp import mApp
 import inspect
+import signal
 import traceback
 
 class MomException( Exception ):
@@ -29,8 +29,14 @@ class MomException( Exception ):
 		Exception.__init__( self )
 		self.value = value
 		self.details = details
-		self.__phase = mApp().getPhase()
 		self.__traceback = traceback.format_stack()[:-1]
+
+		# get phase if possible
+		from core.MApplication import MApplication
+		if MApplication.instance:
+			self.__phase = mApp().getPhase()
+		else:
+			self.__phase = None
 
 		# get caller
 		curframe = inspect.currentframe()

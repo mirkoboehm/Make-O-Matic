@@ -40,5 +40,5 @@ class Enum( object ):
 	def getDescription( cls, enumValue ):
 		try:
 			return cls._Descriptions[enumValue]
-		except KeyError:
+		except KeyError, TypeError:
 			return "N/A"
