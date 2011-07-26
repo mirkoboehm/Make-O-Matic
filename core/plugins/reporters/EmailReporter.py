@@ -55,7 +55,7 @@ class EmailReporter( Reporter ):
 	"""
 
 	def __init__( self, name = None ):
-		super( Reporter, self ).__init__( name = name )
+		super( EmailReporter, self ).__init__( name = name )
 
 		self.setRecipients( [] )
 		self.setEnableFullReport( False )
@@ -111,6 +111,7 @@ class EmailReporter( Reporter ):
 		e.send( email )
 		e.quit()
 		mApp().debug( self, 'Sent E-Mail to following recipients: {0}'.format( ", ".join( email.getToAddresses() ) ) )
+		self._setIsReportSent( True )
 
 	def getObjectStatus( self ):
 		if not XmlReportConverter.hasXsltSupport():

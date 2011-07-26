@@ -25,5 +25,13 @@ class Reporter( Plugin ):
 	def __init__( self, name = None ):
 		Plugin.__init__( self, name )
 
+		self._setIsReportSent( False )
+
 	def getPluginType( self ):
 		return "reporter"
+
+	def _setIsReportSent( self, sent ):
+		self.__reportSent = sent
+
+	def isReportSent( self ):
+		return self.__reportSent

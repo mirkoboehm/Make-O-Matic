@@ -60,6 +60,7 @@ class DaytonaReporter( Reporter ):
 			postUrl = mApp().getSettings().get( DaytonaReporter.PostUrlKey )
 			sendMessage( msg, postUrl )
 			mApp().debug( self, 'Sent message to daytona bot at {0}'.format( postUrl ) )
+			self._setIsReportSent( True )
 		except Exception as e:
 			mApp().debug( self, 'Sending to Daytona bot failed: {0}'.format( e ) )
 

@@ -26,10 +26,8 @@ class ConsoleReporter( Reporter ):
 	def __init__( self, name = None ):
 		Reporter.__init__( self, name )
 
-		self.__finished = False
-
 	def report( self ):
-		if self.__finished:
+		if self.isReportSent():
 			return
 
 		report = InstructionsXmlReport( self.getInstructions() )
@@ -39,5 +37,4 @@ class ConsoleReporter( Reporter ):
 		print( converter.convertToTextSummary() )
 		print( converter.convertToText() )
 		print( " " ) # empty line
-
-		self.__finished = True
+		self._setIsReportSent( True )
