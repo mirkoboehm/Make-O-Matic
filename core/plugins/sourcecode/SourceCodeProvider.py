@@ -96,8 +96,9 @@ class SourceCodeProvider( Plugin ):
 		"""Returns a RevisionInfo object"""
 		if not self.__revisionInfo:
 			info = self._retrieveRevisionInfo()
-			if not info:
+			if not info or not info.isValid():
 				raise ConfigurationError( 'Unable to retrieve revision information. Is the SCM reachable?' )
+
 			self.__revisionInfo = info
 			mApp().getSettings().set( Settings.ProjectRevision, info.revision )
 			mApp().getSettings().set( Settings.ProjectShortRevision, info.shortRevision )

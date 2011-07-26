@@ -78,6 +78,7 @@ class MomTestCase( unittest.TestCase ):
 	def runCommand( self, cmd, description, timeout = None, zeroReturnCode = True ):
 		'''Helper method to run shell commands in tests. It creates a RunCommand object, runs it,
 		and returns it. If the return code is not zero, it dumps the output of the command.'''
+
 		runner = RunCommand( cmd, timeout )
 		runner.run()
 		if zeroReturnCode and runner.getReturnCode() != 0:

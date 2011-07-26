@@ -40,8 +40,4 @@ class ScmTestCase( MomBuildMockupTestCase ):
 		self.build.runSetups()
 
 	def _validateRevisionInfoContent( self, info ):
-		self.assertNotEquals( info.committerName, None )
-		self.assertNotEquals( info.commitMessage, None )
-		self.assertNotEquals( info.commitTime, None )
-		self.assertNotEquals( info.commitTimeReadable, None )
-		self.assertNotEquals( info.revision, None )
+		self.assertTrue( info.isValid(), "Revision information not valid" )

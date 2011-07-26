@@ -35,3 +35,13 @@ class RevisionInfo( MObject ):
 		self.commitTimeReadable = None
 		self.commitMessage = None
 
+	def isValid( self ):
+		"""Test a minimum set of fields that have to be filled"""
+
+		return ( 
+			self.revision != None and
+			self.committerName != None and
+			self.commitTime != None and
+			self.commitTimeReadable != None and
+			self.commitMessage != None
+		)

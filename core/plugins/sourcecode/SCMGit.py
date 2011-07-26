@@ -120,6 +120,8 @@ class SCMGit( SourceCodeProvider ):
 			bodyMessage = u"\n".join( infos[7:] )
 			if bodyMessage:
 				info.commitMessage += u"\n\n" + bodyMessage.rstrip()
+		else:
+			raise ConfigurationError( "Cannot retrieve revision info: {0}".format( runner.getStdErrAsString() ) )
 
 		return info
 
@@ -171,8 +173,8 @@ class SCMGit( SourceCodeProvider ):
 			assert len( parts ) == 2 and parts[0] == 'commit'
 			return parts[1]
 		else:
-			raise ConfigurationError( 'Cannot get log for the clone of "{0}" at "{1}"'
-				.format( self.getUrl(), self._getHiddenClonePath() ) )
+			raise ConfigurationError( 'Cannot get log for the clone of "{0}" at "{1}": {2}'
+				.format( self.getUrl(), self._getHiddenClonePath(), runner.getStdErrAsString() ) )
 
 	def makeCheckoutStep( self ):
 		"""Create steps to check out the source code"""
