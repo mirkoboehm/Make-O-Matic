@@ -97,15 +97,6 @@ class EmailReporterTest( MomBuildMockupTestCase ):
 		email = self.reporter.createEmail()
 		self.assertTrue( scm.getRevision()[:7] in email.getSubject(), "No abbreviated commit hash in subject" )
 
-	def testCreateEmailSubjectWithInvalidRevision( self ):
-		scm = self.build.getProject().getScm()
-
-		scm.setRevision( "---" )
-		self.build.runPreFlightChecks()
-
-		email = self.reporter.createEmail()
-		self.assertTrue( "N/A" in email.getSubject() )
-
 	def testCreateEmailHtmlSummary( self ):
 		scm = self.build.getProject().getScm()
 
