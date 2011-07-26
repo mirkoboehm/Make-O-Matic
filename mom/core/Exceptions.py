@@ -32,7 +32,7 @@ class MomException( Exception ):
 		self.__traceback = traceback.format_stack()[:-1]
 
 		# get phase if possible
-		from core.MApplication import MApplication
+		from mom.core.MApplication import MApplication
 		if MApplication.instance:
 			self.__phase = mApp().getPhase()
 		else:

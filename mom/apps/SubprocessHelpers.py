@@ -17,9 +17,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+# import from root mom namespace, not $CWD/mom, use absolute_import for this (since v2.5).
+from __future__ import absolute_import
 from mom.core.Settings import Settings
-import os
 from mom.core.helpers.GlobalMApp import mApp
+import os
 
 def extend_debug_prefix( token ):
 	indentVar = mApp().getSettings().get( Settings.MomDebugIndentVariable )

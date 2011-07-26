@@ -18,18 +18,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import print_function
-
-from mom.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
-from mom.core.Settings import Settings
-from mom.core.Exceptions import MomError
-from mom.core.helpers.PathResolver import PathResolver
-from mom.core.helpers.GlobalMApp import mApp
-import os
-from mom.core.actions.filesystem.MkDirAction import MkDirAction
 from mom.core.BuildInstructions import BuildInstructions
-from mom.plugins.sourcecode import getScm
-from mom.core.helpers.TypeCheckers import check_for_path_or_none
+from mom.core.Exceptions import MomError
+from mom.core.Settings import Settings
+from mom.core.actions.filesystem.MkDirAction import MkDirAction
 from mom.core.actions.filesystem.RmDirAction import RmDirAction
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.PathResolver import PathResolver
+from mom.core.helpers.TypeCheckers import check_for_path_or_none
+from mom.plugins.sourcecode import getScm
+from mom.plugins.sourcecode.SourceCodeProvider import SourceCodeProvider
+import os
+
 
 class Project( BuildInstructions ):
 	"""A Project represents an entity to build.

@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import mom.core
+import mom
 import inspect
 import os
 
@@ -25,7 +25,7 @@ def mom_root_dir():
 	'''momRootDir returns the src folder of the local clone of the KDAB autobuild.git repository. The KDAB specific
 	modules are located in this folder.'''
 
-	filePath = inspect.getfile( mom.core )
+	filePath = inspect.getfile( mom )
 	path = os.path.split( filePath )[ 0 ]
 	path = os.path.split( path )[ 0 ]
 	return path
