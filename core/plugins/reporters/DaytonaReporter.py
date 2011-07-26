@@ -53,16 +53,14 @@ class DaytonaReporter( Reporter ):
 	def notify( self ):
 		msg = self._createMessage()
 
+		# get settings
+		# reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
+		postUrl = mApp().getSettings().get( DaytonaReporter.PostUrlKey )
+
 		# send message
-		try:
-			# get settings
-			# reporterSender = mApp().getSettings().get( Settings.EmailReporterSender )
-			postUrl = mApp().getSettings().get( DaytonaReporter.PostUrlKey )
-			sendMessage( msg, postUrl )
-			mApp().debug( self, 'Sent message to daytona bot at {0}'.format( postUrl ) )
-			self._setIsReportSent( True )
-		except Exception as e:
-			mApp().debug( self, 'Sending to Daytona bot failed: {0}'.format( e ) )
+		sendMessage( msg, postUrl )
+		mApp().debug( self, 'Sent message to daytona bot at {0}'.format( postUrl ) )
+		self._setIsReportSent( True )
 
 	def getObjectStatus( self ):
 			return ""
