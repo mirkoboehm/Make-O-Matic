@@ -59,13 +59,6 @@ class Publisher( Plugin ):
 		self._setStep( 'upload-packages' )
 		self.setExtraUploadSubDirs( [] )
 
-	def preFlightCheck( self ):
-		if not self.getUploadLocation():
-			raise ConfigurationError( "Must have a valid upload location!" )
-
-		if not self.getUploadBaseUrl():
-			raise ConfigurationError( "Must have a valid upload base URL!" )
-
 	def getObjectStatus( self ):
 		# self.getUploadUrl() may throw if revision, etc. is not available. Catch this.
 		try:
