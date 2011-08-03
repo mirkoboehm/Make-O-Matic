@@ -63,10 +63,10 @@ class QMakeVariable( object ):
 class QMakeBuilder( MakefileGeneratorBuilder ):
 	'''QMakeBuilder generates the actions to build a project with qmake.'''
 
-	def __init__( self, name = None, installPrefixVariableName = 'PREFIX' ):
+	def __init__( self, name = None, installPrefixVariableName = 'PREFIX', projectFileBaseName = None ):
 		MakefileGeneratorBuilder.__init__( self, name )
 
-		self.setProjectFileBaseName( None )
+		self.setProjectFileBaseName( projectFileBaseName )
 		self.enableInstallation( False )
 		self._setCommand( "qmake" )
 		self.__qmakeVariables = []

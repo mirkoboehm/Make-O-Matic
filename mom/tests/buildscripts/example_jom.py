@@ -25,7 +25,7 @@ from mom.plugins.packagers.CPack import CPack
 
 build, config = BuildConfiguration( 'Jom', 'git://gitorious.org/qt-labs/jom.git', '1.0.0' )
 
-config.addPlugin( QMakeBuilder() )
+config.addPlugin( QMakeBuilder( projectFileBaseName = 'jom' ) )
 config.addPlugin( CPack( sourcePackage = True ) )
 
 build.build()
