@@ -27,7 +27,6 @@ from core.helpers.TypeCheckers import check_for_nonnegative_int, check_for_nonem
 from core.Instructions import Instructions
 import traceback
 from core.helpers.MachineInfo import machine_info
-from core.helpers.Enum import Enum
 
 class MApplication( Instructions ):
 	'''MApplication represents the facilities provided by the currently running script.
@@ -35,11 +34,6 @@ class MApplication( Instructions ):
 	and defines the exit code of the program.'''
 
 	instance = None
-
-	class Phase( Enum ):
-		'''Enumerated values representing the phases of the application run.'''
-		Start, Prepare, PreFlightCheck, Setup, Execute, WrapUp, Report, Notify, ShutDown = range ( 9 )
-		_Descriptions = [ 'start', 'prepare', 'pre-flight check', 'setup', 'execute', 'wrap-up', 'report', 'notify', 'shutdown' ]
 
 	def __init__( self, minimumMomVersion = None, name = None, parent = None ):
 		Instructions.__init__( self, name, parent )
@@ -52,7 +46,6 @@ class MApplication( Instructions ):
 		self.__settings = Settings()
 		self.__exception = None
 		self.__returnCode = None
-		self.__phase = self.Phase.Start
 		self._checkMinimumMomVersion( minimumMomVersion )
 
 	def getMomVersion( self ):
@@ -141,12 +134,6 @@ class MApplication( Instructions ):
 	def getException( self ):
 		return self.__exception
 
-	def _setPhase( self, phase ):
-		self.__phase = phase
-
-	def getPhase( self ):
-		return self.__phase
-
 	def error( self, mobject, text, compareTo = None ):
 		[ logger.error( self, mobject, text, compareTo ) for logger in self.getLoggers() ]
 
@@ -179,15 +166,10 @@ class MApplication( Instructions ):
 	def _buildAndReturn( self ):
 		'''Helper method that can be overloaded.'''
 		try:
-			self._setPhase( MApplication.Phase.Prepare )
 			self.runPrepare()
-			self._setPhase( MApplication.Phase.PreFlightCheck )
 			self.runPreFlightChecks()
-			self._setPhase( MApplication.Phase.Setup )
 			self.runSetups()
-			self._setPhase( MApplication.Phase.Execute )
 			self.runExecute()
-			self._setPhase( MApplication.Phase.WrapUp )
 			self.runWrapups()
 		except Exception, e:
 			innerTraceback = traceback.format_tb( sys.exc_info()[2] )
@@ -200,11 +182,8 @@ class MApplication( Instructions ):
 			raise # re-throw exception
 		finally:
 			if self.getReturnCode() != AbortBuildException.getReturnCode():
-				self._setPhase( MApplication.Phase.Report )
 				self.runReports()
-				self._setPhase( MApplication.Phase.Notify )
 				self.runNotifications()
-				self._setPhase( MApplication.Phase.ShutDown )
 				self.runShutDowns()
 
 	def buildAndReturn( self ):

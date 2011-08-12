@@ -21,7 +21,6 @@ from core.BuildParameters import BuildParameters
 from core.Defaults import Defaults
 from core.Exceptions import ConfigurationError, MomError
 from core.MApplication import MApplication
-from core.Parameters import Parameters
 from core.Project import Project
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
@@ -115,7 +114,6 @@ class Build( MApplication ):
 		assert self.getBaseDir()
 		for step in self.calculateBuildSequence():
 			self.addStep( step )
-
 
 	def setup( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
