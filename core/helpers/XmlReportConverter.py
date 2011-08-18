@@ -18,6 +18,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+
 from core.Exceptions import ConfigurationError, MomError, returncode_to_description, BuildError
 from core.MObject import MObject
 from core.executomat.Step import Step
