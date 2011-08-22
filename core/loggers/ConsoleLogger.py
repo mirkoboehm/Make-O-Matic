@@ -29,8 +29,8 @@ from core.Exceptions import MomException
 class ConsoleLogger( Logger ):
 	"""ConsoleLogger prints status and debug messages to the stderr stream."""
 
-	def __init__( self ):
-		Logger.__init__( self, self.__class__.__name__ )
+	def __init__( self, name = None ):
+		super( ConsoleLogger, self ).__init__( name )
 
 	@staticmethod
 	def __getLevel( mapp ):
@@ -39,9 +39,12 @@ class ConsoleLogger( Logger ):
 		return verbosity
 
 	def _logError( self, mapp, mobject, msg ):
-		self.message( mapp, mobject, '*** ERROR: {0}'.format( msg ) )
+		self._log( mapp, mobject, '*** ERROR: {0}'.format( msg ) )
 
 	def _logMessage( self, mapp, mobject, msg ):
+		self._log( mapp, mobject, msg )
+
+	def _log( self, mapp, mobject, msg ):
 		text = msg
 		# FIXME this should be configurable somewhere, and preferably not only for the ConsoleLogger
 		try:
@@ -61,17 +64,21 @@ class ConsoleLogger( Logger ):
 		pieces = filter( lambda x: x, pieces )
 		fulltext = ' '.join( pieces )
 		# fulltext = '{0} {1}[{2}] {3}'.format( self._timeStampPrefix(), self._messagePrefix(), mobject.getName(), text )
-		sys.stderr.write( fulltext.encode( "utf-8" ) )
+
+		self._write( fulltext.encode( "utf-8" ) )
+
+	def _write( self, str ):
+		sys.stderr.write( str )
 
 	def _logDebug( self, mapp, mobject, msg ):
 		if self.__getLevel( mapp ) > 0:
-			self.message( mapp, mobject, 'DEBUG: {0}'.format( msg ) )
+			self._log( mapp, mobject, 'DEBUG: {0}'.format( msg ) )
 
 	def _logDebugN( self, mapp, mobject, level , msg ):
 		check_for_nonnegative_int( level, "The debug level needs to be an integer of zero or more" )
 		verbosity = self.__getLevel( mapp )
 		if verbosity >= level:
-			self.debug( mapp, mobject, msg )
+			self._logDebug( mapp, mobject, msg )
 
 	def preFlightCheck( self ):
 		level = mApp().getSettings().get( Settings.ScriptLogLevel, True )
