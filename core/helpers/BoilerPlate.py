@@ -24,6 +24,7 @@ from core.Project import Project
 from core.Settings import Settings
 from core.helpers.GlobalMApp import mApp
 from core.loggers.ConsoleLogger import ConsoleLogger
+from core.loggers.FileLogger import FileLogger
 from core.plugins.helpers.XmlReportGenerator import XmlReportGenerator
 from core.plugins.reporters.ConsoleReporter import ConsoleReporter
 from core.plugins.selftest.IntegrityChecker import IntegrityChecker
@@ -34,8 +35,8 @@ def getBuild( name, minimumMomVersion ):
 		build = Build( minimumMomVersion, name )
 		build.getParameters().parse()
 		mApp().getSettings().set( Settings.ScriptLogLevel, build.getParameters().getDebugLevel() )
-		logger = ConsoleLogger()
-		build.addLogger( logger )
+		build.addLogger( ConsoleLogger() )
+		build.addLogger( FileLogger() )
 		build.addPlugin( XmlReportGenerator() )
 		build.addPlugin( ConsoleReporter() )
 		build.addPlugin( IntegrityChecker() )
