@@ -41,7 +41,6 @@ class FileLogger( ConsoleLogger ):
 	def setup( self ):
 		dir = self.getInstructions().getBaseDir()
 		filePath = os.path.join( dir, self.FILENAME )
-		print( filePath )
 		self.f = codecs.open( filePath, 'w', encoding = "utf-8" )
 
 		self._writeCachedMessages()
