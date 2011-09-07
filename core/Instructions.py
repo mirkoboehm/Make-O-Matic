@@ -337,8 +337,7 @@ class Instructions( InstructionsBase ):
 				child._runPhase( phase )
 
 			for plugin in self.getPlugins():
-				# only run the methods if the plugin is enabled or we are in pre flight check phase
-				if plugin.isEnabled() or phase == self.Phase.PreFlightCheck:
+				if plugin.isEnabled():
 					self._safeCall( plugin, methodName, catchExceptions = plugin.isOptional() )
 
 	def runPrepare( self ):

@@ -17,6 +17,8 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from core.Settings import Settings
+from core.helpers.GlobalMApp import mApp
 from core.loggers.ConsoleLogger import ConsoleLogger
 import codecs
 import os.path
@@ -30,6 +32,12 @@ class FileLogger( ConsoleLogger ):
 
 		self.f = None
 		self.cachedMessages = []
+
+	def preFlightCheck( self ):
+		# only use the file logger if we are in build mode
+		mode = mApp().getSettings().get( Settings.ScriptRunMode )
+		if mode != Settings.RunMode_Build:
+			self.setEnabled( False )
 
 	def __del__( self ):
 		if self.f:
