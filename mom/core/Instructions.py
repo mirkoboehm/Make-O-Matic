@@ -17,21 +17,26 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-from mom.core.MObject import MObject
-from mom.core.helpers.GlobalMApp import mApp
-from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from copy import deepcopy
 from mom.core.Exceptions import ConfigurationError, MomError, BuildError
-from mom.core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string, check_for_path_or_none
-from mom.core.executomat.Step import Step
-from mom.core.Settings import Settings
-from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
-import traceback
-from copy import deepcopy, copy
-from mom.core.helpers.TimeKeeper import TimeKeeper
-import os
+from mom.core.InstructionsBase import InstructionsBase
+from mom.core.MObject import MObject
 from mom.core.Plugin import Plugin
+from mom.core.Settings import Settings
+from mom.core.executomat.Step import Step
+from mom.core.helpers.Enum import Enum
+from mom.core.helpers.EnvironmentSaver import EnvironmentSaver
+from mom.core.helpers.FilesystemAccess import make_foldername_from_string
+from mom.core.helpers.GlobalMApp import mApp
+from mom.core.helpers.TimeKeeper import TimeKeeper
+from mom.core.helpers.TypeCheckers import check_for_nonempty_string_or_none, check_for_nonempty_string, \
+	check_for_path_or_none
+import copy
+import os
+import traceback
+import types
 
-class Instructions( MObject ):
+class Instructions( InstructionsBase ):
 	"""
 	Instructions is the base class for anything that can be built by Make-O-Matic, including the packages and reports locations.
 
@@ -52,19 +57,28 @@ class Instructions( MObject ):
 	      - Instruction2.1
 	"""
 
+	class Phase( Enum ):
+		'''Enumerated values representing the phases of the application run.'''
+		Start, Prepare, PreFlightCheck, Setup, Execute, WrapUp, Report, Notify, ShutDown = range ( 9 )
+		_Descriptions = [ '_start', 'prepare', 'preFlightCheck', 'setup', 'execute', 'wrapup', 'report', 'notify', 'shutDown' ]
+
 	def __init__( self, name = None, parent = None ):
-		MObject.__init__( self, name )
+		super( Instructions, self ).__init__( name )
+
 		self._setBaseDir( None )
 		self.setLogDir( None )
 		self.deleteLogDirOnShutdown( False )
 		self.setPackagesDir( None )
 		self.setParent( None )
-		if parent: # the parent instructions object
-			parent.addChild( self )
+		self._setCurrentPhase( self.Phase.Start )
+
 		self.__plugins = []
 		self.__instructions = []
 		self.__steps = []
 		self.__timeKeeper = TimeKeeper()
+
+		if parent: # the parent instructions object
+			parent.addChild( self )
 
 	def __deepcopy__( self, memo ):
 		'''Customize the behaviour of deepcopy to not include the parent object.'''
@@ -212,7 +226,8 @@ class Instructions( MObject ):
 		for step in self.getSteps():
 			if step.getName() == identifier:
 				return step
-		raise MomError( 'no such step "{0}"'.format( identifier ) )
+
+		raise MomError( 'No such step "{0}" in "{1}" object'.format( identifier, self.getName() ) )
 
 	def calculateBuildSequence( self ):
 		'''Define the build sequence for this object.
@@ -292,6 +307,12 @@ class Instructions( MObject ):
 			index = index + 1
 		raise MomError( 'Unknown child {0}'.format( instructions ) )
 
+	def _setCurrentPhase( self, phase ):
+		self.__currentPhase = phase
+
+	def getCurrentPhase( self ):
+		return self.__currentPhase
+
 	def _getBaseDirName( self ):
 		myIndex = None
 		if self.getParent():
@@ -304,34 +325,34 @@ class Instructions( MObject ):
 			baseDirName = '{0}{1}{2}'.format( index, spacer, make_foldername_from_string( self.getName() ) )
 		return baseDirName
 
+	def _runPhase( self, phase ):
+		self._setCurrentPhase( phase )
+
+		with EnvironmentSaver():
+			methodName = self.Phase.getDescription( phase )
+
+			mApp().debugN( self, 1, 'Running phase: {0}'.format( methodName ) )
+			method = getattr( self, methodName )
+			method()
+
+			for child in self.getChildren():
+				child._runPhase( phase )
+
+			for plugin in self.getPlugins():
+				if plugin.isEnabled():
+					self._safeCall( plugin, methodName, catchExceptions = plugin.isOptional() )
 
 	def runPrepare( self ):
-		with EnvironmentSaver():
-			mApp().debugN( self, 2, 'preparing' )
-			self.prepare()
-			[ plugin.performPrepare() for plugin in self.getPlugins() ]
-			[ child.runPrepare() for child in self.getChildren() ]
-
+		self._runPhase( self.Phase.Prepare )
 
 	def runPreFlightChecks( self ):
-		with EnvironmentSaver():
-			mApp().debugN( self, 2, 'performing pre-flight checks' )
-			self.preFlightCheck()
-			[ plugin.performPreFlightCheck() for plugin in self.getPlugins() ]
-			[ child.runPreFlightChecks() for child in self.getChildren() ]
+		self._runPhase( self.Phase.PreFlightCheck )
 
 	def runSetups( self ):
-		with EnvironmentSaver():
-			mApp().debugN( self, 2, 'setting up' )
-			self.setup()
-			[ plugin.performSetup() for plugin in self.getPlugins() ]
-			[ child.runSetups() for child in self.getChildren() ]
+		self._runPhase( self.Phase.Setup )
 
 	def runExecute( self ):
-		with EnvironmentSaver():
-			mApp().debugN( self, 2, 'executing' )
-			self.execute()
-			[ child.execute() for child in self.getChildren() ]
+		self._runPhase( self.Phase.Execute )
 
 	def _stepsShouldExecute( self ):
 		'''Return if the steps should be executed for this object.
@@ -356,7 +377,7 @@ class Instructions( MObject ):
 		finally:
 			if not step.isEmpty():
 				noOfActions = len( step.getPreActions() ) + len( step.getMainActions() ) + len( step.getPostActions() )
-				mApp().debug( self, '{0}: actions: {1}, status: {2}, result: {3}, duration: {4}'.format(
+				mApp().debug( self, '{0}: actions: {1}, status: {2}, result: {3}, duration: {4}'.format( 
 					step.getName(),
 					noOfActions,
 					Step.Status.getDescription( step.getStatus() ),
@@ -364,18 +385,10 @@ class Instructions( MObject ):
 					step.getTimeKeeper().deltaString() ) )
 
 	def runWrapups( self ):
-		with EnvironmentSaver():
-			mApp().debugN( self, 2, 'wrapping up' )
-			[ plugin.wrapUp() for plugin in self.getPlugins() ]
-			for child in self.getChildren():
-				child.runWrapups()
+		self._runPhase( self.Phase.WrapUp )
 
 	def runReports( self ):
-		with EnvironmentSaver():
-			mApp().debugN( self, 2, 'creating reports' )
-			for child in self.getChildren():
-				child.runReports()
-			self._runForEach( self.getPlugins(), Plugin.performReport, catchExceptions = True )
+		self._runPhase( self.Phase.Report )
 
 	def runNotifications( self ):
 		notificationsEnabled = mApp().getSettings().get( Settings.ScriptEnableNotifications )
@@ -383,73 +396,31 @@ class Instructions( MObject ):
 			mApp().debug( self, "Not running notify phase, disabled by settings (Settings.ScriptEnableNotifications)" )
 			return
 
-		with EnvironmentSaver():
-			mApp().debugN( self, 2, 'publishing notifications' )
-			for child in self.getChildren():
-				child.runNotifications()
-			self._runForEach( self.getPlugins(), Plugin.performNotify, catchExceptions = True )
+		self._runPhase( self.Phase.Notify )
 
 	def runShutDowns( self ):
-		with EnvironmentSaver():
-			self.shutDown()
-			mApp().debugN( self, 2, 'shutting down' )
-			for child in self.getChildren():
-				child.runShutDowns()
-			self._runForEach( self.getPlugins(), Plugin.shutDown, catchExceptions = True )
+		self._runPhase( self.Phase.ShutDown )
 
-	def _runForEach( self, objectList, method, catchExceptions = False ):
+	def _safeCall( self, object, methodName, catchExceptions = False ):
 		"""Run \param method for each object in \param objectList
 
 		\note The List objectList must contain MObjects only!"""
 
-		assert method
+		assert isinstance( object, MObject )
 
-		for object in objectList:
-			assert isinstance( object, MObject )
-
-			# check if object implements the specified method
-			assert hasattr( object, method.__name__ )
-
-			# run
-			try:
-				method( object )
-			except Exception as e:
-				text = '''\
+		# run
+		try:
+			method = getattr( object, methodName )
+			method()
+		except Exception as e:
+			text = u'''\
 An error occurred during {0}: "{1}"
-Offending module: "{2}"
-{3}'''.format( method.__name__,
-		str( e ),
-		object.getName(),
-		traceback.format_exc()
+Offending module: "{2}"'''.format( method.__name__,
+		unicode( e ),
+		object.getName()
  )
-				mApp().message( self, text )
+			mApp().error( self, text )
+			mApp().error( self, traceback.format_exc() )
 
-				if not catchExceptions:
-					raise # re-raise
-
-	def prepare( self ):
-		'''Execute the prepare phase for this object.'''
-		pass
-
-	def preFlightCheck( self ):
-		'''Execute the pre-flight check phase for this object.'''
-		pass
-
-	def setup( self ):
-		'''Execute the setup phase for this object.'''
-		pass
-
-	def execute( self ):
-		'''Execute the execute phase for this object.
-		If execute is implemented, it is supposed to execute the pay load of the instructions.
-		Execute is not required, many modules only need to act during the different phases.
-		To implement specific operations between setup and wrap-up, re-implement execute.'''
-		pass
-
-	def wrapup( self ):
-		'''Execute the wrapup phase for this object.'''
-		pass
-
-	def shutDown( self ):
-		'''Execute the shut down phase for this object.'''
-		pass
+			if not catchExceptions:
+				raise # re-raise

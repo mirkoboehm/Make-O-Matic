@@ -19,13 +19,13 @@
 
 from copy import deepcopy, copy
 from mom.core.Exceptions import MomException, ConfigurationError
-from mom.core.MObject import MObject
+from mom.core.InstructionsBase import InstructionsBase
 from mom.core.helpers.GlobalMApp import mApp
 from mom.core.helpers.RunCommand import RunCommand
 from mom.core.helpers.TypeCheckers import check_for_nonempty_string, check_for_list_of_paths
 import os.path
 
-class Plugin( MObject ):
+class Plugin( InstructionsBase ):
 	"""
 	Plugins implement specific functionality, for example to integrate a tool like Doxygen into the build script run.
 	They encapsulate all the integration code for a specific purpose,
@@ -51,11 +51,11 @@ class Plugin( MObject ):
 	_PLUGIN_DATA_DIR = os.path.join( os.path.dirname( __file__ ), "plugins/data" )
 
 	def __init__( self, name = None ):
+		super( Plugin, self ).__init__( name )
 
-		MObject.__init__( self, name )
-		self.setEnabled( True )
 		self.setOptional( False )
 		self.setInstructions( None )
+		self.setEnabled( True )
 		self.__command = None
 		self.__commandArguments = []
 		self.__commandSearchPaths = []
@@ -66,6 +66,12 @@ class Plugin( MObject ):
 		clone.__commandArguments = deepcopy( self.__commandArguments, memo )
 		clone.__commandSearchPaths = deepcopy( self.__commandSearchPaths, memo )
 		return clone
+
+	def setEnabled( self, onOff ):
+		self.__enabled = onOff
+
+	def isEnabled( self ):
+		return self.__enabled
 
 	def setInstructions( self, instructions ):
 		'''Assign this plugin to it's instruction object.
@@ -83,18 +89,6 @@ class Plugin( MObject ):
 	def getPluginType( self ):
 		return "general"
 
-	def performPrepare( self ):
-		'''This message controls the execution of the prepare phase.
-		It should not be overloaded. Overload prepare() instead.'''
-		self.prepare()
-
-	def prepare( self ):
-		'''Perform the prepare phase.
-		In the prepare phase, plug-ins are allowed to manipulate settings, and apply changes to the
-		build tree. The pre-flight check is performed after this phase, so plugins should be prepared
-		that setup errors can happen.'''
-		pass
-
 	def resolveCommand( self ):
 		# if no command specified, do not run check
 		if not self.getCommand():
@@ -103,97 +97,24 @@ class Plugin( MObject ):
 		runCommand = RunCommand( [ self.getCommand() ], searchPaths = self.__commandSearchPaths )
 		runCommand.checkVersion()
 
-	def performPreFlightCheck( self ):
+	def preFlightCheck( self ):
 		'''This method handles the execution of the pre flight check.
 
 		Do not overload this method to adapt it, overload preFlightCheck instead ! '''
 
-		if not self.isEnabled():
-			mApp().debugN( self, 2, 'this plugin is disabled, skipping pre flight check.' )
-			return
-
-		def findCommandAndPreFlightCheck():
+		def findCommand():
 			if self.getCommand():
 				self.resolveCommand()
-			self.preFlightCheck()
 
 		if self.isOptional():
 			try:
-				findCommandAndPreFlightCheck()
+				findCommand()
 			except ( MomException, ConfigurationError ), e:
 				mApp().message( self, 'pre flight check failed, disabling the plugin because it is marked as optional: {0}'.format( e ) )
 				self.setObjectDescription( unicode( e ) )
 				self.setEnabled( False )
 		else:
-			findCommandAndPreFlightCheck()
-
-	def preFlightCheck( self ):
-		"""PreFlightCheck is called after the command line arguments have been passed,
-		but before the build steps are generated.
-
-		Modules should check the setup of the tools they use in this phase.
-
-		If any error occurs that prevents the plugin from working properly, the method should throw a ConfigurationError
-		exception."""
-		pass
-
-	def performSetup( self ):
-		'''This method handles the execution of the setup phase.
-
-		Do not overload this method to adapt it, overload setup instead ! '''
-
-		if not self.isEnabled():
-			mApp().debugN( self, 2, 'this plugin is disabled, not generating any actions.' )
-			return
-
-		self.setup()
-
-	def setup( self ):
-		"""Setup is called after the build steps have been generated, and the command line
-		options have been applied to them.
-
-		It can be used to insert actions into the build steps, for example."""
-		pass
-
-	def wrapUp( self ):
-		"""WrapUp is called when the last step has finished.
-
-		It could be used to publish the reports, for example."""
-		pass
-
-	def performReport( self ):
-		if not self.isEnabled():
-			mApp().debugN( self, 2, 'this plug-in is disabled, not not creating reports' )
-			return
-
-		self.report()
-
-	def report( self ):
-		"""Report is called after the build has finished. Plug-ins that generate reports
-		about the build should overload this method."""
-		pass
-
-	def performNotify( self ):
-		if not self.isEnabled():
-			mApp().debugN( self, 2, 'this plug-in is disabled, skipping notifications' )
-			return
-
-		self.notify()
-
-	def notify( self ):
-		"""Send out notifications about the build process. Plug-ins that, for example, send
-		emails, create chat notifications or talk to remote servers should overload this
-		method."""
-		pass
-
-	def shutDown( self ):
-		"""Shutdown is called right before the build ends.
-
-		It could be used to close files or network connections.
-
-		\note shutDown() is called from the finally block of the build method, so in all normal cases, it will be called
-		before the build script ends."""
-		pass
+			findCommand()
 
 	def _setCommandArguments( self, commandArguments ):
 		check_for_list_of_paths( commandArguments, "Must be a list of strings or PathResolver objects" )
@@ -222,12 +143,6 @@ class Plugin( MObject ):
 	def _setCommand( self, command ):
 		check_for_nonempty_string( command, "The command needs to be a non-empty string." )
 		self.__command = command
-
-	def setEnabled( self, onOff ):
-		self.__enabled = onOff
-
-	def isEnabled( self ):
-		return self.__enabled
 
 	def setOptional( self, onOff ):
 		self.__optional = onOff

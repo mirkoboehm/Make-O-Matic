@@ -17,6 +17,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+from mom.core.loggers import FileLogger
 from mom.core.Build import Build
 from mom.core.Configuration import Configuration
 from mom.core.Exceptions import MomException
@@ -34,8 +35,8 @@ def getBuild( name, minimumMomVersion ):
 		build = Build( minimumMomVersion, name )
 		build.getParameters().parse()
 		mApp().getSettings().set( Settings.ScriptLogLevel, build.getParameters().getDebugLevel() )
-		logger = ConsoleLogger()
-		build.addLogger( logger )
+		build.addLogger( ConsoleLogger() )
+		build.addLogger( FileLogger() )
 		build.addPlugin( XmlReportGenerator() )
 		build.addPlugin( ConsoleReporter() )
 		build.addPlugin( IntegrityChecker() )

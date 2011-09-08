@@ -34,7 +34,7 @@ class ConsoleReporter( Reporter ):
 		converter = XmlReportConverter( report )
 
 		print( " " )
-		print( converter.convertToTextSummary() )
-		print( converter.convertToText() )
+		print( converter.convertToTextSummary().encode( "utf-8" ) )
+		print( converter.convertToText().encode( "utf-8" ) )
 		print( " " ) # empty line
 		self._setIsReportSent( True )

@@ -34,7 +34,7 @@ class MomException( Exception ):
 		# get phase if possible
 		from mom.core.MApplication import MApplication
 		if MApplication.instance:
-			self.__phase = mApp().getPhase()
+			self.__phase = mApp().getCurrentPhase()
 		else:
 			self.__phase = None
 

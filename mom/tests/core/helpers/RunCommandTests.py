@@ -17,25 +17,24 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-import unittest
-from mom.core.helpers.RunCommand import RunCommand
 from mom.core.Exceptions import ConfigurationError
+from mom.core.helpers.RunCommand import RunCommand
 from mom.tests.helpers.MomTestCase import MomTestCase
 import os
 import sys
+import unittest
 
 class RunCommandTests( MomTestCase ):
 
-	THIS_FILE_PATH = os.path.realpath( os.path.dirname( __file__ ) )
-	EXECUTABLE = os.path.join( THIS_FILE_PATH, '..', 'scripts', 'check_return_value_helper.py' )
+	EXECUTABLE = os.path.join( MomTestCase.TEST_DIRECTORY, 'scripts', 'check_return_value_helper.py' )
 
 	def testCheckQMakeVersion( self ):
 		# qmake example
 		qmakeCommand = RunCommand( [ "qmake" ] )
-		self.assertRaises( ConfigurationError, qmakeCommand.checkVersion, expectedReturnCode = 0 ) # qmake returns 154
+		self.assertRaises( ConfigurationError, qmakeCommand.checkVersion, expectedReturnCode = 1 ) # qmake returns 0
 
-		version = qmakeCommand.checkVersion( expectedReturnCode = 154 )
-		self.assertTrue( "Qmake" in version and "Qt" in version )
+		version = qmakeCommand.checkVersion( expectedReturnCode = 0 )
+		self.assertTrue( "QMake version" in version )
 
 	def testCheckCMakeVersion( self ):
 		# cmake example
@@ -47,9 +46,9 @@ class RunCommandTests( MomTestCase ):
 
 	def testCheckReturnCodes( self ):
 		'''Check that RunCommand returns the actual return value of the called process.'''
-		for timeout in [ None, 60 ]:
+		for timeout in [ None, 1 ]:
 			for captureOutput in [ False, True ]:
-				for code in range( 16 ):
+				for code in range( 3 ):
 					cmd = [ sys.executable, RunCommandTests.EXECUTABLE, str( code ) ]
 					runner = RunCommand( cmd, timeoutSeconds = timeout, captureOutput = captureOutput )
 					runner.run()

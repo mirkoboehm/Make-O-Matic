@@ -115,7 +115,6 @@ class Build( MApplication ):
 		for step in self.calculateBuildSequence():
 			self.addStep( step )
 
-
 	def setup( self ):
 		mode = mApp().getSettings().get( Settings.ScriptRunMode )
 		if mode == Settings.RunMode_Build:

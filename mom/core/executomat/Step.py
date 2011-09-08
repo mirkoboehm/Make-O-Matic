@@ -180,9 +180,7 @@ class Step( MObject ):
 		if not mApp().getSettings().get( Settings.ScriptEnableLogEnvironment ):
 			return
 
-		mApp().debugN( self, 5, 'environment before executing step "{0}":'.format( self.getName() ) )
-		for key in os.environ:
-			mApp().debugN( self, 5, '--> {0}: {1}'.format( key, os.environ[key] ) )
+		mApp().debugN( self, 5, 'environment before executing step "{0}": {1}'.format( self.getName(), os.environ ) )
 
 	def execute( self, instructions ):
 		"""Execute the step"""
