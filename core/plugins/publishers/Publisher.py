@@ -25,7 +25,7 @@ from core.helpers.GlobalMApp import mApp
 from core.helpers.TemplateSupport import MomTemplate
 from core.helpers.TypeCheckers import check_for_path_or_none, check_for_string, check_for_list_of_paths
 from core.helpers.XmlReportConverter import ReportFormat
-from urlparse import urljoin
+import urlparse
 import os
 
 class PublisherAction( CopyActionBase ):
@@ -143,7 +143,13 @@ class Publisher( Plugin ):
 
 	def getUploadUrl( self ):
 		subDirs = self.getUploadSubDirs()
-		if subDirs:
-			return urljoin( self.getUploadBaseUrl(), self.getUploadSubDirs() )
+		if not subDirs:
+			return self.getUploadBaseUrl()
 
-		return self.getUploadBaseUrl()
+		baseUrl = self.getUploadBaseUrl()
+
+		# be sure to add a leading slash to the base url, otherwise urljoin is going to drop all chars before the last '/'!
+		if not baseUrl.endswith( '/' ):
+			baseUrl += '/'
+
+		return urlparse.urljoin( baseUrl, self.getUploadSubDirs() )
